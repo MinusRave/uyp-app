@@ -1,5 +1,4 @@
 import { type TestSession } from "wasp/entities";
-import { TEST_CONFIG } from "../test/testConfig";
 
 // Personalization variable types
 export interface PersonalizationVars {

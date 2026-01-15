@@ -112,7 +112,7 @@ export async function sendRetentionEmail(
         // Get personalization data (from cache or build fresh)
         let personalizationData: PersonalizationVars;
         if (session.personalizationData) {
-            personalizationData = session.personalizationData as PersonalizationVars;
+            personalizationData = session.personalizationData as unknown as PersonalizationVars;
         } else {
             const appUrl = process.env.WASP_WEB_CLIENT_URL || "http://localhost:3000";
             personalizationData = buildPersonalizationData(session, appUrl);
