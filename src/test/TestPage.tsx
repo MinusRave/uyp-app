@@ -399,14 +399,34 @@ function UserProfileForm({ onSubmit, isSubmitting }: { onSubmit: (data: any) => 
         partnerGender: "",
         userAgeRange: "",
         partnerAgeRange: "",
-        relationshipStatus: ""
+        relationshipStatus: "",
+        // Relationship history
+        relationshipDuration: "",
+        livingTogether: false,
+        hasChildren: false,
+        previousRelationships: "",
+        previousMarriage: false,
+        majorLifeTransition: "",
+        // Partner behavior (for compatibility)
+        partnerConflictStyle: "",
+        fightFrequency: "",
+        repairFrequency: "",
+        partnerHurtfulBehavior: ""
     });
 
-    const handleChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-        setFormData({ ...formData, [e.target.name]: e.target.value });
+    const handleChange = (e: React.ChangeEvent<HTMLSelectElement | HTMLInputElement | HTMLTextAreaElement>) => {
+        const { name, value, type } = e.target;
+        if (type === 'checkbox') {
+            setFormData({ ...formData, [name]: (e.target as HTMLInputElement).checked });
+        } else {
+            setFormData({ ...formData, [name]: value });
+        }
     };
 
-    const isValid = Object.values(formData).every(v => v !== "");
+    // Only require basic fields for validation
+    const isValid = formData.userGender && formData.partnerGender && formData.userAgeRange &&
+        formData.partnerAgeRange && formData.relationshipStatus && formData.relationshipDuration &&
+        formData.partnerConflictStyle && formData.fightFrequency && formData.repairFrequency;
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
@@ -472,6 +492,82 @@ function UserProfileForm({ onSubmit, isSubmitting }: { onSubmit: (data: any) => 
                             <option value="In Crisis">In Crisis</option>
                             <option value="Recently Separated">Recently Separated</option>
                         </select>
+                    </div>
+
+                    {/* Relationship History */}
+                    <div className="border-t border-border pt-6 mt-6 space-y-4">
+                        <h3 className="font-semibold text-lg">About Your Relationship</h3>
+
+                        <div className="space-y-2">
+                            <label className="text-sm font-medium">How long have you been together?</label>
+                            <select name="relationshipDuration" onChange={handleChange} className="w-full p-2 rounded-md border bg-background" required>
+                                <option value="">Select...</option>
+                                <option value="0-6mo">Less than 6 months</option>
+                                <option value="6mo-2yr">6 months to 2 years</option>
+                                <option value="2-5yr">2 to 5 years</option>
+                                <option value="5-10yr">5 to 10 years</option>
+                                <option value="10+yr">10+ years</option>
+                            </select>
+                        </div>
+
+                        <div className="grid grid-cols-2 gap-4">
+                            <label className="flex items-center gap-2 cursor-pointer">
+                                <input type="checkbox" name="livingTogether" onChange={handleChange} className="h-4 w-4" />
+                                <span className="text-sm">Living together</span>
+                            </label>
+                            <label className="flex items-center gap-2 cursor-pointer">
+                                <input type="checkbox" name="hasChildren" onChange={handleChange} className="h-4 w-4" />
+                                <span className="text-sm">Have children</span>
+                            </label>
+                        </div>
+                    </div>
+
+                    {/* Partner Behavior */}
+                    <div className="border-t border-border pt-6 mt-6 space-y-4">
+                        <h3 className="font-semibold text-lg">About Conflicts</h3>
+
+                        <div className="space-y-2">
+                            <label className="text-sm font-medium">How does your partner typically react during conflicts?</label>
+                            <select name="partnerConflictStyle" onChange={handleChange} className="w-full p-2 rounded-md border bg-background" required>
+                                <option value="">Select...</option>
+                                <option value="withdraws">Withdraws / Goes silent</option>
+                                <option value="engages">Engages / Wants to talk it out</option>
+                                <option value="escalates">Escalates / Gets more intense</option>
+                                <option value="deflects">Deflects / Changes subject</option>
+                            </select>
+                        </div>
+
+                        <div className="space-y-2">
+                            <label className="text-sm font-medium">How often do you have conflicts?</label>
+                            <select name="fightFrequency" onChange={handleChange} className="w-full p-2 rounded-md border bg-background" required>
+                                <option value="">Select...</option>
+                                <option value="daily">Daily</option>
+                                <option value="weekly">Weekly</option>
+                                <option value="monthly">Monthly</option>
+                                <option value="rarely">Rarely</option>
+                            </select>
+                        </div>
+
+                        <div className="space-y-2">
+                            <label className="text-sm font-medium">How often do you successfully repair after conflicts?</label>
+                            <select name="repairFrequency" onChange={handleChange} className="w-full p-2 rounded-md border bg-background" required>
+                                <option value="">Select...</option>
+                                <option value="always">Always - We always make up</option>
+                                <option value="sometimes">Sometimes - It depends</option>
+                                <option value="rarely">Rarely - We stay distant</option>
+                                <option value="never">Never - Issues pile up</option>
+                            </select>
+                        </div>
+
+                        <div className="space-y-2">
+                            <label className="text-sm font-medium">What does your partner do that hurts you most? (Optional)</label>
+                            <textarea
+                                name="partnerHurtfulBehavior"
+                                onChange={handleChange}
+                                className="w-full min-h-[80px] p-3 border border-border rounded-md resize-none focus:outline-none focus:ring-2 focus:ring-primary"
+                                placeholder="e.g., Goes silent for days, dismisses my feelings, brings up past mistakes..."
+                            />
+                        </div>
                     </div>
 
                     <button

@@ -286,7 +286,7 @@ export function calculateScore(answers: Record<string, any>, userProfile?: any):
     });
 
     // Calculate Compatibility Score (if partner data available)
-    let compatibilityScore = undefined;
+    let compatibilityScore: any = undefined;
     if (userProfile?.partnerConflictStyle || userProfile?.fightFrequency || userProfile?.repairFrequency) {
         compatibilityScore = calculateCompatibility({
             userDominantLens: dominantLens,

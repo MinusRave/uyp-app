@@ -85,6 +85,24 @@ model TestSession {
   fightFrequency          String?  // "daily" | "weekly" | "monthly" | "rarely"
   repairFrequency         String?  // "always" | "sometimes" | "rarely" | "never"
   partnerHurtfulBehavior  String?  // open-ended description
+
+  // Retention Email Tracking
+  emailSequenceType        String?   // "test_abandonment" | "teaser_viewer" | "checkout_abandonment"
+  retentionEmailStage      Int       @default(0)
+  lastRetentionEmailSentAt DateTime?
+  emailSentHistory         Json      @default("[]") // Array of {stage, sentAt, opened, clicked}
+  
+  // Unsubscribe tracking
+  unsubscribedFromEmails   Boolean   @default(false)
+  unsubscribedAt           DateTime?
+  
+  // Checkout tracking
+  stripeCheckoutSessionId  String?
+  checkoutStartedAt        DateTime?
+  checkoutAbandonedAt      DateTime?
+  
+  // Personalization cache (pre-computed variables for emails)
+  personalizationData      Json?
 }
 
 

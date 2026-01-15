@@ -8,6 +8,7 @@ import { PDFDownloadLink } from "@react-pdf/renderer";
 import { CheatSheetPDF } from "./downloads/CheatSheetPDF";
 import { WorkbookPDF } from "./downloads/WorkbookPDF";
 import { OnboardingWizard } from "./components/OnboardingWizard";
+import { CompatibilityCard } from "./components/CompatibilityCard";
 
 // Helper Interface for Report Data (mirrors backend structure)
 interface FullReportData {
@@ -49,6 +50,19 @@ interface FullReportData {
     // NEW SECTIONS
     scripts: { dimension: string; inTheMoment: string; repair: string; }[];
     partnerTranslations: { dimension: string; text: string; }[];
+
+    // NEW: Compatibility
+    compatibility?: {
+        overallScore: number;
+        breakdown: {
+            dimension: string;
+            score: number;
+            status: string;
+            insight: string;
+        }[];
+        riskLevel: string;
+        topRecommendation: string;
+    };
 
     questions: { dimension: string; questions: string[]; }[];
     closing: string;
@@ -197,9 +211,20 @@ export default function FullReportPage() {
                     </div>
                 </section>
 
+                {/* 2. NEW: Relationship Health (Compatibility) */}
+                {report.compatibility && (
+                    <section className="mb-16">
+                        <div className="flex items-center gap-2 mb-6">
+                            <Heart className="text-red-500" />
+                            <h2 className="text-sm font-bold uppercase tracking-wider text-muted-foreground">02. Relationship Health</h2>
+                        </div>
+                        <CompatibilityCard data={report.compatibility} />
+                    </section>
+                )}
+
                 {/* 3. Primary Lens & State */}
                 <section className="bg-primary/5 rounded-3xl p-8 md:p-10 border border-primary/10">
-                    <h2 className="text-sm font-bold uppercase tracking-wider text-primary mb-4">02. Your Dominant Lens</h2>
+                    <h2 className="text-sm font-bold uppercase tracking-wider text-primary mb-4">03. Your Dominant Lens</h2>
 
                     <div className="mb-8">
                         <h3 className="text-4xl font-extrabold mb-2 capitalize text-primary">{report.primaryLens.lensName.replace('_', ' ')}</h3>
@@ -238,7 +263,7 @@ export default function FullReportPage() {
                     <section id="analytics" className="scroll-mt-24">
                         <div className="flex items-center gap-2 mb-4">
                             <BarChart3 className="text-primary" />
-                            <h2 className="text-sm font-bold uppercase tracking-wider text-muted-foreground">03. The Distortion Graph</h2>
+                            <h2 className="text-sm font-bold uppercase tracking-wider text-muted-foreground">04. The Distortion Graph</h2>
                         </div>
                         <h3 className="text-2xl md:text-3xl font-bold mb-8">What You Feel vs. What Is Real</h3>
                         <div className="bg-card p-6 md:p-8 rounded-3xl border border-border shadow-sm">
@@ -255,7 +280,7 @@ export default function FullReportPage() {
 
                 {/* 5. NEW: The Care Package (Downloads) */}
                 <section id="downloads">
-                    <h2 className="text-sm font-bold uppercase tracking-wider text-muted-foreground mb-4">04. Your Care Package</h2>
+                    <h2 className="text-sm font-bold uppercase tracking-wider text-muted-foreground mb-4">05. Your Care Package</h2>
                     <h3 className="text-3xl font-bold mb-8">Digital Downloads</h3>
 
                     <div className="grid md:grid-cols-2 gap-6">
@@ -423,11 +448,11 @@ export default function FullReportPage() {
                     </div>
                 </section>
 
-                {/* NEW: The Translator Tool */}
+                {/* 7. NEW: The Translator Tool */}
                 <section>
                     <div className="flex items-center gap-2 mb-4">
                         <MessageCircle className="text-green-500" />
-                        <h2 className="text-sm font-bold uppercase tracking-wider text-muted-foreground">04. The Translator</h2>
+                        <h2 className="text-sm font-bold uppercase tracking-wider text-muted-foreground">07. The Translator</h2>
                     </div>
                     <TranslatorTool
                         myLens={report.snapshot.dominantLens}
@@ -438,7 +463,7 @@ export default function FullReportPage() {
 
                 {/* 6. Integration Questions */}
                 <section className="border-t border-border pt-12">
-                    <h2 className="text-sm font-bold uppercase tracking-wider text-muted-foreground mb-4">05. Deepening</h2>
+                    <h2 className="text-sm font-bold uppercase tracking-wider text-muted-foreground mb-4">07. Deepening</h2>
                     <h3 className="text-2xl font-bold mb-6">Questions for Clarity</h3>
                     <div className="grid gap-4 md:grid-cols-2">
                         {report.questions.map((qGroup, i) => (

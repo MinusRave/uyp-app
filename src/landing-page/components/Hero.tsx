@@ -1,6 +1,6 @@
 import { Link as WaspRouterLink, routes } from "wasp/client/router";
 import { Button } from "../../client/components/ui/button";
-import heroImage from "../../client/static/hero.png";
+import heroImage from "../../client/static/hero-couple-silence.png";
 
 export default function Hero() {
   return (
@@ -19,7 +19,7 @@ export default function Hero() {
             <div className="mt-10 flex items-center gap-x-6">
               <Button size="lg" className="font-bold text-lg px-8 py-6 rounded-xl shadow-[0_4px_14px_0_rgba(0,0,0,0.1)] transition-all hover:scale-105" asChild>
                 <WaspRouterLink to={routes.TestRoute.to}>
-                  Get My Clarity Test <span aria-hidden="true" className="ml-2">→</span>
+                  See What's Really Happening <span aria-hidden="true" className="ml-2">→</span>
                 </WaspRouterLink>
               </Button>
             </div>
@@ -31,9 +31,9 @@ export default function Hero() {
           <div className="relative">
             <img
               src={heroImage}
-              alt="App screenshot"
+              alt="Couple sitting apart in exhausted silence, representing unspoken relationship distance"
               width={1000}
-              height={530}
+              height={1000}
               loading="lazy"
               className="relative rounded-xl shadow-2xl ring-1 ring-slate-900/10"
             />

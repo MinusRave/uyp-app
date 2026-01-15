@@ -50,16 +50,18 @@ export default function App() {
   useEffect(() => {
     // Initialize Meta Pixel
     const pixelId = import.meta.env.REACT_APP_META_PIXEL_ID;
-    if (pixelId && window.fbq) {
-      window.fbq("init", pixelId);
+    if (pixelId) {
+      import("../analytics/pixel").then(({ initPixel }) => {
+        initPixel(pixelId);
+      });
     }
   }, []);
 
   useEffect(() => {
     // Track PageView on route change
-    if (window.fbq) {
-      window.fbq("track", "PageView");
-    }
+    import("../analytics/pixel").then(({ trackPixelEvent }) => {
+      trackPixelEvent("PageView");
+    });
   }, [location.pathname]);
 
   return (

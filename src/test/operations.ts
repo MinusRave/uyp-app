@@ -13,10 +13,22 @@ import { sendMagicLink } from "../auth/magicLink";
 type CaptureLeadArgs = { sessionId: string; email: string };
 
 export const captureLead = async ({ sessionId, email }: CaptureLeadArgs, context: any) => {
+    const session = await context.entities.TestSession.findUnique({
+        where: { id: sessionId },
+    });
+
+    if (!session) {
+        throw new HttpError(404, "Session not found");
+    }
+
     // 1. Update TestSession with email
     await context.entities.TestSession.update({
         where: { id: sessionId },
-        data: { email }
+        data: {
+            email,
+            // Set email sequence type for test abandonment if not completed
+            emailSequenceType: !session.isCompleted ? "test_abandonment" : undefined,
+        }
     });
 
     // 2. Send Magic Link
@@ -185,14 +197,35 @@ export const completeTest: CompleteTest<CompleteTestArgs, void> = async (
         answersMap[parseInt(k)] = answers[k].score;
     });
 
-    // Calculate detailed scores
-    const scoreResult = calculateScore(answersMap);
+    // Build userProfile object from session data
+    const userProfile = {
+        userGender: session.userGender,
+        partnerGender: session.partnerGender,
+        userAgeRange: session.userAgeRange,
+        partnerAgeRange: session.partnerAgeRange,
+        relationshipStatus: session.relationshipStatus,
+        relationshipDuration: session.relationshipDuration,
+        livingTogether: session.livingTogether,
+        hasChildren: session.hasChildren,
+        previousRelationships: session.previousRelationships,
+        previousMarriage: session.previousMarriage,
+        majorLifeTransition: session.majorLifeTransition,
+        partnerConflictStyle: session.partnerConflictStyle,
+        fightFrequency: session.fightFrequency,
+        repairFrequency: session.repairFrequency,
+        partnerHurtfulBehavior: session.partnerHurtfulBehavior
+    };
+
+    // Calculate detailed scores WITH user profile data
+    const scoreResult = calculateScore(answersMap, userProfile);
 
     await context.entities.TestSession.update({
         where: { id: sessionId },
         data: {
             isCompleted: true,
             scores: scoreResult as any,
+            // Set email sequence type for teaser viewers (if not already paid)
+            emailSequenceType: !session.isPaid ? "teaser_viewer" : undefined,
         },
     });
 };

@@ -114,8 +114,18 @@ export const generateExecutiveAnalysis: GenerateExecutiveAnalysis<ExecutiveAnaly
         `;
     }
 
+    // Add Partner's Red Flags section
+    if (args.userContext) {
+        prompt += `
+    4. **Your Partner's Red Flags:**
+       Analyze the conflict and identify 2-3 specific behaviors your partner did that hurt you.
+       For each: Validate it's hurtful, explain the nervous system reason, provide the solution.
+       Format: "✅ **[Behavior]** - Yes, this IS [behavior]. Here's why they did it... Here's how to interrupt it..."
+        `;
+    }
+
     prompt += `
-    4. **The Path Forward:** One powerful sentence on the shift they need to make.
+    5. **The Path Forward:** One powerful sentence on the shift they need to make.
 
     TONE:
     Compassionate, direct, profound. No fluff. No "It seems like". Use "You".

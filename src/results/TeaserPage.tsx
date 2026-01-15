@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { Lock, CheckCircle2, Loader2, ArrowRight, Sparkles, MessageCircle, MessageSquare, FileText, Zap } from "lucide-react";
+import { Lock, CheckCircle2, Loader2, ArrowRight, Sparkles, MessageCircle, MessageSquare, FileText, Zap, Heart, Activity, AlertTriangle, Download } from "lucide-react";
 import { createCheckoutSession, getTestSession, captureLead, claimSession } from "wasp/client/operations";
 import { LensRadar } from "../components/LensRadar";
 import { useQuery } from "wasp/client/operations";
@@ -150,6 +150,35 @@ export default function TeaserPage() {
                     </div>
                 </section>
 
+                {/* NEW: Compatibility Pulse Teaser */}
+                <section className="bg-gradient-to-br from-red-50 to-orange-50 dark:from-red-900/10 dark:to-orange-900/10 p-8 rounded-3xl border border-red-100 dark:border-red-800/20 relative overflow-hidden">
+                    <div className="absolute top-0 right-0 p-4 opacity-5">
+                        <Activity size={120} />
+                    </div>
+                    <div className="relative z-10">
+                        <div className="inline-flex items-center gap-2 bg-white dark:bg-red-900/40 text-red-700 dark:text-red-300 px-3 py-1 rounded-full text-xs font-bold uppercase mb-4 shadow-sm">
+                            <Heart size={12} /> Relationship Health Analysis
+                        </div>
+                        <h3 className="font-bold text-2xl mb-4">How Compatible Are You Really?</h3>
+
+                        <div className="flex items-center gap-6 mb-6">
+                            <div className="bg-white dark:bg-red-900/20 rounded-2xl p-6 border-2 border-red-200 dark:border-red-800 text-center min-w-[120px]">
+                                <div className="text-4xl font-black text-red-600 dark:text-red-400 blur-sm select-none">??%</div>
+                                <div className="text-xs text-muted-foreground mt-2 font-medium">Your Score</div>
+                            </div>
+                            <div className="flex-1">
+                                <p className="text-lg font-medium leading-relaxed">
+                                    We analyzed how your nervous systems interact under stress. Your <span className="font-bold text-red-600 dark:text-red-400">Compatibility Pulse</span> reveals 3 critical risk factors and your #1 repair opportunity.
+                                </p>
+                            </div>
+                        </div>
+
+                        <div className="mt-6 flex items-center gap-2 text-sm text-red-600 font-bold bg-white/50 w-fit px-3 py-2 rounded-lg">
+                            <Lock size={14} /> Full Breakdown Locked
+                        </div>
+                    </div>
+                </section>
+
                 {/* 4. NEW: Conflict Teaser */}
                 {conflictDescription && (
                     <section className="bg-gradient-to-br from-purple-50 to-indigo-50 dark:from-purple-900/10 dark:to-indigo-900/10 p-8 rounded-3xl border border-purple-100 dark:border-purple-800/20 relative overflow-hidden">
@@ -167,6 +196,11 @@ export default function TeaserPage() {
                             <p className="text-lg font-medium leading-relaxed">
                                 We've analyzed exactly why this moment triggered you and created a custom <span className="font-bold underline decoration-purple-400 decoration-2">Script Rewrite</span> to show you what you *could* have said to stop the spiral instantly.
                             </p>
+                            <div className="mt-4 p-4 bg-white/60 dark:bg-purple-900/20 rounded-xl border border-purple-200 dark:border-purple-700">
+                                <p className="text-base font-medium">
+                                    <span className="font-bold text-purple-700 dark:text-purple-300">Plus:</span> We identified 2-3 specific behaviors your partner did that hurt you—and we're not sugarcoating it. You'll see <span className="underline decoration-purple-400">validation FIRST</span>, then the nervous system explanation.
+                                </p>
+                            </div>
                             <div className="mt-6 flex items-center gap-2 text-sm text-purple-600 font-bold bg-white/50 w-fit px-3 py-2 rounded-lg">
                                 <Lock size={14} /> Analysis Locked inside Full Report
                             </div>
@@ -180,8 +214,8 @@ export default function TeaserPage() {
                     <p className="text-muted-foreground mb-8">We found a critical misalignment in how you perceive "Support".</p>
 
                     <div className="blur-sm select-none opacity-50 pointer-events-none mb-4">
-                        <p className="text-lg">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.</p>
-                        <p>Ut enim ad minim veniam, quis nostrud exercitation.</p>
+                        <p className="text-lg">You expressed a need for emotional validation, but your partner's default response is often practical problem-solving.</p>
+                        <p>This gap makes you feel unheard despite their best intentions to help.</p>
                     </div>
 
                     <div className="absolute inset-0 bg-gradient-to-t from-background via-transparent to-transparent z-10"></div>
@@ -192,69 +226,103 @@ export default function TeaserPage() {
                     </div>
                 </section>
 
-                {/* 6. THE VALUE STACK (Offer) */}
+                {/* 6. WHAT YOU GET (Honest Value Presentation) */}
                 <section className="">
-                    <h3 className="font-bold text-3xl mb-8 text-center">Your Intervention Plan</h3>
+                    <h3 className="font-bold text-3xl mb-8 text-center">What You Get for $15</h3>
                     <div className="bg-card rounded-3xl border border-border shadow-lg overflow-hidden">
-                        {/* Header */}
-                        <div className="bg-primary/5 p-6 border-b border-border text-center">
-                            <h4 className="font-bold text-xl">The "Understand Your Partner" Protocol</h4>
-                            <p className="text-muted-foreground">Everything you need to fix the disconnect today.</p>
-                        </div>
 
                         {/* Stack Items */}
                         <div className="divide-y divide-border">
-                            {/* Item 1 */}
-                            <div className="p-6 flex gap-4 items-start">
-                                <div className="bg-blue-100 dark:bg-blue-900/30 p-2 rounded-lg text-blue-600 shrink-0">
-                                    <FileText size={24} />
+                            {/* Item 1: Complete Analysis */}
+                            <div className="p-8">
+                                <div className="flex gap-4 items-start mb-4">
+                                    <div className="bg-primary/10 p-3 rounded-xl text-primary shrink-0">
+                                        <Sparkles size={28} />
+                                    </div>
+                                    <div className="flex-1">
+                                        <h5 className="font-bold text-2xl mb-2">Your Complete Relationship Analysis</h5>
+                                        <p className="text-muted-foreground mb-4">Everything you need to understand your patterns and fix the disconnect.</p>
+                                    </div>
                                 </div>
-                                <div>
-                                    <h5 className="font-bold text-lg">The Full 20-Page Assessment</h5>
-                                    <p className="text-sm text-muted-foreground">Detailed breakdown of your nervous system patterns.</p>
+                                <div className="grid md:grid-cols-2 gap-3 pl-16">
+                                    <div className="flex items-start gap-2">
+                                        <CheckCircle2 size={16} className="text-primary mt-1 shrink-0" />
+                                        <span className="text-sm">AI-powered "Mirror" psychological profile</span>
+                                    </div>
+                                    <div className="flex items-start gap-2">
+                                        <CheckCircle2 size={16} className="text-primary mt-1 shrink-0" />
+                                        <span className="text-sm">Compatibility score with risk assessment</span>
+                                    </div>
+                                    <div className="flex items-start gap-2">
+                                        <CheckCircle2 size={16} className="text-primary mt-1 shrink-0" />
+                                        <span className="text-sm">Partner's red flags (validation-first)</span>
+                                    </div>
+                                    <div className="flex items-start gap-2">
+                                        <CheckCircle2 size={16} className="text-primary mt-1 shrink-0" />
+                                        <span className="text-sm">Pattern decoder & blind spot analysis</span>
+                                    </div>
+                                    <div className="flex items-start gap-2">
+                                        <CheckCircle2 size={16} className="text-primary mt-1 shrink-0" />
+                                        <span className="text-sm">Visual distortion graphs</span>
+                                    </div>
+                                    <div className="flex items-start gap-2">
+                                        <CheckCircle2 size={16} className="text-primary mt-1 shrink-0" />
+                                        <span className="text-sm">Custom intervention scripts</span>
+                                    </div>
                                 </div>
-                                <div className="ml-auto font-bold text-muted-foreground line-through">$49</div>
                             </div>
-                            {/* Item 2 */}
-                            <div className="p-6 flex gap-4 items-start bg-purple-50/50 dark:bg-purple-900/10">
-                                <div className="bg-purple-100 dark:bg-purple-900/30 p-2 rounded-lg text-purple-600 shrink-0">
-                                    <Sparkles size={24} />
+
+                            {/* Item 2: Interactive Tools */}
+                            <div className="p-8 bg-green-50/30 dark:bg-green-900/10">
+                                <div className="flex gap-4 items-start">
+                                    <div className="bg-green-100 dark:bg-green-900/30 p-3 rounded-xl text-green-600 shrink-0">
+                                        <MessageCircle size={28} />
+                                    </div>
+                                    <div className="flex-1">
+                                        <h5 className="font-bold text-2xl mb-2">Interactive Communication Tools</h5>
+                                        <p className="text-muted-foreground mb-4">Real-time help when you need it most.</p>
+                                        <div className="space-y-2">
+                                            <div className="flex items-start gap-2">
+                                                <CheckCircle2 size={16} className="text-green-600 mt-1 shrink-0" />
+                                                <span className="text-sm">The Translator: AI-powered message rewriter</span>
+                                            </div>
+                                            <div className="flex items-start gap-2">
+                                                <CheckCircle2 size={16} className="text-green-600 mt-1 shrink-0" />
+                                                <span className="text-sm">De-escalation toolkit with visual cards</span>
+                                            </div>
+                                        </div>
+                                    </div>
                                 </div>
-                                <div>
-                                    <h5 className="font-bold text-lg">The "Mirror" Executive Profile</h5>
-                                    <p className="text-sm text-muted-foreground">Deep psychological synthesis of your personality.</p>
-                                    <span className="text-xs bg-purple-200 dark:bg-purple-800 text-purple-800 dark:text-purple-200 px-2 py-0.5 rounded font-bold">AI POWERED</span>
-                                </div>
-                                <div className="ml-auto font-bold text-muted-foreground line-through">$29</div>
                             </div>
-                            {/* Item 3 */}
-                            <div className="p-6 flex gap-4 items-start">
-                                <div className="bg-green-100 dark:bg-green-900/30 p-2 rounded-lg text-green-600 shrink-0">
-                                    <MessageCircle size={24} />
+
+                            {/* Item 3: Downloadable Resources */}
+                            <div className="p-8">
+                                <div className="flex gap-4 items-start">
+                                    <div className="bg-yellow-100 dark:bg-yellow-900/30 p-3 rounded-xl text-yellow-600 shrink-0">
+                                        <Download size={28} />
+                                    </div>
+                                    <div className="flex-1">
+                                        <h5 className="font-bold text-2xl mb-2">Downloadable Resources</h5>
+                                        <p className="text-muted-foreground mb-4">Take it with you, share with your partner.</p>
+                                        <div className="space-y-2">
+                                            <div className="flex items-start gap-2">
+                                                <CheckCircle2 size={16} className="text-yellow-600 mt-1 shrink-0" />
+                                                <span className="text-sm">Cheat Sheet PDF (for your fridge)</span>
+                                            </div>
+                                            <div className="flex items-start gap-2">
+                                                <CheckCircle2 size={16} className="text-yellow-600 mt-1 shrink-0" />
+                                                <span className="text-sm">Alignment Workbook PDF</span>
+                                            </div>
+                                        </div>
+                                    </div>
                                 </div>
-                                <div>
-                                    <h5 className="font-bold text-lg">The Translator Tool</h5>
-                                    <p className="text-sm text-muted-foreground">Interactive tool to rewrite your texts safely.</p>
-                                </div>
-                                <div className="ml-auto font-bold text-muted-foreground line-through">$19</div>
-                            </div>
-                            {/* Item 4 */}
-                            <div className="p-6 flex gap-4 items-start bg-yellow-50/50 dark:bg-yellow-900/10">
-                                <div className="bg-yellow-100 dark:bg-yellow-900/30 p-2 rounded-lg text-yellow-600 shrink-0">
-                                    <Zap size={24} />
-                                </div>
-                                <div>
-                                    <h5 className="font-bold text-lg">Bonus: The Care Package</h5>
-                                    <p className="text-sm text-muted-foreground">Fridge Sheet & Alignment Workbook.</p>
-                                </div>
-                                <div className="ml-auto font-bold text-green-600">FREE</div>
                             </div>
                         </div>
 
-                        {/* Total */}
-                        <div className="bg-muted/30 p-6 flex justify-between items-center">
-                            <span className="font-bold text-muted-foreground">Total Value</span>
-                            <span className="font-extrabold text-2xl line-through decoration-destructive/50 decoration-2">$97.00</span>
+                        {/* Bottom CTA */}
+                        <div className="bg-primary/5 p-6 text-center border-t border-border">
+                            <p className="text-sm text-muted-foreground mb-2">One-time payment • Instant access • No subscription</p>
+                            <p className="font-bold text-lg">Everything above for just <span className="text-primary text-2xl">$15</span></p>
                         </div>
                     </div>
                 </section>
@@ -262,11 +330,8 @@ export default function TeaserPage() {
                 {/* 7. Final Pricing & CTA */}
                 <section className="text-center pb-12">
                     <div className="bg-secondary/5 rounded-3xl p-8 border-2 border-primary/20 relative overflow-hidden max-w-lg mx-auto shadow-2xl">
-                        <div className="absolute top-0 right-0 bg-primary text-primary-foreground text-xs font-bold px-3 py-1 rounded-bl-xl uppercase tracking-wider">
-                            85% OFF
-                        </div>
 
-                        <p className="text-lg font-medium mb-1">Get the full protocol today for just</p>
+                        <p className="text-lg font-medium mb-1">Get instant access for just</p>
                         <div className="text-5xl font-extrabold text-primary mb-2">$15</div>
                         <p className="text-xs text-muted-foreground mb-8">One-time payment. No subscription.</p>
 

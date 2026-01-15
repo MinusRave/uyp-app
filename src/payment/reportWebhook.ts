@@ -42,7 +42,11 @@ export const stripeWebhook = async (
       console.log(`Unlocking session: ${metadata.testSessionId}`);
       await context.entities.TestSession.update({
         where: { id: metadata.testSessionId },
-        data: { isPaid: true }
+        data: {
+          isPaid: true,
+          // Clear email sequence to stop retention emails
+          emailSequenceType: null,
+        }
       });
     }
   }

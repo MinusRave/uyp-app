@@ -31,6 +31,13 @@ declare global {
     }
 }
 
+
+export const initPixel = (pixelId: string) => {
+    if (typeof window !== 'undefined' && window.fbq) {
+        window.fbq('init', pixelId);
+    }
+};
+
 export const trackPixelEvent = (eventName: PixelEventName, data?: PixelEventData) => {
     if (typeof window !== 'undefined' && window.fbq) {
         window.fbq('track', eventName, data);

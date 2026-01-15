@@ -79,7 +79,7 @@ const getConfig = () => {
                 console.error(error);
               }
             },
-            onReject: () => {},
+            onReject: () => { },
           },
         },
       },
@@ -96,10 +96,9 @@ const getConfig = () => {
             acceptAllBtn: "Accept all",
             acceptNecessaryBtn: "Reject all",
             // showPreferencesBtn: 'Manage Individual preferences', // (OPTIONAL) Activates the preferences modal
-            // TODO: Add your own privacy policy and terms and conditions links below.
             footer: `
-            <a href="<your-url-here>" target="_blank">Privacy Policy</a>
-            <a href="<your-url-here>" target="_blank">Terms and Conditions</a>
+            <a href="/privacy-policy" target="_blank">Privacy Policy</a>
+            <a href="/terms-of-service" target="_blank">Terms and Conditions</a>
                     `,
           },
           // The showPreferencesBtn activates this modal to manage individual preferences https://cookieconsent.orestbida.com/reference/configuration-reference.html#translation-preferencesmodal

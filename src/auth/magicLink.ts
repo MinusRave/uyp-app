@@ -39,9 +39,8 @@ export const sendMagicLink = async (email: string, context: any) => {
     });
 
     if (user) {
-        console.log("[sendMagicLink] Existing user found:", user.id);
-        if (user.auth && user.auth.identities) {
-            console.log("[sendMagicLink] Auth Identities:", JSON.stringify(user.auth.identities, null, 2));
+        if (user) {
+            // Log existing user check specific details only if debug encoding check required
         }
     }
 
@@ -98,7 +97,7 @@ export const requestMagicLink = async ({ email }: { email: string }, context: an
 export const verifyMagicLink = async (req: any, res: any, context: any) => {
     const token = req.query.token as string;
 
-    console.log("[verifyMagicLink] Verifying token:", token);
+
 
     if (!token) {
         return res.status(400).send("Missing token");
@@ -125,7 +124,7 @@ export const verifyMagicLink = async (req: any, res: any, context: any) => {
         return res.status(403).send("Token expired");
     }
 
-    console.log("[verifyMagicLink] Token valid for email:", magicLinkToken.email);
+
 
     // 2. Consume Token
     await context.entities.MagicLinkToken.update({
@@ -183,7 +182,7 @@ export const verifyMagicLink = async (req: any, res: any, context: any) => {
             }
         });
 
-        console.log("[verifyMagicLink] Password updated to token, redirecting to client");
+
 
         // Redirect to client for automatic login
         const clientUrl = process.env.WASP_WEB_CLIENT_URL || "http://localhost:3000";

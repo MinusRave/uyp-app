@@ -87,14 +87,10 @@ app OpenSaaS {
   },
 
   emailSender: {
-    // NOTE: "Dummy" provider is just for local development purposes.
-    //   Make sure to check the server logs for the email confirmation url (it will not be sent to an address)!
-    //   Once you are ready for production, switch to e.g. "SendGrid" or "Mailgun" providers. Check out https://docs.opensaas.sh/guides/email-sending/ .
-    provider: Dummy,
+    provider: SendGrid,
     defaultFrom: {
-      name: "Open SaaS App",
-      // When using a real provider, e.g. SendGrid, you must use the same email address that you configured your account to send out emails with!
-      email: "me@example.com"
+      name: "UnderstandYourPartner",
+      email: "noreply@understandyourpartner.com"
     },
   },
 }
@@ -175,6 +171,23 @@ page EmergencyPage {
 route PrivacyPolicyRoute { path: "/privacy-policy", to: PrivacyPolicyPage }
 page PrivacyPolicyPage {
   component: import PrivacyPolicyPage from "@src/privacy/PrivacyPolicyPage"
+}
+
+route TermsOfServiceRoute { path: "/terms-of-service", to: TermsOfServicePage }
+page TermsOfServicePage {
+  component: import TermsOfServicePage from "@src/legal/TermsOfServicePage"
+}
+
+route UnsubscribeRoute { path: "/unsubscribe", to: UnsubscribePage }
+page UnsubscribePage {
+  component: import UnsubscribePage from "@src/client/UnsubscribePage"
+}
+
+api unsubscribeApi {
+  fn: import { handleUnsubscribe } from "@src/server/email/unsubscribe",
+  entities: [TestSession],
+  middlewareConfigFn: import { unsubscribeMiddlewareConfigFn } from "@src/server/email/unsubscribe",
+  httpRoute: (GET, "/api/unsubscribe")
 }
 
 action startTest {
@@ -356,6 +369,17 @@ job dailyStatsJob {
     // cron: "* * * * *" // every minute. useful for debugging
   },
   entities: [User, DailyStats, Logs, PageViewSource]
+}
+
+job retentionEmailJob {
+  executor: PgBoss,
+  perform: {
+    fn: import { sendRetentionEmails } from "@src/server/jobs/sendRetentionEmails"
+  },
+  schedule: {
+    cron: "*/15 * * * *" // every 15 minutes
+  },
+  entities: [TestSession]
 }
 //#endregion
 
