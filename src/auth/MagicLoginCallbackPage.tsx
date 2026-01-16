@@ -7,6 +7,7 @@ export default function MagicLoginCallbackPage() {
     const navigate = useNavigate();
     const token = searchParams.get("token"); // This is actually the OTP/Password passed from server
     const email = searchParams.get("email");
+    const redirectTo = searchParams.get("redirectTo") || "/";
 
     const [status, setStatus] = useState("Verifying...");
     const [error, setError] = useState("");
@@ -30,7 +31,7 @@ export default function MagicLoginCallbackPage() {
 
                 // Give a moment for the auth state to update, then navigate
                 setTimeout(() => {
-                    navigate("/");
+                    navigate(redirectTo);
                 }, 500);
             } catch (e: any) {
                 // Login failed - this should NOT happen anymore since server updates password

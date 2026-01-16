@@ -79,7 +79,7 @@ export const sendMagicLink = async (email: string, context: any) => {
     });
 
     // 4. Send Email
-    const apiUrl = process.env.WASP_API_URL || "http://localhost:3001";
+    const apiUrl = process.env.WASP_SERVER_URL || "http://localhost:3001";
     const link = `${apiUrl}/auth/magic-login-callback?token=${token}`;
 
     await emailSender.send({
@@ -184,9 +184,26 @@ export const verifyMagicLink = async (req: any, res: any, context: any) => {
 
 
 
+        // 5. Determine Redirect Path based on latest session
+        let redirectPath = "/test"; // Default: start/resume test
+
+        const latestSession = await context.entities.TestSession.findFirst({
+            where: { userId: user.id },
+            orderBy: { createdAt: 'desc' }
+        });
+
+        if (latestSession) {
+            if (latestSession.isPaid) {
+                redirectPath = "/report";
+            } else if (latestSession.isCompleted) {
+                redirectPath = "/results"; // Teaser/Paywall
+            }
+            // If neither, it stays "/test" which auto-resumes
+        }
+
         // Redirect to client for automatic login
         const clientUrl = process.env.WASP_WEB_CLIENT_URL || "http://localhost:3000";
-        res.redirect(`${clientUrl}/auth/magic-login-callback?email=${encodeURIComponent(user.email)}&token=${token}`);
+        res.redirect(`${clientUrl}/auth/magic-login-callback?email=${encodeURIComponent(user.email)}&token=${token}&redirectTo=${encodeURIComponent(redirectPath)}`);
     } catch (error: any) {
         console.error("[verifyMagicLink] Password update failed:", error);
         return res.status(500).send("Failed to authenticate");

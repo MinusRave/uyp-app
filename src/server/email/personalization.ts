@@ -6,8 +6,6 @@ export interface PersonalizationVars {
     current_question: number;
     dominant_lens: string;
     dominant_dimension: string;
-    dominant_score: number;
-    average_score: number;
     q4_answer: string;
     q11_answer: string;
     q14_answer: string;
@@ -77,19 +75,6 @@ export function getLensDescription(dominantLens: string): string {
     return LENS_DESCRIPTIONS[dominantLens] || "You have a unique interpretive pattern.";
 }
 
-// Calculate average score for a dimension (for comparison in emails)
-export function getAverageScore(dimension: string): number {
-    // These are population averages - adjust based on actual data
-    const averages: Record<string, number> = {
-        silence: 55,
-        conflict: 58,
-        intentions: 52,
-        reassurance: 60,
-        repair: 54,
-    };
-    return averages[dimension] || 55;
-}
-
 // Main personalization data builder
 export function buildPersonalizationData(
     session: TestSession,
@@ -105,7 +90,6 @@ export function buildPersonalizationData(
     // Get dominant lens from scores
     const dominant_lens = scores?.dominantLens || "silence";
     const dominant_dimension = dominant_lens;
-    const dominant_score = scores?.[dominant_lens]?.SL || 0;
 
     // Get specific question answers
     const q4_answer = getLikertLabel(answers["4"] || 3);
@@ -139,8 +123,6 @@ export function buildPersonalizationData(
         current_question: session.currentQuestionIndex,
         dominant_lens,
         dominant_dimension,
-        dominant_score,
-        average_score: getAverageScore(dominant_lens),
         q4_answer,
         q11_answer,
         q14_answer,

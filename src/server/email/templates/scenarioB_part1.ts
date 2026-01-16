@@ -1,132 +1,91 @@
 import { type PersonalizationVars } from "../personalization";
+import { wrapHtml } from "../emailLayout";
 
-// Email B1: "Your Relationship Analysis is Complete" (Immediate)
+// Email B1: "I know exactly why you're struggling" (15 minutes after seeing teaser)
 export function getTeaserB1Email(vars: PersonalizationVars): {
-    subject: string;
-    html: string;
-    text: string;
+  subject: string;
+  html: string;
+  text: string;
 } {
-    const subject = `Your results are ready, ${vars.first_name}`;
+  const subject = "I know exactly why you're struggling";
 
-    const triggersText = vars.top_3_triggers.map((t) => `  • ${t}`).join("\n");
+  const text = `${vars.first_name},
 
-    const text = `Hi ${vars.first_name},
+I saw your results.
 
-Your UnderstandYourPartner analysis is complete.
+You are seeing the relationship through the lens of ${vars.dominant_lens.replace(/_/g, " ")}.
 
-Based on your 28 answers, we identified your dominant interpretive lens:
+This isn't a flaw. It's a protection mechanism.
 
-**${vars.dominant_lens.toUpperCase()}**
+But here is the problem: Your partner doesn't know this is happening. They just see your reaction.
 
-${vars.lens_short_description}
+In your full Analysis Report, I explain exactly how this lens is distorting your communication—and how to turn it off.
 
-This is why you react the way you do when your partner:
-${triggersText}
+I also give you 3 specific "Script Rewrites" to use the next time you feel triggered.
 
-You saw the overview. But the full report shows you:
-  ✓ The exact moments you misread your partner (and why)
-  ✓ The hidden fear driving your reactions
-  ✓ The 3 scripts that will de-escalate your next fight
-
-Unlock Your Full Report ($39): ${process.env.WASP_WEB_CLIENT_URL}/results
-
-Most people don't know this about themselves. You do now.
+Unlock Your Full Analysis ($15): ${process.env.WASP_WEB_CLIENT_URL}/results
 
 – The UYP Team
 
 Unsubscribe: ${vars.unsubscribe_url}`;
 
-    const html = `
-    <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
-      <p>Hi ${vars.first_name},</p>
+  const contentHtml = `
+      <p><strong>${vars.first_name},</strong></p>
       
-      <p>Your UnderstandYourPartner analysis is complete.</p>
+      <p>I saw your results.</p>
       
-      <p>Based on your 28 answers, we identified your dominant interpretive lens:</p>
+      <p>You are seeing the relationship through the lens of <strong style="color: #8B55A5;">${vars.dominant_lens.replace(/_/g, " ")}</strong>.</p>
       
-      <div style="background-color: #EEF2FF; padding: 20px; border-radius: 8px; margin: 20px 0; text-align: center;">
-        <h2 style="color: #4F46E5; margin: 0 0 10px 0; text-transform: capitalize;">${vars.dominant_lens}</h2>
-        <p style="margin: 0; color: #1F2937;">${vars.lens_short_description}</p>
-      </div>
+      <p>This isn't a flaw. It's a protection mechanism.</p>
       
-      <p>This is why you react the way you do when your partner:</p>
-      <ul style="color: #374151;">
-        ${vars.top_3_triggers.map((t) => `<li>${t}</li>`).join("")}
-      </ul>
+      <p>But here is the problem: <strong>Your partner doesn't know this is happening.</strong> They just see your reaction.</p>
       
-      <p>You saw the overview. But the full report shows you:</p>
-      <ul style="color: #374151;">
-        <li>✓ The exact moments you misread your partner (and why)</li>
-        <li>✓ The hidden fear driving your reactions</li>
-        <li>✓ The 3 scripts that will de-escalate your next fight</li>
-      </ul>
+      <p>In your full Analysis Report, I explain exactly how this lens is distorting your communication—and how to turn it off.</p>
+      
+      <p>I also give you 3 specific "Script Rewrites" to use the next time you feel triggered.</p>
       
       <p style="text-align: center; margin: 30px 0;">
-        <a href="${process.env.WASP_WEB_CLIENT_URL}/results" 
-           style="background-color: #4F46E5; color: white; padding: 14px 28px; text-decoration: none; border-radius: 6px; display: inline-block; font-weight: 600;">
-          Unlock Your Full Report ($39) →
+        <a href="${process.env.WASP_WEB_CLIENT_URL}/results" class="button">
+          Unlock Your Full Analysis ($15) →
         </a>
       </p>
       
-      <p>Most people don't know this about themselves. You do now.</p>
-      
       <p>– The UYP Team</p>
       
-      <hr style="margin: 30px 0; border: none; border-top: 1px solid #e5e7eb;">
-      
-      <p style="font-size: 12px; color: #6b7280;">
-        <a href="${vars.unsubscribe_url}" style="color: #6b7280;">Unsubscribe</a>
-      </p>
-    </div>
+      <div class="footer">
+        <a href="${vars.unsubscribe_url}">Unsubscribe from these emails</a>
+      </div>
   `;
 
-    return { subject, html, text };
+  return { subject, html: wrapHtml(contentHtml, subject), text };
 }
 
-// Email B2: "Your answer to Question #4..." (1 hour later)
+// Email B2: "The hidden pattern" (2 hours later)
 export function getTeaserB2Email(vars: PersonalizationVars): {
-    subject: string;
-    html: string;
-    text: string;
+  subject: string;
+  html: string;
+  text: string;
 } {
-    const subject = `Your answer to Q4 triggered something`;
+  const subject = "The hidden pattern";
 
-    const isHighSilenceSensitivity =
-        vars.q4_answer === "Strongly Agree" || vars.q4_answer === "Agree";
+  // Use variables carefully - fallback if answers aren't what we expect, though personalization.ts ensures defaults
+  const specificInsight = vars.has_high_silence_sensitivity
+    ? `You answered "${vars.q4_answer}" to question 4 (about silence making you uncomfortable). This suggests you have high "Disconnect Sensitivity" — you feel emotional distance before it's actually there.`
+    : `You noticed a mismatch in how you and your partner handle conflict.`;
 
-    const text = `${vars.first_name},
+  const text = `${vars.first_name},
 
-I'm looking at your answer to Question 4:
+I was looking at your results again...
 
-**"When my partner is silent, I assume something is wrong."**
+${specificInsight}
 
-You answered: **${vars.q4_answer}**
-
-${isHighSilenceSensitivity
-            ? `This answer activates what we call the **"Disconnect Alarm"** — your nervous system interprets silence as emotional abandonment.
-
-Here's what's happening in your brain:
-
-Your amygdala (threat detector) learned early in life that silence = danger. So when your partner goes quiet, your body floods with cortisol. You *feel* rejected, even if your partner is just tired.
-
-The problem? Your partner doesn't know this is happening. To them, you're "overreacting." To you, they're "shutting you out."
-
-**This is the mismatch.**
-
-Your full report shows you:
-  → The exact physiological pattern you're stuck in
-  → Why your partner's silence isn't what you think it is
-  → The 60-second grounding script to stop the spiral`
-            : `This answer tells me you have **low Disconnect Sensitivity** — you're comfortable with silence.
-
-But here's the twist: Question 11 shows you have **high Conflict Urgency**. You don't fear silence, you fear *unresolved tension*.
+But here's the twist: Your other answers show you have high Conflict Urgency. You don't fear silence, you fear *unresolved tension*.
 
 This specific combination creates a pattern we call "The Pressure Cooker." You're calm until there's a fight, then you need resolution *immediately*.
 
-Your partner probably needs space to process. You need closure now. That's the loop.`
-        }
+Your partner probably needs space to process. You need closure now. That's the loop.
 
-See Your Full Breakdown ($39): ${process.env.WASP_WEB_CLIENT_URL}/results
+See Your Full Breakdown ($15): ${process.env.WASP_WEB_CLIENT_URL}/results
 
 This isn't a personality quiz. It's a map of your nervous system.
 
@@ -134,48 +93,27 @@ This isn't a personality quiz. It's a map of your nervous system.
 
 Unsubscribe: ${vars.unsubscribe_url}`;
 
-    const html = `
-    <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
-      <p>${vars.first_name},</p>
+  const contentHtml = `
+      <p><strong>${vars.first_name},</strong></p>
+
+      <p>I was looking at your results again...</p>
       
-      <p>I'm looking at your answer to Question 4:</p>
-      
-      <div style="background-color: #F9FAFB; padding: 15px; border-left: 4px solid #4F46E5; margin: 20px 0;">
-        <p style="margin: 0; font-style: italic;">"When my partner is silent, I assume something is wrong."</p>
+      <div style="background-color: #FAF8F5; border-left: 4px solid #8B55A5; padding: 15px; margin: 20px 0; font-style: italic;">
+        ${vars.has_high_silence_sensitivity
+      ? `You answered "<strong>${vars.q4_answer}</strong>" to question 4 (about silence making you uncomfortable). <br><br>This suggests you have high "Disconnect Sensitivity" — you feel emotional distance before it's actually there.`
+      : `You noticed a mismatch in how you and your partner handle conflict.`
+    }
       </div>
       
-      <p>You answered: <strong>${vars.q4_answer}</strong></p>
-      
-      ${isHighSilenceSensitivity
-            ? `<p>This answer activates what we call the <strong>"Disconnect Alarm"</strong> — your nervous system interprets silence as emotional abandonment.</p>
-      
-      <p>Here's what's happening in your brain:</p>
-      
-      <p>Your amygdala (threat detector) learned early in life that silence = danger. So when your partner goes quiet, your body floods with cortisol. You <em>feel</em> rejected, even if your partner is just tired.</p>
-      
-      <p>The problem? Your partner doesn't know this is happening. To them, you're "overreacting." To you, they're "shutting you out."</p>
-      
-      <p style="font-weight: 600; color: #DC2626;">This is the mismatch.</p>
-      
-      <p>Your full report shows you:</p>
-      <ul style="color: #374151;">
-        <li>→ The exact physiological pattern you're stuck in</li>
-        <li>→ Why your partner's silence isn't what you think it is</li>
-        <li>→ The 60-second grounding script to stop the spiral</li>
-      </ul>`
-            : `<p>This answer tells me you have <strong>low Disconnect Sensitivity</strong> — you're comfortable with silence.</p>
-      
-      <p>But here's the twist: Question 11 shows you have <strong>high Conflict Urgency</strong>. You don't fear silence, you fear <em>unresolved tension</em>.</p>
+      <p>But here's the twist: Your other answers show you have <strong>high Conflict Urgency</strong>. You don't just dislike silence, you fear <em>unresolved tension</em>.</p>
       
       <p>This specific combination creates a pattern we call "The Pressure Cooker." You're calm until there's a fight, then you need resolution <em>immediately</em>.</p>
       
-      <p>Your partner probably needs space to process. You need closure now. That's the loop.</p>`
-        }
+      <p>Your partner probably needs space to process. You need closure now. That's the loop.</p>
       
       <p style="text-align: center; margin: 30px 0;">
-        <a href="${process.env.WASP_WEB_CLIENT_URL}/results" 
-           style="background-color: #4F46E5; color: white; padding: 14px 28px; text-decoration: none; border-radius: 6px; display: inline-block; font-weight: 600;">
-          See Your Full Breakdown ($39) →
+        <a href="${process.env.WASP_WEB_CLIENT_URL}/results" class="button">
+          See Your Full Breakdown ($15) →
         </a>
       </p>
       
@@ -183,56 +121,53 @@ Unsubscribe: ${vars.unsubscribe_url}`;
       
       <p>– The UYP Team</p>
       
-      <hr style="margin: 30px 0; border: none; border-top: 1px solid #e5e7eb;">
-      
-      <p style="font-size: 12px; color: #6b7280;">
-        <a href="${vars.unsubscribe_url}" style="color: #6b7280;">Unsubscribe</a>
-      </p>
-    </div>
+      <div class="footer">
+        <a href="${vars.unsubscribe_url}">Unsubscribe from these emails</a>
+      </div>
   `;
 
-    return { subject, html, text };
+  return { subject, html: wrapHtml(contentHtml, subject), text };
 }
 
 // Email B3: "You surprised me 😮" (3 hours later)
 export function getTeaserB3Email(vars: PersonalizationVars): {
-    subject: string;
-    html: string;
-    text: string;
+  subject: string;
+  html: string;
+  text: string;
 } {
-    const subject = `Your hidden relationship superpower`;
+  const subject = "Your hidden relationship superpower";
 
-    const dimensionMap: Record<string, { weakness: string; strength: string; script: string }> = {
-        silence: {
-            weakness: "too sensitive",
-            strength: "You feel disconnection before it becomes a crisis. You're the early warning system in your relationship.",
-            script: "The problem isn't that you're \"too sensitive.\" The problem is you don't have a script for *what to do* when you feel it.",
-        },
-        conflict: {
-            weakness: "overthink",
-            strength: "You notice tension that others miss. You're emotionally intelligent.",
-            script: "The problem isn't that you \"overthink.\" The problem is you try to fix it alone, without giving your partner the map.",
-        },
-        intentions: {
-            weakness: "read into things",
-            strength: "You assume your partner's actions have meaning. You're looking for connection.",
-            script: "The problem isn't that you \"read into things.\" The problem is you're reading the wrong language.",
-        },
-        reassurance: {
-            weakness: "needy",
-            strength: "You value emotional connection and aren't afraid to ask for it.",
-            script: "The problem isn't that you're \"needy.\" The problem is your partner doesn't know your specific reassurance language.",
-        },
-        repair: {
-            weakness: "hold grudges",
-            strength: "You take emotional repair seriously. You don't sweep things under the rug.",
-            script: "The problem isn't that you \"hold grudges.\" The problem is you need explicit closure that your partner might not know how to give.",
-        },
-    };
+  const dimensionMap: Record<string, { weakness: string; strength: string; script: string }> = {
+    silence: {
+      weakness: "too sensitive",
+      strength: "You feel disconnection before it becomes a crisis. You're the early warning system in your relationship.",
+      script: "The problem isn't that you're \"too sensitive.\" The problem is you don't have a script for *what to do* when you feel it.",
+    },
+    conflict: {
+      weakness: "overthink",
+      strength: "You notice tension that others miss. You're emotionally intelligent.",
+      script: "The problem isn't that you \"overthink.\" The problem is you try to fix it alone, without giving your partner the map.",
+    },
+    intentions: {
+      weakness: "read into things",
+      strength: "You assume your partner's actions have meaning. You're looking for connection.",
+      script: "The problem isn't that you \"read into things.\" The problem is you're reading the wrong language.",
+    },
+    reassurance: {
+      weakness: "needy",
+      strength: "You value emotional connection and aren't afraid to ask for it.",
+      script: "The problem isn't that you're \"needy.\" The problem is your partner doesn't know your specific reassurance language.",
+    },
+    repair: {
+      weakness: "hold grudges",
+      strength: "You take emotional repair seriously. You don't sweep things under the rug.",
+      script: "The problem isn't that you \"hold grudges.\" The problem is you need explicit closure that your partner might not know how to give.",
+    },
+  };
 
-    const content = dimensionMap[vars.dominant_dimension] || dimensionMap.silence;
+  const content = dimensionMap[vars.dominant_dimension] || dimensionMap.silence;
 
-    const text = `${vars.first_name},
+  const text = `${vars.first_name},
 
 Most people who score high on ${vars.dominant_dimension} see it as a weakness.
 
@@ -240,7 +175,7 @@ You probably do too.
 
 But here's what you don't know:
 
-**${vars.dominant_dimension.toUpperCase()} is also your greatest relationship strength.**
+${vars.dominant_dimension.toUpperCase()} IS ALSO YOUR GREATEST RELATIONSHIP STRENGTH.
 
 Here's why:
 
@@ -252,7 +187,7 @@ Your full report gives you that script.
 
 People pay $200/hour for couples therapy to learn this.
 
-You can get it for $39.
+You can get it for $15.
 
 Unlock Your Full Analysis: ${process.env.WASP_WEB_CLIENT_URL}/results
 
@@ -262,8 +197,7 @@ P.S. — Only 18% of people have your exact profile. You're not broken. You're w
 
 Unsubscribe: ${vars.unsubscribe_url}`;
 
-    const html = `
-    <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
+  const contentHtml = `
       <p>${vars.first_name},</p>
       
       <p>Most people who score high on <strong>${vars.dominant_dimension}</strong> see it as a weakness.</p>
@@ -272,40 +206,38 @@ Unsubscribe: ${vars.unsubscribe_url}`;
       
       <p>But here's what you don't know:</p>
       
-      <div style="background-color: #ECFDF5; padding: 20px; border-radius: 8px; margin: 20px 0; border-left: 4px solid #10B981;">
-        <p style="margin: 0; font-weight: 600; color: #065F46; text-transform: uppercase;">${vars.dominant_dimension} is also your greatest relationship strength.</p>
+      <div style="background-color: #FAF8F5; padding: 20px; border-radius: 8px; margin: 20px 0; border: 1px solid #E2E8F0;">
+        <p style="margin: 0; font-weight: 700; color: #8B55A5; text-transform: uppercase; letter-spacing: 0.05em; text-align: center;">${vars.dominant_dimension} is also your greatest relationship strength.</p>
       </div>
       
       <p>Here's why:</p>
       
-      <p style="color: #374151;">${content.strength}</p>
+      <p><strong>${content.strength}</strong></p>
       
-      <p style="color: #374151;">${content.script}</p>
+      <p>${content.script}</p>
       
       <p><strong>Your full report gives you that script.</strong></p>
       
       <p>People pay $200/hour for couples therapy to learn this.</p>
       
-      <p>You can get it for $39.</p>
+      <p>You can get it for $15.</p>
       
       <p style="text-align: center; margin: 30px 0;">
-        <a href="${process.env.WASP_WEB_CLIENT_URL}/results" 
-           style="background-color: #4F46E5; color: white; padding: 14px 28px; text-decoration: none; border-radius: 6px; display: inline-block; font-weight: 600;">
+        <a href="${process.env.WASP_WEB_CLIENT_URL}/results" class="button">
           Unlock Your Full Analysis →
         </a>
       </p>
       
       <p>– The UYP Team</p>
       
-      <p style="font-size: 14px; color: #6b7280;"><strong>P.S.</strong> — Only 18% of people have your exact profile. You're not broken. You're wired differently.</p>
-      
-      <hr style="margin: 30px 0; border: none; border-top: 1px solid #e5e7eb;">
-      
-      <p style="font-size: 12px; color: #6b7280;">
-        <a href="${vars.unsubscribe_url}" style="color: #6b7280;">Unsubscribe</a>
+      <p style="font-size: 14px; color: #64748B; margin-top: 30px; border-top: 1px solid #E2E8F0; padding-top: 20px;">
+        <strong>P.S.</strong> — Only 18% of people have your exact profile. You're not broken. You're wired differently.
       </p>
-    </div>
+      
+      <div class="footer">
+        <a href="${vars.unsubscribe_url}">Unsubscribe from these emails</a>
+      </div>
   `;
 
-    return { subject, html, text };
+  return { subject, html: wrapHtml(contentHtml, subject), text };
 }

@@ -315,7 +315,7 @@ api paymentsWebhook {
 
  api magicLinkCallback {
    fn: import { verifyMagicLink } from "@src/auth/magicLink",
-   entities: [User, MagicLinkToken],
+   entities: [User, MagicLinkToken, TestSession],
    middlewareConfigFn: import { magicLinkMiddlewareConfigFn } from "@src/auth/magicLink",
    httpRoute: (GET, "/auth/magic-login-callback")
  }

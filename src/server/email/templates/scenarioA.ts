@@ -1,25 +1,21 @@
 import { type PersonalizationVars } from "../personalization";
+import { wrapHtml } from "../emailLayout";
 
+// Email 1: "You were 5 minutes away..."
 export function getTestAbandon1Email(vars: PersonalizationVars): {
-    subject: string;
-    html: string;
-    text: string;
+  subject: string;
+  html: string;
+  text: string;
 } {
-    const questionsLeft = 28 - vars.current_question;
-    const isMoreThanHalf = vars.current_question >= 15;
+  const subject = "You were 5 minutes away from clarity...";
 
-    const subject = `Your relationship test is saved at question ${vars.current_question}/28`;
+  const text = `You were 5 minutes away...
 
-    const text = `Hi there,
+You started the UnderstandYourPartner test but didn't finish.
 
-I noticed you started the UnderstandYourPartner test but didn't finish.
+The answers you gave so far paint an interesting picture, but without the full 28 answers, the analysis is incomplete.
 
-Your progress is saved. You left off at question ${vars.current_question}/28.
-
-${isMoreThanHalf
-            ? `You're more than halfway there — just ${questionsLeft} questions left.`
-            : `It takes about 8 minutes to complete. No right or wrong answers.`
-        }
+Finishing the test is the only way to get your personalized Relationship Guide.
 
 Continue Your Test: ${process.env.WASP_WEB_CLIENT_URL}/test
 
@@ -29,22 +25,15 @@ The sooner you finish, the sooner you'll see where you might be misreading your 
 
 Unsubscribe: ${vars.unsubscribe_url}`;
 
-    const html = `
-    <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
-      <p>Hi there,</p>
+  const contentHtml = `
+      <p>You started the UnderstandYourPartner test but didn't finish.</p>
       
-      <p>I noticed you started the UnderstandYourPartner test but didn't finish.</p>
+      <p>The answers you gave so far paint an interesting picture, but without the full 28 answers, the analysis is incomplete.</p>
       
-      <p>Your progress is saved. You left off at question <strong>${vars.current_question}/28</strong>.</p>
-      
-      ${isMoreThanHalf
-            ? `<p>You're more than halfway there — just <strong>${questionsLeft} questions left</strong>.</p>`
-            : `<p>It takes about 8 minutes to complete. No right or wrong answers.</p>`
-        }
+      <p>Finishing the test is the only way to get your personalized Relationship Guide.</p>
       
       <p style="text-align: center; margin: 30px 0;">
-        <a href="${process.env.WASP_WEB_CLIENT_URL}/test" 
-           style="background-color: #4F46E5; color: white; padding: 14px 28px; text-decoration: none; border-radius: 6px; display: inline-block; font-weight: 600;">
+        <a href="${process.env.WASP_WEB_CLIENT_URL}/test" class="button">
           Continue Your Test →
         </a>
       </p>
@@ -53,153 +42,100 @@ Unsubscribe: ${vars.unsubscribe_url}`;
       
       <p>– The UYP Team</p>
       
-      <hr style="margin: 30px 0; border: none; border-top: 1px solid #e5e7eb;">
-      
-      <p style="font-size: 12px; color: #6b7280;">
-        <a href="${vars.unsubscribe_url}" style="color: #6b7280;">Unsubscribe from these emails</a>
-      </p>
-    </div>
+      <div class="footer">
+        <a href="${vars.unsubscribe_url}">Unsubscribe from these emails</a>
+      </div>
   `;
 
-    return { subject, html, text };
+  return { subject, html: wrapHtml(contentHtml, subject), text };
 }
 
+// Email 2: "The pattern doesn't disappear..."
 export function getTestAbandon2Email(vars: PersonalizationVars): {
-    subject: string;
-    html: string;
-    text: string;
+  subject: string;
+  html: string;
+  text: string;
 } {
-    const questionsLeft = 28 - vars.current_question;
+  const subject = "The pattern doesn't disappear just because you closed the tab.";
 
-    const subject = `We analyzed your first ${vars.current_question} answers...`;
+  const text = `The pattern doesn't disappear...
 
-    const silenceSection = vars.has_high_silence_sensitivity
-        ? `→ You answered "${vars.q4_answer}" to question 4 (about silence making you uncomfortable)
-   This suggests you have high "Disconnect Sensitivity" — you feel emotional distance before it's actually there.`
-        : "";
+We noticed you still haven't finished your test.
 
-    const conflictSection = vars.has_conflict_avoidance
-        ? `→ Your answers to questions 7 and 11 show a pattern we call "Conflict Foreclosure"
-   You try to solve problems immediately, which can feel like pressure to your partner.`
-        : "";
+Avoiding the analysis is a common response to relationship anxiety. Often, we fear what we might find out about ourselves.
 
-    const text = `Hi,
+But understanding your partner starts with understanding your own reactions. Clarity is better than uncertainty.
 
-Even though you didn't finish, I ran your first ${vars.current_question} answers through our system.
-
-Here's what stood out:
-
-${silenceSection}
-
-${conflictSection}
-
-But here's the thing: I can't give you the full picture without all 28 answers.
-
-The last ${questionsLeft} questions measure how your partner actually behaves vs. how you *think* they behave. That's where the real insight is.
-
-Finish Your Test (${questionsLeft} questions left): ${process.env.WASP_WEB_CLIENT_URL}/test
-
-This link expires in 48 hours.
+Continue Your Test: ${process.env.WASP_WEB_CLIENT_URL}/test
 
 – The UYP Team
 
 Unsubscribe: ${vars.unsubscribe_url}`;
 
-    const html = `
-    <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
-      <p>Hi,</p>
+  const contentHtml = `
+      <p>We noticed you still haven't finished your test.</p>
       
-      <p>Even though you didn't finish, I ran your first <strong>${vars.current_question} answers</strong> through our system.</p>
+      <p>Avoiding the analysis is a common response to relationship anxiety. Often, we fear what we might find out about ourselves.</p>
       
-      <p>Here's what stood out:</p>
-      
-      ${silenceSection
-            ? `<div style="background-color: #f3f4f6; padding: 15px; border-left: 4px solid #4F46E5; margin: 20px 0;">
-          <p style="margin: 0;">${silenceSection.replace(/\n/g, "<br>")}</p>
-        </div>`
-            : ""
-        }
-      
-      ${conflictSection
-            ? `<div style="background-color: #f3f4f6; padding: 15px; border-left: 4px solid #4F46E5; margin: 20px 0;">
-          <p style="margin: 0;">${conflictSection.replace(/\n/g, "<br>")}</p>
-        </div>`
-            : ""
-        }
-      
-      <p>But here's the thing: <strong>I can't give you the full picture without all 28 answers.</strong></p>
-      
-      <p>The last ${questionsLeft} questions measure how your partner actually behaves vs. how you <em>think</em> they behave. That's where the real insight is.</p>
+      <p>But understanding your partner starts with understanding your own reactions. <strong>Clarity is better than uncertainty.</strong></p>
       
       <p style="text-align: center; margin: 30px 0;">
-        <a href="${process.env.WASP_WEB_CLIENT_URL}/test" 
-           style="background-color: #4F46E5; color: white; padding: 14px 28px; text-decoration: none; border-radius: 6px; display: inline-block; font-weight: 600;">
-          Finish Your Test (${questionsLeft} questions left) →
+        <a href="${process.env.WASP_WEB_CLIENT_URL}/test" class="button">
+          Continue Your Test →
         </a>
       </p>
       
-      <p style="color: #6b7280; font-size: 14px;">This link expires in 48 hours.</p>
-      
       <p>– The UYP Team</p>
       
-      <hr style="margin: 30px 0; border: none; border-top: 1px solid #e5e7eb;">
-      
-      <p style="font-size: 12px; color: #6b7280;">
-        <a href="${vars.unsubscribe_url}" style="color: #6b7280;">Unsubscribe</a>
-      </p>
-    </div>
+      <div class="footer">
+        <a href="${vars.unsubscribe_url}">Unsubscribe from these emails</a>
+      </div>
   `;
 
-    return { subject, html, text };
+  return { subject, html: wrapHtml(contentHtml, subject), text };
 }
 
+// Email 3: "Your partner is waiting..."
 export function getTestAbandon3Email(vars: PersonalizationVars): {
-    subject: string;
-    html: string;
-    text: string;
+  subject: string;
+  html: string;
+  text: string;
 } {
-    const subject = `Your test expires tonight`;
+  const subject = "Your partner is waiting (even if they don't know it).";
 
-    const text = `Hi,
+  const text = `Your partner is waiting...
 
-Your saved test session will be archived tonight at midnight.
+This is the last reminder to finish your test.
 
-If you want to see your relationship analysis, you need to finish now.
+We delete incomplete sessions after 7 days to protect your privacy.
 
-Complete Test: ${process.env.WASP_WEB_CLIENT_URL}/test
+Don't let this opportunity for clarity slip away. It takes just a few more minutes to uncover patterns that might save you years of misunderstanding.
 
-After tonight, you'll need to start over from question 1.
+Continue Your Test: ${process.env.WASP_WEB_CLIENT_URL}/test
 
 – The UYP Team
 
 Unsubscribe: ${vars.unsubscribe_url}`;
 
-    const html = `
-    <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
-      <p>Hi,</p>
+  const contentHtml = `
+      <p>This is the last reminder to finish your test.</p>
       
-      <p>Your saved test session will be <strong>archived tonight at midnight</strong>.</p>
+      <p>We delete incomplete sessions after 7 days to protect your privacy.</p>
       
-      <p>If you want to see your relationship analysis, you need to finish now.</p>
+      <p><strong>Don't let this opportunity for clarity slip away.</strong> It takes just a few more minutes to uncover patterns that might save you years of misunderstanding.</p>
       
       <p style="text-align: center; margin: 30px 0;">
-        <a href="${process.env.WASP_WEB_CLIENT_URL}/test" 
-           style="background-color: #DC2626; color: white; padding: 14px 28px; text-decoration: none; border-radius: 6px; display: inline-block; font-weight: 600;">
-          Complete Test →
+        <a href="${process.env.WASP_WEB_CLIENT_URL}/test" class="button">
+          Continue Your Test →
         </a>
       </p>
       
-      <p style="color: #6b7280;">After tonight, you'll need to start over from question 1.</p>
-      
       <p>– The UYP Team</p>
       
-      <hr style="margin: 30px 0; border: none; border-top: 1px solid #e5e7eb;">
-      
-      <p style="font-size: 12px; color: #6b7280;">
-        <a href="${vars.unsubscribe_url}" style="color: #6b7280;">Unsubscribe</a>
-      </p>
-    </div>
+      <div class="footer">
+        <a href="${vars.unsubscribe_url}">Unsubscribe from these emails</a>
+      </div>
   `;
 
-    return { subject, html, text };
+  return { subject, html: wrapHtml(contentHtml, subject), text };
 }
