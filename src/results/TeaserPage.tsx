@@ -1,6 +1,6 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { Lock, CheckCircle2, Loader2, ArrowRight, Sparkles, MessageCircle, MessageSquare, FileText, Zap, Heart, Activity, AlertTriangle, Shield } from "lucide-react";
+import { Lock, CheckCircle2, Loader2, ArrowRight, Sparkles, MessageCircle, MessageSquare, FileText, Zap, Heart, Activity, AlertTriangle, Shield, Clock, X } from "lucide-react";
 import { createCheckoutSession, getTestSession, captureLead, claimSession } from "wasp/client/operations";
 import { LensRadar } from "../components/LensRadar";
 import { useQuery } from "wasp/client/operations";
@@ -18,6 +18,13 @@ export default function TeaserPage() {
     const [isSavingEmail, setIsSavingEmail] = useState(false);
     const [editingEmail, setEditingEmail] = useState(false);
 
+    // CRO State
+    const [timeLeft, setTimeLeft] = useState(900); // 15 minutes in seconds
+    const [showStickyCTA, setShowStickyCTA] = useState(false);
+    const [showExitIntent, setShowExitIntent] = useState(false);
+    const headerRef = useRef<HTMLDivElement>(null);
+    const hasTriggeredExit = useRef(false);
+
     useEffect(() => {
         if (!isLoading && !session) navigate("/test");
         if (session?.isPaid) navigate("/report");
@@ -28,6 +35,47 @@ export default function TeaserPage() {
         }
     }, [isLoading, session, navigate, user]);
 
+    // Timer Logic
+    useEffect(() => {
+        const timer = setInterval(() => {
+            setTimeLeft((prev) => (prev > 0 ? prev - 1 : 0));
+        }, 1000);
+        return () => clearInterval(timer);
+    }, []);
+
+    // Format Time (MM:SS)
+    const formatTime = (seconds: number) => {
+        const m = Math.floor(seconds / 60);
+        const s = seconds % 60;
+        return `${m}:${s < 10 ? '0' : ''}${s}`;
+    };
+
+    // Sticky CTA Observer
+    useEffect(() => {
+        const observer = new IntersectionObserver(([entry]) => {
+            // Show sticky CTA when header is NO LONGER visible
+            setShowStickyCTA(!entry.isIntersecting);
+        }, { threshold: 0 });
+
+        if (headerRef.current) {
+            observer.observe(headerRef.current);
+        }
+        return () => observer.disconnect();
+    }, []);
+
+    // Exit Intent Detection
+    useEffect(() => {
+        const handleMouseLeave = (e: MouseEvent) => {
+            if (e.clientY <= 0 && !hasTriggeredExit.current && !session?.email && !email) {
+                setShowExitIntent(true);
+                hasTriggeredExit.current = true;
+            }
+        };
+
+        document.addEventListener("mouseleave", handleMouseLeave);
+        return () => document.removeEventListener("mouseleave", handleMouseLeave);
+    }, [email, session]);
+
     const handleUpdateEmail = async (e?: React.FormEvent) => {
         if (e) e.preventDefault();
         if (!session || !email) return;
@@ -36,6 +84,7 @@ export default function TeaserPage() {
             await captureLead({ sessionId: session.id, email });
             trackPixelEvent('Lead');
             setEditingEmail(false);
+            setShowExitIntent(false); // Close modal on success
         } catch (e) {
             console.error(e);
             alert("Error updating email.");
@@ -88,9 +137,16 @@ export default function TeaserPage() {
     return (
         <div className="min-h-screen bg-background text-foreground font-sans animate-fade-in pb-24">
 
-            {/* 1. Header */}
-            <header className="py-12 px-6 text-center max-w-3xl mx-auto">
-                <div className="inline-flex items-center gap-2 bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400 px-4 py-1.5 rounded-full text-sm font-bold uppercase tracking-wide mb-6">
+            {/* 1. Header (Ref for Sticky CTA) */}
+            <header ref={headerRef} className="py-8 px-6 text-center max-w-3xl mx-auto relative">
+
+                {/* Timer Banner */}
+                <div className="bg-red-50 dark:bg-red-900/20 text-red-600 dark:text-red-400 font-bold text-sm py-2 px-4 rounded-full inline-flex items-center gap-2 mb-6 animate-pulse">
+                    <Clock size={14} />
+                    Results reserved for {formatTime(timeLeft)}
+                </div>
+
+                <div className="inline-flex items-center gap-2 bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400 px-4 py-1.5 rounded-full text-sm font-bold uppercase tracking-wide mb-6 block mx-auto w-fit">
                     <CheckCircle2 size={16} /> Analysis Complete
                 </div>
                 <h1 className="text-3xl md:text-5xl font-extrabold mb-6 leading-tight">
@@ -349,7 +405,7 @@ export default function TeaserPage() {
                         {/* Bottom CTA */}
                         <div className="bg-primary/5 p-6 text-center border-t border-border">
                             <p className="text-sm text-muted-foreground mb-2">One-time payment • Instant access • No subscription</p>
-                            <p className="font-bold text-lg">Everything above for just <span className="text-primary text-2xl">$15</span></p>
+                            <p className="font-bold text-lg">Everything above for just <span className="text-muted-foreground line-through mr-2">$49</span><span className="text-primary text-2xl">$15</span></p>
                         </div>
                     </div>
                 </section>
@@ -359,7 +415,10 @@ export default function TeaserPage() {
                     <div className="bg-secondary/5 rounded-3xl p-8 border-2 border-primary/20 relative overflow-hidden max-w-lg mx-auto shadow-2xl">
 
                         <p className="text-lg font-medium mb-1">Get instant access for just</p>
-                        <div className="text-5xl font-extrabold text-primary mb-2">$15</div>
+                        <div className="flex items-center justify-center gap-3 mb-2">
+                            <span className="text-2xl text-muted-foreground line-through decoration-2 decoration-muted-foreground/50">$49</span>
+                            <div className="text-5xl font-extrabold text-primary">$15</div>
+                        </div>
                         <p className="text-xs text-muted-foreground mb-8">One-time payment. No subscription.</p>
 
                         {/* Email Input */}
@@ -392,6 +451,75 @@ export default function TeaserPage() {
                     </div>
                 </section>
             </main>
+
+            {/* STICKY CTA (Mobile & Desktop) */}
+            <div className={`fixed bottom-0 left-0 w-full bg-background border-t border-border p-4 shadow-2xl transform transition-transform duration-300 z-50 ${showStickyCTA ? 'translate-y-0' : 'translate-y-full'}`}>
+                <div className="max-w-3xl mx-auto flex items-center justify-between gap-4">
+                    <div className="hidden md:block">
+                        <p className="font-bold text-sm">Your Full Analysis</p>
+                        <p className="text-xs text-muted-foreground">Reserved for {formatTime(timeLeft)}</p>
+                    </div>
+                    <div className="flex items-center gap-3 ml-auto md:ml-0 w-full md:w-auto">
+                        <div className="text-right shrink-0">
+                            <span className="block text-xs line-through text-muted-foreground">$49</span>
+                            <span className="block font-bold text-xl text-primary leading-none">$15</span>
+                        </div>
+                        <button
+                            onClick={handleUnlock}
+                            disabled={isRedirecting}
+                            className="flex-1 md:flex-none bg-primary text-primary-foreground font-bold py-3 px-6 rounded-full shadow-lg text-sm whitespace-nowrap"
+                        >
+                            Unlock Now
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            {/* EXIT INTENT MODAL */}
+            {showExitIntent && (
+                <div className="fixed inset-0 bg-black/50 z-[100] flex items-center justify-center p-4 animate-fade-in">
+                    <div className="bg-background rounded-2xl p-6 md:p-8 max-w-md w-full relative shadow-2xl border-2 border-primary/20">
+                        <button
+                            onClick={() => setShowExitIntent(false)}
+                            className="absolute top-4 right-4 text-muted-foreground hover:text-foreground"
+                        >
+                            <X size={24} />
+                        </button>
+
+                        <div className="text-center">
+                            <div className="bg-orange-100 text-orange-600 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
+                                <AlertTriangle size={32} />
+                            </div>
+                            <h3 className="text-2xl font-bold mb-2">Wait! Don't lose your results.</h3>
+                            <p className="text-muted-foreground mb-6">
+                                Your detailed analysis has already been generated. If you leave now, it may be deleted for security.
+                                <br /><br />
+                                <span className="font-bold text-foreground">Enter your email to save it for later.</span>
+                            </p>
+
+                            <form onSubmit={handleUpdateEmail} className="space-y-4">
+                                <input
+                                    type="email"
+                                    required
+                                    placeholder="Enter your email"
+                                    className="w-full p-3 rounded-xl border border-input text-center text-lg"
+                                    value={email}
+                                    onChange={e => setEmail(e.target.value)}
+                                />
+                                <button
+                                    type="submit"
+                                    disabled={isSavingEmail}
+                                    className="w-full bg-primary text-primary-foreground font-bold py-3 rounded-full hover:opacity-90 transition-opacity"
+                                >
+                                    {isSavingEmail ? "Saving..." : "Save My Results"}
+                                </button>
+                            </form>
+
+                        </div>
+                    </div>
+                </div>
+            )}
+
         </div>
     );
 }

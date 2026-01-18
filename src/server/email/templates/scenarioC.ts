@@ -15,7 +15,7 @@ I noticed you started checking out for your UnderstandYourPartner report, but di
 
 Your session is still active. You can finish your purchase here:
 
-Complete Your Purchase ($15): ${process.env.WASP_WEB_CLIENT_URL}/results
+Complete Your Purchase ($15, reduced from $49): ${process.env.WASP_WEB_CLIENT_URL}/results
 
 If you ran into a technical issue, just reply to this email and I'll help.
 
@@ -32,7 +32,7 @@ Unsubscribe: ${vars.unsubscribe_url}`;
       
       <p style="text-align: center; margin: 30px 0;">
         <a href="${process.env.WASP_WEB_CLIENT_URL}/results" class="button">
-          Complete Your Purchase ($15) →
+          Complete Your Purchase (<span style="text-decoration: line-through; opacity: 0.7;">$49</span> $15) →
         </a>
       </p>
       
@@ -69,7 +69,7 @@ Was it:
 
 Just reply and let me know. I'll make it right.
 
-Complete Your Purchase ($15): ${process.env.WASP_WEB_CLIENT_URL}/results
+Complete Your Purchase ($15, reduced from $49): ${process.env.WASP_WEB_CLIENT_URL}/results
 
 ---
 
@@ -101,7 +101,7 @@ Unsubscribe: ${vars.unsubscribe_url}`;
 
       <p style="text-align: center; margin: 30px 0;">
         <a href="${process.env.WASP_WEB_CLIENT_URL}/results" class="button">
-          Last Chance to Unlock ($15) →
+          Last Chance to Unlock (<span style="text-decoration: line-through; opacity: 0.7;">$49</span> $15) →
         </a>
       </p>
       
@@ -143,7 +143,7 @@ If you want to unlock your full report, you need to complete your purchase now.
 
 Your session is about to expire.
 
-Last Chance to Unlock ($15): ${process.env.WASP_WEB_CLIENT_URL}/results
+Last Chance to Unlock ($15, reduced from $49): ${process.env.WASP_WEB_CLIENT_URL}/results
 
 After midnight, you'll need to retake the entire 28-question test.
 
@@ -166,7 +166,7 @@ Unsubscribe: ${vars.unsubscribe_url}`;
       
       <p style="text-align: center; margin: 30px 0;">
         <a href="${process.env.WASP_WEB_CLIENT_URL}/results" class="button">
-          Finish Checkout ($15) →
+          Finish Checkout (<span style="text-decoration: line-through; opacity: 0.7;">$49</span> $15) →
         </a>
       </p>
       

@@ -27,7 +27,7 @@ ${getLensSpecificTip(vars.dominant_lens)}
 
 Your Relationship Guide is full of these micro-habit adjustments. They take seconds, but they change everything.
 
-Get The Full Toolkit ($15): ${process.env.WASP_WEB_CLIENT_URL}/results
+Get The Full Toolkit ($15, reduced from $49): ${process.env.WASP_WEB_CLIENT_URL}/results
 
 – The UYP Team
 
@@ -56,7 +56,7 @@ Unsubscribe: ${vars.unsubscribe_url}`;
 
   <p style="text-align: center; margin: 30px 0;">
     <a href="${process.env.WASP_WEB_CLIENT_URL}/results" class="button">
-      Get The Full Toolkit ($15) →
+      Get The Full Toolkit (<span style="text-decoration: line-through; opacity: 0.7;">$49</span> $15) →
     </a>
   </p>
 
@@ -104,7 +104,7 @@ You've waited long enough. The groove is getting deep.
 
 Your Relationship Guide is the steering wheel.
 
-Turn the wheel today ($15): ${process.env.WASP_WEB_CLIENT_URL}/results
+Turn the wheel today ($15, reduced from $49): ${process.env.WASP_WEB_CLIENT_URL}/results
 
 – The UYP Team
 
@@ -128,7 +128,7 @@ Unsubscribe: ${vars.unsubscribe_url}`;
 
   <p style="text-align: center; margin: 30px 0;">
     <a href="${process.env.WASP_WEB_CLIENT_URL}/results" class="button">
-      Turn the wheel today ($15) →
+      Turn the wheel today (<span style="text-decoration: line-through; opacity: 0.7;">$49</span> $15) →
     </a>
   </p>
 
@@ -158,13 +158,13 @@ We archive incomplete sessions after 7 days for privacy reasons.
 
 If you want to understand your pattern, this is your moment.
 
-Here is what you get for $15:
+Here is what you get for $15 (normally $49):
 - Your core "Lens" breakdown
 - The 3 triggers that set you off (and why)
 - Custom scripts to stop the fights
 - Your personal Relationship Operating Manual
 
-Unlock Your Full Report ($15): ${process.env.WASP_WEB_CLIENT_URL}/results
+Unlock Your Full Report ($15, reduced from $49): ${process.env.WASP_WEB_CLIENT_URL}/results
 
 Don't let this insight slip away.
 
@@ -181,7 +181,7 @@ Unsubscribe: ${vars.unsubscribe_url}`;
 
   <p><strong>If you want to understand your pattern, this is your moment.</strong></p>
 
-  <p>Here is what you get for $15:</p>
+  <p>Here is what you get for <span style="text-decoration: line-through; opacity: 0.7;">$49</span> $15:</p>
 
   <ul style="color: #374151;">
     <li>Your core "Lens" breakdown</li>
@@ -192,7 +192,7 @@ Unsubscribe: ${vars.unsubscribe_url}`;
 
   <p style="text-align: center; margin: 30px 0;">
     <a href="${process.env.WASP_WEB_CLIENT_URL}/results" class="button">
-      Unlock Your Full Report ($15) →
+      Unlock Your Full Report (<span style="text-decoration: line-through; opacity: 0.7;">$49</span> $15) →
     </a>
   </p>
 

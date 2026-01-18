@@ -22,13 +22,17 @@ export const sendMagicLink = async (email: string, context: any) => {
         throw new HttpError(400, "Invalid email");
     }
 
+    const normalizedEmail = email.toLowerCase();
+
     // 2. Generate Token First (Use as password for new users)
     const token = crypto.randomBytes(32).toString('hex');
     const expiresAt = new Date(Date.now() + 1000 * 60 * 15); // 15 mins
 
-    // 3. Find or Create User (Shadow or Real)
-    let user = await context.entities.User.findUnique({
-        where: { email },
+    // 3. Find or Create User (Shadow or Real) using Case-Insensitive Search
+    let user = await context.entities.User.findFirst({
+        where: {
+            email: { equals: normalizedEmail, mode: 'insensitive' }
+        },
         include: {
             auth: {
                 include: {
@@ -39,9 +43,7 @@ export const sendMagicLink = async (email: string, context: any) => {
     });
 
     if (user) {
-        if (user) {
-            // Log existing user check specific details only if debug encoding check required
-        }
+        // Log existing user check specific details only if debug encoding check required
     }
 
     if (!user) {
@@ -58,10 +60,11 @@ export const sendMagicLink = async (email: string, context: any) => {
             });
 
             // createUser(providerId, providerData, userFields)
+            // Always create with normalized email
             user = await createUser(
-                { providerName: "email", providerUserId: email },
+                { providerName: "email", providerUserId: normalizedEmail },
                 providerData,
-                { email }
+                { email: normalizedEmail }
             );
         } catch (e: any) {
             console.error("[sendMagicLink] createUser failed:", e);
@@ -73,7 +76,7 @@ export const sendMagicLink = async (email: string, context: any) => {
     await context.entities.MagicLinkToken.create({
         data: {
             token,
-            email,
+            email: normalizedEmail,
             expiresAt
         }
     });
@@ -83,7 +86,7 @@ export const sendMagicLink = async (email: string, context: any) => {
     const link = `${apiUrl}/auth/magic-login-callback?token=${token}`;
 
     await emailSender.send({
-        to: email,
+        to: normalizedEmail,
         subject: "Your Magic Login Link",
         text: `Click here to login: ${link}`,
         html: `<p>Click here to login: <a href="${link}">${link}</a></p>`
@@ -96,8 +99,6 @@ export const requestMagicLink = async ({ email }: { email: string }, context: an
 
 export const verifyMagicLink = async (req: any, res: any, context: any) => {
     const token = req.query.token as string;
-
-
 
     if (!token) {
         return res.status(400).send("Missing token");
@@ -124,17 +125,20 @@ export const verifyMagicLink = async (req: any, res: any, context: any) => {
         return res.status(403).send("Token expired");
     }
 
-
-
     // 2. Consume Token
     await context.entities.MagicLinkToken.update({
         where: { id: magicLinkToken.id },
         data: { used: true }
     });
 
-    // 3. Find User with Auth
-    const user = await context.entities.User.findUnique({
-        where: { email: magicLinkToken.email },
+    // 3. Find User with Auth using Case-Insensitive Search
+    // The token email is already normalized if created by new logic, but handled safely anyway
+    const normalizedTokenEmail = magicLinkToken.email.toLowerCase();
+
+    const user = await context.entities.User.findFirst({
+        where: {
+            email: { equals: normalizedTokenEmail, mode: 'insensitive' }
+        },
         include: {
             auth: {
                 include: {
@@ -205,7 +209,7 @@ export const verifyMagicLink = async (req: any, res: any, context: any) => {
                             identities: {
                                 create: {
                                     providerName: 'email',
-                                    providerUserId: user.email,
+                                    providerUserId: normalizedTokenEmail,
                                     providerData
                                 }
                             }
@@ -225,7 +229,7 @@ export const verifyMagicLink = async (req: any, res: any, context: any) => {
                             identities: {
                                 create: {
                                     providerName: 'email',
-                                    providerUserId: user.email,
+                                    providerUserId: normalizedTokenEmail,
                                     providerData
                                 }
                             }
@@ -253,8 +257,9 @@ export const verifyMagicLink = async (req: any, res: any, context: any) => {
         }
 
         // Redirect to client for automatic login
+        // Use normalized email for the client redirect to keep things clean
         const clientUrl = process.env.WASP_WEB_CLIENT_URL || "http://localhost:3000";
-        res.redirect(`${clientUrl}/auth/magic-login-callback?email=${encodeURIComponent(user.email)}&token=${token}&redirectTo=${encodeURIComponent(redirectPath)}`);
+        res.redirect(`${clientUrl}/auth/magic-login-callback?email=${encodeURIComponent(normalizedTokenEmail)}&token=${token}&redirectTo=${encodeURIComponent(redirectPath)}`);
     } catch (error: any) {
         console.error("[verifyMagicLink] Password update failed:", error);
         return res.status(500).send("Failed to authenticate");

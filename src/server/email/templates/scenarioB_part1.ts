@@ -23,7 +23,7 @@ In your full Analysis Report, I explain exactly how this lens is distorting your
 
 I also give you 3 specific "Script Rewrites" to use the next time you feel triggered.
 
-Unlock Your Full Analysis ($15): ${process.env.WASP_WEB_CLIENT_URL}/results
+Unlock Your Full Analysis ($15, reduced from $49): ${process.env.WASP_WEB_CLIENT_URL}/results
 
 – The UYP Team
 
@@ -46,7 +46,7 @@ Unsubscribe: ${vars.unsubscribe_url}`;
       
       <p style="text-align: center; margin: 30px 0;">
         <a href="${process.env.WASP_WEB_CLIENT_URL}/results" class="button">
-          Unlock Your Full Analysis ($15) →
+          Unlock Your Full Analysis (<span style="text-decoration: line-through; opacity: 0.7;">$49</span> $15) →
         </a>
       </p>
       
@@ -85,7 +85,7 @@ This specific combination creates a pattern we call "The Pressure Cooker." You'r
 
 Your partner probably needs space to process. You need closure now. That's the loop.
 
-See Your Full Breakdown ($15): ${process.env.WASP_WEB_CLIENT_URL}/results
+See Your Full Breakdown ($15, reduced from $49): ${process.env.WASP_WEB_CLIENT_URL}/results
 
 This isn't a personality quiz. It's a map of your nervous system.
 
@@ -113,7 +113,7 @@ Unsubscribe: ${vars.unsubscribe_url}`;
       
       <p style="text-align: center; margin: 30px 0;">
         <a href="${process.env.WASP_WEB_CLIENT_URL}/results" class="button">
-          See Your Full Breakdown ($15) →
+          See Your Full Breakdown (<span style="text-decoration: line-through; opacity: 0.7;">$49</span> $15) →
         </a>
       </p>
       
@@ -187,7 +187,7 @@ Your full report gives you that script.
 
 People pay $200/hour for couples therapy to learn this.
 
-You can get it for $15.
+You can get it for $15 (normally $49).
 
 Unlock Your Full Analysis: ${process.env.WASP_WEB_CLIENT_URL}/results
 
@@ -220,7 +220,7 @@ Unsubscribe: ${vars.unsubscribe_url}`;
       
       <p>People pay $200/hour for couples therapy to learn this.</p>
       
-      <p>You can get it for $15.</p>
+      <p>You can get it for <span style="text-decoration: line-through; opacity: 0.7;">$49</span> $15.</p>
       
       <p style="text-align: center; margin: 30px 0;">
         <a href="${process.env.WASP_WEB_CLIENT_URL}/results" class="button">

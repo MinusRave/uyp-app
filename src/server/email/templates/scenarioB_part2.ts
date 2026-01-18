@@ -25,7 +25,7 @@ You are subconsciously drawn to partners who trigger this specific sensitivity b
 
 Your full report explains this "Attraction Loop" in detail—and how to break it.
 
-Unlock The Answer ($15): ${process.env.WASP_WEB_CLIENT_URL}/results
+Unlock The Answer ($15, reduced from $49): ${process.env.WASP_WEB_CLIENT_URL}/results
 
 We've already done the work. You just need to see it.
 
@@ -50,7 +50,7 @@ Unsubscribe: ${vars.unsubscribe_url}`;
       
       <p style="text-align: center; margin: 30px 0;">
         <a href="${process.env.WASP_WEB_CLIENT_URL}/results" class="button">
-          Unlock The Answer ($15) →
+          Unlock The Answer (<span style="text-decoration: line-through; opacity: 0.7;">$49</span> $15) →
         </a>
       </p>
       
@@ -94,7 +94,7 @@ In your report, I have a section called **"The resentment meter."** It shows you
 
 Stop working so hard. Start being real.
 
-Get Your Relationship Map ($15): ${process.env.WASP_WEB_CLIENT_URL}/results
+Get Your Relationship Map ($15, reduced from $49): ${process.env.WASP_WEB_CLIENT_URL}/results
 
 – The UYP Team
 
@@ -125,7 +125,7 @@ Unsubscribe: ${vars.unsubscribe_url}`;
       
       <p style="text-align: center; margin: 30px 0;">
         <a href="${process.env.WASP_WEB_CLIENT_URL}/results" class="button">
-          Get Your Relationship Map ($15) →
+          Get Your Relationship Map (<span style="text-decoration: line-through; opacity: 0.7;">$49</span> $15) →
         </a>
       </p>
       
@@ -167,7 +167,7 @@ They didn't need years of therapy. They just needed a translator.
 
 Your report *is* that translator.
 
-Get The Same Protocol They Used ($15): ${process.env.WASP_WEB_CLIENT_URL}/results
+Get The Same Protocol They Used ($15, reduced from $49): ${process.env.WASP_WEB_CLIENT_URL}/results
 
 – The UYP Team
 
@@ -198,7 +198,7 @@ Unsubscribe: ${vars.unsubscribe_url}`;
       
       <p style="text-align: center; margin: 30px 0;">
         <a href="${process.env.WASP_WEB_CLIENT_URL}/results" class="button">
-          Get The Same Protocol They Used ($15) →
+          Get The Same Protocol They Used (<span style="text-decoration: line-through; opacity: 0.7;">$49</span> $15) →
         </a>
       </p>
       
