@@ -201,12 +201,10 @@ export default function FullReportPage() {
                         <div className="absolute top-0 right-0 w-96 h-96 bg-purple-500/5 rounded-full blur-3xl -mr-48 -mt-48 pointer-events-none animate-pulse"></div>
                         <div className="absolute bottom-0 left-0 w-80 h-80 bg-indigo-500/5 rounded-full blur-3xl -ml-40 -mb-40 pointer-events-none animate-pulse" style={{ animationDelay: '1s' }}></div>
 
-                        {/* Title with gradient text */}
-                        <h3 className="relative z-10 text-4xl md:text-5xl font-serif font-bold mb-8 bg-gradient-to-r from-purple-600 via-indigo-600 to-purple-600 bg-clip-text text-transparent animate-gradient bg-[length:200%_auto]">
-                            The Mirror
-                        </h3>
+
 
                         {isAiLoading ? (
+
                             <div className="flex flex-col items-center justify-center py-16 space-y-4">
                                 <Loader2 className="animate-spin text-purple-500" size={40} />
                                 <p className="text-muted-foreground animate-pulse text-lg">Analyzing your complete nervous system profile...</p>
@@ -625,7 +623,7 @@ export default function FullReportPage() {
                 </footer>
 
             </main>
-        </div>
+        </div >
     );
 }
 
