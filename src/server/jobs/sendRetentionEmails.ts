@@ -13,6 +13,7 @@ export async function sendRetentionEmails(args: any, context: any) {
                 email: { not: null },
                 emailSequenceType: { not: null },
                 unsubscribedFromEmails: false,
+                isArchived: false,
             },
         });
 

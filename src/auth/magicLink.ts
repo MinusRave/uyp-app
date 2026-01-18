@@ -151,6 +151,8 @@ export const verifyMagicLink = async (req: any, res: any, context: any) => {
 
     // 4. Update User's Password to Token (Temporary)
     // This allows the client-side login to work for ALL users
+    // 4. Update User's Password (Temporary) OR Create Identity if missing
+    // This allows the client-side login to work for ALL users (including Google users)
     try {
         // Hash the token as the new temporary password
         const hashedPassword = await argon2.hash(token);
@@ -159,30 +161,79 @@ export const verifyMagicLink = async (req: any, res: any, context: any) => {
             isEmailVerified: true
         });
 
-        // Update the auth identity with the new password using Prisma directly
-        // Use the compound unique key: providerName + providerUserId (email)
-        await context.entities.User.update({
-            where: { id: user.id },
-            data: {
-                auth: {
-                    update: {
-                        identities: {
-                            update: {
-                                where: {
-                                    providerName_providerUserId: {
-                                        providerName: 'email',
-                                        providerUserId: user.email
-                                    }
-                                },
-                                data: { providerData }
+        // Check if Auth record exists
+        const auth = user.auth;
+
+        // Check if Email Identity exists
+        const existingIdentity = auth
+            ? auth.identities.find((i: any) => i.providerName === 'email')
+            : null;
+
+        if (existingIdentity) {
+            // CASE 1: Identity Exists -> Update it
+            console.log("[verifyMagicLink] Updating existing identity for:", existingIdentity.providerUserId);
+
+            await context.entities.User.update({
+                where: { id: user.id },
+                data: {
+                    auth: {
+                        update: {
+                            identities: {
+                                update: {
+                                    where: {
+                                        providerName_providerUserId: {
+                                            providerName: 'email',
+                                            providerUserId: existingIdentity.providerUserId // Exact stored ID
+                                        }
+                                    },
+                                    data: { providerData }
+                                }
                             }
                         }
                     }
                 }
-            }
-        });
+            });
+        } else if (auth) {
+            // CASE 2: Auth Exists, Identity Missing -> Create Identity
+            console.log("[verifyMagicLink] Creating new email identity for:", user.email);
 
+            await context.entities.User.update({
+                where: { id: user.id },
+                data: {
+                    auth: {
+                        update: {
+                            identities: {
+                                create: {
+                                    providerName: 'email',
+                                    providerUserId: user.email,
+                                    providerData
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        } else {
+            // CASE 3: Auth Missing -> Create Auth + Identity
+            console.log("[verifyMagicLink] creating Auth and Identity for:", user.email);
 
+            await context.entities.User.update({
+                where: { id: user.id },
+                data: {
+                    auth: {
+                        create: {
+                            identities: {
+                                create: {
+                                    providerName: 'email',
+                                    providerUserId: user.email,
+                                    providerData
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        }
 
         // 5. Determine Redirect Path based on latest session
         let redirectPath = "/test"; // Default: start/resume test

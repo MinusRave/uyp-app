@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { Lock, CheckCircle2, Loader2, ArrowRight, Sparkles, MessageCircle, MessageSquare, FileText, Zap, Heart, Activity, AlertTriangle, Download } from "lucide-react";
+import { Lock, CheckCircle2, Loader2, ArrowRight, Sparkles, MessageCircle, MessageSquare, FileText, Zap, Heart, Activity, AlertTriangle, Shield } from "lucide-react";
 import { createCheckoutSession, getTestSession, captureLead, claimSession } from "wasp/client/operations";
 import { LensRadar } from "../components/LensRadar";
 import { useQuery } from "wasp/client/operations";
@@ -295,23 +295,50 @@ export default function TeaserPage() {
                                 </div>
                             </div>
 
-                            {/* Item 3: Downloadable Resources */}
-                            <div className="p-8">
+                            {/* Item 3: Partner Communication Guide */}
+                            <div className="p-8 bg-pink-50/30 dark:bg-pink-900/10">
                                 <div className="flex gap-4 items-start">
-                                    <div className="bg-yellow-100 dark:bg-yellow-900/30 p-3 rounded-xl text-yellow-600 shrink-0">
-                                        <Download size={28} />
+                                    <div className="bg-pink-100 dark:bg-pink-900/30 p-3 rounded-xl text-pink-600 shrink-0">
+                                        <Heart size={28} />
                                     </div>
                                     <div className="flex-1">
-                                        <h5 className="font-bold text-2xl mb-2">Downloadable Resources</h5>
-                                        <p className="text-muted-foreground mb-4">Take it with you, share with your partner.</p>
+                                        <h5 className="font-bold text-2xl mb-2">Partner Communication Guide</h5>
+                                        <p className="text-muted-foreground mb-4">Share-ready explanation of your patterns for your partner.</p>
                                         <div className="space-y-2">
                                             <div className="flex items-start gap-2">
-                                                <CheckCircle2 size={16} className="text-yellow-600 mt-1 shrink-0" />
-                                                <span className="text-sm">Cheat Sheet PDF (for your fridge)</span>
+                                                <CheckCircle2 size={16} className="text-pink-600 mt-1 shrink-0" />
+                                                <span className="text-sm">What helps you feel safe</span>
                                             </div>
                                             <div className="flex items-start gap-2">
-                                                <CheckCircle2 size={16} className="text-yellow-600 mt-1 shrink-0" />
-                                                <span className="text-sm">Alignment Workbook PDF</span>
+                                                <CheckCircle2 size={16} className="text-pink-600 mt-1 shrink-0" />
+                                                <span className="text-sm">What triggers your defenses</span>
+                                            </div>
+                                            <div className="flex items-start gap-2">
+                                                <CheckCircle2 size={16} className="text-pink-600 mt-1 shrink-0" />
+                                                <span className="text-sm">Personalized do's and don'ts</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            {/* Item 4: Intervention Cards */}
+                            <div className="p-8">
+                                <div className="flex gap-4 items-start">
+                                    <div className="bg-blue-100 dark:bg-blue-900/30 p-3 rounded-xl text-blue-600 shrink-0">
+                                        <Shield size={28} />
+                                    </div>
+                                    <div className="flex-1">
+                                        <h5 className="font-bold text-2xl mb-2">Conflict Intervention Cards</h5>
+                                        <p className="text-muted-foreground mb-4">Scenario-specific scripts for your toughest moments.</p>
+                                        <div className="space-y-2">
+                                            <div className="flex items-start gap-2">
+                                                <CheckCircle2 size={16} className="text-blue-600 mt-1 shrink-0" />
+                                                <span className="text-sm">Tailored to your dominant pattern</span>
+                                            </div>
+                                            <div className="flex items-start gap-2">
+                                                <CheckCircle2 size={16} className="text-blue-600 mt-1 shrink-0" />
+                                                <span className="text-sm">In-the-moment and repair scripts</span>
                                             </div>
                                         </div>
                                     </div>

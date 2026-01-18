@@ -381,6 +381,17 @@ job retentionEmailJob {
   },
   entities: [TestSession]
 }
+
+job cleanupSessionsJob {
+  executor: PgBoss,
+  perform: {
+    fn: import { cleanupSessions } from "@src/server/jobs/cleanupSessions"
+  },
+  schedule: {
+    cron: "0 0 * * *" // Runs daily at midnight
+  },
+  entities: [TestSession]
+}
 //#endregion
 
 //#region Admin Dashboard
@@ -419,6 +430,30 @@ route NotFoundRoute { path: "*", to: NotFoundPage }
 page NotFoundPage {
   component: import { NotFoundPage } from "@src/client/components/NotFoundPage"
 }
+route AdminSessionsRoute { path: "/admin/sessions", to: AdminSessionsPage }
+page AdminSessionsPage {
+  authRequired: true,
+  component: import AdminSessionsPage from "@src/admin/dashboards/sessions/SessionsPage"
+}
+
+route AdminSessionDetailRoute { path: "/admin/sessions/:sessionId", to: AdminSessionDetailPage }
+page AdminSessionDetailPage {
+  authRequired: true,
+  component: import AdminSessionDetailPage from "@src/admin/dashboards/sessions/SessionDetailPage"
+}
+
+route AdminFunnelRoute { path: "/admin/analytics/funnel", to: AdminFunnelPage }
+page AdminFunnelPage {
+  authRequired: true,
+  component: import AdminFunnelPage from "@src/admin/dashboards/analytics/FunnelPage"
+}
+
+route AdminDemographicsRoute { path: "/admin/analytics/demographics", to: AdminDemographicsPage }
+page AdminDemographicsPage {
+  authRequired: true,
+  component: import AdminDemographicsPage from "@src/admin/dashboards/analytics/DemographicsPage"
+}
+
 //#endregion
 
 //#region Contact Form Messages
@@ -434,5 +469,25 @@ page AdminMessagesPage {
 
 action claimSession {
   fn: import { claimSession } from "@src/test/operations",
+  entities: [TestSession]
+}
+
+query getTestSessions {
+  fn: import { getTestSessions } from "@src/admin/operations",
+  entities: [TestSession, User]
+}
+
+query getSessionDetail {
+  fn: import { getSessionDetail } from "@src/admin/operations",
+  entities: [TestSession, User]
+}
+
+query getFunnelStats {
+  fn: import { getFunnelStats } from "@src/admin/operations",
+  entities: [TestSession]
+}
+
+query getDemographicStats {
+  fn: import { getDemographicStats } from "@src/admin/operations",
   entities: [TestSession]
 }

@@ -7,6 +7,9 @@ import {
   Settings,
   Sheet,
   X,
+  PieChart,
+  BarChart,
+  List
 } from "lucide-react";
 import React, { useEffect, useRef, useState } from "react";
 import { NavLink, useLocation } from "react-router-dom";
@@ -143,6 +146,96 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
                 </NavLink>
               </li>
               {/* <!-- Menu Item Users --> */}
+
+              {/* <!-- Menu Item Sessions --> */}
+              <li>
+                <NavLink
+                  to="/admin/sessions"
+                  className={({ isActive }) =>
+                    cn(
+                      "text-muted-foreground hover:bg-accent hover:text-accent-foreground group relative flex items-center gap-2.5 rounded-sm px-4 py-2 font-medium duration-300 ease-in-out",
+                      {
+                        "bg-accent text-accent-foreground": isActive || pathname.includes("sessions"),
+                      },
+                    )
+                  }
+                >
+                  <List />
+                  Sessions
+                </NavLink>
+              </li>
+              {/* <!-- Menu Item Sessions --> */}
+
+              {/* <!-- Menu Item Analytics Group --> */}
+              <SidebarLinkGroup
+                activeCondition={pathname.includes("analytics")}
+              >
+                {(handleClick, open) => {
+                  return (
+                    <React.Fragment>
+                      <NavLink
+                        to="#"
+                        className={cn(
+                          "text-muted-foreground hover:bg-accent hover:text-accent-foreground group relative flex items-center gap-2.5 rounded-sm px-4 py-2 font-medium duration-300 ease-in-out",
+                          {
+                            "bg-accent text-accent-foreground":
+                              pathname.includes("analytics"),
+                          },
+                        )}
+                        onClick={(e) => {
+                          e.preventDefault();
+                          sidebarExpanded
+                            ? handleClick()
+                            : setSidebarExpanded(true);
+                        }}
+                      >
+                        <PieChart />
+                        Analytics
+                        {open ? <ChevronUp /> : <ChevronDown />}
+                      </NavLink>
+                      {/* <!-- Dropdown Menu Start --> */}
+                      <div
+                        className={cn("translate transform overflow-hidden", {
+                          hidden: !open,
+                        })}
+                      >
+                        <ul className="mb-5.5 mt-4 flex flex-col gap-2.5 pl-6">
+                          <li>
+                            <NavLink
+                              to="/admin/analytics/funnel"
+                              end
+                              className={({ isActive }) =>
+                                cn(
+                                  "text-muted-foreground hover:text-accent group relative flex items-center gap-2.5 rounded-md px-4 font-medium duration-300 ease-in-out",
+                                  { "!text-accent": isActive },
+                                )
+                              }
+                            >
+                              Funnel Analysis
+                            </NavLink>
+                          </li>
+                          <li>
+                            <NavLink
+                              to="/admin/analytics/demographics"
+                              end
+                              className={({ isActive }) =>
+                                cn(
+                                  "text-muted-foreground hover:text-accent group relative flex items-center gap-2.5 rounded-md px-4 font-medium duration-300 ease-in-out",
+                                  { "!text-accent": isActive },
+                                )
+                              }
+                            >
+                              Demographics
+                            </NavLink>
+                          </li>
+                        </ul>
+                      </div>
+                      {/* <!-- Dropdown Menu End --> */}
+                    </React.Fragment>
+                  );
+                }}
+              </SidebarLinkGroup>
+              {/* <!-- Menu Item Analytics Group --> */}
 
               {/* <!-- Menu Item Settings --> */}
               <li>

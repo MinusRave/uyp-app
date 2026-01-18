@@ -63,6 +63,9 @@ model TestSession {
 
   // NEW: Input for "The Fight Decoder"
   conflictDescription  String?
+  
+  // NEW: Persisted AI Analysis
+  executiveAnalysis    String?
 
   // Onboarding tracking
   onboardingCompleted    Boolean   @default(false)
@@ -103,6 +106,9 @@ model TestSession {
   
   // Personalization cache (pre-computed variables for emails)
   personalizationData      Json?
+
+  // Archive status for data retention policy
+  isArchived               Boolean   @default(false)
 }
 
 

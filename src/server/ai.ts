@@ -43,6 +43,11 @@ export const generateExecutiveAnalysis: GenerateExecutiveAnalysis<ExecutiveAnaly
         if (!session.isPaid && !userOwnsSession) {
             throw new Error('Unauthorized: Session not paid.');
         }
+
+        // 2. CACHE CHECK: If analysis already exists, return it!
+        if ((session as any).executiveAnalysis) {
+            return { markdown: (session as any).executiveAnalysis };
+        }
     } else if (!context.user) {
         // No session ID and not logged in
         throw new Error('Must be logged in or provide valid session ID.');
@@ -145,6 +150,17 @@ export const generateExecutiveAnalysis: GenerateExecutiveAnalysis<ExecutiveAnaly
 
         const content = msg.content[0];
         if (content.type === 'text') {
+            // 3. CACHE SAVE: Persist to DB
+            if (session) {
+                try {
+                    await context.entities.TestSession.update({
+                        where: { id: session.id },
+                        data: { executiveAnalysis: content.text }
+                    });
+                } catch (e) {
+                    console.error("Failed to save analysis to DB:", e);
+                }
+            }
             return { markdown: content.text };
         }
         return { markdown: "Analysis generation failed." };

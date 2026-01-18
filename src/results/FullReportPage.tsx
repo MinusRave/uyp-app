@@ -2,13 +2,19 @@ import React, { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "wasp/client/auth";
 import { useQuery, getTestSession, generateExecutiveAnalysis, translateMessage } from "wasp/client/operations";
-import { Loader2, Lock, CheckCircle, CheckCircle2, AlertTriangle, ArrowRight, Heart, MessageCircle, MessageSquare, Eye, Shield, Zap, Quote, BarChart3, Download, BookOpen, Sparkles, FileText } from "lucide-react";
+import { Loader2, Lock, CheckCircle, CheckCircle2, AlertTriangle, ArrowRight, Heart, MessageCircle, MessageSquare, Eye, Shield, Zap, Quote, BarChart3, BookOpen, Sparkles, FileText, ChevronDown, TrendingDown, Repeat, Target, Lightbulb } from "lucide-react";
+import ReactMarkdown from 'react-markdown';
+import remarkGfm from 'remark-gfm';
 import { DistortionGraph } from "../components/DistortionGraph";
-import { PDFDownloadLink } from "@react-pdf/renderer";
-import { CheatSheetPDF } from "./downloads/CheatSheetPDF";
-import { WorkbookPDF } from "./downloads/WorkbookPDF";
+
 import { OnboardingWizard } from "./components/OnboardingWizard";
 import { CompatibilityCard } from "./components/CompatibilityCard";
+import {
+    Accordion,
+    AccordionContent,
+    AccordionItem,
+    AccordionTrigger,
+} from "../client/components/ui/accordion";
 
 // Helper Interface for Report Data (mirrors backend structure)
 interface FullReportData {
@@ -183,30 +189,36 @@ export default function FullReportPage() {
 
             <main className="max-w-3xl mx-auto px-6 py-12 space-y-24">
 
-                {/* 1. NEW: The Mirror (Executive Synthesis) */}
+                {/* 1. The Mirror (Executive Synthesis) - ACCORDION */}
                 <section className="mb-16">
                     <div className="flex items-center gap-2 mb-6">
                         <Sparkles className="text-purple-500" />
                         <h2 className="text-sm font-bold uppercase tracking-wider text-muted-foreground">01. The Executive Summary</h2>
                     </div>
 
-                    <div className="bg-gradient-to-br from-purple-50 to-indigo-50 dark:from-purple-900/20 dark:to-indigo-900/20 p-8 md:p-10 rounded-3xl border border-purple-100 dark:border-purple-800 shadow-sm relative overflow-hidden">
-                        {/* Decorative background element */}
-                        <div className="absolute top-0 right-0 w-64 h-64 bg-purple-500/5 rounded-full blur-3xl -mr-32 -mt-32 pointer-events-none"></div>
+                    <div className="relative overflow-hidden bg-gradient-to-br from-purple-50 via-indigo-50 to-purple-50 dark:from-purple-900/20 dark:via-indigo-900/20 dark:to-purple-900/20 p-8 md:p-12 rounded-3xl border border-purple-100 dark:border-purple-800 shadow-xl">
+                        {/* Animated decorative background elements */}
+                        <div className="absolute top-0 right-0 w-96 h-96 bg-purple-500/5 rounded-full blur-3xl -mr-48 -mt-48 pointer-events-none animate-pulse"></div>
+                        <div className="absolute bottom-0 left-0 w-80 h-80 bg-indigo-500/5 rounded-full blur-3xl -ml-40 -mb-40 pointer-events-none animate-pulse" style={{ animationDelay: '1s' }}></div>
 
-                        <h3 className="text-3xl font-bold mb-6 text-foreground/90 font-serif">The Mirror</h3>
+                        {/* Title with gradient text */}
+                        <h3 className="relative z-10 text-4xl md:text-5xl font-serif font-bold mb-8 bg-gradient-to-r from-purple-600 via-indigo-600 to-purple-600 bg-clip-text text-transparent animate-gradient bg-[length:200%_auto]">
+                            The Mirror
+                        </h3>
 
                         {isAiLoading ? (
-                            <div className="flex flex-col items-center justify-center py-12 space-y-4">
-                                <Loader2 className="animate-spin text-purple-500" size={32} />
-                                <p className="text-muted-foreground animate-pulse">Analyzing your complete nervous system profile...</p>
+                            <div className="flex flex-col items-center justify-center py-16 space-y-4">
+                                <Loader2 className="animate-spin text-purple-500" size={40} />
+                                <p className="text-muted-foreground animate-pulse text-lg">Analyzing your complete nervous system profile...</p>
                             </div>
                         ) : aiAnalysis ? (
-                            <div className="bg-white/50 dark:bg-black/20 rounded-xl p-6 md:p-8 border border-white/40 dark:border-white/5 shadow-sm">
-                                <SimpleMarkdown content={aiAnalysis} />
+                            <div className="relative z-10">
+                                <div className="relative z-10">
+                                    <MirrorInsightCards content={aiAnalysis} />
+                                </div>
                             </div>
                         ) : (
-                            <p className="text-muted-foreground italic">Analysis could not be generated at this time.</p>
+                            <p className="text-muted-foreground italic text-center py-8">Analysis could not be generated at this time.</p>
                         )}
                     </div>
                 </section>
@@ -277,78 +289,199 @@ export default function FullReportPage() {
 
 
 
-
-                {/* 5. NEW: The Care Package (Downloads) */}
-                <section id="downloads">
-                    <h2 className="text-sm font-bold uppercase tracking-wider text-muted-foreground mb-4">05. Your Care Package</h2>
-                    <h3 className="text-3xl font-bold mb-8">Digital Downloads</h3>
-
-                    <div className="grid md:grid-cols-2 gap-6">
-                        {/* Fridge Sheet Download */}
-                        <div className="bg-gradient-to-br from-blue-50 to-indigo-50 dark:from-blue-900/20 dark:to-indigo-900/20 p-8 rounded-2xl border border-blue-100 dark:border-blue-800 flex flex-col items-center text-center">
-                            <div className="w-12 h-12 bg-blue-600 text-white rounded-xl flex items-center justify-center mb-4 shadow-lg shadow-blue-500/30">
-                                <Download size={24} />
-                            </div>
-                            <h4 className="font-bold text-xl mb-2">The Fridge Sheet</h4>
-                            <p className="text-sm text-muted-foreground mb-6">
-                                A one-page summary of your scripts and partner translations. Print it and stick it on the fridge.
-                            </p>
-
-                            {/* PDF Link - Rendered conditionally to ensure client-side execution */}
-                            <PDFDownloadLink
-                                document={
-                                    <CheatSheetPDF data={{
-                                        lensName: report.snapshot.dominantLens,
-                                        stateName: report.primaryLens.stateName,
-                                        scripts: {
-                                            inTheMoment: dominantScript?.inTheMoment || "",
-                                            repair: dominantScript?.repair || ""
-                                        },
-                                        partnerTranslation: dominantTranslation?.text || ""
-                                    }} />
-                                }
-                                fileName="UYP-Fridge-Sheet.pdf"
-                                className="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-6 rounded-full transition-all text-sm flex items-center gap-2"
-                            >
-                                {({ blob, url, loading, error }) =>
-                                    loading ? 'Generating PDF...' : 'Download PDF'
-                                }
-                            </PDFDownloadLink>
+                {/* 5. Partner Communication Guide - NEW */}
+                {dominantTranslation && (
+                    <section className="mb-16">
+                        <div className="flex items-center gap-2 mb-6">
+                            <Heart className="text-pink-500" />
+                            <h2 className="text-sm font-bold uppercase tracking-wider text-muted-foreground">05. Partner Communication Guide</h2>
                         </div>
 
-                        {/* Workbook Download */}
-                        <div className="bg-gradient-to-br from-emerald-50 to-teal-50 dark:from-emerald-900/20 dark:to-teal-900/20 p-8 rounded-2xl border border-emerald-100 dark:border-emerald-800 flex flex-col items-center text-center">
-                            <div className="w-12 h-12 bg-emerald-600 text-white rounded-xl flex items-center justify-center mb-4 shadow-lg shadow-emerald-500/30">
-                                <BookOpen size={24} />
-                            </div>
-                            <h4 className="font-bold text-xl mb-2">Alignment Workbook</h4>
-                            <p className="text-sm text-muted-foreground mb-6">
-                                A 4-week guided journal to help you observe and regulate your pattern in real-time.
+                        <div className="bg-gradient-to-br from-pink-50 to-rose-50 dark:from-pink-900/10 dark:to-rose-900/10 p-8 md:p-10 rounded-3xl border border-pink-100 dark:border-pink-800 shadow-sm">
+                            <h3 className="text-3xl font-bold mb-6">Share This With Your Partner</h3>
+                            <p className="text-lg text-muted-foreground mb-8">
+                                This section explains your patterns in language your partner can understand. Share it to help them support you better.
                             </p>
 
-                            <PDFDownloadLink
-                                document={
-                                    <WorkbookPDF data={{
-                                        lensName: report.primaryLens.lensName,
-                                        coreNeed: report.primaryLens.need,
-                                        fear: report.primaryLens.fear,
-                                        analysis: report.primaryLens.analysis
-                                    }} />
-                                }
-                                fileName="UYP-Alignment-Workbook.pdf"
-                                className="bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-2 px-6 rounded-full transition-all text-sm flex items-center gap-2"
-                            >
-                                {({ blob, url, loading, error }) =>
-                                    loading ? 'Generating PDF...' : 'Download Workbook'
-                                }
-                            </PDFDownloadLink>
-                        </div>
-                    </div>
-                </section>
+                            {/* Partner-friendly explanation */}
+                            <div className="bg-white dark:bg-black/20 rounded-2xl p-6 md:p-8 border border-pink-200 dark:border-pink-800 mb-8">
+                                <h4 className="font-bold text-xl mb-4 text-pink-600 dark:text-pink-400">What Your Partner Needs to Know</h4>
+                                <SimpleMarkdown content={dominantTranslation.text} />
+                            </div>
 
-                {/* 6. NEW: Full Spectrum Profile (Deep Dive) */}
+                            {/* Do's and Don'ts */}
+                            <div className="grid md:grid-cols-2 gap-6">
+                                {/* What Helps */}
+                                <div className="bg-green-50 dark:bg-green-900/20 rounded-xl p-6 border border-green-200 dark:border-green-800">
+                                    <h4 className="font-bold text-lg mb-4 flex items-center gap-2 text-green-700 dark:text-green-400">
+                                        <CheckCircle size={20} />
+                                        What Helps
+                                    </h4>
+                                    <ul className="space-y-3">
+                                        <li className="flex gap-2 items-start">
+                                            <span className="text-green-600 mt-1">•</span>
+                                            <span>Acknowledge my {report.primaryLens.need.toLowerCase()}</span>
+                                        </li>
+                                        {dominantScript?.repair && (
+                                            <li className="flex gap-2 items-start">
+                                                <span className="text-green-600 mt-1">•</span>
+                                                <span>Give me time to process and circle back</span>
+                                            </li>
+                                        )}
+                                        <li className="flex gap-2 items-start">
+                                            <span className="text-green-600 mt-1">•</span>
+                                            <span>Be patient when I'm in {report.primaryLens.stateName.toLowerCase()} mode</span>
+                                        </li>
+                                    </ul>
+                                </div>
+
+                                {/* What Hurts */}
+                                <div className="bg-red-50 dark:bg-red-900/20 rounded-xl p-6 border border-red-200 dark:border-red-800">
+                                    <h4 className="font-bold text-lg mb-4 flex items-center gap-2 text-red-700 dark:text-red-400">
+                                        <AlertTriangle size={20} />
+                                        What Hurts
+                                    </h4>
+                                    <ul className="space-y-3">
+                                        <li className="flex gap-2 items-start">
+                                            <span className="text-red-600 mt-1">•</span>
+                                            <span>Triggering my fear of {report.primaryLens.fear.toLowerCase()}</span>
+                                        </li>
+                                        <li className="flex gap-2 items-start">
+                                            <span className="text-red-600 mt-1">•</span>
+                                            <span>Dismissing my feelings when {report.primaryLens.activates.toLowerCase()}</span>
+                                        </li>
+                                        <li className="flex gap-2 items-start">
+                                            <span className="text-red-600 mt-1">•</span>
+                                            <span>Pushing me to respond before I'm ready</span>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+                )}
+
+                {/* 6. Gender Dynamics Analysis - NEW */}
+                {report.primaryLens && (
+                    <section className="mb-16">
+                        <div className="flex items-center gap-2 mb-6">
+                            <Eye className="text-teal-500" />
+                            <h2 className="text-sm font-bold uppercase tracking-wider text-muted-foreground">06. Gender & Socialization Context</h2>
+                        </div>
+
+                        <div className="bg-gradient-to-br from-teal-50 to-cyan-50 dark:from-teal-900/10 dark:to-cyan-900/10 p-8 md:p-10 rounded-3xl border border-teal-100 dark:border-teal-800 shadow-sm">
+                            <h3 className="text-3xl font-bold mb-6">How Socialization Shapes Your Pattern</h3>
+
+                            <div className="bg-white dark:bg-black/20 rounded-2xl p-6 md:p-8 border border-teal-200 dark:border-teal-800 space-y-6">
+                                <div>
+                                    <h4 className="font-bold text-lg mb-3 text-teal-600 dark:text-teal-400">Your Core Pattern</h4>
+                                    <p className="text-lg leading-relaxed italic">
+                                        "{report.primaryLens.analysis}"
+                                    </p>
+                                </div>
+
+                                <div className="border-t border-teal-200 dark:border-teal-800 pt-6">
+                                    <h4 className="font-bold text-lg mb-3 text-teal-600 dark:text-teal-400">The Socialization Layer</h4>
+                                    <p className="leading-relaxed">
+                                        Your <strong className="text-primary">{report.primaryLens.lensName.replace('_', ' ')}</strong> sensitivity
+                                        may have been reinforced by how you were taught to handle {report.primaryLens.lensName.replace('_', ' ')} situations.
+                                        Many people learn early on that {report.primaryLens.activates.toLowerCase()} is dangerous,
+                                        which creates a protective response that persists into adult relationships.
+                                    </p>
+                                </div>
+
+                                <div className="bg-teal-50 dark:bg-teal-900/30 rounded-lg p-4 border border-teal-200 dark:border-teal-700">
+                                    <p className="text-sm">
+                                        <strong>Important:</strong> This isn't about gender stereotypes. It's about recognizing how your unique
+                                        upbringing and social conditioning may have shaped your nervous system's response patterns.
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+                )}
+
+                {/* 7. Intervention Cards - NEW */}
+                {report.scripts && report.scripts.length > 0 && (
+                    <section className="mb-16">
+                        <div className="flex items-center gap-2 mb-6">
+                            <Shield className="text-blue-500" />
+                            <h2 className="text-sm font-bold uppercase tracking-wider text-muted-foreground">07. Intervention Cards</h2>
+                        </div>
+
+                        <h3 className="text-3xl font-bold mb-8">Your Conflict Scenarios & Responses</h3>
+                        <p className="text-lg text-muted-foreground mb-8">
+                            These cards show specific situations that trigger your patterns and exactly what to say in those moments.
+                        </p>
+
+                        <div className="grid gap-6">
+                            {report.scripts.map((script, index) => (
+                                <div
+                                    key={script.dimension}
+                                    className={`rounded-2xl border overflow-hidden ${script.dimension === report.snapshot.dominantLens
+                                        ? 'bg-primary/5 border-primary/20 ring-2 ring-primary/10'
+                                        : 'bg-card border-border'
+                                        }`}
+                                >
+                                    <div className={`p-4 border-b ${script.dimension === report.snapshot.dominantLens
+                                        ? 'bg-primary/10 border-primary/10'
+                                        : 'bg-muted border-border'
+                                        }`}>
+                                        <div className="flex items-center justify-between">
+                                            <h4 className="font-bold text-lg capitalize flex items-center gap-2">
+                                                {script.dimension.replace('_', ' ')}
+                                                {script.dimension === report.snapshot.dominantLens && (
+                                                    <span className="text-xs bg-primary text-primary-foreground px-2 py-0.5 rounded-full uppercase">
+                                                        Your Dominant Pattern
+                                                    </span>
+                                                )}
+                                            </h4>
+                                        </div>
+                                    </div>
+
+                                    <div className="p-6 space-y-6">
+                                        {/* Scenario */}
+                                        <div>
+                                            <h5 className="text-sm font-bold uppercase tracking-wide text-muted-foreground mb-2">
+                                                When This Happens:
+                                            </h5>
+                                            <p className="text-base">
+                                                When {script.dimension.replace('_', ' ')} is triggered in your relationship...
+                                            </p>
+                                        </div>
+
+                                        {/* In The Moment Response */}
+                                        <div className="bg-orange-50 dark:bg-orange-900/20 rounded-xl p-4 border border-orange-200 dark:border-orange-800">
+                                            <h5 className="text-sm font-bold uppercase tracking-wide text-orange-700 dark:text-orange-400 mb-3 flex items-center gap-2">
+                                                <Zap size={16} />
+                                                Say This In The Moment:
+                                            </h5>
+                                            <p className="text-lg font-medium italic">
+                                                "{script.inTheMoment}"
+                                            </p>
+                                        </div>
+
+                                        {/* Repair Response */}
+                                        <div className="bg-blue-50 dark:bg-blue-900/20 rounded-xl p-4 border border-blue-200 dark:border-blue-800">
+                                            <h5 className="text-sm font-bold uppercase tracking-wide text-blue-700 dark:text-blue-400 mb-3 flex items-center gap-2">
+                                                <CheckCircle size={16} />
+                                                For Repair Later:
+                                            </h5>
+                                            <p className="text-base">
+                                                "{script.repair}"
+                                            </p>
+                                        </div>
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+                    </section>
+                )}
+
+
+                {/* 8. Full Spectrum Profile (Deep Dive) */}
                 <section>
-                    <h2 className="text-sm font-bold uppercase tracking-wider text-muted-foreground mb-4">05. Full Spectrum Profile</h2>
+                    <h2 className="text-sm font-bold uppercase tracking-wider text-muted-foreground mb-4">08. Full Spectrum Profile</h2>
                     <h3 className="text-3xl font-bold mb-8">Your Complete Map</h3>
                     <p className="text-lg text-muted-foreground mb-8">
                         You are not just one pattern. Here is how your nervous system reacts across all 5 dimensions of your relationship.
@@ -394,9 +527,9 @@ export default function FullReportPage() {
                     </div>
                 </section>
 
-                {/* 7. Toolkit (Scripts) */}
+                {/* 9. Toolkit (Scripts) */}
                 <section id="toolkit">
-                    <h2 className="text-sm font-bold uppercase tracking-wider text-muted-foreground mb-4">06. Your Toolkit</h2>
+                    <h2 className="text-sm font-bold uppercase tracking-wider text-muted-foreground mb-4">09. Your Toolkit</h2>
                     <h3 className="text-3xl font-bold mb-8">De-Escalation Scripts</h3>
 
                     <div className="grid gap-8">
@@ -452,7 +585,7 @@ export default function FullReportPage() {
                 <section>
                     <div className="flex items-center gap-2 mb-4">
                         <MessageCircle className="text-green-500" />
-                        <h2 className="text-sm font-bold uppercase tracking-wider text-muted-foreground">07. The Translator</h2>
+                        <h2 className="text-sm font-bold uppercase tracking-wider text-muted-foreground">10. The Translator</h2>
                     </div>
                     <TranslatorTool
                         myLens={report.snapshot.dominantLens}
@@ -463,7 +596,7 @@ export default function FullReportPage() {
 
                 {/* 6. Integration Questions */}
                 <section className="border-t border-border pt-12">
-                    <h2 className="text-sm font-bold uppercase tracking-wider text-muted-foreground mb-4">07. Deepening</h2>
+                    <h2 className="text-sm font-bold uppercase tracking-wider text-muted-foreground mb-4">11. Deepening</h2>
                     <h3 className="text-2xl font-bold mb-6">Questions for Clarity</h3>
                     <div className="grid gap-4 md:grid-cols-2">
                         {report.questions.map((qGroup, i) => (
@@ -509,9 +642,33 @@ function TranslatorTool({ myLens, partnerLens, sessionId }: { myLens: string; pa
                 message,
                 userLens: myLens,
                 partnerLens: partnerLens,
-                sessionId: sessionId // NEW: Pass ID
+                sessionId: sessionId
             });
-            setResult(res);
+
+            // Parse the response - handle both direct JSON and markdown-wrapped JSON
+            let parsed = res;
+
+            // If translatedMessage is a string that looks like JSON, try to parse it
+            if (typeof res.translatedMessage === 'string' && res.translatedMessage.includes('```json')) {
+                try {
+                    // Remove markdown code blocks
+                    const cleanJson = res.translatedMessage
+                        .replace(/```json\s*/g, '')
+                        .replace(/```\s*/g, '')
+                        .trim();
+
+                    const jsonData = JSON.parse(cleanJson);
+                    parsed = {
+                        translatedMessage: jsonData.translatedMessage || jsonData.message || res.translatedMessage,
+                        analysis: jsonData.analysis || jsonData.explanation || res.analysis
+                    };
+                } catch (parseError) {
+                    console.error('Failed to parse JSON from response:', parseError);
+                    // Keep original response if parsing fails
+                }
+            }
+
+            setResult(parsed);
         } catch (e) {
             console.error(e);
         } finally {
@@ -575,60 +732,299 @@ function TranslatorTool({ myLens, partnerLens, sessionId }: { myLens: string; pa
     );
 }
 
-function SimpleMarkdown({ content }: { content: string }) {
-    // Simple parser for standard AI markdown
-    const lines = content.split('\n');
+// MirrorInsightCards - Displays analysis as a series of beautiful therapeutic insight cards
+function MirrorInsightCards({ content }: { content: string }) {
+    // 1. Normalize content
+    const normalizedContent = content
+        .replace(/---/g, '\n<HR_MARKER>\n')
+        .replace(/\\n/g, '\n')
+        .replace(/(\#{1,3})\s/g, '\n$1 ')
+        .replace(/\n{3,}/g, '\n\n');
+
+    const sections = parseInsights(normalizedContent);
 
     return (
-        <div className="space-y-4 font-serif text-lg leading-relaxed text-foreground/90">
-            {lines.map((line, i) => {
-                // Headers
-                if (line.startsWith('### ')) {
-                    return <h3 key={i} className="text-xl font-bold mt-6 mb-2 text-primary">{line.replace('### ', '')}</h3>;
-                }
-                if (line.startsWith('## ')) {
-                    return <h2 key={i} className="text-2xl font-bold mt-8 mb-4 border-b border-border/50 pb-2">{line.replace('## ', '')}</h2>;
-                }
-                if (line.startsWith('# ')) {
-                    return <h1 key={i} className="text-3xl font-bold mt-8 mb-6">{line.replace('# ', '')}</h1>;
-                }
+        <div className="space-y-6 md:space-y-8">
+            {sections.map((section, index) => {
+                const style = getSectionStyle(section.title);
+                const Icon = style.icon;
 
-                // Lists
-                if (line.trim().startsWith('- ')) {
+                // Special layout for the very first "Title" card if it exists and is short
+                if (index === 0 && section.title.toLowerCase().includes('deep mirror')) {
                     return (
-                        <div key={i} className="flex gap-2 pl-4">
-                            <span className="text-primary font-bold">•</span>
-                            <span>{parseBold(line.replace('- ', ''))}</span>
+                        <div key={index} className="text-center mb-10">
+                            <h2 className="text-4xl md:text-5xl font-serif font-bold bg-gradient-to-r from-purple-600 via-indigo-600 to-purple-600 bg-clip-text text-transparent mb-4">
+                                {section.title}
+                            </h2>
+                            <div className="h-1 w-24 bg-gradient-to-r from-transparent via-purple-300 to-transparent mx-auto"></div>
+                            {section.content && <p className="mt-4 text-xl text-muted-foreground max-w-2xl mx-auto">{section.content}</p>}
                         </div>
                     );
                 }
 
-                // Numbered lists (simple detection)
-                if (/^\d+\.\s/.test(line)) {
-                    return (
-                        <div key={i} className="flex gap-2 pl-4">
-                            <span className="text-primary font-bold">{line.split('.')[0]}.</span>
-                            <span>{parseBold(line.replace(/^\d+\.\s/, ''))}</span>
+                return (
+                    <div
+                        key={index}
+                        className={`relative overflow-hidden rounded-3xl border-2 transition-all duration-500 hover:shadow-xl ${style.containerClass}`}
+                    >
+                        {/* Decorative background icon */}
+                        <div className={`absolute -right-6 -top-6 opacity-[0.03] transform rotate-12 ${style.highlightClass}`}>
+                            <Icon size={200} />
                         </div>
-                    );
-                }
 
-                // Empty lines
-                if (!line.trim()) return <div key={i} className="h-2" />;
+                        <div className="p-8 md:p-10 relative z-10">
+                            <div className="flex flex-col md:flex-row gap-6 md:items-start">
+                                {/* Icon Column */}
+                                <div className={`shrink-0`}>
+                                    <div className={`w-14 h-14 rounded-2xl flex items-center justify-center shadow-sm ${style.iconClass}`}>
+                                        <Icon size={28} strokeWidth={2.5} />
+                                    </div>
+                                </div>
 
-                // Paragraphs
-                return <p key={i}>{parseBold(line)}</p>;
+                                {/* Content Column */}
+                                <div className="flex-1">
+                                    <h4 className={`text-2xl md:text-3xl font-bold mb-6 ${style.highlightClass}`}>
+                                        {section.title}
+                                    </h4>
+
+                                    <div className="prose prose-lg dark:prose-invert max-w-none">
+                                        <SimpleMarkdown content={section.content} />
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                );
             })}
         </div>
     );
 }
 
-// Helper to bold text wrapped in **
-function parseBold(text: string) {
+// Smart styling based on section title keywords
+function getSectionStyle(title: string) {
+    const lower = title.toLowerCase();
+
+    if (lower.includes('truth') || lower.includes('core')) {
+        return {
+            icon: Sparkles,
+            containerClass: "bg-purple-50/50 dark:bg-purple-900/10 border-purple-100 dark:border-purple-800",
+            triggerClass: "hover:bg-purple-50/80 dark:hover:bg-purple-900/20",
+            iconClass: "bg-purple-100 text-purple-600 dark:bg-purple-900/40 dark:text-purple-300",
+            labelClass: "text-purple-600 dark:text-purple-400",
+            highlightClass: "text-purple-700 dark:text-purple-300"
+        };
+    }
+    if (lower.includes('cost') || lower.includes('toll') || lower.includes('pain') || lower.includes('distortion')) {
+        return {
+            icon: TrendingDown,
+            containerClass: "bg-rose-50/50 dark:bg-rose-900/10 border-rose-100 dark:border-rose-800",
+            triggerClass: "hover:bg-rose-50/80 dark:hover:bg-rose-900/20",
+            iconClass: "bg-rose-100 text-rose-600 dark:bg-rose-900/40 dark:text-rose-300",
+            labelClass: "text-rose-600 dark:text-rose-400",
+            highlightClass: "text-rose-700 dark:text-rose-300"
+        };
+    }
+    if (lower.includes('decoder') || lower.includes('loop') || lower.includes('cycle') || lower.includes('conflict')) {
+        return {
+            icon: Repeat,
+            containerClass: "bg-orange-50/50 dark:bg-orange-900/10 border-orange-100 dark:border-orange-800",
+            triggerClass: "hover:bg-orange-50/80 dark:hover:bg-orange-900/20",
+            iconClass: "bg-orange-100 text-orange-600 dark:bg-orange-900/40 dark:text-orange-300",
+            labelClass: "text-orange-600 dark:text-orange-400",
+            highlightClass: "text-orange-700 dark:text-orange-300"
+        };
+    }
+    if (lower.includes('partner') || lower.includes('their') || lower.includes('view') || lower.includes('perspective')) {
+        return {
+            icon: Eye,
+            containerClass: "bg-blue-50/50 dark:bg-blue-900/10 border-blue-100 dark:border-blue-800",
+            triggerClass: "hover:bg-blue-50/80 dark:hover:bg-blue-900/20",
+            iconClass: "bg-blue-100 text-blue-600 dark:bg-blue-900/40 dark:text-blue-300",
+            labelClass: "text-blue-600 dark:text-blue-400",
+            highlightClass: "text-blue-700 dark:text-blue-300"
+        };
+    }
+    if (lower.includes('forward') || lower.includes('path') || lower.includes('action') || lower.includes('solution') || lower.includes('growth')) {
+        return {
+            icon: Target,
+            containerClass: "bg-emerald-50/50 dark:bg-emerald-900/10 border-emerald-100 dark:border-emerald-800",
+            triggerClass: "hover:bg-emerald-50/80 dark:hover:bg-emerald-900/20",
+            iconClass: "bg-emerald-100 text-emerald-600 dark:bg-emerald-900/40 dark:text-emerald-300",
+            labelClass: "text-emerald-600 dark:text-emerald-400",
+            highlightClass: "text-emerald-700 dark:text-emerald-300"
+        };
+    }
+    if (lower.includes('insight') || lower.includes('key') || lower.includes('realization')) {
+        return {
+            icon: Lightbulb,
+            containerClass: "bg-yellow-50/50 dark:bg-yellow-900/10 border-yellow-100 dark:border-yellow-800",
+            triggerClass: "hover:bg-yellow-50/80 dark:hover:bg-yellow-900/20",
+            iconClass: "bg-yellow-100 text-yellow-600 dark:bg-yellow-900/40 dark:text-yellow-300",
+            labelClass: "text-yellow-600 dark:text-yellow-400",
+            highlightClass: "text-yellow-700 dark:text-yellow-300"
+        };
+    }
+
+    // Default
+    return {
+        icon: FileText,
+        containerClass: "bg-gray-50/50 dark:bg-gray-800/20 border-gray-100 dark:border-gray-700",
+        triggerClass: "hover:bg-gray-50/80 dark:hover:bg-gray-800/30",
+        iconClass: "bg-gray-100 text-gray-600 dark:bg-gray-800 dark:text-gray-300",
+        labelClass: "text-gray-500",
+        highlightClass: "text-primary"
+    };
+}
+
+// Improved Parser: Cleans titles and structure
+function parseInsights(content: string): { title: string; content: string }[] {
+    const lines = content.split('\n');
+    const sections: { title: string; content: string }[] = [];
+    let currentTitle = '';
+    let currentContent = '';
+
+    // Regex to match headers but STRIP the # marks and any trailing ** or ::
+    const headerRegex = /^(#{1,3})\s+(.*)/;
+
+    // Helper to push section
+    const pushSection = (title: string, body: string) => {
+        const cleanTitle = title.replace(/\*\*/g, '').replace(/:/g, '').trim();
+        const cleanBody = body.trim();
+        if (cleanTitle || cleanBody) {
+            sections.push({ title: cleanTitle || "Insight", content: cleanBody });
+        }
+    };
+
+    for (const line of lines) {
+        const trimmed = line.trim();
+        const headerMatch = trimmed.match(headerRegex);
+
+        if (headerMatch || trimmed === '<HR_MARKER>') {
+            // If we have accumulated content, push it
+            if (currentTitle || currentContent) {
+                pushSection(currentTitle, currentContent);
+            }
+
+            // Start new section
+            if (trimmed === '<HR_MARKER>') {
+                // If marker, just reset, next line might be header or content
+                currentTitle = '';
+                currentContent = '';
+            } else if (headerMatch) {
+                currentTitle = headerMatch[2]; // Capture group 2 is the text
+                currentContent = '';
+            }
+        } else {
+            currentContent += line + '\n';
+        }
+    }
+
+    // Final push
+    if (currentTitle || currentContent) {
+        pushSection(currentTitle, currentContent);
+    }
+
+    return sections;
+}
+
+function SimpleMarkdown({ content }: { content: string }) {
+    if (!content) return null;
+
+    // 1. Pre-process: Handle "---" as explicit section breaks if they lack newlines, 
+    // and split by newlines to process line-by-line.
+    const normalizedContent = content
+        .replace(/---/g, '\n<HR_MARKER>\n')
+        .replace(/\\n/g, '\n'); // Handle escaped newlines if coming from JSON
+
+    const lines = normalizedContent.split('\n');
+
+    return (
+        <div className="space-y-4 font-serif text-lg leading-relaxed text-foreground/90">
+            {lines.map((line, i) => {
+                const trimmed = line.trim();
+                if (!trimmed) return <div key={i} className="h-2" />;
+
+                // Horizontal Rule / Section Break
+                if (trimmed === '<HR_MARKER>') {
+                    return <div key={i} className="my-8 border-t-2 border-primary/10 w-1/3 mx-auto" />;
+                }
+
+                // Headers
+                if (trimmed.startsWith('# ')) {
+                    return <h1 key={i} className="text-3xl md:text-4xl font-bold mt-10 mb-6 text-primary tracking-tight">{formatText(trimmed.replace('# ', ''))}</h1>;
+                }
+                if (trimmed.startsWith('## ')) {
+                    return <h2 key={i} className="text-2xl font-bold mt-8 mb-4 text-foreground/80 flex items-center gap-2">
+                        {/* Optional: Add icon based on header content if desired, for now just text */}
+                        {formatText(trimmed.replace('## ', ''))}
+                    </h2>;
+                }
+                if (trimmed.startsWith('### ')) {
+                    return <h3 key={i} className="text-xl font-bold mt-6 mb-2 text-primary/80 uppercase tracking-wide text-sm">{formatText(trimmed.replace('### ', ''))}</h3>;
+                }
+
+                // Lists
+                // Handle "✅ **Title**" specific style
+                if (trimmed.startsWith('✅')) {
+                    return (
+                        <div key={i} className="bg-green-50 dark:bg-green-900/10 p-4 rounded-xl border border-green-100 dark:border-green-900/30 my-4">
+                            <div className="flex gap-3 items-start">
+                                <span className="text-xl mt-1">✅</span>
+                                <div>{formatText(trimmed.replace('✅', ''))}</div>
+                            </div>
+                        </div>
+                    );
+                }
+
+                // Bullet points
+                if (trimmed.startsWith('- ') || trimmed.startsWith('* ')) {
+                    return (
+                        <div key={i} className="flex gap-3 pl-2 md:pl-4">
+                            <span className="text-primary font-bold mt-1.5 leading-none">•</span>
+                            <span>{formatText(trimmed.replace(/^[-*] /, ''))}</span>
+                        </div>
+                    );
+                }
+
+                // Numbered lists
+                if (/^\d+\.\s/.test(trimmed)) {
+                    const [num, ...rest] = trimmed.split('.');
+                    return (
+                        <div key={i} className="flex gap-2 pl-2 md:pl-4">
+                            <span className="text-primary font-bold">{num}.</span>
+                            <span>{formatText(rest.join('.').trim())}</span>
+                        </div>
+                    );
+                }
+
+                // Standard Paragraph
+                return <p key={i} className="text-gray-700 dark:text-gray-300">{formatText(trimmed)}</p>;
+            })}
+        </div>
+    );
+}
+
+// Helper to handle Bold (**text**) and Italic (*text*) formatting
+function formatText(text: string): React.ReactNode[] {
+    // Split by bold patterns first
     const parts = text.split(/(\*\*.*?\*\*)/g);
+
     return parts.map((part, i) => {
+        // Handle Bold
         if (part.startsWith('**') && part.endsWith('**')) {
-            return <strong key={i} className="font-semibold text-primary/90">{part.slice(2, -2)}</strong>;
+            const content = part.slice(2, -2);
+            return <strong key={i} className="font-bold text-primary/90">{formatItalics(content)}</strong>;
+        }
+        // Handle Iterables within non-bold text
+        return <span key={i}>{formatItalics(part)}</span>;
+    });
+}
+
+function formatItalics(text: string): React.ReactNode[] {
+    const parts = text.split(/(\*.*?\*)/g); // Simple italic regex, careful with * lists handled above
+    return parts.map((part, j) => {
+        if (part.startsWith('*') && part.endsWith('*') && part.length > 2) {
+            return <em key={j} className="italic text-foreground/80">{part.slice(1, -1)}</em>;
         }
         return part;
     });

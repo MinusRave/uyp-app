@@ -2,7 +2,6 @@ import { type TestSession } from "wasp/entities";
 
 // Personalization variable types
 export interface PersonalizationVars {
-    first_name: string;
     current_question: number;
     dominant_lens: string;
     dominant_dimension: string;
@@ -85,7 +84,6 @@ export function buildPersonalizationData(
 
     // Extract email prefix as first name (or use a default)
     const email = session.email || "";
-    const first_name = email.split("@")[0] || "there";
 
     // Get dominant lens from scores
     const dominant_lens = scores?.dominantLens || "silence";
@@ -119,7 +117,6 @@ export function buildPersonalizationData(
     const unsubscribe_url = `${appUrl}/unsubscribe?token=${session.id}`;
 
     return {
-        first_name,
         current_question: session.currentQuestionIndex,
         dominant_lens,
         dominant_dimension,

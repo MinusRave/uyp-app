@@ -11,7 +11,7 @@ export function getTeaserB4Email(vars: PersonalizationVars): {
 
   const lensDescription = vars.dominant_lens.replace(/_/g, " ");
 
-  const text = `${vars.first_name},
+  const text = `Hello,
 
 Have you ever noticed that your relationships tend to follow a similar pattern?
 
@@ -34,7 +34,7 @@ We've already done the work. You just need to see it.
 Unsubscribe: ${vars.unsubscribe_url}`;
 
   const contentHtml = `
-      <p><strong>${vars.first_name},</strong></p>
+      <p><strong>Hello,</strong></p>
       
       <p>Have you ever noticed that your relationships tend to follow a similar pattern?</p>
       
@@ -74,7 +74,7 @@ export function getTeaserB5Email(vars: PersonalizationVars): {
 } {
   const subject = "The 'Good Partner' Trap";
 
-  const text = `${vars.first_name},
+  const text = `Hello,
 
 I see this in my practice every day.
 
@@ -101,7 +101,7 @@ Get Your Relationship Map ($15): ${process.env.WASP_WEB_CLIENT_URL}/results
 Unsubscribe: ${vars.unsubscribe_url}`;
 
   const contentHtml = `
-      <p><strong>${vars.first_name},</strong></p>
+      <p><strong>Hello,</strong></p>
       
       <p>I see this in my practice every day.</p>
       
@@ -147,7 +147,7 @@ export function getTeaserB6Email(vars: PersonalizationVars): {
 } {
   const subject = "A note from my clinical files";
 
-  const text = `${vars.first_name},
+  const text = `Hello,
 
 I want to tell you about a couple I worked with recently. Let's call them Sarah and Mark.
 
@@ -174,7 +174,7 @@ Get The Same Protocol They Used ($15): ${process.env.WASP_WEB_CLIENT_URL}/result
 Unsubscribe: ${vars.unsubscribe_url}`;
 
   const contentHtml = `
-      <p><strong>${vars.first_name},</strong></p>
+      <p><strong>Hello,</strong></p>
       
       <p>I want to tell you about a couple I worked with recently. Let's call them Sarah and Mark.</p>
       

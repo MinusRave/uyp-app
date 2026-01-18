@@ -32,7 +32,7 @@ export default function TermsOfServicePage() {
                         <strong>Pricing:</strong> The full report costs $15 (one-time payment).
                     </p>
                     <p>
-                        <strong>Refund Policy:</strong> We offer a 7-day money-back guarantee. If you're not satisfied with your report, email us at support@understandyourpartner.com within 7 days of purchase for a full refund.
+                        <strong>Refund Policy:</strong> We offer a 7-day money-back guarantee. If you're not satisfied with your report, email us at admin@understandyourpartner.com within 7 days of purchase for a full refund.
                     </p>
 
                     <h2>5. Intellectual Property</h2>
@@ -75,7 +75,7 @@ export default function TermsOfServicePage() {
 
                     <h2>12. Contact</h2>
                     <p>
-                        Questions? Email us at <strong>support@understandyourpartner.com</strong>
+                        Questions? Email us at <strong>admin@understandyourpartner.com</strong>
                     </p>
                 </div>
             </div>

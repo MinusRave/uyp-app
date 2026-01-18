@@ -9,7 +9,7 @@ export function getTeaserB1Email(vars: PersonalizationVars): {
 } {
   const subject = "I know exactly why you're struggling";
 
-  const text = `${vars.first_name},
+  const text = `Hello,
 
 I saw your results.
 
@@ -30,7 +30,7 @@ Unlock Your Full Analysis ($15): ${process.env.WASP_WEB_CLIENT_URL}/results
 Unsubscribe: ${vars.unsubscribe_url}`;
 
   const contentHtml = `
-      <p><strong>${vars.first_name},</strong></p>
+      <p><strong>Hello,</strong></p>
       
       <p>I saw your results.</p>
       
@@ -73,7 +73,7 @@ export function getTeaserB2Email(vars: PersonalizationVars): {
     ? `You answered "${vars.q4_answer}" to question 4 (about silence making you uncomfortable). This suggests you have high "Disconnect Sensitivity" — you feel emotional distance before it's actually there.`
     : `You noticed a mismatch in how you and your partner handle conflict.`;
 
-  const text = `${vars.first_name},
+  const text = `Hello,
 
 I was looking at your results again...
 
@@ -94,7 +94,7 @@ This isn't a personality quiz. It's a map of your nervous system.
 Unsubscribe: ${vars.unsubscribe_url}`;
 
   const contentHtml = `
-      <p><strong>${vars.first_name},</strong></p>
+      <p><strong>Hello,</strong></p>
 
       <p>I was looking at your results again...</p>
       
@@ -167,7 +167,7 @@ export function getTeaserB3Email(vars: PersonalizationVars): {
 
   const content = dimensionMap[vars.dominant_dimension] || dimensionMap.silence;
 
-  const text = `${vars.first_name},
+  const text = `Hello,
 
 Most people who score high on ${vars.dominant_dimension} see it as a weakness.
 
@@ -198,7 +198,7 @@ P.S. — Only 18% of people have your exact profile. You're not broken. You're w
 Unsubscribe: ${vars.unsubscribe_url}`;
 
   const contentHtml = `
-      <p>${vars.first_name},</p>
+      <p>Hello,</p>
       
       <p>Most people who score high on <strong>${vars.dominant_dimension}</strong> see it as a weakness.</p>
       

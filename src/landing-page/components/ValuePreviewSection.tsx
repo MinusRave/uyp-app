@@ -108,7 +108,7 @@ export default function ValuePreviewSection() {
                 {/* Bottom CTA */}
                 <div className="mt-12 text-center">
                     <p className="text-sm text-muted-foreground">
-                        Plus: Pattern decoder, visual analytics, intervention scripts, and downloadable guides
+                        Plus: Pattern decoder, visual analytics, intervention scripts, and personalized partner communication tools
                     </p>
                 </div>
             </div>

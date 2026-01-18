@@ -134,6 +134,15 @@ export const createCheckoutSession: CreateCheckoutSession<
     throw new HttpError(500, "Failed to create checkout session");
   }
 
+  // UPDATE: Save checkout session details to DB so we can track abandonment
+  await context.entities.TestSession.update({
+    where: { id: sessionId },
+    data: {
+      stripeCheckoutSessionId: session.id,
+      checkoutStartedAt: new Date(),
+    }
+  });
+
   return {
     sessionUrl: session.url,
     sessionId: session.id,

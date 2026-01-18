@@ -9,7 +9,7 @@ export function getTeaserB7Email(vars: PersonalizationVars): {
 } {
   const subject = "The 6-second trick that rewires your brain";
 
-  const text = `${vars.first_name},
+  const text = `Hello,
 
 I want to give you a tool you can use tonight.
 
@@ -34,7 +34,7 @@ Get The Full Toolkit ($15): ${process.env.WASP_WEB_CLIENT_URL}/results
 Unsubscribe: ${vars.unsubscribe_url}`;
 
   const contentHtml = `
-  <p><strong>${vars.first_name},</strong></p>
+  <p><strong>Hello,</strong></p>
 
   <p>I want to give you a tool you can use tonight.</p>
 
@@ -89,7 +89,7 @@ export function getTeaserB8Email(vars: PersonalizationVars): {
 } {
   const subject = "The cost of waiting";
 
-  const text = `${vars.first_name},
+  const text = `Hello,
 
 There is a concept in psychology called "pattern entrenchment."
 
@@ -111,7 +111,7 @@ Turn the wheel today ($15): ${process.env.WASP_WEB_CLIENT_URL}/results
 Unsubscribe: ${vars.unsubscribe_url}`;
 
   const contentHtml = `
-  <p><strong>${vars.first_name},</strong></p>
+  <p><strong>Hello,</strong></p>
 
   <p>There is a concept in psychology called "pattern entrenchment."</p>
 
@@ -150,7 +150,7 @@ export function getTeaserB9Email(vars: PersonalizationVars): {
 } {
   const subject = "Your analysis is being archived";
 
-  const text = `${vars.first_name},
+  const text = `Hello,
 
 This is the last email regarding your test results.
 
@@ -173,7 +173,7 @@ Don't let this insight slip away.
 Unsubscribe: ${vars.unsubscribe_url}`;
 
   const contentHtml = `
-  <p><strong>${vars.first_name},</strong></p>
+  <p><strong>Hello,</strong></p>
 
   <p>This is the last email regarding your test results.</p>
 
