@@ -63,7 +63,8 @@ export const stripeWebhook = async (
       if (testSession && testSession.email) {
         try {
           const appUrl = process.env.WASP_WEB_CLIENT_URL || "http://localhost:3000";
-          const personalizationData = buildPersonalizationData(testSession, appUrl);
+          const apiUrl = process.env.WASP_API_SERVER_URL || "http://localhost:3001";
+          const personalizationData = buildPersonalizationData(testSession, appUrl, apiUrl);
           const emailContent = getPaymentConfirmationEmail(personalizationData);
 
           await emailSender.send({

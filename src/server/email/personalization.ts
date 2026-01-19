@@ -77,7 +77,8 @@ export function getLensDescription(dominantLens: string): string {
 // Main personalization data builder
 export function buildPersonalizationData(
     session: TestSession,
-    appUrl: string
+    appUrl: string,
+    apiUrl: string
 ): PersonalizationVars {
     const answers = session.answers as Record<string, number>;
     const scores = session.scores as any;
@@ -114,7 +115,8 @@ export function buildPersonalizationData(
     );
 
     // Generate unsubscribe URL
-    const unsubscribe_url = `${appUrl}/unsubscribe?token=${session.id}`;
+    // MUST point to the API endpoint which handles the DB update and redirects
+    const unsubscribe_url = `${apiUrl}/api/unsubscribe?token=${session.id}`;
 
     return {
         current_question: session.currentQuestionIndex,
@@ -148,7 +150,8 @@ export async function cachePersonalizationData(
     }
 
     const appUrl = process.env.WASP_WEB_CLIENT_URL || "http://localhost:3000";
-    const personalizationData = buildPersonalizationData(session, appUrl);
+    const apiUrl = process.env.WASP_API_SERVER_URL || "http://localhost:3001";
+    const personalizationData = buildPersonalizationData(session, appUrl, apiUrl);
 
     // Cache in database
     await context.entities.TestSession.update({

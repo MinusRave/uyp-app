@@ -115,7 +115,8 @@ export async function sendRetentionEmail(
             personalizationData = session.personalizationData as unknown as PersonalizationVars;
         } else {
             const appUrl = process.env.WASP_WEB_CLIENT_URL || "http://localhost:3000";
-            personalizationData = buildPersonalizationData(session, appUrl);
+            const apiUrl = process.env.WASP_API_SERVER_URL || "http://localhost:3001";
+            personalizationData = buildPersonalizationData(session, appUrl, apiUrl);
 
             // Cache it
             await context.entities.TestSession.update({
