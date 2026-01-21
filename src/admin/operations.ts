@@ -19,6 +19,7 @@ type GetTestSessionsResult = {
 
 type FunnelStats = {
     started: number;
+    questionCounts: number[];
     onboarding: number;
     emailCaptured: number;
     completed: number;
@@ -101,8 +102,43 @@ export const getFunnelStats: GetFunnelStats<void, FunnelStats> = async (_args, c
     const completed = await context.entities.TestSession.count({ where: { isCompleted: true } });
     const paid = await context.entities.TestSession.count({ where: { isPaid: true } });
 
+    // Detailed Question Funnel
+    // Get distribution of users by their current question index
+    const progressGroups = await context.entities.TestSession.groupBy({
+        by: ['currentQuestionIndex'],
+        _count: { currentQuestionIndex: true }
+    });
+
+    // Create a map for easy lookup
+    const progressMap = new Map<number, number>();
+    progressGroups.forEach(g => {
+        progressMap.set(g.currentQuestionIndex, g._count.currentQuestionIndex);
+    });
+
+    // Calculate funnel for each question (1 to 28)
+    const totalQuestions = 28;
+    const questionCounts: number[] = [];
+
+    // For each question Q_i (1-indexed), the number of people who "reached" it
+    // are those whose currentQuestionIndex >= i-1.
+    // e.g. Reached Q1 (Index 0) = Anyone with Index >= 0 (Everyone started)
+    // e.g. Reached Q2 (Index 1) = Anyone with Index >= 1
+    for (let i = 0; i < totalQuestions; i++) {
+        // Calculate sum of counts for all indices >= i
+        let count = 0;
+        // We iterate through all groups to sum up relevant counts
+        // Optimization: In a huge DB this loop is fine as 'progressGroups' has max 29 entries (0-28)
+        progressGroups.forEach(g => {
+            if (g.currentQuestionIndex >= i) {
+                count += g._count.currentQuestionIndex;
+            }
+        });
+        questionCounts.push(count);
+    }
+
     return {
         started,
+        questionCounts,
         onboarding,
         emailCaptured,
         completed,

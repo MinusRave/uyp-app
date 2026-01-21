@@ -8,14 +8,17 @@ import { ApexOptions } from "apexcharts";
 const AdminFunnelPage = ({ user }: { user: AuthUser }) => {
     const { data: stats, isLoading } = useQuery(getFunnelStats);
 
+    const questionCategories = Array.from({ length: 28 }, (_, i) => `Q${i + 1}`);
+
     const series = [
         {
             name: "Sessions",
             data: stats ? [
                 stats.started,
+                ...(stats.questionCounts || []), // Detailed questions
+                stats.completed,
                 stats.onboarding,
                 stats.emailCaptured,
-                stats.completed,
                 stats.paid
             ] : []
         },
@@ -24,23 +27,31 @@ const AdminFunnelPage = ({ user }: { user: AuthUser }) => {
     const options: ApexOptions = {
         chart: {
             type: "bar",
-            height: 350,
+            height: 1000, // Increased height for more categories
         },
         plotOptions: {
             bar: {
                 borderRadius: 4,
                 horizontal: true,
+                barHeight: '80%',
             },
         },
         dataLabels: {
             enabled: true,
         },
         xaxis: {
-            categories: ["Started", "Onboarding", "Email Captured", "Completed", "Paid"],
+            categories: [
+                "Started",
+                ...questionCategories,
+                "Completed",
+                "Onboarding",
+                "Email Captured",
+                "Paid"
+            ],
         },
         colors: ['#3C50E0'],
         title: {
-            text: "User Conversion Funnel",
+            text: "User Conversion Funnel (Detail)",
             align: 'left'
         }
     };
@@ -58,7 +69,7 @@ const AdminFunnelPage = ({ user }: { user: AuthUser }) => {
                         <div className="h-[350px] flex items-center justify-center">Loading...</div>
                     ) : (
                         <div id="funnelChart">
-                            <ReactApexChart options={options} series={series} type="bar" height={350} />
+                            <ReactApexChart options={options} series={series} type="bar" height={1000} />
                         </div>
                     )}
                 </div>
