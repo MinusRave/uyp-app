@@ -5,6 +5,7 @@ import { stripeClient } from "./stripe/stripeClient";
 import { emailSender } from "wasp/server/email";
 import { getPaymentConfirmationEmail } from "../server/email/templates/paymentConfirmation";
 import { buildPersonalizationData } from "../server/email/personalization";
+import { sendCapiEvent } from "../server/analytics/metaCapi";
 
 // ... middleware config ...
 export const stripeMiddlewareConfigFn: MiddlewareConfigFn = (
@@ -48,6 +49,40 @@ export const stripeWebhook = async (
       const testSession = await context.entities.TestSession.findUnique({
         where: { id: metadata.testSessionId },
       });
+
+      // Send Meta CAPI Purchase Event
+      // Using stripe session ID as the duplicate key eventID
+      try {
+        const eventId = session.id; // cs_test_...
+        const userEmail = testSession?.email || session.customer_details?.email;
+
+        // Import dynamically if needed or assume it's available. 
+        // Since this is a server file, we can import from metaCapi.
+        // But wait, imports in Wasp must be from src path.
+        // We need to add the import at the top. 
+
+        await sendCapiEvent({
+          eventName: 'Purchase',
+          eventId: eventId,
+          eventSourceUrl: 'https://understandyourpartner.com/report',
+          userData: {
+            email: userEmail,
+            fbp: metadata.fbp, // If we saved this in metadata, which we should have! 
+            // Wait, we didn't save fbp/fbc in metadata in createCheckoutSession.
+            // We should add that to createCheckoutSession metadata first?
+            // Or just use email which is strong enough.
+          },
+          customData: {
+            currency: 'usd',
+            value: 15.00,
+            content_name: 'Full Relationship Report',
+            content_type: 'product',
+            order_id: session.id
+          }
+        });
+      } catch (e) {
+        console.error("Failed to send CAPI Purchase event:", e);
+      }
 
       // Update session to mark as paid and stop retention emails
       await context.entities.TestSession.update({

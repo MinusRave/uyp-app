@@ -58,14 +58,17 @@ export const generateCheckoutSession: GenerateCheckoutSession<
   };
 };
 
+import { sendCapiEvent } from "../server/analytics/metaCapi";
+
 export type CreateCheckoutSessionArgs = {
   sessionId: string;
+  eventID?: string;
 };
 
 export const createCheckoutSession: CreateCheckoutSession<
   CreateCheckoutSessionArgs,
   CheckoutSession
-> = async ({ sessionId }, context) => {
+> = async ({ sessionId, eventID }, context) => {
   // 1. Fetch Session
   console.log("[createCheckoutSession] SessionId:", sessionId);
   console.log("[createCheckoutSession] User Context:", context.user?.id);
@@ -104,6 +107,31 @@ export const createCheckoutSession: CreateCheckoutSession<
     throw new HttpError(401, "Email required. Please log in or provide email at end of test.");
   }
 
+  // 3. Send Meta CAPI InitiateCheckout Event
+  if (eventID) {
+    // Run in background
+    sendCapiEvent({
+      eventName: 'InitiateCheckout',
+      eventId: eventID,
+      eventSourceUrl: (context as any).req?.headers?.referer || 'https://understandyourpartner.com/results',
+      userData: {
+        email: customerEmail,
+        clientIp: (context as any).req?.ip,
+        userAgent: (context as any).req?.headers?.['user-agent'],
+        fbp: (context as any).req?.cookies?.['_fbp'],
+        fbc: (context as any).req?.cookies?.['_fbc'],
+      },
+      customData: {
+        currency: 'usd',
+        value: 15.00,
+        content_name: 'Full Relationship Report',
+        content_category: 'Report',
+        content_ids: ['report-full'],
+        content_type: 'product',
+      }
+    });
+  }
+
   const session = await stripeClient.checkout.sessions.create({
     payment_method_types: ["card"],
     line_items: [
@@ -120,13 +148,14 @@ export const createCheckoutSession: CreateCheckoutSession<
       },
     ],
     mode: "payment",
-    success_url: `${config.frontendUrl}/report?success=true`,
+    success_url: `${config.frontendUrl}/report?success=true&session_id={CHECKOUT_SESSION_ID}`,
     cancel_url: `${config.frontendUrl}/results`,
     customer_email: customerEmail,
     metadata: {
       testSessionId: sessionId,
       userId: context.user?.id || "", // Empty if anonymous
-      type: "report_unlock"
+      type: "report_unlock",
+      capiEventId: eventID || "", // Pass it just in case we need it
     },
   });
 

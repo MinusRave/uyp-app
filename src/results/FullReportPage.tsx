@@ -1,11 +1,12 @@
 import React, { useEffect, useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import { useAuth } from "wasp/client/auth";
 import { useQuery, getTestSession, generateExecutiveAnalysis, translateMessage } from "wasp/client/operations";
 import { Loader2, Lock, CheckCircle, CheckCircle2, AlertTriangle, ArrowRight, Heart, MessageCircle, MessageSquare, Eye, Shield, Zap, Quote, BarChart3, BookOpen, Sparkles, FileText, ChevronDown, TrendingDown, Repeat, Target, Lightbulb } from "lucide-react";
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import { DistortionGraph } from "../components/DistortionGraph";
+import { trackPixelEvent } from "../analytics/pixel";
 
 import { OnboardingWizard } from "./components/OnboardingWizard";
 import { CompatibilityCard } from "./components/CompatibilityCard";
@@ -79,6 +80,24 @@ export default function FullReportPage() {
     const { data: user } = useAuth();
     const localSessionId = typeof window !== 'undefined' ? localStorage.getItem("uyp-session-id") : null;
     const { data: session, isLoading, error } = useQuery(getTestSession, { sessionId: localSessionId || undefined });
+
+    const [urlSearchParams] = useSearchParams();
+    const success = urlSearchParams.get("success");
+    const sessionIdParam = urlSearchParams.get("session_id");
+
+    useEffect(() => {
+        if (success === "true" && sessionIdParam) {
+            const trackedKey = `uyp-tracked-purchase-${sessionIdParam}`;
+            if (!localStorage.getItem(trackedKey)) {
+                trackPixelEvent('Purchase', {
+                    value: 15.00,
+                    currency: 'USD',
+                    eventID: sessionIdParam
+                });
+                localStorage.setItem(trackedKey, 'true');
+            }
+        }
+    }, [success, sessionIdParam]);
 
     useEffect(() => {
         if (!isLoading && (!session || !session.isPaid)) {

@@ -5,6 +5,7 @@ import { routes } from "wasp/client/router";
 import { Loader2, Mail, MessageSquare, ChevronLeft } from "lucide-react";
 import { cn } from "../client/utils";
 import { trackPixelEvent } from "../analytics/pixel";
+import { generateEventId } from "../analytics/eventId";
 
 // --- Data: Questions ---
 // Imported from config
@@ -168,8 +169,18 @@ export default function TestPage() {
         e.preventDefault();
         if (!email || !sessionId) return;
         setIsSubmitting(true);
+
+        // Generate Event ID for deduplication
+        const eventID = generateEventId();
+
         try {
-            await captureLead({ sessionId, email });
+            await captureLead({ sessionId, email, eventID });
+            // Add Client Pixel Event (was missing)
+            trackPixelEvent('Lead', { eventID });
+
+            // Small delay to ensure Pixel event has time to fire before navigation
+            await new Promise(resolve => setTimeout(resolve, 300));
+
             await completeTest({ sessionId });
             navigate(routes.ProcessingRoute.build());
         } catch (err) {

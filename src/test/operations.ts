@@ -10,9 +10,11 @@ import { sendMagicLink } from "../auth/magicLink";
 
 // --- Queries ---
 
-type CaptureLeadArgs = { sessionId: string; email: string };
+import { sendCapiEvent } from "../server/analytics/metaCapi";
 
-export const captureLead = async ({ sessionId, email }: CaptureLeadArgs, context: any) => {
+type CaptureLeadArgs = { sessionId: string; email: string; eventID?: string };
+
+export const captureLead = async ({ sessionId, email, eventID }: CaptureLeadArgs, context: any) => {
     const session = await context.entities.TestSession.findUnique({
         where: { id: sessionId },
     });
@@ -33,6 +35,24 @@ export const captureLead = async ({ sessionId, email }: CaptureLeadArgs, context
 
     // 2. Send Magic Link
     await sendMagicLink(email, context);
+
+    // 3. Send Meta CAPI Lead Event
+    if (eventID) {
+        // Run in background / don't await execution to avoid blocking response
+        sendCapiEvent({
+            eventName: 'Lead',
+            eventId: eventID,
+            eventSourceUrl: context.req?.headers?.referer || 'https://understandyourpartner.com/test',
+            userData: {
+                email: email,
+                clientIp: context.req?.ip,
+                userAgent: context.req?.headers?.['user-agent'],
+                // Try to get fbp/fbc from cookies if available in context
+                fbp: context.req?.cookies?.['_fbp'],
+                fbc: context.req?.cookies?.['_fbc'],
+            }
+        });
+    }
 };
 
 export const getTestSession: GetTestSession<{ sessionId?: string }, TestSession | null> = async (

@@ -14,6 +14,9 @@ import CookieConsentBanner from "./components/cookie-consent/Banner";
  * use this component to wrap all child components
  * this is useful for templates, themes, and context
  */
+// Keep track of initialization to prevent duplicates in React Strict Mode
+let isPixelInitialized = false;
+
 export default function App() {
   const location = useLocation();
   const isMarketingPage = useMemo(() => {
@@ -49,8 +52,10 @@ export default function App() {
 
   useEffect(() => {
     // Initialize Meta Pixel
-    const pixelId = import.meta.env.REACT_APP_META_PIXEL_ID;
-    if (pixelId) {
+    // Hardcoded ID to ensure it works client-side without env var issues
+    const pixelId = '916987204839994';
+    if (pixelId && !isPixelInitialized) {
+      isPixelInitialized = true;
       import("../analytics/pixel").then(({ initPixel }) => {
         initPixel(pixelId);
       });

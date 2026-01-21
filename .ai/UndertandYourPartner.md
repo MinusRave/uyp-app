@@ -1,294 +1,69 @@
-UnderstandYourPartner.com
-Executive & Conceptual Definition (AI Instruction Document)
-1. What UnderstandYourPartner.com Is
-
-UnderstandYourPartner.com is a psychology-inspired digital project focused on helping people better understand their romantic relationships by examining how they interpret their partner’s behavior, rather than attempting to define or diagnose the partner.
-
-The core idea is simple but powerful:
-
-Most relationship conflicts are not caused by what the partner does,
-but by the meaning we assign to what they do.
-
-UnderstandYourPartner.com exists to make those meanings visible.
-
-The project does not provide therapy, diagnoses, or clinical assessments.
-It does not label partners or assign blame.
-Instead, it helps users develop self-awareness, emotional clarity, and a more accurate understanding of relational dynamics.
-
-2. The Problem It Addresses
-
-In many relationships, recurring issues arise from misinterpretation:
-
-silence is read as emotional distance
-
-conflict is read as rejection
-
-lack of reassurance is read as lack of care
-
-These interpretations are often shaped by:
-
-personal emotional needs
-
-sensitivity to uncertainty
-
-past relational experiences
-
-individual communication styles
-
-Most online relationship content oversimplifies these dynamics, offering:
-
-rigid labels
-
-one-sided blame
-
-generic advice
-
-UnderstandYourPartner.com addresses this gap by focusing on interpretive patterns, not surface behaviors.
-
-3. Core Value Proposition
-
-UnderstandYourPartner.com helps users:
-
-recognize their own interpretive lens
-
-understand how their needs influence perception
-
-identify where misunderstandings are likely to occur
-
-distinguish between difference in style and actual relational problems
-
-The value lies not in telling users what to do, but in helping them see why they react the way they do, and how that shapes the relationship.
-
-4. The Central Product Concept: The Test
-
-The main experience is a structured psychological test designed to reveal:
-
-Partner Model (PM)
-How the user perceives and interprets their partner’s behavior.
-
-Self Lens (SL)
-How the user personally reacts to ambiguity, conflict, reassurance, and emotional distance.
-
-The test does not claim to describe the partner’s true personality.
-It explicitly measures the user’s interpretation of the partner and the user’s internal reactions.
-
-5. Question Design Philosophy
-
-The test consists of 28 fixed questions, designed to be completed in approximately 10–12 minutes.
-
-Question Types
-
-Likert scale questions (Strongly disagree → Strongly agree)
-
-Questions are emotionally safe, non-judgmental, and non-clinical
-
-Two Categories of Questions
-
-Partner Model questions (PM):
-“How do you interpret your partner’s behavior?”
-
-Self Lens questions (SL):
-“How do you personally react in relational situations?”
-
-This dual structure is essential.
-Value emerges from the comparison between PM and SL, not from either alone.
-
-6. Psychological Dimensions Measured
-
-The test measures five core relational dimensions, each evaluated separately for PM and SL:
-
-Silence & Distance
-How silence is interpreted vs. how silence affects the user emotionally.
-
-Conflict & Tension
-How disagreement is perceived vs. how the user reacts to conflict.
-
-Intention Attribution
-Whether behaviors are interpreted as intentional or given the benefit of the doubt.
-
-Need for Reassurance
-The user’s need for explicit reassurance vs. perceived partner expressiveness.
-
-Repair & Closure
-Expectations around emotional repair and closure after conflict.
-
-These dimensions are non-diagnostic and framed as relational tendencies, not traits.
-
-7. Scoring Logic (Conceptual, Non-Technical)
-
-All scoring is deterministic, transparent, and explainable.
-
-Step 1 – Dimension Scores
-
-Each dimension produces:
-
-a Partner Model score (PM): how the partner is perceived
-
-a Self Lens score (SL): how the user reacts
-
-Scores are normalized on a 0–100 scale for clarity.
-
-Step 2 – Mismatch Analysis
-
-For each dimension, the system calculates a Mismatch Score:
-
-the absolute difference between SL and PM scores
-
-This highlights areas where:
-
-the user’s emotional needs
-
-and the perceived partner style
-
-may be out of sync.
-
-Mismatch is interpreted as:
-
-low mismatch → alignment
-
-medium mismatch → latent tension
-
-high mismatch → high risk of misunderstanding
-
-Step 3 – Interpretive Risk Patterns
-
-Certain combinations of scores activate misinterpretation risks, such as:
-
-reading emotional distance where there may be processing
-
-interpreting conflict as rejection
-
-assuming negative intent under stress
-
-These are presented as tendencies, never as facts.
-
-8. Report Structure & Output Philosophy
-
-The full report is structured around clarity, not instruction.
-
-Report Sections
-
-Your Primary Interpretive Lens
-The dominant way the user tends to interpret relational signals.
-
-Where You Likely Understand Your Partner Well
-Areas of alignment and accurate interpretation.
-
-Likely Misreads
-Where perception may be distorted by emotional needs or expectations.
-
-Recurring Misunderstanding Loops
-Typical patterns where the same conflict repeats with different triggers.
-
-Three Practical Reflections / Actions
-
-one observation to notice
-
-one communication shift
-
-one self-regulation focus
-
-The report avoids:
-
-blame
-
-directives
-
-moral judgment
-
-It aims to foster insight and agency.
-
-9. Optional AI Commentary (Guided Reflection Only)
-
-An optional AI-generated commentary may be added on top of the deterministic report.
-
-Its role is strictly limited to:
-
-summarizing insights in empathetic language
-
-suggesting reflective questions
-
-encouraging curiosity rather than certainty
-
-The AI must:
-
-never diagnose
-
-never label the partner
-
-never claim objective truth
-
-never replace the core deterministic logic
-
-If AI commentary is unavailable or fails, the core report remains complete and sufficient.
-
-10. Business & Marketing Objectives
-Primary Business Goal
-
-To validate and grow a trusted digital brand focused on relationship self-understanding, not therapy or advice.
-
-Marketing Philosophy
-
-Content-first
-
-Trust-first
-
-No sensationalism
-
-No fear-based messaging
-
-The project prioritizes:
-
-SEO and educational content
-
-social content based on recognizable relational moments
-
-email as a long-term relationship channel
-
-11. Target Audience
-
-Adults (roughly 25–45) who:
-
-are in a relationship or recently experienced relational difficulty
-
-feel confused by recurring misunderstandings
-
-want insight, not quick fixes
-
-are skeptical of labels and pop-psychology
-
-12. Positioning Principles
-
-UnderstandYourPartner.com is:
-
-not a relationship test about “compatibility”
-
-not a personality labeler
-
-not a diagnostic tool
-
-not a therapy substitute
-
-It is a self-understanding tool for relational clarity.
-
-13. Core Principles (Non-Negotiable)
-
-No diagnoses
-
-No partner labeling
-
-No blame
-
-No clinical claims
-
-No false certainty
-
-Clarity over certainty.
-Understanding over judgment.
-Awareness over advice.
-
-14. One-Sentence Definition (Canonical)
-
-UnderstandYourPartner.com helps people understand their relationships by revealing how their own interpretations shape what they see in their partner.
-
-End of Instruction Document
+# UnderstandYourPartner - Business Documentation
+
+## Executive Summary
+**UnderstandYourPartner** is a direct-to-consumer online psychological assessment platform. It helps individuals and couples decode their relationship dynamics through a 10-minute test. Instead of generic advice, users receive a personalized "User Manual" for their partner's nervous system, generated by an advanced AI that acts as an objective third-party therapist.
+
+## The User's Why: Driver & End Game
+To understand the business, we must understand the user's state of mind. They are not taking this test for "fun"; they are taking it out of **exhaustion**.
+
+### The Driver (Why they click "Start")
+The user is stuck in a circular conflict loop. They feel:
+*   **Invalidated:** "I keep explaining myself, but they don't get it."
+*   **Crazy:** "Am I too sensitive? Is my reality wrong?"
+*   **Desperate:** "This is my last attempt to fix this before I give up."
+*   **The Hope for Vindication:** They secretly want an objective source to say, "You are right, and here is the scientific proof."
+
+### The "End Game" (The Ultimate Benefit)
+What is the user actually buying? It isn't just "understanding"—it is **Emotional Safety and Control**. By paying $15, they acquire a predictable mechanism to interact with their partner.
+*   **Relief from Chaos:** The partner's behavior changes from "malicious and random" to "predictable and biological."
+*   **The "User Manual":** A concrete tool to stop the pain. "If I say X, they panic. If I say Z (as the app suggests), they stay calm."
+*   **Peace:** The ultimate ROI is the silence of a fight that *didn't* happen.
+
+## Value Proposition
+- **"Cheaper than 5 minutes of therapy":** Immediate, accessible relationship clarity without the high cost or wait times of counseling.
+- **Objective Vindication:** Moves couples from "he said, she said" arguments to data-driven discussions.
+- **Privacy First:** We don't sell data; we sell clarity. Results are encrypted and private.
+- **Instant Implementation:** Provides actionable scripts and "repair attempts" that can be used immediately to de-escalate conflict.
+
+## Product Flow & Business Model
+The application follows a "Test -> Teaser -> Paywall -> Value" model:
+
+1.  **The Assessment (Free):** Users answer 28 psychometric questions designed to measure their emotional reactions and interpretations.
+2.  **The Teaser (Free):** Users see high-level insights, such as their "Dominant Lens" (e.g., "Amplified Distress") and key trigger points, but the actionable advice is locked.
+3.  **The Unlock (Monetization):** Users pay a **one-time fee of $15.00** to unlock their full report.
+4.  **The Deep Mirror (Product):** Access to the full, AI-generated analysis, scripts, and compatibility breakdown.
+
+## Methodology & Technology
+The core of the product combines established psychological theory with modern AI.
+
+### 1. The 5 Core Dimensions
+The assessment measures users across five critical relationship dimensions:
+1.  **Silence & Distance:** How one interprets and reacts to a partner's need for space (e.g., Secure vs. Abandonment Anxiety).
+2.  **Conflict & Tension:** Tolerance for unresolved arguments (e.g., Avoider vs. Urgent Resolver).
+3.  **Intentional Attribution:** The tendency to view a partner's actions as malicious vs. accidental (Benefit of Doubt vs. Malice Detective).
+4.  **Reassurance Need:** The level of verbal validation required to feel loved (Self-Assured vs. Validation Hungry).
+5.  **Repair & Closure:** The ability to "let go" after a disagreement (Quick Eraser vs. Lingering Resentment).
+
+### 2. The Quadrant System Algorithm
+Answers are scored not just on a linear scale but mapped onto a **Quadrant System** based on two axes:
+-   **Sensitivity Level (SL):** Biological/Emotional reactivity to the trigger.
+-   **Perception of Malice (PM):** Cognitive interpretation of the partner's intent.
+
+This categorization (e.g., *Amplified Distress, Detached Cynicism, Self-Regulation, Secure Flow*) allows for highly specific diagnosis of *why* a conflict occurs—is it biological panic or a trust issue?
+
+### 3. AI "Deep Mirror" Analysis
+Upon payment, the system uses **Claude 3.5 Sonnet** (via Anthropic API) to generate a personalized "Executive Analysis". This is not a static template. The AI acts as a senior therapist, analyzing:
+-   The user's specific dimensional profile.
+-   Relationship context (duration, children, marriage structure).
+-   A specific recent conflict description provided by the user.
+
+The output acts as a compassionate but direct "Mirror," explaining exactly how their nervous system is sabotaging their connection and providing a specific script to fix it.
+
+## Target Audience
+-   **Couples in Crisis:** Partners looking for a "last resort" or immediate clarity who are tired of circular arguments.
+-   **The "Misunderstood" Partner:** Individuals who feel their partner "just doesn't get" why they react the way they do.
+-   **Introspective Individuals:** Users wanting to understand their own patterns ("Why do I always panic when he's silent?") before bringing it to the relationship.
+
+## Pricing
+-   **Full Report Unlock:** **$15.00** (One-time payment).
+    -   Includes: Full Dimensional Analysis, "Deep Mirror" AI Letter, Conflict Decoder, and Actionable Scripts.

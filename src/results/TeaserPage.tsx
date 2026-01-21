@@ -6,6 +6,7 @@ import { LensRadar } from "../components/LensRadar";
 import { useQuery } from "wasp/client/operations";
 import { useAuth } from "wasp/client/auth";
 import { trackPixelEvent } from "../analytics/pixel";
+import { generateEventId } from "../analytics/eventId";
 
 export default function TeaserPage() {
     const navigate = useNavigate();
@@ -80,9 +81,19 @@ export default function TeaserPage() {
         if (e) e.preventDefault();
         if (!session || !email) return;
         setIsSavingEmail(true);
+
+        // Generate Event ID for deduplication
+        const eventID = generateEventId();
+
         try {
-            await captureLead({ sessionId: session.id, email });
-            trackPixelEvent('Lead');
+            // Pass eventID to Server (CAPI)
+            await captureLead({ sessionId: session.id, email, eventID });
+
+            // Pass eventID to Client Pixel
+            trackPixelEvent('Lead', { eventID });
+            // Small delay to ensure Pixel event has time to fire
+            await new Promise(resolve => setTimeout(resolve, 300));
+
             setEditingEmail(false);
             setShowExitIntent(false); // Close modal on success
         } catch (e) {
@@ -106,9 +117,17 @@ export default function TeaserPage() {
         }
 
         setIsRedirecting(true);
+
+        // Generate Event ID for deduplication
+        const eventID = generateEventId();
+
         try {
-            trackPixelEvent('InitiateCheckout');
-            const checkout = await createCheckoutSession({ sessionId: session.id });
+            // Pass eventID to Client Pixel
+            trackPixelEvent('InitiateCheckout', { eventID });
+
+            // Pass eventID to Server (CAPI)
+            const checkout = await createCheckoutSession({ sessionId: session.id, eventID });
+
             if (checkout.sessionUrl) window.location.href = checkout.sessionUrl;
         } catch (e) {
             console.error(e);
