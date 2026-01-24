@@ -28,7 +28,7 @@ declare global {
             action: string,
             eventName: string,
             params?: any,
-            options?: { eventID?: string }
+            options?: { eventID?: string; test_event_code?: string }
         ) => void;
     }
 }
@@ -36,7 +36,15 @@ declare global {
 
 export const initPixel = (pixelId: string) => {
     if (typeof window !== 'undefined' && window.fbq) {
-        window.fbq('init', pixelId);
+        // Get test_event_code from env
+        const testCode = import.meta.env.REACT_APP_META_TEST_EVENT_CODE;
+
+        // Initialize with test_event_code in options (4th parameter)
+        // Syntax: fbq('init', pixelId, userData, options)
+        const options = testCode ? { test_event_code: testCode } : {};
+
+        console.log('[Pixel] Initializing with options:', options);
+        window.fbq('init', pixelId, {}, options);
     }
 };
 
@@ -45,21 +53,16 @@ export const trackPixelEvent = (eventName: PixelEventName, data?: PixelEventData
     if (typeof window !== 'undefined' && window.fbq) {
         const params = { ...data };
 
-        // Inject Test Event Code if available (for localhost debugging)
-        // This ensures Browser events show up in the same Test Events tab as CAPI events
-        const testCode = import.meta.env.REACT_APP_META_TEST_EVENT_CODE;
-        if (testCode) {
-            (params as any).test_event_code = testCode;
-        }
-
+        // Extract eventID from params for deduplication with server-side events
         const eventID = params.eventID;
-
-        // Remove eventID from the data payload as it should be passed as a separate option
         if (eventID) {
             delete params.eventID;
         }
 
-        const options = eventID ? { eventID } : undefined;
+        // Build options object with eventID
+        // Note: test_event_code is set globally in init, no need to pass it per-event
+        const options: any = {};
+        if (eventID) options.eventID = eventID;
 
         console.log(`[Pixel] Calling fbq('track', '${eventName}', ${JSON.stringify(params)}, ${JSON.stringify(options)})`);
         window.fbq('track', eventName, params, options);
