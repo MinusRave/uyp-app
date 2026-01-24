@@ -169,10 +169,10 @@ export default function TeaserPage() {
                     <CheckCircle2 size={16} /> Analysis Complete
                 </div>
                 <h1 className="text-3xl md:text-5xl font-extrabold mb-6 leading-tight">
-                    We have decoded your <span className="text-primary">relationship patterns</span>.
+                    We found the <span className="text-primary">root cause</span> of your disconnect.
                 </h1>
                 <p className="text-xl md:text-2xl text-muted-foreground font-medium">
-                    Your answers reveal a specific "Protection Limit" that is silently driving your conflicts.
+                    It's not just "communication issues". It's a hidden mismatch in how you both process stress.
                 </p>
             </header>
 
@@ -303,7 +303,7 @@ export default function TeaserPage() {
 
                 {/* 6. WHAT YOU GET (Honest Value Presentation) */}
                 <section className="">
-                    <h3 className="font-bold text-3xl mb-8 text-center">What You Get for $15</h3>
+                    <h3 className="font-bold text-3xl mb-8 text-center">What You Get for $19</h3>
                     <div className="bg-card rounded-3xl border border-border shadow-lg overflow-hidden">
 
                         {/* Stack Items */}
@@ -423,8 +423,8 @@ export default function TeaserPage() {
 
                         {/* Bottom CTA */}
                         <div className="bg-primary/5 p-6 text-center border-t border-border">
-                            <p className="text-sm text-muted-foreground mb-2">One-time payment • Instant access • No subscription</p>
-                            <p className="font-bold text-lg">Everything above for just <span className="text-muted-foreground line-through mr-2">$49</span><span className="text-primary text-2xl">$15</span></p>
+                            <p className="text-sm text-muted-foreground mb-2">Cost of 1hr Couples Therapy: <span className="line-through decoration-red-500 decoration-2">$150+</span></p>
+                            <p className="font-bold text-lg">Your Price Today: <span className="text-primary text-2xl">$19</span></p>
                         </div>
                     </div>
                 </section>
@@ -435,10 +435,10 @@ export default function TeaserPage() {
 
                         <p className="text-lg font-medium mb-1">Get instant access for just</p>
                         <div className="flex items-center justify-center gap-3 mb-2">
-                            <span className="text-2xl text-muted-foreground line-through decoration-2 decoration-muted-foreground/50">$49</span>
-                            <div className="text-5xl font-extrabold text-primary">$15</div>
+                            <span className="text-xl text-muted-foreground line-through decoration-2 decoration-muted-foreground/50">$97</span>
+                            <div className="text-5xl font-extrabold text-primary">$19</div>
                         </div>
-                        <p className="text-xs text-muted-foreground mb-8">One-time payment. No subscription.</p>
+                        <p className="text-xs text-muted-foreground mb-8">Less than the cost of a takeout dinner.</p>
 
                         {/* Email Input */}
                         {(!user?.email && !session.email && !email) && (
@@ -480,8 +480,8 @@ export default function TeaserPage() {
                     </div>
                     <div className="flex items-center gap-3 ml-auto md:ml-0 w-full md:w-auto">
                         <div className="text-right shrink-0">
-                            <span className="block text-xs line-through text-muted-foreground">$49</span>
-                            <span className="block font-bold text-xl text-primary leading-none">$15</span>
+                            <span className="block text-xs line-through text-muted-foreground">$97</span>
+                            <span className="block font-bold text-xl text-primary leading-none">$19</span>
                         </div>
                         <button
                             onClick={handleUnlock}
@@ -490,6 +490,7 @@ export default function TeaserPage() {
                         >
                             Unlock Now
                         </button>
+                        <p className="hidden md:block text-[10px] text-muted-foreground text-center mt-1">100% Money-back Guarantee</p>
                     </div>
                 </div>
             </div>

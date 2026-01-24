@@ -142,7 +142,7 @@ export const createCheckoutSession: CreateCheckoutSession<
             name: "UnderstandYourPartner - Full Report",
             description: "Detailed analysis of your relationship dynamics.",
           },
-          unit_amount: 1500, // $15.00
+          unit_amount: 1900, // $19.00
         },
         quantity: 1,
       },

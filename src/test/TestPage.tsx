@@ -199,9 +199,9 @@ export default function TestPage() {
         );
     }
 
-    // PROFILE FORM UI
+    // PROFILE FORM UI (Now QuizWizard)
     if (showProfileForm) {
-        return <UserProfileForm onSubmit={handleProfileSubmit} isSubmitting={isSubmitting} />;
+        return <QuizWizard onSubmit={handleProfileSubmit} isSubmitting={isSubmitting} />;
     }
 
     // CONFLICT GATE UI (New)
@@ -404,192 +404,346 @@ export default function TestPage() {
     );
 }
 
-function UserProfileForm({ onSubmit, isSubmitting }: { onSubmit: (data: any) => void, isSubmitting: boolean }) {
+
+// --- Wizard Components ---
+
+function QuizWizard({ onSubmit, isSubmitting }: { onSubmit: (data: any) => void, isSubmitting: boolean }) {
+    const [step, setStep] = useState(1);
     const [formData, setFormData] = useState({
         userGender: "",
         partnerGender: "",
         userAgeRange: "",
         partnerAgeRange: "",
         relationshipStatus: "",
-        // Relationship history
         relationshipDuration: "",
         livingTogether: false,
         hasChildren: false,
-        previousRelationships: "",
-        previousMarriage: false,
-        majorLifeTransition: "",
-        // Partner behavior (for compatibility)
         partnerConflictStyle: "",
         fightFrequency: "",
         repairFrequency: "",
         partnerHurtfulBehavior: ""
     });
 
-    const handleChange = (e: React.ChangeEvent<HTMLSelectElement | HTMLInputElement | HTMLTextAreaElement>) => {
-        const { name, value, type } = e.target;
-        if (type === 'checkbox') {
-            setFormData({ ...formData, [name]: (e.target as HTMLInputElement).checked });
-        } else {
-            setFormData({ ...formData, [name]: value });
-        }
+    const updateData = (key: string, value: any) => {
+        setFormData(prev => ({ ...prev, [key]: value }));
     };
 
-    // Only require basic fields for validation
-    const isValid = formData.userGender && formData.partnerGender && formData.userAgeRange &&
-        formData.partnerAgeRange && formData.relationshipStatus && formData.relationshipDuration &&
-        formData.partnerConflictStyle && formData.fightFrequency && formData.repairFrequency;
+    const nextStep = () => setStep(prev => prev + 1);
+    const prevStep = () => setStep(prev => prev - 1);
 
-    const handleSubmit = (e: React.FormEvent) => {
-        e.preventDefault();
-        if (isValid) onSubmit(formData);
+    const handleFinalSubmit = () => {
+        onSubmit(formData);
     };
+
+    // Wizard Steps
+    return (
+        <div className="min-h-screen bg-background flex flex-col items-center justify-center p-4 animate-fade-in">
+            <div className="w-full max-w-lg">
+                {/* Progress Bar (Subtle) */}
+                <div className="mb-8 flex justify-center gap-2">
+                    {[1, 2, 3, 4].map(s => (
+                        <div key={s} className={cn("h-1.5 w-12 rounded-full transition-all duration-500", step >= s ? "bg-primary" : "bg-muted")} />
+                    ))}
+                </div>
+
+                {step === 1 && (
+                    <Step1_Status
+                        value={formData.relationshipStatus}
+                        onChange={(val) => { updateData('relationshipStatus', val); nextStep(); }}
+                    />
+                )}
+
+                {step === 2 && (
+                    <Step2_History
+                        data={formData}
+                        updateData={updateData}
+                        onNext={nextStep}
+                        onBack={prevStep}
+                    // Only auto-advance if specific conditions met inside if complex, but simple enough to have a "Next" button here as it has multiple fields
+                    />
+                )}
+
+                {step === 3 && (
+                    <Step3_Conflict
+                        data={formData}
+                        updateData={updateData}
+                        onNext={nextStep}
+                        onBack={prevStep}
+                    />
+                )}
+
+                {step === 4 && (
+                    <Step4_Demographics
+                        data={formData}
+                        updateData={updateData}
+                        onSubmit={handleFinalSubmit}
+                        onBack={prevStep}
+                        isSubmitting={isSubmitting}
+                    />
+                )}
+            </div>
+        </div>
+    );
+}
+
+// -- Step Components --
+
+function Step1_Status({ value, onChange }: { value: string, onChange: (val: string) => void }) {
+    const options = [
+        { id: "In Crisis", label: "In Crisis", icon: "💔", desc: "We're on the brink of breaking up" },
+        { id: "Unstable", label: "Unstable", icon: "⚠️", desc: "Frequent fights or emotional distance" },
+        { id: "Together", label: "Stable but Stuck", icon: "😐", desc: "We're okay, but something is missing" },
+        { id: "Recently Separated", label: "Recently Separated", icon: "🏚️", desc: "Trying to understand what happened" },
+    ];
 
     return (
-        <div className="min-h-screen bg-background flex items-center justify-center p-6 animate-fade-in">
-            <div className="max-w-lg w-full bg-card p-8 rounded-2xl shadow-xl border border-border">
-                <h2 className="text-2xl font-bold mb-2 text-center text-primary">About You & Your Partner</h2>
-                <p className="text-center text-muted-foreground mb-8">Help us personalize your analysis.</p>
+        <div className="space-y-6 animate-slide-up">
+            <div className="text-center space-y-2">
+                <h2 className="text-3xl font-bold">First, how would you describe your relationship right now?</h2>
+                <p className="text-muted-foreground">Select the one that fits best.</p>
+            </div>
+            <div className="grid gap-3">
+                {options.map((opt) => (
+                    <button
+                        key={opt.id}
+                        onClick={() => onChange(opt.id)}
+                        className="w-full text-left p-6 rounded-2xl border-2 border-border hover:border-primary hover:bg-primary/5 transition-all group active:scale-[0.98]"
+                    >
+                        <div className="flex items-center gap-4">
+                            <span className="text-4xl group-hover:scale-110 transition-transform">{opt.icon}</span>
+                            <div>
+                                <div className="font-bold text-lg">{opt.label}</div>
+                                <div className="text-muted-foreground text-sm">{opt.desc}</div>
+                            </div>
+                        </div>
+                    </button>
+                ))}
+            </div>
+        </div>
+    );
+}
 
-                <form onSubmit={handleSubmit} className="space-y-4">
-                    <div className="grid grid-cols-2 gap-4">
-                        <div className="space-y-2">
-                            <label className="text-sm font-medium">Your Gender</label>
-                            <select name="userGender" onChange={handleChange} className="w-full p-2 rounded-md border bg-background" required>
-                                <option value="">Select...</option>
-                                <option value="Male">Male</option>
-                                <option value="Female">Female</option>
-                                <option value="Other">Other</option>
-                            </select>
-                        </div>
-                        <div className="space-y-2">
-                            <label className="text-sm font-medium">Partner's Gender</label>
-                            <select name="partnerGender" onChange={handleChange} className="w-full p-2 rounded-md border bg-background" required>
-                                <option value="">Select...</option>
-                                <option value="Male">Male</option>
-                                <option value="Female">Female</option>
-                                <option value="Other">Other</option>
-                            </select>
-                        </div>
+function Step2_History({ data, updateData, onNext, onBack }: { data: any, updateData: any, onNext: () => void, onBack: () => void }) {
+    return (
+        <div className="space-y-6 animate-slide-up">
+            <div className="text-center">
+                <h2 className="text-2xl font-bold mb-1">A few quick details</h2>
+                <p className="text-muted-foreground">To benchmark your results against similar couples.</p>
+            </div>
+
+            <div className="space-y-4 bg-card p-6 rounded-2xl border border-border shadow-sm">
+                <div className="space-y-3">
+                    <label className="text-sm font-medium block">How long have you been together?</label>
+                    <div className="grid grid-cols-2 gap-2">
+                        {['0-6mo', '6mo-2yr', '2-5yr', '5-10yr', '10+yr'].map(val => (
+                            <button
+                                key={val}
+                                onClick={() => updateData('relationshipDuration', val)}
+                                className={cn(
+                                    "p-3 rounded-lg border text-sm transition-all",
+                                    data.relationshipDuration === val ? "border-primary bg-primary/10 text-primary font-bold" : "border-border hover:border-primary/50"
+                                )}
+                            >
+                                {val === '0-6mo' ? '< 6 Months' : val === '6mo-2yr' ? '6 Months - 2 Years' : val === '10+yr' ? '10+ Years' : val + ' Years'}
+                            </button>
+                        ))}
                     </div>
+                </div>
 
-                    <div className="grid grid-cols-2 gap-4">
-                        <div className="space-y-2">
-                            <label className="text-sm font-medium">Your Age</label>
-                            <select name="userAgeRange" onChange={handleChange} className="w-full p-2 rounded-md border bg-background" required>
-                                <option value="">Select...</option>
-                                <option value="<25">Under 25</option>
-                                <option value="25-34">25-34</option>
-                                <option value="35-44">35-44</option>
-                                <option value="45+">45+</option>
-                            </select>
-                        </div>
-                        <div className="space-y-2">
-                            <label className="text-sm font-medium">Partner's Age</label>
-                            <select name="partnerAgeRange" onChange={handleChange} className="w-full p-2 rounded-md border bg-background" required>
-                                <option value="">Select...</option>
-                                <option value="<25">Under 25</option>
-                                <option value="25-34">25-34</option>
-                                <option value="35-44">35-44</option>
-                                <option value="45+">45+</option>
-                            </select>
-                        </div>
-                    </div>
+                <div className="space-y-3 pt-2">
+                    <label className="flex items-center gap-3 p-3 rounded-lg border border-border hover:bg-muted/50 cursor-pointer transition-colors">
+                        <input
+                            type="checkbox"
+                            checked={data.livingTogether}
+                            onChange={(e) => updateData('livingTogether', e.target.checked)}
+                            className="w-5 h-5 rounded border-gray-300 text-primary focus:ring-primary"
+                        />
+                        <span className="font-medium">We live together</span>
+                    </label>
 
+                    <label className="flex items-center gap-3 p-3 rounded-lg border border-border hover:bg-muted/50 cursor-pointer transition-colors">
+                        <input
+                            type="checkbox"
+                            checked={data.hasChildren}
+                            onChange={(e) => updateData('hasChildren', e.target.checked)}
+                            className="w-5 h-5 rounded border-gray-300 text-primary focus:ring-primary"
+                        />
+                        <span className="font-medium">We have children</span>
+                    </label>
+                </div>
+            </div>
+
+            <div className="flex gap-3">
+                <button onClick={onBack} className="px-6 py-3 rounded-full font-medium text-muted-foreground hover:bg-muted">Back</button>
+                <button
+                    onClick={onNext}
+                    disabled={!data.relationshipDuration}
+                    className="flex-1 py-3 rounded-full bg-primary text-primary-foreground font-bold hover:opacity-90 disabled:opacity-50 transition-opacity"
+                >
+                    Continue
+                </button>
+            </div>
+        </div>
+    );
+}
+
+function Step3_Conflict({ data, updateData, onNext, onBack }: { data: any, updateData: any, onNext: () => void, onBack: () => void }) {
+    return (
+        <div className="space-y-6 animate-slide-up">
+            <div className="text-center">
+                <h2 className="text-2xl font-bold mb-1">Conflict Dynamics</h2>
+                <p className="text-muted-foreground">Understanding how you fight is key.</p>
+            </div>
+
+            <div className="space-y-4 bg-card p-6 rounded-2xl border border-border shadow-sm">
+                <div className="space-y-2">
+                    <label className="text-sm font-medium">How often do you have conflicts?</label>
+                    <select
+                        value={data.fightFrequency}
+                        onChange={(e) => updateData('fightFrequency', e.target.value)}
+                        className="w-full p-3 rounded-lg border bg-background"
+                    >
+                        <option value="">Select...</option>
+                        <option value="daily">Daily</option>
+                        <option value="weekly">Weekly</option>
+                        <option value="monthly">Monthly</option>
+                        <option value="rarely">Rarely</option>
+                    </select>
+                </div>
+
+                <div className="space-y-2">
+                    <label className="text-sm font-medium">When you fight, your partner typically:</label>
+                    <select
+                        value={data.partnerConflictStyle}
+                        onChange={(e) => updateData('partnerConflictStyle', e.target.value)}
+                        className="w-full p-3 rounded-lg border bg-background"
+                    >
+                        <option value="">Select...</option>
+                        <option value="withdraws">Withdraws / Goes silent</option>
+                        <option value="escalates">Escalates / Gets intense</option>
+                        <option value="deflects">Deflects / Blames you</option>
+                        <option value="engages">Tries to resolve it calmly</option>
+                    </select>
+                </div>
+
+                <div className="space-y-2">
+                    <label className="text-sm font-medium">Do you successfully repair afterwards?</label>
+                    <select
+                        value={data.repairFrequency}
+                        onChange={(e) => updateData('repairFrequency', e.target.value)}
+                        className="w-full p-3 rounded-lg border bg-background"
+                    >
+                        <option value="">Select...</option>
+                        <option value="always">Always - We make up quickly</option>
+                        <option value="sometimes">Sometimes - It takes time</option>
+                        <option value="rarely">Rarely - We brush it under the rug</option>
+                        <option value="never">Never - Resentment builds up</option>
+                    </select>
+                </div>
+            </div>
+
+            <div className="flex gap-3">
+                <button onClick={onBack} className="px-6 py-3 rounded-full font-medium text-muted-foreground hover:bg-muted">Back</button>
+                <button
+                    onClick={onNext}
+                    disabled={!data.fightFrequency || !data.partnerConflictStyle || !data.repairFrequency}
+                    className="flex-1 py-3 rounded-full bg-primary text-primary-foreground font-bold hover:opacity-90 disabled:opacity-50 transition-opacity"
+                >
+                    Continue
+                </button>
+            </div>
+        </div>
+    );
+}
+
+function Step4_Demographics({ data, updateData, onSubmit, onBack, isSubmitting }: { data: any, updateData: any, onSubmit: () => void, onBack: () => void, isSubmitting: boolean }) {
+    const isValid = data.userGender && data.partnerGender && data.userAgeRange && data.partnerAgeRange;
+
+    return (
+        <div className="space-y-6 animate-slide-up">
+            <div className="text-center">
+                <h2 className="text-2xl font-bold mb-1">Last Step</h2>
+                <p className="text-muted-foreground">Demographics for statistical accuracy.</p>
+            </div>
+
+            <div className="bg-card p-6 rounded-2xl border border-border shadow-sm space-y-4">
+                <div className="grid grid-cols-2 gap-4">
                     <div className="space-y-2">
-                        <label className="text-sm font-medium">Relationship Status</label>
-                        <select name="relationshipStatus" onChange={handleChange} className="w-full p-2 rounded-md border bg-background" required>
+                        <label className="text-sm font-medium">Your Gender</label>
+                        <div className="flex flex-col gap-2">
+                            {['Male', 'Female'].map(g => (
+                                <button
+                                    key={g}
+                                    onClick={() => updateData('userGender', g)}
+                                    className={cn("p-2 rounded border text-sm", data.userGender === g ? "bg-primary text-primary-foreground border-primary" : "border-border")}
+                                >
+                                    {g}
+                                </button>
+                            ))}
+                            {/* Other option could be added but keeping simple for speed */}
+                        </div>
+                    </div>
+                    <div className="space-y-2">
+                        <label className="text-sm font-medium">Partner's Gender</label>
+                        <div className="flex flex-col gap-2">
+                            {['Male', 'Female'].map(g => (
+                                <button
+                                    key={g}
+                                    onClick={() => updateData('partnerGender', g)}
+                                    className={cn("p-2 rounded border text-sm", data.partnerGender === g ? "bg-primary text-primary-foreground border-primary" : "border-border")}
+                                >
+                                    {g}
+                                </button>
+                            ))}
+                        </div>
+                    </div>
+                </div>
+
+                <div className="grid grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                        <label className="text-sm font-medium">Your Age</label>
+                        <select
+                            value={data.userAgeRange}
+                            onChange={(e) => updateData('userAgeRange', e.target.value)}
+                            className="w-full p-2 rounded border bg-background"
+                        >
                             <option value="">Select...</option>
-                            <option value="Together">Together</option>
-                            <option value="In Crisis">In Crisis</option>
-                            <option value="Recently Separated">Recently Separated</option>
+                            <option value="<25">Under 25</option>
+                            <option value="25-34">25-34</option>
+                            <option value="35-44">35-44</option>
+                            <option value="45+">45+</option>
                         </select>
                     </div>
-
-                    {/* Relationship History */}
-                    <div className="border-t border-border pt-6 mt-6 space-y-4">
-                        <h3 className="font-semibold text-lg">About Your Relationship</h3>
-
-                        <div className="space-y-2">
-                            <label className="text-sm font-medium">How long have you been together?</label>
-                            <select name="relationshipDuration" onChange={handleChange} className="w-full p-2 rounded-md border bg-background" required>
-                                <option value="">Select...</option>
-                                <option value="0-6mo">Less than 6 months</option>
-                                <option value="6mo-2yr">6 months to 2 years</option>
-                                <option value="2-5yr">2 to 5 years</option>
-                                <option value="5-10yr">5 to 10 years</option>
-                                <option value="10+yr">10+ years</option>
-                            </select>
-                        </div>
-
-                        <div className="grid grid-cols-2 gap-4">
-                            <label className="flex items-center gap-2 cursor-pointer">
-                                <input type="checkbox" name="livingTogether" onChange={handleChange} className="h-4 w-4" />
-                                <span className="text-sm">Living together</span>
-                            </label>
-                            <label className="flex items-center gap-2 cursor-pointer">
-                                <input type="checkbox" name="hasChildren" onChange={handleChange} className="h-4 w-4" />
-                                <span className="text-sm">Have children</span>
-                            </label>
-                        </div>
+                    <div className="space-y-2">
+                        <label className="text-sm font-medium">Partner's Age</label>
+                        <select
+                            value={data.partnerAgeRange}
+                            onChange={(e) => updateData('partnerAgeRange', e.target.value)}
+                            className="w-full p-2 rounded border bg-background"
+                        >
+                            <option value="">Select...</option>
+                            <option value="<25">Under 25</option>
+                            <option value="25-34">25-34</option>
+                            <option value="35-44">35-44</option>
+                            <option value="45+">45+</option>
+                        </select>
                     </div>
-
-                    {/* Partner Behavior */}
-                    <div className="border-t border-border pt-6 mt-6 space-y-4">
-                        <h3 className="font-semibold text-lg">About Conflicts</h3>
-
-                        <div className="space-y-2">
-                            <label className="text-sm font-medium">How does your partner typically react during conflicts?</label>
-                            <select name="partnerConflictStyle" onChange={handleChange} className="w-full p-2 rounded-md border bg-background" required>
-                                <option value="">Select...</option>
-                                <option value="withdraws">Withdraws / Goes silent</option>
-                                <option value="engages">Engages / Wants to talk it out</option>
-                                <option value="escalates">Escalates / Gets more intense</option>
-                                <option value="deflects">Deflects / Changes subject</option>
-                            </select>
-                        </div>
-
-                        <div className="space-y-2">
-                            <label className="text-sm font-medium">How often do you have conflicts?</label>
-                            <select name="fightFrequency" onChange={handleChange} className="w-full p-2 rounded-md border bg-background" required>
-                                <option value="">Select...</option>
-                                <option value="daily">Daily</option>
-                                <option value="weekly">Weekly</option>
-                                <option value="monthly">Monthly</option>
-                                <option value="rarely">Rarely</option>
-                            </select>
-                        </div>
-
-                        <div className="space-y-2">
-                            <label className="text-sm font-medium">How often do you successfully repair after conflicts?</label>
-                            <select name="repairFrequency" onChange={handleChange} className="w-full p-2 rounded-md border bg-background" required>
-                                <option value="">Select...</option>
-                                <option value="always">Always - We always make up</option>
-                                <option value="sometimes">Sometimes - It depends</option>
-                                <option value="rarely">Rarely - We stay distant</option>
-                                <option value="never">Never - Issues pile up</option>
-                            </select>
-                        </div>
-
-                        <div className="space-y-2">
-                            <label className="text-sm font-medium">What does your partner do that hurts you most? (Optional)</label>
-                            <textarea
-                                name="partnerHurtfulBehavior"
-                                onChange={handleChange}
-                                className="w-full min-h-[80px] p-3 border border-border rounded-md resize-none focus:outline-none focus:ring-2 focus:ring-primary"
-                                placeholder="e.g., Goes silent for days, dismisses my feelings, brings up past mistakes..."
-                            />
-                        </div>
-                    </div>
-
-                    <button
-                        type="submit"
-                        disabled={!isValid || isSubmitting}
-                        className="w-full py-3 mt-4 rounded-full bg-primary text-primary-foreground font-bold hover:opacity-90 disabled:opacity-50"
-                    >
-                        {isSubmitting ? "Starting..." : "Start Test →"}
-                    </button>
-                </form>
+                </div>
             </div>
+
+            <div className="flex gap-3">
+                <button onClick={onBack} className="px-6 py-3 rounded-full font-medium text-muted-foreground hover:bg-muted">Back</button>
+                <button
+                    onClick={onSubmit}
+                    disabled={!isValid || isSubmitting}
+                    className="flex-1 py-4 rounded-full bg-primary text-primary-foreground font-bold text-lg hover:opacity-90 disabled:opacity-50 transition-all shadow-lg hover:shadow-xl hover:scale-[1.02]"
+                >
+                    {isSubmitting ? <Loader2 className="animate-spin mx-auto" /> : "Start Full Analysis →"}
+                </button>
+            </div>
+            <p className="text-center text-xs text-muted-foreground px-4">
+                By starting, you agree to our Terms. Your data is encrypted and private.
+            </p>
         </div>
     );
 }

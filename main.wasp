@@ -266,10 +266,11 @@ action deleteUserAccount {
 //#endregion
 
 //#region Payment
-route PricingPageRoute { path: "/pricing", to: PricingPage }
-page PricingPage {
-  component: import PricingPage from "@src/payment/PricingPage"
-}
+// Pricing Page hidden as per request
+// route PricingPageRoute { path: "/pricing", to: PricingPage }
+// page PricingPage {
+//   component: import PricingPage from "@src/payment/PricingPage"
+// }
 
 route CheckoutResultRoute { path: "/checkout", to: CheckoutResultPage }
 page CheckoutResultPage {
