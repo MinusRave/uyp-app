@@ -6,6 +6,7 @@ import { Loader2, Lock, CheckCircle, CheckCircle2, AlertTriangle, ArrowRight, He
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import { DistortionGraph } from "../components/DistortionGraph";
+import { LensRadar } from "../components/LensRadar";
 import { trackPixelEvent } from "../analytics/pixel";
 
 import { OnboardingWizard } from "./components/OnboardingWizard";
@@ -501,8 +502,29 @@ export default function FullReportPage() {
                     <h2 className="text-sm font-bold uppercase tracking-wider text-muted-foreground mb-4">08. Full Spectrum Profile</h2>
                     <h3 className="text-3xl font-bold mb-8">Your Complete Map</h3>
                     <p className="text-lg text-muted-foreground mb-8">
-                        You are not just one pattern. Here is how your nervous system reacts across all 5 dimensions of your relationship.
+                        You are not just one pattern. Here is how your nervous system reacts across all 5 dimensions.
                     </p>
+
+                    {/* NEW: Radar Chart Visual */}
+                    <div className="mb-12 bg-secondary/5 rounded-3xl p-6 md:p-8 flex flex-col md:flex-row items-center gap-8 border border-secondary/10">
+                        <div className="w-full md:w-1/2 aspect-square max-h-[300px]">
+                            <LensRadar data={[
+                                { dimension: "silence", score: report.dimensionsDetailed?.find(d => d.id === 'silence')?.score.SL || 0 },
+                                { dimension: "conflict", score: report.dimensionsDetailed?.find(d => d.id === 'conflict')?.score.SL || 0 },
+                                { dimension: "pressure", score: report.dimensionsDetailed?.find(d => d.id === 'pressure')?.score.SL || 0 },
+                                { dimension: "disconnection", score: report.dimensionsDetailed?.find(d => d.id === 'disconnection')?.score.SL || 0 },
+                                { dimension: "misunderstanding", score: report.dimensionsDetailed?.find(d => d.id === 'not_heard')?.score.SL || 0 },
+                            ]} />
+                        </div>
+                        <div className="flex-1 text-center md:text-left">
+                            <h4 className="font-bold text-lg mb-2">Your Sensitivity Shape</h4>
+                            <p className="text-sm text-muted-foreground leading-relaxed">
+                                The areas stretching outward represent where your protective system is most active.
+                                Notice how <strong>{report.snapshot.dominantLens.replace('_', ' ')}</strong> spikes?
+                                That's not a flaw—it's where your body is working hardest to keep you safe.
+                            </p>
+                        </div>
+                    </div>
 
                     <div className="space-y-6">
                         {report.dimensionsDetailed?.map((dim) => {
@@ -879,6 +901,18 @@ function getSectionStyle(title: string) {
             iconClass: "bg-yellow-100 text-yellow-600 dark:bg-yellow-900/40 dark:text-yellow-300",
             labelClass: "text-yellow-600 dark:text-yellow-400",
             highlightClass: "text-yellow-700 dark:text-yellow-300"
+        };
+    }
+
+    // NEW: Personal Script Rewrite (Golden Style)
+    if (lower.includes('script') || lower.includes('rewrite') || lower.includes('instead')) {
+        return {
+            icon: Sparkles, // Or maybe a Pen/Edit icon if imported
+            containerClass: "bg-amber-50/80 dark:bg-amber-900/20 border-amber-200 dark:border-amber-700 shadow-md transform hover:-translate-y-1",
+            triggerClass: "hover:bg-amber-100 dark:hover:bg-amber-900/40",
+            iconClass: "bg-amber-100 text-amber-600 dark:bg-amber-900/40 dark:text-amber-400",
+            labelClass: "text-amber-600 dark:text-amber-400",
+            highlightClass: "text-amber-700 dark:text-amber-400 font-serif italic"
         };
     }
 

@@ -123,7 +123,7 @@ export const createCheckoutSession: CreateCheckoutSession<
       },
       customData: {
         currency: 'usd',
-        value: 15.00,
+        value: 19.00,
         content_name: 'Full Relationship Report',
         content_category: 'Report',
         content_ids: ['report-full'],

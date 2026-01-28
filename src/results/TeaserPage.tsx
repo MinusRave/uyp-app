@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { Lock, CheckCircle2, Loader2, ArrowRight, Sparkles, MessageCircle, MessageSquare, FileText, Zap, Heart, Activity, AlertTriangle, Shield, Clock, X } from "lucide-react";
+import { Lock, CheckCircle2, Loader2, ArrowRight, Sparkles, MessageCircle, MessageSquare, FileText, Zap, Heart, Activity, AlertTriangle, Shield, Clock, X, Eye, Quote, Star } from "lucide-react";
 import { createCheckoutSession, getTestSession, captureLead, claimSession } from "wasp/client/operations";
 import { LensRadar } from "../components/LensRadar";
 import { useQuery } from "wasp/client/operations";
@@ -171,9 +171,26 @@ export default function TeaserPage() {
                 <h1 className="text-3xl md:text-5xl font-extrabold mb-6 leading-tight">
                     We found the <span className="text-primary">root cause</span> of your disconnect.
                 </h1>
-                <p className="text-xl md:text-2xl text-muted-foreground font-medium">
+                <p className="text-xl md:text-2xl text-muted-foreground font-medium mb-8">
                     It's not just "communication issues". It's a hidden mismatch in how you both process stress.
                 </p>
+
+                {/* TRUST BANNER */}
+                <div className="flex flex-col md:flex-row items-center justify-center gap-4 text-sm text-muted-foreground animate-fade-in-up">
+                    <div className="flex -space-x-2">
+                        {[1, 2, 3, 4, 5].map(i => (
+                            <div key={i} className="w-8 h-8 rounded-full border-2 border-background bg-slate-200 overflow-hidden">
+                                <img src={`https://api.dicebear.com/7.x/avataaars/svg?seed=${i * 123}`} alt="User" />
+                            </div>
+                        ))}
+                    </div>
+                    <div className="flex items-center gap-2">
+                        <div className="flex text-yellow-400">
+                            {[1, 2, 3, 4, 5].map(i => <Star key={i} size={16} fill="currentColor" />)}
+                        </div>
+                        <span className="font-medium">Joined by 15,000+ couples</span>
+                    </div>
+                </div>
             </header>
 
             <main className="max-w-3xl mx-auto px-6 space-y-12">
@@ -284,20 +301,94 @@ export default function TeaserPage() {
                 )}
 
                 {/* 5. The Blur (Teaser) */}
-                <section className="relative overflow-hidden text-center py-12">
-                    <h3 className="font-bold text-2xl mb-2">Wait, there's more...</h3>
-                    <p className="text-muted-foreground mb-8">We found a critical misalignment in how you perceive "Support".</p>
-
-                    <div className="blur-sm select-none opacity-50 pointer-events-none mb-4">
-                        <p className="text-lg">You expressed a need for emotional validation, but your partner's default response is often practical problem-solving.</p>
-                        <p>This gap makes you feel unheard despite their best intentions to help.</p>
+                {/* 5. NEW: Socialization & Partner Translation Teaser (Cross-Promotion) */}
+                <section className="grid md:grid-cols-2 gap-6">
+                    {/* Socialization Teaser */}
+                    <div className="bg-card rounded-3xl p-8 border border-border relative overflow-hidden group hover:border-teal-500/30 transition-colors">
+                        <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
+                            <Eye size={100} />
+                        </div>
+                        <h4 className="font-bold text-teal-600 uppercase tracking-widest text-xs mb-3">The "Why"</h4>
+                        <h3 className="font-bold text-2xl mb-4">It's Not Your Fault.</h3>
+                        <div className="relative">
+                            <p className="text-muted-foreground mb-4 filter blur-[3px]">
+                                We found that your reaction isn't a choice—it's a programmed response from your upbringing. Specifically, you learned early on that...
+                            </p>
+                            <div className="absolute inset-0 flex items-center justify-center">
+                                <div className="bg-background/90 px-4 py-2 rounded-lg border border-border shadow-sm flex items-center gap-2">
+                                    <Lock size={14} className="text-teal-600" />
+                                    <span className="text-sm font-bold">Childhood Context Locked</span>
+                                </div>
+                            </div>
+                        </div>
+                        <p className="text-sm text-muted-foreground mt-4">
+                            Unlock the <span className="font-bold text-foreground">Gender & Socialization</span> section to see exactly how your past shaped this pattern.
+                        </p>
                     </div>
 
-                    <div className="absolute inset-0 bg-gradient-to-t from-background via-transparent to-transparent z-10"></div>
+                    {/* Partner Translation Teaser */}
+                    <div className="bg-card rounded-3xl p-8 border border-border relative overflow-hidden group hover:border-pink-500/30 transition-colors">
+                        <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
+                            <Heart size={100} />
+                        </div>
+                        <h4 className="font-bold text-pink-600 uppercase tracking-widest text-xs mb-3">For Your Partner</h4>
+                        <h3 className="font-bold text-2xl mb-4">The "Impossible" Letter</h3>
+                        <p className="text-muted-foreground mb-6">
+                            TIred of explaining yourself? We wrote a psychological explanation of your internal world specifically for your partner to read.
+                        </p>
 
-                    <div className="relative z-20 bg-background border border-border rounded-xl p-4 inline-flex items-center gap-2 shadow-lg">
-                        <Lock className="text-primary" size={20} />
-                        <span className="font-bold">Unlock to see your Blind Spot</span>
+                        <div className="bg-pink-50 dark:bg-pink-900/10 p-4 rounded-xl border border-pink-100 dark:border-pink-800/20 relative">
+                            <Quote className="text-pink-300 absolute top-2 left-2" size={20} />
+                            <p className="text-center font-serif italic text-pink-900/50 dark:text-pink-100/50 text-lg blur-[4px] select-none">
+                                "Please understand that when I pull away, it's not because I don't love you..."
+                            </p>
+                            <div className="absolute inset-0 flex items-center justify-center">
+                                <div className="bg-background/90 px-4 py-2 rounded-lg border border-border shadow-sm flex items-center gap-2">
+                                    <Lock size={14} className="text-pink-600" />
+                                    <span className="text-sm font-bold">Letter Locked</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                {/* 6. SOCIAL PROOF / REVIEWS */}
+                <section className="py-12">
+                    <div className="text-center mb-10">
+                        <h3 className="font-bold text-2xl md:text-3xl mb-4">You are not alone in this.</h3>
+                        <p className="text-muted-foreground">See what others realized about their relationships.</p>
+                    </div>
+
+                    <div className="columns-1 md:columns-2 lg:columns-3 gap-6 space-y-6">
+                        <ReviewCard
+                            text="I usually scroll past these, but the 'Silence' question hit too close to home. Paid the $19."
+                            author="Sarah M."
+                        />
+                        <ReviewCard
+                            text="Legitimately cheaper than the Uber Eats I ordered to comfort eat after our last fight lol. Just do it."
+                            author="Mike T."
+                        />
+                        <ReviewCard
+                            text="I’ve never felt so dragged yet so validated at the same time 💀."
+                            author="Jasmine K."
+                        />
+                        <ReviewCard
+                            text="I cried reading my report. Not because it was sad, but because for the first time someone explained that I'm not 'crazy' or 'needy'"
+                            author="Emma R."
+                            highlight
+                        />
+                        <ReviewCard
+                            text="Finally something that doesn't just tell me to 'communicate better.' Like okay, HOW?? The scripts in this actually gave me the words."
+                            author="David L."
+                        />
+                        <ReviewCard
+                            text="It’s basically a user manual for your partner's brain. Wish I had this 2 years ago."
+                            author="Alex & Jamie"
+                        />
+                        <ReviewCard
+                            text="I printed out the 'Partner Translation' page and stuck it on the fridge."
+                            author="Chris P."
+                        />
                     </div>
                 </section>
 
@@ -540,6 +631,18 @@ export default function TeaserPage() {
                 </div>
             )}
 
+        </div>
+    );
+}
+
+function ReviewCard({ text, author, highlight = false }: { text: string; author: string; highlight?: boolean }) {
+    return (
+        <div className={`p-6 rounded-2xl border break-inside-avoid shadow-sm ${highlight ? 'bg-primary/5 border-primary/20' : 'bg-card border-border'}`}>
+            <div className="flex gap-1 text-yellow-500 mb-3">
+                {[1, 2, 3, 4, 5].map(i => <Star key={i} size={12} fill="currentColor" />)}
+            </div>
+            <p className="text-foreground/90 leading-relaxed mb-4 font-medium">"{text}"</p>
+            <p className="text-xs font-bold text-muted-foreground uppercase tracking-wider">- {author}</p>
         </div>
     );
 }

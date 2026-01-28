@@ -115,7 +115,10 @@ export const generateExecutiveAnalysis: GenerateExecutiveAnalysis<ExecutiveAnaly
        - Read the "LAST CONFLICT DESCRIPTION" provided above.
        - VALIDATION: If the text is nonsense, too short ("asdf"), or irrelevant, IGNORE IT and write: "I see you shared a moment, but I don't have quite enough detail to analyze it perfectly yet."
        - IF VALID: Analyze *why* the conflict happened based on their Lens vs Partner's likely reaction. Explain what really happened underneath the surface.
-       - Provide 1 specific script they could have used instead.
+       
+       ### Your Personal Script Rewrite
+       Then, provide a specific replacement script for THIS exact moment.
+       Format: "Instead of [what they likely said/did], try: '[Exact wording]'"
         `;
     }
 
@@ -126,6 +129,7 @@ export const generateExecutiveAnalysis: GenerateExecutiveAnalysis<ExecutiveAnaly
        Analyze the conflict and identify 2-3 specific behaviors your partner did that hurt you.
        For each: Validate it's hurtful, explain the nervous system reason, provide the solution.
        Format: "✅ **[Behavior]** - Yes, this IS [behavior]. Here's why they did it... Here's how to interrupt it..."
+       (Ensure you use the ✅ emoji so I can highlight this section).
         `;
     }
 

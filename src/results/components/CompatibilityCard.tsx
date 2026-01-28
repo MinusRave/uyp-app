@@ -69,36 +69,42 @@ export function CompatibilityCard({ data }: CompatibilityCardProps) {
                         <span className="font-bold text-sm uppercase tracking-widest text-muted-foreground">Harmony Score</span>
                     </div>
 
-                    {/* Breakdown */}
-                    <div className="md:col-span-2 space-y-4">
-                        {data.breakdown.map((item, idx) => (
-                            <div key={idx} className="bg-background p-4 rounded-xl border border-border/50 hover:border-border transition-colors">
-                                <div className="flex items-start gap-4">
-                                    <div className="mt-1 flex-shrink-0">
-                                        {getStatusIcon(item.status)}
-                                    </div>
-                                    <div className="space-y-1">
-                                        <div className="flex items-center justify-between w-full">
-                                            <h4 className="font-bold text-sm">{item.dimension}</h4>
-                                            <span className="text-xs font-mono text-muted-foreground">{item.score}/100</span>
-                                        </div>
-                                        {/* Progress Bar */}
-                                        <div className="h-1.5 w-full bg-accent rounded-full overflow-hidden">
-                                            <div
-                                                className={cn("h-full rounded-full transition-all duration-500",
-                                                    item.status === 'aligned' ? 'bg-green-500' :
-                                                        item.status === 'mismatched' ? 'bg-yellow-500' : 'bg-red-500'
-                                                )}
-                                                style={{ width: `${item.score}%` }}
-                                            />
-                                        </div>
-                                        <p className="text-sm text-muted-foreground mt-2 leading-relaxed">
-                                            {item.insight}
-                                        </p>
-                                    </div>
+                    {/* Breakdown by Type - Specifically Highlighting Risks */}
+                    <div className="md:col-span-2 space-y-6">
+
+                        {/* 1. Critical Risks Section (If any) */}
+                        {data.breakdown.filter(i => i.status === 'opposite' || i.status === 'mismatched').length > 0 && (
+                            <div>
+                                <h4 className="font-bold text-sm uppercase text-red-500 mb-3 flex items-center gap-2">
+                                    <AlertTriangle size={16} /> Critical Risk Factors
+                                </h4>
+                                <div className="space-y-3">
+                                    {data.breakdown
+                                        .filter(i => i.status === 'opposite' || i.status === 'mismatched')
+                                        .sort((a, b) => a.score - b.score) // Lowest first
+                                        .map((item, idx) => (
+                                            <CompatibilityRow key={idx} item={item} />
+                                        ))}
                                 </div>
                             </div>
-                        ))}
+                        )}
+
+                        {/* 2. Strengths Section */}
+                        {data.breakdown.filter(i => i.status === 'aligned').length > 0 && (
+                            <div>
+                                <h4 className="font-bold text-sm uppercase text-green-600 mb-3 flex items-center gap-2">
+                                    <CheckCircle2 size={16} /> Core Strengths
+                                </h4>
+                                <div className="space-y-3">
+                                    {data.breakdown
+                                        .filter(i => i.status === 'aligned')
+                                        .sort((a, b) => b.score - a.score) // Highest first
+                                        .map((item, idx) => (
+                                            <CompatibilityRow key={idx} item={item} />
+                                        ))}
+                                </div>
+                            </div>
+                        )}
                     </div>
                 </div>
 
@@ -113,6 +119,45 @@ export function CompatibilityCard({ data }: CompatibilityCardProps) {
                             <p className="text-foreground/90 font-medium">{data.topRecommendation}</p>
                         </div>
                     </div>
+                </div>
+            </div>
+        </div>
+    );
+}
+
+function CompatibilityRow({ item }: { item: any }) {
+    const getStatusIcon = (status: string) => {
+        switch (status) {
+            case 'aligned': return <CheckCircle2 className="w-5 h-5 text-green-500" />;
+            case 'mismatched': return <AlertTriangle className="w-5 h-5 text-yellow-500" />;
+            case 'opposite': return <XCircle className="w-5 h-5 text-red-500" />;
+            default: return <AlertTriangle className="w-5 h-5 text-muted-foreground" />;
+        }
+    };
+
+    return (
+        <div className="bg-background p-4 rounded-xl border border-border/50 hover:border-border transition-colors">
+            <div className="flex items-start gap-4">
+                <div className="mt-1 flex-shrink-0">
+                    {getStatusIcon(item.status)}
+                </div>
+                <div className="space-y-1 w-full">
+                    <div className="flex items-center justify-between w-full">
+                        <h4 className="font-bold text-sm">{item.dimension}</h4>
+                        <span className="text-xs font-mono text-muted-foreground">{item.score}/100</span>
+                    </div>
+                    <div className="h-1.5 w-full bg-accent rounded-full overflow-hidden">
+                        <div
+                            className={cn("h-full rounded-full transition-all duration-500",
+                                item.status === 'aligned' ? 'bg-green-500' :
+                                    item.status === 'mismatched' ? 'bg-yellow-500' : 'bg-red-500'
+                            )}
+                            style={{ width: `${item.score}%` }}
+                        />
+                    </div>
+                    <p className="text-sm text-muted-foreground mt-2 leading-relaxed">
+                        {item.insight}
+                    </p>
                 </div>
             </div>
         </div>
