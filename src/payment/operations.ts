@@ -169,6 +169,9 @@ export const createCheckoutSession: CreateCheckoutSession<
     data: {
       stripeCheckoutSessionId: session.id,
       checkoutStartedAt: new Date(),
+      // Also persist cookies here in case they were missed or updated
+      fbp: (context as any).req?.cookies?.['_fbp'] || undefined,
+      fbc: (context as any).req?.cookies?.['_fbc'] || undefined,
     }
   });
 

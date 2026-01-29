@@ -53,6 +53,19 @@ export const captureLead = async ({ sessionId, email, eventID }: CaptureLeadArgs
             }
         });
     }
+
+    // 4. Persist cookies to TestSession for future use (e.g. Purchase Webhook)
+    const fbp = context.req?.cookies?.['_fbp'];
+    const fbc = context.req?.cookies?.['_fbc'];
+    if (fbp || fbc) {
+        await context.entities.TestSession.update({
+            where: { id: sessionId },
+            data: {
+                fbp: fbp || undefined,
+                fbc: fbc || undefined
+            }
+        });
+    }
 };
 
 export const getTestSession: GetTestSession<{ sessionId?: string }, TestSession | null> = async (

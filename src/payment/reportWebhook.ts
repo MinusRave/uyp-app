@@ -67,10 +67,8 @@ export const stripeWebhook = async (
           eventSourceUrl: 'https://understandyourpartner.com/report',
           userData: {
             email: userEmail,
-            fbp: metadata.fbp, // If we saved this in metadata, which we should have! 
-            // Wait, we didn't save fbp/fbc in metadata in createCheckoutSession.
-            // We should add that to createCheckoutSession metadata first?
-            // Or just use email which is strong enough.
+            fbp: testSession?.fbp || metadata.fbp,
+            fbc: testSession?.fbc,
           },
           customData: {
             currency: 'usd',

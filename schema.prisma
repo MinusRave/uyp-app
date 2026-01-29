@@ -67,6 +67,10 @@ model TestSession {
   // NEW: Persisted AI Analysis
   executiveAnalysis    String?
 
+  // Meta CAPI Cookies tracking
+  fbp                  String?
+  fbc                  String?
+
   // Onboarding tracking
   onboardingCompleted    Boolean   @default(false)
   onboardingStep         Int       @default(0)
