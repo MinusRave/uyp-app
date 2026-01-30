@@ -171,9 +171,14 @@ export default function TeaserPage() {
                 <h1 className="text-3xl md:text-5xl font-extrabold mb-6 leading-tight">
                     We found the <span className="text-primary">root cause</span> of your disconnect.
                 </h1>
-                <p className="text-xl md:text-2xl text-muted-foreground font-medium mb-8">
-                    It's not just "communication issues". It's a hidden mismatch in how you both process stress.
-                </p>
+
+                {/* TRANSLATION LAYER */}
+                <div className="bg-primary/5 border border-primary/20 p-4 rounded-xl mb-8 text-left max-w-2xl mx-auto">
+                    <p className="font-medium text-foreground text-lg">
+                        <span className="font-bold text-primary mr-2">In simple terms:</span>
+                        We found exactly what sets your body off during fights, and why your partner reacts differently.
+                    </p>
+                </div>
 
                 {/* TRUST BANNER */}
                 <div className="flex flex-col md:flex-row items-center justify-center gap-4 text-sm text-muted-foreground animate-fade-in-up">
@@ -202,8 +207,8 @@ export default function TeaserPage() {
                         Your strongest sensitivity is around {dominantLens.replace('_', ' ')}
                     </h3>
                     <p className="text-lg leading-relaxed text-foreground/90">
-                        When situations touch this area, your emotional system reacts quickly.
-                        You tend to notice signals related to <strong>{dominantLens.replace('_', ' ')}</strong> more than anything else.
+                        <span className="font-bold text-primary block mb-2">In simple terms: when you don't feel {dominantLens.replace('_', ' ')}, your body goes into alert mode fast.</span>
+                        You experience this as chest tightness, urgency, or a sudden need to fix things <em>right now</em>.
                         This is where most of your interpretations are formed.
                     </p>
                 </section>
@@ -228,7 +233,8 @@ export default function TeaserPage() {
                         {/* Emotional Consequence */}
                         <div className="order-1 md:order-2">
                             <p className="text-lg mb-6">
-                                Because your "Protection Limit" is low in this specific area, your nervous system defaults to:
+                                Your body hits its limit quickly here. <span className="text-muted-foreground text-sm">(We call this a low "Protection Limit").</span>
+                                When that happens, your instincts default to:
                             </p>
                             <div className="bg-secondary/10 p-6 rounded-2xl text-center border border-secondary/20">
                                 <span className="text-2xl md:text-3xl font-bold text-secondary-foreground block mb-2 capitalize">
@@ -260,7 +266,7 @@ export default function TeaserPage() {
                             </div>
                             <div className="flex-1">
                                 <p className="text-lg font-medium leading-relaxed">
-                                    We analyzed how your nervous systems interact under stress. Your <span className="font-bold text-red-600 dark:text-red-400">Compatibility Pulse</span> reveals 3 critical risk factors and your #1 repair opportunity.
+                                    We analyzed how your instincts interact under stress. Your <span className="font-bold text-red-600 dark:text-red-400">Compatibility Pulse</span> (how well you regulate each other) reveals 3 critical risk factors and your #1 repair opportunity.
                                 </p>
                             </div>
                         </div>
@@ -284,6 +290,9 @@ export default function TeaserPage() {
                             <h3 className="font-bold text-2xl mb-4">We decoded your last argument.</h3>
                             <p className="text-muted-foreground mb-4 font-serif italic text-lg opacity-80">
                                 "{conflictDescription.length > 60 ? conflictDescription.substring(0, 60) + "..." : conflictDescription}"
+                            </p>
+                            <p className="text-lg font-bold text-purple-700 dark:text-purple-300 mb-4">
+                                This is why the fight feels bigger than it should.
                             </p>
                             <p className="text-lg font-medium leading-relaxed">
                                 We've analyzed exactly why this moment triggered you and created a custom <span className="font-bold underline decoration-purple-400 decoration-2">Script Rewrite</span> to show you what you *could* have said to stop the spiral instantly.
@@ -520,16 +529,40 @@ export default function TeaserPage() {
                     </div>
                 </section>
 
+                {/* EMOTIONAL ROI SECTION (New) */}
+                <section className="bg-gradient-to-br from-primary/5 to-transparent p-8 rounded-3xl border border-primary/10 mb-12">
+                    <h3 className="font-bold text-2xl mb-6 text-center">After you unlock this, you’ll finally know:</h3>
+                    <div className="space-y-4 max-w-xl mx-auto">
+                        <div className="flex items-center gap-3 bg-background p-4 rounded-xl border border-border shadow-sm">
+                            <CheckCircle2 className="text-green-500 shrink-0" />
+                            <span className="font-medium">Why this specific fight keeps repeating (and how to stop it).</span>
+                        </div>
+                        <div className="flex items-center gap-3 bg-background p-4 rounded-xl border border-border shadow-sm">
+                            <CheckCircle2 className="text-green-500 shrink-0" />
+                            <span className="font-medium">Why "trying to stay calm" just makes you explode later.</span>
+                        </div>
+                        <div className="flex items-center gap-3 bg-background p-4 rounded-xl border border-border shadow-sm">
+                            <CheckCircle2 className="text-green-500 shrink-0" />
+                            <span className="font-medium">Exactly what to say when your body wants to explode or shut down.</span>
+                        </div>
+                    </div>
+                </section>
+
                 {/* 7. Final Pricing & CTA */}
                 <section className="text-center pb-12">
                     <div className="bg-secondary/5 rounded-3xl p-8 border-2 border-primary/20 relative overflow-hidden max-w-lg mx-auto shadow-2xl">
 
-                        <p className="text-lg font-medium mb-1">Get instant access for just</p>
+                        <p className="text-lg font-medium mb-1">Get your full explanation for just</p>
                         <div className="flex items-center justify-center gap-3 mb-2">
                             <span className="text-xl text-muted-foreground line-through decoration-2 decoration-muted-foreground/50">$97</span>
                             <div className="text-5xl font-extrabold text-primary">$19</div>
                         </div>
-                        <p className="text-xs text-muted-foreground mb-8">Less than the cost of a takeout dinner.</p>
+
+                        {/* TRUST TESTIMONIAL ABOVE CTA */}
+                        <div className="bg-white/80 dark:bg-black/20 p-3 rounded-lg mb-6 backdrop-blur-sm">
+                            <div className="flex justify-center text-yellow-500 mb-1">★★★★★</div>
+                            <p className="text-sm font-medium italic">"This explained my reactions better than months of advice."</p>
+                        </div>
 
                         {/* Email Input */}
                         {(!user?.email && !session.email && !email) && (
@@ -550,7 +583,7 @@ export default function TeaserPage() {
                             className="w-full bg-primary text-primary-foreground text-xl font-bold py-4 px-12 rounded-full shadow-xl hover:scale-105 transition-transform active:scale-95 disabled:opacity-70 flex items-center justify-center gap-2 mx-auto"
                         >
                             {isRedirecting && <Loader2 className="animate-spin" />}
-                            Unlock My Results
+                            Show Me Why This Happens
                             <ArrowRight size={20} />
                         </button>
                         <div className="mt-4 flex items-center justify-center gap-4 text-xs text-muted-foreground">
@@ -579,7 +612,7 @@ export default function TeaserPage() {
                             disabled={isRedirecting}
                             className="flex-1 md:flex-none bg-primary text-primary-foreground font-bold py-3 px-6 rounded-full shadow-lg text-sm whitespace-nowrap"
                         >
-                            Unlock Now
+                            Show Me Why
                         </button>
                         <p className="hidden md:block text-[10px] text-muted-foreground text-center mt-1">100% Money-back Guarantee</p>
                     </div>

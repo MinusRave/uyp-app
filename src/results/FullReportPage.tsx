@@ -199,6 +199,13 @@ export default function FullReportPage() {
                 <h1 className="text-4xl md:text-6xl font-extrabold mb-6 tracking-tight text-primary">
                     {report.cover.title}
                 </h1>
+
+                {/* BLUNT MIRROR SENTENCE (New) */}
+                <div className="bg-primary/5 border border-primary/20 p-4 rounded-xl mb-8 max-w-2xl mx-auto">
+                    <p className="text-lg font-medium text-foreground">
+                        "When conflict shows up, your body reacts before your brain. That’s why this feels out of control — even when you love each other."
+                    </p>
+                </div>
                 <p className="text-xl md:text-2xl text-muted-foreground mb-8 font-light">
                     {report.cover.subtitle}
                 </p>
@@ -227,7 +234,7 @@ export default function FullReportPage() {
 
                             <div className="flex flex-col items-center justify-center py-16 space-y-4">
                                 <Loader2 className="animate-spin text-purple-500" size={40} />
-                                <p className="text-muted-foreground animate-pulse text-lg">Analyzing your complete nervous system profile...</p>
+                                <p className="text-muted-foreground animate-pulse text-lg">Analyzing your complete profile...</p>
                             </div>
                         ) : aiAnalysis ? (
                             <div className="relative z-10">
@@ -318,7 +325,11 @@ export default function FullReportPage() {
                         <div className="bg-gradient-to-br from-pink-50 to-rose-50 dark:from-pink-900/10 dark:to-rose-900/10 p-8 md:p-10 rounded-3xl border border-pink-100 dark:border-pink-800 shadow-sm">
                             <h3 className="text-3xl font-bold mb-6">Share This With Your Partner</h3>
                             <p className="text-lg text-muted-foreground mb-8">
-                                This section explains your patterns in language your partner can understand. Share it to help them support you better.
+                                This section explains your patterns in language your partner can understand.
+                                <br />
+                                <span className="text-sm font-bold text-primary bg-primary/10 px-2 py-1 rounded ml-1">
+                                    Note: This is for YOU to understand them first. You do not have to send this.
+                                </span>
                             </p>
 
                             {/* Partner-friendly explanation */}
@@ -411,7 +422,7 @@ export default function FullReportPage() {
                                 <div className="bg-teal-50 dark:bg-teal-900/30 rounded-lg p-4 border border-teal-200 dark:border-teal-700">
                                     <p className="text-sm">
                                         <strong>Important:</strong> This isn't about gender stereotypes. It's about recognizing how your unique
-                                        upbringing and social conditioning may have shaped your nervous system's response patterns.
+                                        upbringing and social conditioning may have shaped your instinctive response patterns.
                                     </p>
                                 </div>
                             </div>
@@ -429,7 +440,8 @@ export default function FullReportPage() {
 
                         <h3 className="text-3xl font-bold mb-8">Your Conflict Scenarios & Responses</h3>
                         <p className="text-lg text-muted-foreground mb-8">
-                            These cards show specific situations that trigger your patterns and exactly what to say in those moments.
+                            These scripts aren't just words. They work because they <strong>keep your partner's alarm system from going off</strong>.
+                            Use them to stop the spiral before it starts.
                         </p>
 
                         <div className="grid gap-6">
@@ -502,7 +514,7 @@ export default function FullReportPage() {
                     <h2 className="text-sm font-bold uppercase tracking-wider text-muted-foreground mb-4">08. Full Spectrum Profile</h2>
                     <h3 className="text-3xl font-bold mb-8">Your Complete Map</h3>
                     <p className="text-lg text-muted-foreground mb-8">
-                        You are not just one pattern. Here is how your nervous system reacts across all 5 dimensions.
+                        You are not just one pattern. Here is how your body reacts across all 5 dimensions.
                     </p>
 
                     {/* NEW: Radar Chart Visual */}
