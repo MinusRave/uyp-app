@@ -15,6 +15,10 @@ const AdminFunnelPage = ({ user }: { user: AuthUser }) => {
             name: "Sessions",
             data: stats ? [
                 stats.started,
+                stats.step1,
+                stats.step2,
+                stats.step3,
+                stats.step4,
                 ...(stats.questionCounts || []), // Detailed questions
                 stats.completed,
                 stats.onboarding,
@@ -32,7 +36,7 @@ const AdminFunnelPage = ({ user }: { user: AuthUser }) => {
         plotOptions: {
             bar: {
                 borderRadius: 4,
-                horizontal: true,
+                horizontal: false,
                 barHeight: '80%',
             },
         },
@@ -42,6 +46,10 @@ const AdminFunnelPage = ({ user }: { user: AuthUser }) => {
         xaxis: {
             categories: [
                 "Started",
+                "Wizard Step 1",
+                "Wizard Step 2",
+                "Wizard Step 3",
+                "Wizard Step 4",
                 ...questionCategories,
                 "Completed",
                 "Onboarding",

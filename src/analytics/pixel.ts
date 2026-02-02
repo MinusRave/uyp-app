@@ -8,7 +8,8 @@ type PixelEventName =
     | 'InitiateCheckout'
     | 'Purchase'
     | 'CompleteRegistration'
-    | 'Contact';
+    | 'Contact'
+    | 'CustomEvent';
 
 interface PixelEventData {
     content_name?: string;

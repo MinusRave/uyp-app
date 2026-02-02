@@ -121,14 +121,17 @@ export type UserProfile = {
     partnerHurtfulBehavior?: string;
 };
 
-export const startTest: StartTest<UserProfile | void, TestSession> = async (args, context) => {
+// Update startTest signature
+// args: UserProfile & { fbclid?: string } | void
+
+export const startTest: StartTest<UserProfile & { fbclid?: string } | void, TestSession> = async (args, context) => {
     // Create a new test session with profile data
     const session = await context.entities.TestSession.create({
         data: {
             userId: context.user ? context.user.id : undefined,
             currentQuestionIndex: 0,
             answers: {},
-            // Profile data
+            // Profile data (optional at start)
             userGender: args?.userGender,
             partnerGender: args?.partnerGender,
             userAgeRange: args?.userAgeRange,
@@ -146,10 +149,27 @@ export const startTest: StartTest<UserProfile | void, TestSession> = async (args
             fightFrequency: args?.fightFrequency,
             repairFrequency: args?.repairFrequency,
             partnerHurtfulBehavior: args?.partnerHurtfulBehavior,
+            // Meta Attribution
+            fbclid: args?.fbclid,
         },
     });
 
     return session;
+};
+
+export const updateWizardProgress = async (args: any, context: any) => {
+    if (!args.sessionId) throw new HttpError(400, "Session ID required");
+
+    // Clean args to remove sessionId from data payload
+    const data = { ...args };
+    delete data.sessionId;
+
+    // We update whatever profile fields are passed, plus the wizard step if provided
+    // This allows for incremental saving
+    await context.entities.TestSession.update({
+        where: { id: args.sessionId },
+        data: data
+    });
 };
 
 type SubmitAnswerArgs = {

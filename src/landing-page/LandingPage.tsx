@@ -39,7 +39,7 @@ export default function LandingPage() {
           </h1>
 
           <p className="text-xl md:text-2xl text-muted-foreground mb-10 max-w-2xl mx-auto leading-relaxed animate-fade-in-up delay-200">
-            It’s not just "miscommunication." It’s a mismatch in how your bodies process stress.
+            You keep having the same fight because you’re solving the wrong problem.
           </p>
 
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4 animate-fade-in-up delay-300">
@@ -47,12 +47,14 @@ export default function LandingPage() {
               to={routes.TestRoute.build()}
               className="w-full sm:w-auto px-8 py-4 bg-primary text-primary-foreground text-lg font-bold rounded-full shadow-lg hover:scale-105 hover:shadow-xl transition-all flex items-center justify-center gap-2"
             >
-              Start Free Analysis <ArrowRight size={20} />
+              Start Analysis <ArrowRight size={20} />
             </Link>
             <span className="text-sm text-muted-foreground mt-2 sm:mt-0 sm:ml-4">
-              Takes 10 mins • No credit card required
+              See the pattern behind your fights in 10 minutes. No credit card required.
             </span>
+
           </div>
+
 
           <div className="mt-12 flex items-center justify-center gap-2 text-sm text-muted-foreground animate-fade-in-up delay-500">
             <Users size={16} /> Joined by 15,000+ couples

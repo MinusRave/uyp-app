@@ -26,12 +26,15 @@ export default function TeaserPage() {
     const headerRef = useRef<HTMLDivElement>(null);
     const hasTriggeredExit = useRef(false);
 
+    const claimedSessionRef = useRef<string | null>(null);
+
     useEffect(() => {
         if (!isLoading && !session) navigate("/test");
         if (session?.isPaid) navigate("/report");
         if (session?.email) setEmail(session.email);
 
-        if (user && session && !session.userId) {
+        if (user && session && !session.userId && session.id !== claimedSessionRef.current) {
+            claimedSessionRef.current = session.id;
             claimSession({ sessionId: session.id }).catch(console.error);
         }
     }, [isLoading, session, navigate, user]);
@@ -524,7 +527,7 @@ export default function TeaserPage() {
                         {/* Bottom CTA */}
                         <div className="bg-primary/5 p-6 text-center border-t border-border">
                             <p className="text-sm text-muted-foreground mb-2">Cost of 1hr Couples Therapy: <span className="line-through decoration-red-500 decoration-2">$150+</span></p>
-                            <p className="font-bold text-lg">Your Price Today: <span className="text-primary text-2xl">$19</span></p>
+                            <p className="font-bold text-lg">Your Price Today: <span className="text-primary text-2xl">${import.meta.env.REACT_APP_REPORT_PRICE || "19"}</span></p>
                         </div>
                     </div>
                 </section>
@@ -555,7 +558,7 @@ export default function TeaserPage() {
                         <p className="text-lg font-medium mb-1">Get your full explanation for just</p>
                         <div className="flex items-center justify-center gap-3 mb-2">
                             <span className="text-xl text-muted-foreground line-through decoration-2 decoration-muted-foreground/50">$97</span>
-                            <div className="text-5xl font-extrabold text-primary">$19</div>
+                            <div className="text-5xl font-extrabold text-primary">${import.meta.env.REACT_APP_REPORT_PRICE || "19"}</div>
                         </div>
 
                         {/* TRUST TESTIMONIAL ABOVE CTA */}
@@ -605,7 +608,7 @@ export default function TeaserPage() {
                     <div className="flex items-center gap-3 ml-auto md:ml-0 w-full md:w-auto">
                         <div className="text-right shrink-0">
                             <span className="block text-xs line-through text-muted-foreground">$97</span>
-                            <span className="block font-bold text-xl text-primary leading-none">$19</span>
+                            <span className="block font-bold text-xl text-primary leading-none">${import.meta.env.REACT_APP_REPORT_PRICE || "19"}</span>
                         </div>
                         <button
                             onClick={handleUnlock}

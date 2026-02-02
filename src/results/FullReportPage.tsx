@@ -91,7 +91,7 @@ export default function FullReportPage() {
             const trackedKey = `uyp-tracked-purchase-${sessionIdParam}`;
             if (!localStorage.getItem(trackedKey)) {
                 trackPixelEvent('Purchase', {
-                    value: 15.00,
+                    value: parseFloat(import.meta.env.REACT_APP_REPORT_PRICE || "19.00"),
                     currency: 'USD',
                     eventID: sessionIdParam
                 });

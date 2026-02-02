@@ -70,6 +70,7 @@ model TestSession {
   // Meta CAPI Cookies tracking
   fbp                  String?
   fbc                  String?
+  fbclid               String? // Captured from URL query param
 
   // Onboarding tracking
   onboardingCompleted    Boolean   @default(false)

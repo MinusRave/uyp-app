@@ -251,6 +251,11 @@ action skipOnboarding {
   entities: [TestSession]
 }
 
+action updateWizardProgress {
+  fn: import { updateWizardProgress } from "@src/test/operations",
+  entities: [TestSession]
+}
+
 //#endregion
 
 query getPaginatedUsers {

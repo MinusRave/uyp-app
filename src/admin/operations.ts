@@ -19,6 +19,10 @@ type GetTestSessionsResult = {
 
 type FunnelStats = {
     started: number;
+    step1: number;
+    step2: number;
+    step3: number;
+    step4: number;
     questionCounts: number[];
     onboarding: number;
     emailCaptured: number;
@@ -97,7 +101,15 @@ export const getFunnelStats: GetFunnelStats<void, FunnelStats> = async (_args, c
     }
 
     const started = await context.entities.TestSession.count();
-    const onboarding = await context.entities.TestSession.count({ where: { onboardingStep: { gt: 0 } } });
+
+    // Wizard Steps (onboardingStep)
+    // Step 1 Completed means onboardingStep >= 1
+    const step1 = await context.entities.TestSession.count({ where: { onboardingStep: { gte: 1 } } });
+    const step2 = await context.entities.TestSession.count({ where: { onboardingStep: { gte: 2 } } });
+    const step3 = await context.entities.TestSession.count({ where: { onboardingStep: { gte: 3 } } });
+    const step4 = await context.entities.TestSession.count({ where: { onboardingStep: { gte: 4 } } });
+
+    const onboarding = await context.entities.TestSession.count({ where: { onboardingStep: { gt: 0 } } }); // Keeping legacy metric
     const emailCaptured = await context.entities.TestSession.count({ where: { email: { not: null } } });
     const completed = await context.entities.TestSession.count({ where: { isCompleted: true } });
     const paid = await context.entities.TestSession.count({ where: { isPaid: true } });
@@ -138,6 +150,10 @@ export const getFunnelStats: GetFunnelStats<void, FunnelStats> = async (_args, c
 
     return {
         started,
+        step1,
+        step2,
+        step3,
+        step4,
         questionCounts,
         onboarding,
         emailCaptured,

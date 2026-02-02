@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { startTest, submitAnswer, completeTest, getTestSession, useQuery, captureLead, updateConflictDescription } from "wasp/client/operations";
+import { startTest, submitAnswer, completeTest, getTestSession, useQuery, captureLead, updateConflictDescription, updateWizardProgress } from "wasp/client/operations";
 import { routes } from "wasp/client/router";
 import { Loader2, Mail, MessageSquare, ChevronLeft } from "lucide-react";
 import { cn } from "../client/utils";
@@ -53,6 +53,9 @@ export default function TestPage() {
     // State for Profile Form
     const [showProfileForm, setShowProfileForm] = useState(false);
 
+    // Guard against double-initialization
+    const isCreatingSession = React.useRef(false);
+
     useEffect(() => {
         const handleSessionCheck = async () => {
             if (isSessionLoading) return;
@@ -64,36 +67,71 @@ export default function TestPage() {
                     return;
                 }
                 setSessionId(existingSession.id);
-                const savedIndex = existingSession.currentQuestionIndex || 0;
-                if (savedIndex >= QUESTIONS.length) {
-                    // Check if conflict desc is done
-                    if (existingSession.conflictDescription) {
-                        setShowConflictGate(false);
-                        setShowEmailGate(true);
+
+                // If we have a session, assume we might be resuming
+                // Check if wizard is done (we can infer this from profile data being present, e.g., gender)
+                const isWizardDone = !!existingSession.userGender;
+
+                if (isWizardDone) {
+                    setShowProfileForm(false);
+                    // Set Q index
+                    const savedIndex = existingSession.currentQuestionIndex || 0;
+                    if (savedIndex >= QUESTIONS.length) {
+                        if (existingSession.conflictDescription) {
+                            setShowConflictGate(false);
+                            setShowEmailGate(true);
+                        } else {
+                            setShowConflictGate(true);
+                        }
                     } else {
-                        setShowConflictGate(true);
+                        setCurrentQIndex(savedIndex);
                     }
                 } else {
-                    setCurrentQIndex(savedIndex);
+                    // Wizard not done, show it (with pre-filled data if any)
+                    setShowProfileForm(true);
                 }
 
             } else {
-                // No session? Show Profile Form first.
-                setShowProfileForm(true);
+                // No session found.
+                // If we had a localSessionId but query returned null, it's invalid.
+                if (localSessionId) {
+                    localStorage.removeItem("uyp-session-id");
+                }
+
+                // Create "Guest Session" IMMEDIATELY
+                if (isCreatingSession.current) return;
+                isCreatingSession.current = true;
+
+                try {
+                    // Get fbclid from local storage if available
+                    const { getFbclid } = await import("../analytics/utils");
+                    const fbclid = getFbclid();
+
+                    const newSession = await startTest({ fbclid: fbclid || undefined } as any);
+                    setSessionId(newSession.id);
+                    localStorage.setItem("uyp-session-id", newSession.id);
+                    setShowProfileForm(true);
+                } catch (e) {
+                    console.error("Failed to create guest session", e);
+                } finally {
+                    isCreatingSession.current = false;
+                }
             }
         };
 
         handleSessionCheck();
     }, [existingSession, isSessionLoading, navigate]);
 
+    // Wizard is now just updating the DB
     const handleProfileSubmit = async (data: any) => {
         setIsSubmitting(true);
         try {
-            const newSession = await startTest(data);
-            setSessionId(newSession.id);
+            if (!sessionId) return;
+            // Final save of demographics
+            await updateWizardProgress({ sessionId, ...data });
             setShowProfileForm(false);
         } catch (e) {
-            console.error("Failed to start test", e);
+            console.error("Failed to save wizard data", e);
             alert("Error initializing test.");
         } finally {
             setIsSubmitting(false);
@@ -201,7 +239,7 @@ export default function TestPage() {
 
     // PROFILE FORM UI (Now QuizWizard)
     if (showProfileForm) {
-        return <QuizWizard onSubmit={handleProfileSubmit} isSubmitting={isSubmitting} />;
+        return <QuizWizard onSubmit={handleProfileSubmit} isSubmitting={isSubmitting} sessionId={sessionId} />;
     }
 
     // CONFLICT GATE UI (New)
@@ -407,7 +445,7 @@ export default function TestPage() {
 
 // --- Wizard Components ---
 
-function QuizWizard({ onSubmit, isSubmitting }: { onSubmit: (data: any) => void, isSubmitting: boolean }) {
+function QuizWizard({ onSubmit, isSubmitting, sessionId }: { onSubmit: (data: any) => void, isSubmitting: boolean, sessionId: string | null }) {
     const [step, setStep] = useState(1);
     const [formData, setFormData] = useState({
         userGender: "",
@@ -428,10 +466,44 @@ function QuizWizard({ onSubmit, isSubmitting }: { onSubmit: (data: any) => void,
         setFormData(prev => ({ ...prev, [key]: value }));
     };
 
-    const nextStep = () => setStep(prev => prev + 1);
+    const nextStep = async (currentStepData?: any) => {
+        setStep(prev => prev + 1);
+
+        // Save progress to DB if we have a session
+        if (sessionId) {
+            try {
+                // We save whatever data we have so far, plus the step we just finished
+                // If valid currentStepData is passed (e.g. from Step1), merge it
+                const payload = { ...formData, ...currentStepData, sessionId, onboardingStep: step };
+                await updateWizardProgress(payload);
+
+                // Track Pixel Event for Step Completion
+                const stepNames = ["Status", "History", "Conflict"];
+                import("../analytics/pixel").then(({ trackPixelEvent }) => {
+                    trackPixelEvent("CustomEvent", {
+                        content_name: "WizardStep",
+                        step_number: step,
+                        step_name: stepNames[step - 1]
+                    });
+                });
+
+            } catch (e) {
+                console.error("Background save failed", e);
+            }
+        }
+    };
+
     const prevStep = () => setStep(prev => prev - 1);
 
-    const handleFinalSubmit = () => {
+    const handleFinalSubmit = async () => {
+        // Track final step
+        import("../analytics/pixel").then(({ trackPixelEvent }) => {
+            trackPixelEvent("CustomEvent", {
+                content_name: "WizardStep",
+                step_number: 4,
+                step_name: "Demographics"
+            });
+        });
         onSubmit(formData);
     };
 
@@ -449,7 +521,10 @@ function QuizWizard({ onSubmit, isSubmitting }: { onSubmit: (data: any) => void,
                 {step === 1 && (
                     <Step1_Status
                         value={formData.relationshipStatus}
-                        onChange={(val) => { updateData('relationshipStatus', val); nextStep(); }}
+                        onChange={(val) => {
+                            updateData('relationshipStatus', val);
+                            nextStep({ relationshipStatus: val });
+                        }}
                     />
                 )}
 
@@ -457,7 +532,7 @@ function QuizWizard({ onSubmit, isSubmitting }: { onSubmit: (data: any) => void,
                     <Step2_History
                         data={formData}
                         updateData={updateData}
-                        onNext={nextStep}
+                        onNext={() => nextStep()}
                         onBack={prevStep}
                     // Only auto-advance if specific conditions met inside if complex, but simple enough to have a "Next" button here as it has multiple fields
                     />
@@ -467,7 +542,7 @@ function QuizWizard({ onSubmit, isSubmitting }: { onSubmit: (data: any) => void,
                     <Step3_Conflict
                         data={formData}
                         updateData={updateData}
-                        onNext={nextStep}
+                        onNext={() => nextStep()}
                         onBack={prevStep}
                     />
                 )}

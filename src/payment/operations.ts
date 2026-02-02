@@ -123,7 +123,7 @@ export const createCheckoutSession: CreateCheckoutSession<
       },
       customData: {
         currency: 'usd',
-        value: 19.00,
+        value: parseFloat(process.env.REPORT_PRICE || "19.00"),
         content_name: 'Full Relationship Report',
         content_category: 'Report',
         content_ids: ['report-full'],
@@ -142,7 +142,7 @@ export const createCheckoutSession: CreateCheckoutSession<
             name: "UnderstandYourPartner - Full Report",
             description: "Detailed analysis of your relationship dynamics.",
           },
-          unit_amount: 1900, // $19.00
+          unit_amount: Math.round(parseFloat(process.env.REPORT_PRICE || "19.00") * 100),
         },
         quantity: 1,
       },

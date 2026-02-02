@@ -60,6 +60,11 @@ export default function App() {
         initPixel(pixelId);
       });
     }
+
+    // Capture fbclid if present
+    import("../analytics/utils").then(({ captureFbclid }) => {
+      captureFbclid();
+    });
   }, []);
 
   useEffect(() => {
