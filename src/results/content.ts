@@ -8,107 +8,107 @@ export const getLevel = (score: number): ScoreLevel => {
 
 export const DIMENSIONS = {
     silence_distance: {
-        title: "Silence & Distance",
-        description: "How you interpret and react to your partner's need for space or silence.",
+        title: "The Silence Trap",
+        description: "How you react when they pull away.",
         levels: {
             LOW: {
                 title: "Secure with Space",
-                text: "You generally feel comfortable when your partner needs space or is silent. You don't immediately interpret it as a threat to the relationship.",
-                advice: "Continue to respect their space, but ensure you also voice your needs when you want connection."
+                text: "You're okay when they need space. You don't panic.",
+                advice: "Keep respecting their space, but say something when you need connection."
             },
             MEDIUM: {
                 title: "Occasional Doubt",
-                text: "You sometimes wonder if silence means something is wrong, but you can usually rationalize it.",
-                advice: "When doubt creeps in, ask for clarification calmly instead of assuming the worst."
+                text: "You sometimes wonder 'Are we okay?' when they are quiet, but you can talk yourself down.",
+                advice: "When you feel that doubt, just ask: 'We good?' instead of guessing."
             },
             HIGH: {
-                title: "Silence Alert System",
-                text: "You strongly interpret silence or distance as a sign of anger or rejection. It triggers immediate anxiety.",
-                advice: "Practice 'pausing'. When they go silent, remind yourself: 'Silence is not necessarily rejection'. ask: 'Do you need some time?'"
+                title: "Panic Mode",
+                text: "When they go silent, your body screams 'Danger'. You feel like they are leaving you.",
+                advice: "Practice 'pausing'. When they go silent, tell yourself: 'They are overwhelmed, not leaving'. ask: 'Do you need a minute?'"
             }
         }
     },
     conflict_tension: {
-        title: "Conflict & Tension",
-        description: "Your comfort level with unresolved arguments and emotional tension.",
+        title: "The Blow-up",
+        description: "How you handle it when things get heated.",
         levels: {
             LOW: {
-                title: "Conflict Avoider",
-                text: "You may try to avoid conflict at all costs to keep the peace.",
-                advice: "Remember that healthy conflict is necessary for growth. Don't suppress your needs just to avoid tension."
+                title: "Peacekeeper",
+                text: "You swallow your feelings just to keep things calm.",
+                advice: "Swallowing your feelings creates resentment. You need to speak up even if it's scary."
             },
             MEDIUM: {
-                title: "Balanced Resolver",
-                text: "You can handle some tension but prefer to resolve things relatively quickly.",
-                advice: "You have a healthy balance. Keep focusing on 'repair' after arguments."
+                title: "Balanced",
+                text: "You can handle a fight without thinking the world is ending.",
+                advice: "Keep focusing on 'repair'—making jokes or apologizing after a fight."
             },
             HIGH: {
-                title: "Urgent Resolver",
-                text: "You feel extreme distress if a conflict isn't resolved immediately. 'Going to bed angry' is impossible for you.",
-                advice: "Learn to self-soothe during unresolved tension. Sometimes partners need time to cool down before resolving."
+                title: "Urgent Fixer",
+                text: "You feel physically sick if a fight isn't resolved RIGHT NOW. You can't sleep until it's fixed.",
+                advice: "Learn to self-soothe. Sometimes they need to cool down before they can talk. Pushing them pushes them away."
             }
         }
     },
     intentional_attribution: {
-        title: "Intentional Attribution",
-        description: "To what extent you believe your partner hurts you on purpose.",
+        title: "The Blame Game",
+        description: "Do you think they hurt you on purpose?",
         levels: {
             LOW: {
                 title: "Benefit of the Doubt",
-                text: "You rarely believe your partner is trying to hurt you intentionally.",
-                advice: "This is a great strength. Keep assuming positive intent."
+                text: "You know they aren't trying to be mean.",
+                advice: "This is a superpower. Keep assuming they mean well."
             },
             MEDIUM: {
-                title: "Situational Skeptic",
-                text: "In heated moments, you might suspect they are doing things just to annoy you.",
-                advice: "Check your narrative. Are they actually 'trying to hurt you' or just being careless?"
+                title: "Skeptic",
+                text: "When you're mad, you start to think: 'They are doing this just to annoy me.'",
+                advice: "Check the story in your head. Are they evil, or just careless?"
             },
             HIGH: {
-                title: "Malice Detective",
-                text: "You often feel your partner's actions are calculated attacks against you.",
-                advice: "This pattern erodes trust. Challenge this thought: 'Could this be a mistake rather than an attack?'"
+                title: "The Prosecutor",
+                text: "You feel like everything they do is a personal attack.",
+                advice: "This kills love. Ask yourself: 'Could this be a mistake rather than an attack?'"
             }
         }
     },
     reassurance_need: {
-        title: "Reassurance Need",
-        description: "How much verbal confirmation you need to feel loved.",
+        title: "Feeling Unloved",
+        description: "How often you need to hear 'I love you'.",
         levels: {
             LOW: {
-                title: "Self-Assured",
-                text: "You feel loved without needing constant verbal reminders.",
-                advice: "Make sure you still appreciate when they DO give compliments."
+                title: "Secure",
+                text: "You know they love you, even if they don't say it constantly.",
+                advice: "Make sure you still appreciate when they DO say it."
             },
             MEDIUM: {
-                title: "Moderate Validation",
-                text: "You enjoy reassurance but don't crumble without it.",
-                advice: "Communicate your 'love language' clearly so they know when you need a boost."
+                title: "Normal Needs",
+                text: "You like hearing it, but you don't panic without it.",
+                advice: "Tell them clearly: 'I need a little boost today'."
             },
             HIGH: {
-                title: "Validation Hungry",
-                text: "You feel empty or anxious if you don't hear 'I love you' or receive validation frequently.",
-                advice: "Work on self-validation. Your worth exists independently of their praise."
+                title: "Starving for Signal",
+                text: "If they are quiet, you feel unloved. You need constant proof.",
+                advice: "Work on believing you are worthy, with or without their constant praise."
             }
         }
     },
     repair_closure: {
-        title: "Repair & Closure",
-        description: "How you handle the aftermath of a disagreement.",
+        title: "Making Up",
+        description: "Can you let it go?",
         levels: {
             LOW: {
-                title: "Lingering Resentment",
-                text: "You struggle to let go and may hold grudges after arguments.",
-                advice: "Holding onto resentment hurts you more than them. Practice 'letting go' rituals."
+                title: "Grudge Holder",
+                text: "You hold onto the pain long after the fight is over.",
+                advice: "Holding a grudge hurts YOU, not them. Let it go for your own sake."
             },
             MEDIUM: {
-                title: "Steady Repairer",
-                text: "You can move on, though sometimes IT takes a while.",
-                advice: "Focus on 'repair attempts'—small jokes or apologies that break the tension."
+                title: "Steady",
+                text: "You can move on, but it takes you a minute.",
+                advice: "Focus on small jokes to break the tension."
             },
             HIGH: {
-                title: "Quick Eraser",
-                text: "You might want to pretend nothing happened just to move on quickly.",
-                advice: "Ensure you aren't rug-sweeping. Genuine repair means acknowledging what happened, not just ignoring it."
+                title: "Rug Sweeper",
+                text: "You pretend nothing happened just to stop the bad feelings.",
+                advice: "Don't just pretend. Actually say 'Are we good?' then really let it go."
             }
         }
     }

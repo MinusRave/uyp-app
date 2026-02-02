@@ -172,7 +172,7 @@ export default function TeaserPage() {
                     <CheckCircle2 size={16} /> Analysis Complete
                 </div>
                 <h1 className="text-3xl md:text-5xl font-extrabold mb-6 leading-tight">
-                    We found the <span className="text-primary">root cause</span> of your disconnect.
+                    We found <span className="text-primary">exactly why</span> you're stuck.
                 </h1>
 
                 {/* TRANSLATION LAYER */}
@@ -205,14 +205,14 @@ export default function TeaserPage() {
 
                 {/* 2. Dominant Pattern */}
                 <section className="bg-card p-8 rounded-3xl shadow-sm border border-border">
-                    <h2 className="text-primary font-bold uppercase tracking-wider text-xs mb-2">Dominant Pattern</h2>
+                    <h2 className="text-primary font-bold uppercase tracking-wider text-xs mb-2">Your Loop</h2>
                     <h3 className="text-2xl md:text-3xl font-bold mb-4 capitalize">
-                        Your strongest sensitivity is around {dominantLens.replace('_', ' ')}
+                        Your strongest trigger is {dominantLens.replace('_', ' ')}
                     </h3>
                     <p className="text-lg leading-relaxed text-foreground/90">
-                        <span className="font-bold text-primary block mb-2">In simple terms: when you don't feel {dominantLens.replace('_', ' ')}, your body goes into alert mode fast.</span>
-                        You experience this as chest tightness, urgency, or a sudden need to fix things <em>right now</em>.
-                        This is where most of your interpretations are formed.
+                        <span className="font-bold text-primary block mb-2">In simple terms: when you feel {dominantLens.replace('_', ' ')}, your body goes into panic mode.</span>
+                        You feel chest tightness, urgency, or a sudden need to fix things <em>right now</em>.
+                        This is where you snap.
                     </p>
                 </section>
 
@@ -221,14 +221,14 @@ export default function TeaserPage() {
                     <div className="grid md:grid-cols-2 gap-8 items-center">
                         {/* Radar Chart */}
                         <div className="order-2 md:order-1 relative">
-                            <h3 className="font-bold text-sm uppercase text-muted-foreground mb-4 text-center md:text-left">Your Sensitivity Profile</h3>
+                            <h3 className="font-bold text-sm uppercase text-muted-foreground mb-4 text-center md:text-left">Your Emotional Triggers</h3>
                             <div className="bg-secondary/5 rounded-full p-4 border border-secondary/10">
                                 <LensRadar data={[
                                     { dimension: "silence", score: scores.dimensions?.silence?.SL || 30 },
                                     { dimension: "conflict", score: scores.dimensions?.conflict?.SL || 30 },
                                     { dimension: "pressure", score: scores.dimensions?.pressure?.SL || 30 },
                                     { dimension: "disconnection", score: scores.dimensions?.disconnection?.SL || 30 },
-                                    { dimension: "misunderstanding", score: scores.dimensions?.not_heard?.SL || 30 },
+                                    { dimension: "not heard", score: scores.dimensions?.not_heard?.SL || 30 },
                                 ]} />
                             </div>
                         </div>
@@ -236,7 +236,7 @@ export default function TeaserPage() {
                         {/* Emotional Consequence */}
                         <div className="order-1 md:order-2">
                             <p className="text-lg mb-6">
-                                Your body hits its limit quickly here. <span className="text-muted-foreground text-sm">(We call this a low "Protection Limit").</span>
+                                Your body hits its limit quickly here. <span className="text-muted-foreground text-sm">(This is your "Panic Threshold").</span>
                                 When that happens, your instincts default to:
                             </p>
                             <div className="bg-secondary/10 p-6 rounded-2xl text-center border border-secondary/20">
@@ -247,6 +247,30 @@ export default function TeaserPage() {
                                     This isn’t random. It’s your body's attempt to keep you safe.
                                 </p>
                             </div>
+                        </div>
+                    </div>
+                </section>
+
+                {/* NEW: What You Unlock Next Block */}
+                <section className="bg-primary/5 border border-primary/20 p-8 rounded-3xl mb-12 animate-fade-in-up">
+                    <h3 className="font-bold text-2xl mb-4 text-center md:text-left">What you unlock next</h3>
+                    <p className="text-lg mb-6">This isn’t just an explanation.</p>
+                    <div className="space-y-4">
+                        <div className="flex items-start gap-3">
+                            <CheckCircle2 className="text-primary shrink-0 mt-1" />
+                            <span>Clear explanations of why this dynamic happens</span>
+                        </div>
+                        <div className="flex items-start gap-3">
+                            <CheckCircle2 className="text-primary shrink-0 mt-1" />
+                            <span className="font-bold">Exact sentences you can use when a fight starts</span>
+                        </div>
+                        <div className="flex items-start gap-3">
+                            <CheckCircle2 className="text-primary shrink-0 mt-1" />
+                            <span>A breakdown of what to do differently to stop the loop</span>
+                        </div>
+                        <div className="flex items-start gap-3">
+                            <CheckCircle2 className="text-primary shrink-0 mt-1" />
+                            <span>A rewrite of a real argument you described</span>
                         </div>
                     </div>
                 </section>
@@ -324,7 +348,7 @@ export default function TeaserPage() {
                         <h3 className="font-bold text-2xl mb-4">It's Not Your Fault.</h3>
                         <div className="relative">
                             <p className="text-muted-foreground mb-4 filter blur-[3px]">
-                                We found that your reaction isn't a choice—it's a programmed response from your upbringing. Specifically, you learned early on that...
+                                We found that your reaction isn't a choice—it's a habit. Specifically, you learned as a kid that...
                             </p>
                             <div className="absolute inset-0 flex items-center justify-center">
                                 <div className="bg-background/90 px-4 py-2 rounded-lg border border-border shadow-sm flex items-center gap-2">
@@ -457,7 +481,7 @@ export default function TeaserPage() {
                                         <MessageCircle size={28} />
                                     </div>
                                     <div className="flex-1">
-                                        <h5 className="font-bold text-2xl mb-2">Interactive Communication Tools</h5>
+                                        <h5 className="font-bold text-2xl mb-2">How to respond without making it worse</h5>
                                         <p className="text-muted-foreground mb-4">Real-time help when you need it most.</p>
                                         <div className="space-y-2">
                                             <div className="flex items-start gap-2">
@@ -507,7 +531,7 @@ export default function TeaserPage() {
                                         <Shield size={28} />
                                     </div>
                                     <div className="flex-1">
-                                        <h5 className="font-bold text-2xl mb-2">Conflict Intervention Cards</h5>
+                                        <h5 className="font-bold text-2xl mb-2">What to say when the fight starts</h5>
                                         <p className="text-muted-foreground mb-4">Scenario-specific scripts for your toughest moments.</p>
                                         <div className="space-y-2">
                                             <div className="flex items-start gap-2">
@@ -530,6 +554,20 @@ export default function TeaserPage() {
                             <p className="font-bold text-lg">Your Price Today: <span className="text-primary text-2xl">${import.meta.env.REACT_APP_REPORT_PRICE || "19"}</span></p>
                         </div>
                     </div>
+                </section>
+
+                {/* COST OF INACTION SECTION (New) */}
+                <section className="bg-orange-50 dark:bg-orange-900/10 p-8 rounded-3xl border border-orange-100 dark:border-orange-800/20 mb-12">
+                    <div className="flex items-center gap-3 mb-4">
+                        <AlertTriangle className="text-orange-600 shrink-0" />
+                        <h3 className="font-bold text-2xl text-orange-800 dark:text-orange-300">The Cost of Waiting</h3>
+                    </div>
+                    <p className="text-lg leading-relaxed mb-4">
+                        This doesn't just "go away". If this loop of <span className="font-bold">{dominantLens.replace('_', ' ')}</span> continues, "silence" eventually becomes "indifference".
+                    </p>
+                    <p className="text-muted-foreground italic">
+                        "In 2 years, you might not be fighting anymore—but you might not be talking, either."
+                    </p>
                 </section>
 
                 {/* EMOTIONAL ROI SECTION (New) */}
@@ -579,6 +617,10 @@ export default function TeaserPage() {
                                 />
                             </div>
                         )}
+
+                        <p className="text-sm font-bold text-primary mb-4">
+                            This is not generic advice. Everything is tailored to your pattern and your answers.
+                        </p>
 
                         <button
                             onClick={handleUnlock}

@@ -30,16 +30,17 @@ export default function LandingPage() {
 
         <div className="max-w-4xl mx-auto text-center">
           <div className="inline-flex items-center gap-2 bg-primary/10 text-primary px-4 py-1.5 rounded-full text-sm font-bold uppercase tracking-wide mb-8 animate-fade-in-up">
-            <Brain size={16} /> Scientific Relationship Analysis
+            <Brain size={16} /> The "Why" behind your arguments
           </div>
 
           <h1 className="text-4xl md:text-6xl font-extrabold tracking-tight mb-6 leading-tight animate-fade-in-up delay-100">
-            Stop guessing <br className="hidden md:block" />
-            <span className="text-primary">why you fight.</span>
+            Why you keep having <br className="hidden md:block" />
+            <span className="text-primary">the same fight.</span>
           </h1>
 
           <p className="text-xl md:text-2xl text-muted-foreground mb-10 max-w-2xl mx-auto leading-relaxed animate-fade-in-up delay-200">
-            You keep having the same fight because you’re solving the wrong problem.
+            It’s not your fault. It’s a biological trap. <br className="hidden md:block" />
+            And you can stop it in 10 minutes.
           </p>
 
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4 animate-fade-in-up delay-300">
@@ -66,28 +67,28 @@ export default function LandingPage() {
       <section className="py-24 px-6 bg-card">
         <div className="max-w-3xl mx-auto">
           <div className="text-center mb-16">
-            <h2 className="text-3xl font-bold mb-4">Does this sound like your relationship?</h2>
-            <p className="text-muted-foreground">The pattern is usually the same, even if the topic changes.</p>
+            <h2 className="text-3xl font-bold mb-4">Does this sound like you?</h2>
+            <p className="text-muted-foreground">Different topic. Same exhausting feeling.</p>
           </div>
 
           <div className="grid gap-6">
             <ProblemCard
               icon={<MessageCircle className="text-orange-500" />}
-              title="The Infinite Argument"
-              desc="You have the same fight over and over. Different subject, same exhausting feeling."
-              mirror="Why it happens: Your brain is trying to solve a logic problem, but your partner is having a safety problem."
+              title="The Fight That Never Ends"
+              desc="You have the same argument over and over. You explain yourself, but they just don't get it."
+              mirror="The Truth: You are trying to use logic, but your partner is in 'survival mode'."
             />
             <ProblemCard
               icon={<Shield className="text-blue-500" />}
-              title="The Distance"
-              desc="When things get tough, one of you shuts down or pulls away."
-              mirror="What it feels like: You feel ignored. They feel overwhelmed. Neither of you feels heard."
+              title="The Shut Down"
+              desc="When things get tough, they pull away. You feel abandoned, they feel suffocated."
+              mirror="The Truth: They aren't ignoring you. They are trying not to explode."
             />
             <ProblemCard
               icon={<Activity className="text-red-500" />}
               title="The Eggshells"
-              desc="You overthink what to say to avoid triggering a reaction."
-              mirror="The reality: You are managing their emotions instead of being a partner."
+              desc="You constantly watch your tone so you don't 'trigger' a reaction."
+              mirror="The Truth: You are managing their emotions instead of being a partner."
             />
           </div>
         </div>
@@ -123,24 +124,24 @@ export default function LandingPage() {
 
           <div className="order-1 md:order-2">
             <h2 className="text-3xl md:text-4xl font-bold mb-6">
-              See the <span className="text-primary">hidden pattern</span> causing the chaos.
+              See the <span className="text-primary">biological trap</span> causing the chaos.
             </h2>
             <p className="text-lg text-muted-foreground mb-8 leading-relaxed">
-              We don't give you generic advice like "communicate better." We use a 64-dimensional psychological model to map exactly where your instincts collide.
+              We don't give you generic advice like "communicate better." We show you the exact biological instincts that collide when you fight.
             </p>
 
             <div className="space-y-6">
               <Feature
-                title="Identify Your Trigger Loops"
-                desc="Translation: Find out exactly what specific tone, look, or phrase sets your body on fire before you even know you're mad."
+                title="Identify Your 'Panic' Loop"
+                desc="Translation: Find out exactly what tone, look, or phrase sets your body on fire before you even know you're mad."
               />
               <Feature
-                title="Decode Your Partner's Silence"
-                desc="Translation: Understand why they pull away (it’s usually not because they don't care, but because they care too much causing overload)."
+                title="Decode The Silence"
+                desc="Translation: Understand why they pull away (it’s not because they don't care, it's because they care too much causing overload)."
               />
               <Feature
-                title="Get actionable scripts"
-                desc="Translation: Know the exact words to say to stop a fight in 30 seconds."
+                title="Stop it in 30 seconds"
+                desc="Translation: Know the exact words to say to lower the temperature instantly."
               />
             </div>
           </div>
