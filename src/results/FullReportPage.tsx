@@ -677,7 +677,7 @@ export default function FullReportPage() {
 
                 {/* THE BOTTOM LINE */}
                 {deepDiveContent['bottom_line'] && (
-                    <section className="bg-primary/5 rounded-3xl p-8 md:p-12 border border-primary/20 mt-12 mb-20 relative overflow-hidden">
+                    <section id="section-bottom_line" className="bg-primary/5 rounded-3xl p-8 md:p-12 border border-primary/20 mt-12 mb-20 relative overflow-hidden">
                         <div className="absolute top-0 right-0 p-6 opacity-5 pointer-events-none">
                             <Quote size={120} />
                         </div>
