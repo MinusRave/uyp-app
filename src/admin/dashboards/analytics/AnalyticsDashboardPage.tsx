@@ -8,6 +8,7 @@ import TotalPageViewsCard from "./TotalPageViewsCard";
 import TotalPayingUsersCard from "./TotalPayingUsersCard";
 import TotalRevenueCard from "./TotalRevenueCard";
 import TotalSignupsCard from "./TotalSignupsCard";
+import EmailPerformanceTable from "./EmailPerformanceTable";
 
 const Dashboard = ({ user }: { user: AuthUser }) => {
   const { data: stats, isLoading, error } = useQuery(getDailyStats);
@@ -67,6 +68,8 @@ const Dashboard = ({ user }: { user: AuthUser }) => {
               <SourcesTable sources={stats?.dailyStats?.sources} />
             </div>
           </div>
+
+          <EmailPerformanceTable />
         </div>
 
         {!stats && (

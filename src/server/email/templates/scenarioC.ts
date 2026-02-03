@@ -1,42 +1,58 @@
 import { type PersonalizationVars } from "../personalization";
 import { wrapHtml } from "../emailLayout";
 
-// Email C1: "You left something in your cart" (15 minutes after abandonment)
+// Email C1: "You left this behind" (15 minutes after abandonment)
 export function getCheckoutC1Email(vars: PersonalizationVars): {
   subject: string;
   html: string;
   text: string;
 } {
-  const subject = "You left something in your cart";
+  const subject = "You left this behind";
 
-  const text = `Hi,
+  const text = `Hey,
 
-I noticed you started checking out for your UnderstandYourPartner report, but didn't complete the payment.
+I noticed you started checking out but didn't finish.
 
-Your session is still active. You can finish your purchase here:
+Your analysis is ready.
 
-Complete Your Purchase ($15, reduced from $49): ${process.env.WASP_WEB_CLIENT_URL}/results
+Inside, you'll find:
+- Why you keep having the same fight (The Loop)
+- The exact words to stop it (The Script)
+- How to get your partner to listen (The Translation)
 
-If you ran into a technical issue, just reply to this email and I'll help.
+Your session is still active.
+
+Unlock Your Report (~~$197~~ $29) → ${process.env.WASP_WEB_CLIENT_URL}/results
+
+If you had a technical issue, just reply to this email.
 
 – The UYP Team
 
 Unsubscribe: ${vars.unsubscribe_url}`;
 
   const contentHtml = `
-      <p>Hi,</p>
+      <p><strong>Hey,</strong></p>
       
-      <p>I noticed you started checking out for your UnderstandYourPartner report, but didn't complete the payment.</p>
+      <p>I noticed you started checking out but didn't finish.</p>
       
-      <p>Your session is still active. You can finish your purchase here:</p>
+      <p><strong>Your analysis is ready.</strong></p>
+      
+      <p>Inside, you'll find:</p>
+      <ul style="color: #374151;">
+        <li>Why you keep having the same fight (The Loop)</li>
+        <li>The exact words to stop it (The Script)</li>
+        <li>How to get your partner to listen (The Translation)</li>
+      </ul>
+      
+      <p>Your session is still active.</p>
       
       <p style="text-align: center; margin: 30px 0;">
         <a href="${process.env.WASP_WEB_CLIENT_URL}/results" class="button">
-          Complete Your Purchase (<span style="text-decoration: line-through; opacity: 0.7;">$49</span> $15) →
+          Unlock Your Report (<span style="text-decoration: line-through; opacity: 0.6;">$197</span> $29) →
         </a>
       </p>
       
-      <p>If you ran into a technical issue, just reply to this email and I'll help.</p>
+      <p>If you had a technical issue, just reply to this email.</p>
       
       <p>– The UYP Team</p>
       
@@ -54,68 +70,60 @@ export function getCheckoutC2Email(vars: PersonalizationVars): {
   html: string;
   text: string;
 } {
-  const subject = "Quick question about your checkout";
+  const subject = "Was it the price?";
 
-  const text = `Hello,
+  const text = `Hey,
 
-You were 30 seconds away from unlocking your full report.
+You were 30 seconds away from unlocking your report.
 
 I'm curious — what stopped you?
 
 Was it:
-  • The price? (The report is a one-time payment)
-  • A technical issue? (I can send you a direct payment link)
-  • Not sure it's worth it? (Read what others say below)
+1. The price? (People spend $200/hour on therapy. This is $29.)
+2. Skepticism? (Is this real? Yes. It's based on 40 years of research.)
+3. Fear? (It's scary to see the truth. But it's worse to stay blind.)
 
-Just reply and let me know. I'll make it right.
+Whatever it is, you're at a fork in the road.
 
-Complete Your Purchase ($15, reduced from $49): ${process.env.WASP_WEB_CLIENT_URL}/results
+Path A: Do nothing. Keep having the same fight.
+Path B: Spend $29. Get the map. Change the pattern.
 
----
+It's up to you.
 
-What people say after unlocking:
-
-"Worth every penny. I've spent $1000s on therapy and this explained more in 10 minutes." — Jessica L.
-
-"I was skeptical. Then I read the Conflict Loop section and literally gasped." — Marcus T.
+Finish Your Purchase (~~$197~~ $29) → ${process.env.WASP_WEB_CLIENT_URL}/results
 
 – The UYP Team
 
 Unsubscribe: ${vars.unsubscribe_url}`;
 
   const contentHtml = `
-      <p>Hello,</p>
+      <p><strong>Hey,</strong></p>
       
-      <p>You were 30 seconds away from unlocking your full report.</p>
+      <p>You were 30 seconds away from unlocking your report.</p>
       
       <p>I'm curious — what stopped you?</p>
       
       <p><strong>Was it:</strong></p>
       <ul style="color: #374151;">
-        <li>The price? (The report is a one-time payment)</li>
-        <li>Timing? (The report is instant)</li>
-        <li>Skeptical? (We are based on 40 years of research)</li>
+        <li><strong>The price?</strong> (People spend $200/hour on therapy. This is $29.)</li>
+        <li><strong>Skepticism?</strong> (Is this real? Yes. It's based on 40 years of research.)</li>
+        <li><strong>Fear?</strong> (It's scary to see the truth. But it's worse to stay blind.)</li>
       </ul>
       
-      <p>Your session is about to expire.</p>
+      <p>Whatever it is, you're at a fork in the road.</p>
+      
+      <div style="background-color: #FAF8F5; padding: 20px; border-radius: 8px; margin: 20px 0;">
+        <p style="margin: 0 0 8px 0; color: #64748B;">Path A: Do nothing. Keep having the same fight.</p>
+        <p style="margin: 0; font-weight: 600; color: #0F172A;">Path B: Spend $29. Get the map. Change the pattern.</p>
+      </div>
+      
+      <p>It's up to you.</p>
 
       <p style="text-align: center; margin: 30px 0;">
         <a href="${process.env.WASP_WEB_CLIENT_URL}/results" class="button">
-          Last Chance to Unlock (<span style="text-decoration: line-through; opacity: 0.7;">$49</span> $15) →
+          Finish Your Purchase (<span style="text-decoration: line-through; opacity: 0.6;">$197</span> $29) →
         </a>
       </p>
-      
-      <hr style="margin: 30px 0; border: none; border-top: 1px solid #e5e7eb;">
-      
-      <p><strong>What people say after unlocking:</strong></p>
-      
-      <div style="background-color: #FAF8F5; padding: 15px; border-radius: 6px; margin: 15px 0;">
-        <p style="margin: 0; font-style: italic; color: #374151;">"Worth every penny. I've spent $1000s on therapy and this explained more in 10 minutes." — Jessica L.</p>
-      </div>
-      
-      <div style="background-color: #FAF8F5; padding: 15px; border-radius: 6px; margin: 15px 0;">
-        <p style="margin: 0; font-style: italic; color: #374151;">"I was skeptical. Then I read the Conflict Loop section and literally gasped." — Marcus T.</p>
-      </div>
       
       <p>– The UYP Team</p>
       
@@ -127,58 +135,52 @@ Unsubscribe: ${vars.unsubscribe_url}`;
   return { subject, html: wrapHtml(contentHtml, subject), text };
 }
 
-// Email C3: "Your report expires tonight" (6 hours later)
+// Email C3: "Expiring tonight" (6 hours later - tightened to be same day urgency)
 export function getCheckoutC3Email(vars: PersonalizationVars): {
   subject: string;
   html: string;
   text: string;
 } {
-  const subject = "Last chance: Your analysis expires at midnight";
+  const subject = "Archiving this session";
 
-  const text = `Hello,
+  const text = `Hey,
 
-Your completed test analysis will be archived tonight at midnight.
+Final heads up.
 
-If you want to unlock your full report, you need to complete your purchase now.
+We can't keep unpaid sessions open forever.
 
-Your session is about to expire.
+Your analysis is scheduled to be archived.
 
-Last Chance to Unlock ($15, reduced from $49): ${process.env.WASP_WEB_CLIENT_URL}/results
+If you want to understand your relationship pattern—and actually fix it—this is the moment.
 
-After midnight, you'll need to retake the entire 28-question test.
+Tomorrow, you'll have to start over.
 
-Don't lose your results.
+Unlock Your Results Now (~~$197~~ $29) → ${process.env.WASP_WEB_CLIENT_URL}/results
 
 – The UYP Team
-
----
-
----
 
 Unsubscribe: ${vars.unsubscribe_url}`;
 
   const contentHtml = `
-      <p>Hello,</p>
+      <p><strong>Hey,</strong></p>
       
-      <p>Your completed test analysis will be <strong style="color: #BE185D;">archived tonight at midnight</strong>.</p>
+      <p>Final heads up.</p>
       
-      <p>If you want to unlock your full report, you need to complete your purchase now.</p>
+      <p>We can't keep unpaid sessions open forever.</p>
+      
+      <p><strong>Your analysis is scheduled to be archived.</strong></p>
+      
+      <p>If you want to understand your relationship pattern—and actually fix it—this is the moment.</p>
+      
+      <p>Tomorrow, you'll have to start over.</p>
       
       <p style="text-align: center; margin: 30px 0;">
         <a href="${process.env.WASP_WEB_CLIENT_URL}/results" class="button">
-          Finish Checkout (<span style="text-decoration: line-through; opacity: 0.7;">$49</span> $15) →
+          Unlock Your Results Now (<span style="text-decoration: line-through; opacity: 0.6;">$197</span> $29) →
         </a>
       </p>
       
-      <p style="color: #64748B;">After midnight, you'll need to retake the entire 28-question test.</p>
-      
-      <p>Don't lose your results.</p>
-      
       <p>– The UYP Team</p>
-      
-      <hr style="margin: 30px 0; border: none; border-top: 1px solid #e5e7eb;">
-      
-
       
       <div class="footer">
         <a href="${vars.unsubscribe_url}">Unsubscribe from these emails</a>

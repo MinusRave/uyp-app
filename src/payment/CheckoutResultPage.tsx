@@ -12,7 +12,7 @@ export default function CheckoutResultPage() {
 
   useEffect(() => {
     if (status === "success") {
-      trackPixelEvent('Purchase', { value: parseFloat(import.meta.env.REACT_APP_REPORT_PRICE || "19.00"), currency: 'USD' });
+      trackPixelEvent('Purchase', { value: parseFloat(import.meta.env.REACT_APP_REPORT_PRICE || "29.00"), currency: 'USD' });
     }
   }, [status]);
 

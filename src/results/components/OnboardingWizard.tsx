@@ -128,35 +128,31 @@ export function OnboardingWizard({
 function WelcomeStep() {
     return (
         <div className="text-center space-y-6">
-            <div className="text-6xl">🎉</div>
-            <h2 className="text-3xl font-bold">Welcome to Your Results</h2>
+            <div className="text-6xl text-primary">⚡</div>
+            <h2 className="text-3xl font-bold">Your Profile is Ready.</h2>
             <p className="text-lg text-muted-foreground">
-                Your analysis is ready. Here's what you just unlocked:
+                We have analyzed the 5 dimensions of your relationship. Here is what we found:
             </p>
-            <ul className="text-left space-y-3 max-w-md mx-auto">
-                <li className="flex items-start gap-2">
-                    <span className="text-green-500 mt-1">✓</span>
-                    <span>Your dominant sensitivity pattern</span>
+            <ul className="text-left space-y-4 max-w-md mx-auto bg-secondary/10 p-6 rounded-2xl border border-secondary/20">
+                <li className="flex items-start gap-3">
+                    <span className="text-primary font-bold mt-1">01.</span>
+                    <span className="font-medium"><strong>The Executive Analysis:</strong> The "Cold Truth" diagnosis of why you are stuck.</span>
                 </li>
-                <li className="flex items-start gap-2">
-                    <span className="text-green-500 mt-1">✓</span>
-                    <span>The "Mirror" executive profile</span>
+                <li className="flex items-start gap-3">
+                    <span className="text-primary font-bold mt-1">02.</span>
+                    <span className="font-medium"><strong>Deep Dive:</strong> Detailed breakdown of Communication, Intimacy, and Trust.</span>
                 </li>
-                <li className="flex items-start gap-2">
-                    <span className="text-green-500 mt-1">✓</span>
-                    <span>De-escalation scripts</span>
+                <li className="flex items-start gap-3">
+                    <span className="text-primary font-bold mt-1">03.</span>
+                    <span className="font-medium"><strong>The Protocol:</strong> Your specific scripts to stop the fighting.</span>
                 </li>
-                <li className="flex items-start gap-2">
-                    <span className="text-green-500 mt-1">✓</span>
-                    <span>The Translator Tool</span>
-                </li>
-                <li className="flex items-start gap-2">
-                    <span className="text-green-500 mt-1">✓</span>
-                    <span>Downloadable resources</span>
+                <li className="flex items-start gap-3">
+                    <span className="text-primary font-bold mt-1">04.</span>
+                    <span className="font-medium"><strong>The Bottom Line:</strong> A final verdict on your relationship's future.</span>
                 </li>
             </ul>
             <p className="text-sm text-muted-foreground italic">
-                This quick tour will show you how to use them. Most users who skip this never come back—don't be that person.
+                Step 1 of 3: Orientation
             </p>
         </div>
     );
@@ -170,111 +166,64 @@ function SaveScriptsStep({
     shareToPhone,
 }: any) {
     return (
-        <div className="space-y-6">
-            <h2 className="text-3xl font-bold">Save These 2 Scripts</h2>
-            <p className="text-muted-foreground">
-                When you feel panic rising, you won't have time to open an app. Save these NOW.
+        <div className="space-y-6 text-center">
+            <h2 className="text-3xl font-bold text-red-600 dark:text-red-400">⚠️ The Circuit Breaker</h2>
+            <p className="text-muted-foreground max-w-lg mx-auto">
+                This is the most critical tool in your report. When you are flooded (heart racing), you cannot think. <strong>Save this now.</strong>
             </p>
 
             {/* Script 1 */}
-            <div className="bg-card border rounded-xl p-6 space-y-3">
-                <h3 className="font-semibold">When you feel panic rising:</h3>
-                <div className="bg-muted p-4 rounded-lg text-sm italic">
+            <div className="bg-card border rounded-xl p-6 space-y-3 text-left shadow-lg">
+                <h3 className="font-bold text-sm uppercase tracking-wider text-red-500">Emergency Protocol (Read Verbatim)</h3>
+                <div className="bg-secondary/20 p-4 rounded-lg text-lg italic font-serif leading-relaxed border-l-4 border-red-500">
                     "{scripts.inTheMoment}"
                 </div>
-                <div className="flex gap-2">
+                <div className="flex gap-2 justify-end">
                     <Button
-                        variant="outline"
+                        variant="secondary"
                         size="sm"
                         onClick={() => copyToClipboard(scripts.inTheMoment)}
                     >
                         <Copy className="mr-2 h-4 w-4" />
                         Copy
                     </Button>
-                    <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() => shareToPhone(scripts.inTheMoment)}
-                    >
-                        <Share2 className="mr-2 h-4 w-4" />
-                        Share to Phone
-                    </Button>
                 </div>
             </div>
 
-            {/* Script 2 */}
-            <div className="bg-card border rounded-xl p-6 space-y-3">
-                <h3 className="font-semibold">For repair after conflict:</h3>
-                <div className="bg-muted p-4 rounded-lg text-sm italic">
-                    "{scripts.repair}"
-                </div>
-                <div className="flex gap-2">
-                    <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() => copyToClipboard(scripts.repair)}
-                    >
-                        <Copy className="mr-2 h-4 w-4" />
-                        Copy
-                    </Button>
-                    <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() => shareToPhone(scripts.repair)}
-                    >
-                        <Share2 className="mr-2 h-4 w-4" />
-                        Share to Phone
-                    </Button>
-                </div>
+            <div className="bg-secondary/10 p-4 rounded-lg border border-secondary/20">
+                <label className="flex items-center gap-3 cursor-pointer justify-center">
+                    <input
+                        type="checkbox"
+                        checked={savedChecked}
+                        onChange={(e) => setSavedChecked(e.target.checked)}
+                        className="h-5 w-5 accent-primary"
+                    />
+                    <span className="font-medium">I have saved this script to my phone.</span>
+                </label>
             </div>
-
-            <div className="bg-blue-50 dark:bg-blue-900/20 p-4 rounded-lg">
-                <p className="text-sm">
-                    💡 <strong>Pro Tip:</strong> Save these to your Notes app RIGHT NOW. Your future self will thank you.
-                </p>
-            </div>
-
-            <label className="flex items-center gap-2 cursor-pointer">
-                <input
-                    type="checkbox"
-                    checked={savedChecked}
-                    onChange={(e) => setSavedChecked(e.target.checked)}
-                    className="h-4 w-4"
-                />
-                <span>I saved these (or will right after this)</span>
-            </label>
         </div>
     );
 }
 
 function CompleteStep({ dominantPattern }: { dominantPattern: string }) {
     return (
-        <div className="text-center space-y-6">
-            <div className="text-6xl">✨</div>
-            <h2 className="text-3xl font-bold">You're All Set!</h2>
-            <p className="text-lg text-muted-foreground">
-                Your full report is ready to explore. You'll find:
+        <div className="text-center space-y-8">
+            <div className="text-6xl">🔒</div>
+            <h2 className="text-3xl font-bold">Access Granted</h2>
+            <p className="text-lg text-muted-foreground max-w-xl mx-auto">
+                You are about to see the full analysis. Be warned: this report is designed to be a mirror, not a hug. It may be uncomfortable to read.
             </p>
-            <ul className="text-left space-y-3 max-w-md mx-auto">
-                <li className="flex items-start gap-2">
-                    <span className="text-primary mt-1">→</span>
-                    <span><strong>The Mirror:</strong> Your personalized AI analysis</span>
-                </li>
-                <li className="flex items-start gap-2">
-                    <span className="text-primary mt-1">→</span>
-                    <span><strong>Visual Analytics:</strong> Your distortion graph</span>
-                </li>
-                <li className="flex items-start gap-2">
-                    <span className="text-primary mt-1">→</span>
-                    <span><strong>Care Package:</strong> Downloadable PDFs</span>
-                </li>
-                <li className="flex items-start gap-2">
-                    <span className="text-primary mt-1">→</span>
-                    <span><strong>The Translator:</strong> Rewrite messages safely</span>
-                </li>
-            </ul>
-            <p className="text-sm text-muted-foreground">
-                Remember: You can always come back to this report. It's saved in your account.
+
+            <div className="bg-primary/5 p-6 rounded-2xl border border-primary/10 max-w-md mx-auto">
+                <h4 className="font-bold text-primary mb-2">Before you begin:</h4>
+                <p className="text-sm">
+                    Read the "Executive Analysis" first. Do not skip to the score.
+                    Understand the <strong>why</strong> before you judge the <strong>what</strong>.
+                </p>
+            </div>
+
+            <p className="text-xs text-muted-foreground uppercase tracking-widest">
+                Session ID Encrypted & Saved
             </p>
         </div>
     );

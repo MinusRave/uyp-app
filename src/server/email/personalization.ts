@@ -32,18 +32,18 @@ export function getLikertLabel(answerId: number): string {
 
 // Lens descriptions for each dominant lens
 const LENS_DESCRIPTIONS: Record<string, string> = {
-    silence: "You react strongly to silence and emotional distance.",
-    conflict: "You have heightened sensitivity to tension and unresolved conflict.",
-    intentions: "You tend to interpret your partner's actions through a lens of assumed intent.",
-    reassurance: "You have a strong need for explicit emotional validation and reassurance.",
-    repair: "You require clear closure and repair after conflicts to feel secure.",
+    communication: "You get stuck in a 'Panic vs. Shutdown' loop during conflict.",
+    emotional_safety: "You feel like you are constantly walking on eggshells.",
+    physical_intimacy: "You feel a deep disconnect or rejection in your physical connection.",
+    power_fairness: "You feel overwhelmed by an unequal mental load or parenting dynamic.",
+    future_values: "You feel like you are drifting apart or growing in different directions.",
 };
 
 // Get top triggers based on scores
 export function getTopTriggers(scores: any): string[] {
     const triggers: { dimension: string; score: number }[] = [];
 
-    const dimensions = ["silence", "conflict", "intentions", "reassurance", "repair"];
+    const dimensions = ["communication", "emotional_safety", "physical_intimacy", "power_fairness", "future_values"];
 
     dimensions.forEach((dim) => {
         if (scores[dim] && scores[dim].SL > 60) {
@@ -59,11 +59,11 @@ export function getTopTriggers(scores: any): string[] {
 
     // Map to human-readable strings
     const triggerMap: Record<string, string> = {
-        silence: "Silence or emotional distance",
-        conflict: "Unresolved tension or disagreements",
-        intentions: "Perceived negative intent from your partner",
-        reassurance: "Lack of explicit affection or validation",
-        repair: "Incomplete closure after conflicts",
+        communication: "Feeling shut out or ignored",
+        emotional_safety: "Feeling unsafe or criticized",
+        physical_intimacy: "Feeling unwanted or rejected",
+        power_fairness: "Feeling like a parent/servant",
+        future_values: "Feeling disconnected from a shared future",
     };
 
     return triggers.slice(0, 3).map((t) => triggerMap[t.dimension]);
@@ -87,7 +87,7 @@ export function buildPersonalizationData(
     const email = session.email || "";
 
     // Get dominant lens from scores
-    const dominant_lens = scores?.dominantLens || "silence";
+    const dominant_lens = scores?.dominantLens || "communication";
     const dominant_dimension = dominant_lens;
 
     // Get specific question answers
@@ -95,13 +95,14 @@ export function buildPersonalizationData(
     const q11_answer = getLikertLabel(answers["11"] || 3);
     const q14_answer = getLikertLabel(answers["14"] || 3);
 
-    // Calculate flags
-    const has_high_silence_sensitivity = (scores?.silence?.SL || 0) > 60;
-    const has_conflict_avoidance = (scores?.conflict?.SL || 0) > 65;
+    // Calculate flags - ADAPTED FOR NEW MODEL
+    // silence sensitivity -> likely Communication or Safety
+    const has_high_silence_sensitivity = (scores?.communication?.SL || 0) > 60;
+    const has_conflict_avoidance = (scores?.emotional_safety?.SL || 0) > 65;
 
-    // Get PM and SL for conflict dimension
-    const PM_conflict = scores?.conflict?.PM || 0;
-    const SL_conflict = scores?.conflict?.SL || 0;
+    // Get PM and SL for conflict dimension (using 'communication' as proxy for conflict style)
+    const PM_conflict = scores?.communication?.PM || 0;
+    const SL_conflict = scores?.communication?.SL || 0;
 
     // Get top triggers
     const top_3_triggers = getTopTriggers(scores);

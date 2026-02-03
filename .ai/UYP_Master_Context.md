@@ -6,45 +6,68 @@
 **Role:** We are **Nervous System Translators**. We do not give generic "love advice." We explain the *biological* and *psychological* mechanics of why two people who love each other keep having the same fight.
 
 ## 2. BRAND VOICE & TONE
-Our voice is **Compassionate, Direct, Non-Clinical, and Validating.**
+Our voice is **Visceral, Raw, and "Anti-AI".**
 
 | Dimension | We ARE | We are NOT |
 | :--- | :--- | :--- |
-| **Tone** | "Smart Psychology" (The Gottman Institute meets modern design) | Clinical, cold, or academic |
-| **Authority** | Scientific but accessible ("The biological reason you panic...") | "Love Guru" or mystical ("Manifest your love...") |
-| **Focus** | Systems & Loops ("The dynamic is the problem") | Blaming ("You/He/She is the problem") |
-| **Vibe** | Premium, Safe, "The Truth" | Cheesy, Pink/Red Hearts, "Date Night Ideas" |
+| **Tone** | "Gut Punch Reality" | "Clinical Validation" |
+| **Authority** | The blunt friend who is a genius therapist. | The gentle therapist who says "that's valid." |
+| **Focus** | Physical Sensations & Hard Truths. | Abstract Concepts & Soft Reassurance. |
+| **Vibe** | Expensive, Heavy, "The Cold Truth". | Brochure-like, Hopeful, "Healing Journey". |
 
-### 🚨 The "Anti-Persona" (What to Avoid)
-*   Never sound like a "Cosmopolitan" quiz ("Is he cheating?").
-*   Never use "Therapist Speak" without translating it (e.g., don't just say "Dysregulated," say "Your body goes into survival mode").
-*   Never promise "Happily Ever After." Promise **Clarity** and **Reduction of Chaos**.
+### 🚨 The "Anti-Slop" Protocol (Strict Blacklist)
+To avoid sounding like a generic LLM, the following words/concepts are **BANNED**:
+*   🚫 "Valid" / "Validate" (Don't say it's valid. Say it's inevitable.)
+*   🚫 "Safe Space" / "Container" (Too woo-woo.)
+*   🚫 "Nervous System Regulation" (Too clinical. Say "Calm your body down.")
+*   🚫 "Dysregulated" (Say "Panicked" or "Numb".)
+*   🚫 "Protecting you" (Say "Shielding you" or "Blocking him".)
+*   🚫 "Healing Journey" (Say "The Fix".)
 
-## 3. THE USER AVATAR & PSYCHOLOGY
-Our users are **Exhausted**. They are in a state of **Cognitive Dissonance**: "I love this person, but I feel unsafe/unheard/crazy."
+**The Golden Rule:** If it sounds like something a HR department would say, **burn it.**
 
-### Core Dynamic: The "Chaser" vs. The "Runner"
-Most of our users fall into this classic trap (Anxious-Avoidant trap):
-*   **The Chaser (Anxious):**
-    *   *Internal Monologue:* "If we don't fix this NOW, it means you don't care. Silence feels like abandonment."
-    *   *Behavior:* Explodes, pursues, text-bombs, seeks reassurance.
-    *   *Need:* "I need to know I matter."
-*   **The Runner (Avoidant/Container):**
-    *   *Internal Monologue:* "I can't do anything right. I need to get away to stop making it worse."
-    *   *Behavior:* Shuts down, withdraws, goes silent, leaves the room.
-    *   *Need:* "I need to know I am competent/autonomous."
+## 3. THE USER AVATAR & CLINICAL MATRIX
+Our users are beyond "tired." They are in **Survival Mode**. We diagnose them into 5 distinct Clinical Profiles based on their data.
 
-**The Trap:** The Chaser gets loud -> The Runner shuts down -> The Chaser panics more -> The Runner retreats further.
+### 1. The "Parentified" Lover (Accountability Fatigue)
+*   **The Specific Pain:** "I am sleeping with my employee/child."
+*   **The dynamic:** One partner manages everything (emotional/logistical); the other is passive.
+*   **Why Sex Dies:** You cannot lust after someone you have to raise.
+*   **The Data:** Low Desire + High "Parent/Manager" Score.
+
+### 2. The "Safety-Starved" Partner (The Nervous System Block)
+*   **The Specific Pain:** "I love you, but my body is afraid of you."
+*   **The dynamic:** Variable reinforcement. Sometimes partner is sweet, sometimes explosive/critical.
+*   **Why Sex Dies:** The body freezes. Vulnerability feels like suicide.
+*   **The Data:** Low Desire + High Conflict Intensity/Walking on Eggshells.
+
+### 3. The "Anxious Pursuer" (The Validation Trap)
+*   **The Specific Pain:** "I am screaming in a soundproof room."
+*   **The dynamic:** Chasing intimacy as a painkiller for anxiety.
+*   **Why Sex Dies:** The partner feels "hunted" and "consumed", not desired.
+*   **The Data:** High Desire + High Rejection Sensitivity + Panic in Silence.
+
+### 4. The "Burnt-Out" Pursuer (The Event Horizon)
+*   **The Specific Pain:** "I don't even have the energy to fight anymore."
+*   **The dynamic:** Years of chasing have led to "Detachment". The most dangerous phase.
+*   **Why Sex Dies:** Brief flashes of rage followed by long periods of numbness.
+*   **The Data:** High Rejection Sensitivity + "Roommates" + Low Conflict (Apathy).
+
+### 5. The "Complacent Roommates" (The Erotic Recess)
+*   **The Specific Pain:** "We are best friends who forgot to be lovers."
+*   **The dynamic:** High safety, low polarity. Sweatpants and Netflix for 5 years.
+*   **Why Sex Dies:** Friction is required for fire. You have smoothed out all the edges.
+*   **The Data:** Low Conflict + Low Resentment + Low Intimacy.
 
 ## 4. MARKETING ANGLES & "TRUTH BOMBS"
 Use these concepts to generate hooks and ad copy.
 
 ### 🏆 Tier S Resonance Lines (The "Gut Punches")
-*   "I get loud because you get quiet."
+*   "You aren't refusing sex. You are refusing *him*."
+*   "You go numb because it's the only way to stay in the room."
+*   "You are using his body as a pacifier."
 *   "The fight is never about the dishes. It’s about 'Do I matter to you?'"
-*   "You hear me, but you don't listen."
 *   "Silence isn't peace. It’s the sound of us breaking."
-*   "I feel lonely even when you’re sitting right next to me."
 
 ### 🔑 Key Marketing Angles
 1.  **The "Silent Divorce":** Targeting couples who stopped fighting and just drifted apart. "You aren't fighting anymore. That's the problem."
@@ -77,17 +100,19 @@ We score every dimension on two axes:
 **The Model:** Free Quiz -> Educational Teaser -> **$19 One-Time Payment** -> Full "Deep Mirror" Report.
 
 *   **Step 1: The Test (Free).** 28 Likert-scale questions.
-*   **Step 2: The Teaser (Free).** Reveals their "Dominant Lens" (e.g., "You view the world through 'Abandonment Anxiety'"). Hooks them with "See *why* this happens."
-*   **Step 3: The Offer ($19).** "Unlock your tailored Relationship User Manual. Cheaper than 5 minutes of therapy."
+*   **Step 2: The Teaser (Free - Insight First).**
+    *   **The Diagnosis:** "You are [Profile Name]."
+    *   **The Cold Truth:** The specific biological/psychological mechanism blocking intimacy. (Free Value).
+    *   **The Hook:** "We know how to turn this off. But you need the Protocol."
+*   **Step 3: The Offer ($19).** "Unlock the Protocol."
 *   **Step 4: The Product (Deep Mirror).**
-    *   **AI Executive Analysis:** A personalized letter from a "Senior Therapist" (AI) analyzing their specific dynamic.
-    *   **Conflict Decoder:** We take a real fight they described and "rewrite" it with scripts.
+    *   **AI Executive Analysis:** A personalized clinical dossier.
+    *   **Conflict Decoder:** We take a real fight they described and "rewrite" it based on their profile.
     *   **Actionable Scripts:** "Say this instead of that."
 
 ## 7. CRITICAL GUIDELINES FOR LLM GENERATION
 When generating content (Ads, Blogs, Emails):
-*   **DO** use emojis sparingly but effectively (e.g., 🧠, 🛡️, ❤️‍🩹).
-*   **DO** focus on the *internal feeling* ("Your chest tightens"), not just external events.
-*   **DO** validate BOTH sides. The "Runner" isn't a villain; they are overwhelmed. The "Chaser" isn't crazy; they are lonely.
-*   **DON'T** be cheesy. No "Spicing up the bedroom."
-*   **DON'T** be generic. "Communication is key" is banned. Say "Learn to translate your nervous system" instead.
+*   **DO** focus on the *visceral sensation* ("throat tightening", "stomach dropping").
+*   **DO** be dangerously honest. Even if it hurts.
+*   **DON'T** ever use "Therapy Speak".
+*   **DON'T** be generic. "Communication is key" is banned.

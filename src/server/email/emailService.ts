@@ -137,19 +137,32 @@ export async function sendRetentionEmail(
         // Generate email content
         const emailContent = templateFn(personalizationData);
 
-        // Send email
+        // Derive Tracking ID (e.g., A1, B3, C2)
+        let emailCode = "X0";
+        if (session.emailSequenceType === "test_abandonment") emailCode = `A${stage}`;
+        if (session.emailSequenceType === "teaser_viewer") emailCode = `B${stage}`;
+        if (session.emailSequenceType === "checkout_abandonment") emailCode = `C${stage}`;
+
+        // Send email with Custom Args for Tracking
         await emailSender.send({
             to: session.email,
             subject: emailContent.subject,
             text: emailContent.text,
             html: emailContent.html,
+            // @ts-ignore - Wasp types might not explicitly show this, but SendGrid provider handles it
+            customArgs: {
+                session_id: session.id,
+                stage: stage.toString(),
+                scenario: session.emailSequenceType,
+                email_id: emailCode
+            }
         });
 
         // Track email sent
-        await trackEmailSent(session.id, stage, context);
+        await trackEmailSent(session.id, stage, emailCode, context);
 
         console.log(
-            `Sent ${session.emailSequenceType} email stage ${stage} to ${session.email}`
+            `Sent ${session.emailSequenceType} email stage ${stage} (${emailCode}) to ${session.email}`
         );
 
         return true;
@@ -163,6 +176,7 @@ export async function sendRetentionEmail(
 async function trackEmailSent(
     sessionId: string,
     stage: number,
+    emailId: string,
     context: any
 ): Promise<void> {
     const session = await context.entities.TestSession.findUnique({
@@ -174,6 +188,7 @@ async function trackEmailSent(
     const history = (session.emailSentHistory as any[]) || [];
     history.push({
         stage,
+        emailId, // Saved so we can match it in the webhook
         sentAt: new Date().toISOString(),
         opened: false,
         clicked: false,

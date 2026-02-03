@@ -256,6 +256,12 @@ action updateWizardProgress {
   entities: [TestSession]
 }
 
+api systemCheck {
+  fn: import { systemCheck } from "@src/server/test/systemCheck",
+  entities: [TestSession],
+  httpRoute: (POST, "/system-check")
+}
+
 //#endregion
 
 query getPaginatedUsers {
@@ -320,6 +326,12 @@ api paymentsWebhook {
   entities: [User],
   middlewareConfigFn: import { paymentsMiddlewareConfigFn } from "@src/payment/webhook",
   httpRoute: (POST, "/payments-webhook")
+}
+
+api sendgridWebhook {
+  fn: import { sendgridWebhook } from "@src/server/webhooks/sendgrid",
+  entities: [TestSession],
+  httpRoute: (POST, "/email-webhook")
 }
 //#endregion
 
@@ -507,3 +519,10 @@ query getDemographicStats {
   fn: import { getDemographicStats } from "@src/admin/operations",
   entities: [TestSession]
 }
+
+query getEmailStats {
+  fn: import { getEmailStats } from "@src/admin/operations",
+  entities: [TestSession]
+}
+
+

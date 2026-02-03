@@ -1,52 +1,64 @@
 import { type PersonalizationVars } from "../personalization";
 import { wrapHtml } from "../emailLayout";
 
-// Email B1: "I know exactly why you're struggling" (15 minutes after seeing teaser)
+// Email B1: "Your [SCORE] is in the Yellow Zone" (Immediate after seeing teaser)
 export function getTeaserB1Email(vars: PersonalizationVars): {
   subject: string;
   html: string;
   text: string;
 } {
-  const subject = "I know exactly why you're struggling";
+  const subject = "I saw your results.";
 
-  const text = `Hello,
+  const lensName = vars.dominant_lens.replace(/_/g, " ");
+
+  const text = `Hey,
 
 I saw your results.
 
-You are seeing the relationship through the lens of ${vars.dominant_lens.replace(/_/g, " ")}.
+You're seeing the relationship through the lens of ${lensName}.
 
-This isn't a flaw. It's a protection mechanism.
+That's not a flaw. It's how you learned to stay safe.
 
-But here is the problem: Your partner doesn't know this is happening. They just see your reaction.
+But here's the problem: Your partner doesn't know this is happening. They just see you reacting.
 
-In your full Analysis Report, I explain exactly how this lens is distorting your communication—and how to turn it off.
+Remember the blurred section on your report? Here's what's inside:
 
-I also give you 3 specific "Script Rewrites" to use the next time you feel triggered.
+→ The Circuit Breaker Script (stops fights before they spiral)
+→ Why your last fight really happened
+→ What your partner is actually trying to say (translation guide)
 
-Unlock Your Full Analysis ($15, reduced from $49): ${process.env.WASP_WEB_CLIENT_URL}/results
+This isn't therapy. It's a map of what's actually happening when you fight.
+
+Unlock Your Report (~~$197~~ $29) → ${process.env.WASP_WEB_CLIENT_URL}/results
 
 – The UYP Team
 
 Unsubscribe: ${vars.unsubscribe_url}`;
 
   const contentHtml = `
-      <p><strong>Hello,</strong></p>
+      <p><strong>Hey,</strong></p>
       
       <p>I saw your results.</p>
       
-      <p>You are seeing the relationship through the lens of <strong style="color: #8B55A5;">${vars.dominant_lens.replace(/_/g, " ")}</strong>.</p>
+      <p>You're seeing the relationship through the lens of <strong style="color: #8B55A5;">${lensName}</strong>.</p>
       
-      <p>This isn't a flaw. It's a protection mechanism.</p>
+      <p>That's not a flaw. It's how you learned to stay safe.</p>
       
-      <p>But here is the problem: <strong>Your partner doesn't know this is happening.</strong> They just see your reaction.</p>
+      <p>But here's the problem: <strong>Your partner doesn't know this is happening.</strong> They just see you reacting.</p>
       
-      <p>In your full Analysis Report, I explain exactly how this lens is distorting your communication—and how to turn it off.</p>
+      <p style="font-size: 15px; color: #64748B; margin: 20px 0;">Remember the blurred section on your report? Here's what's inside:</p>
       
-      <p>I also give you 3 specific "Script Rewrites" to use the next time you feel triggered.</p>
+      <div style="background-color: #FAF8F5; border-left: 4px solid #8B55A5; padding: 20px; margin: 24px 0;">
+        <p style="margin: 0 0 8px 0; color: #334155;">→ The Circuit Breaker Script (stops fights before they spiral)</p>
+        <p style="margin: 0 0 8px 0; color: #334155;">→ Why your last fight really happened</p>
+        <p style="margin: 0; color: #334155;">→ What your partner is actually trying to say (translation guide)</p>
+      </div>
+      
+      <p>This isn't therapy. It's a map of what's actually happening when you fight.</p>
       
       <p style="text-align: center; margin: 30px 0;">
         <a href="${process.env.WASP_WEB_CLIENT_URL}/results" class="button">
-          Unlock Your Full Analysis (<span style="text-decoration: line-through; opacity: 0.7;">$49</span> $15) →
+          Unlock Your Report (<span style="text-decoration: line-through; opacity: 0.6;">$197</span> $29) →
         </a>
       </p>
       
@@ -60,64 +72,72 @@ Unsubscribe: ${vars.unsubscribe_url}`;
   return { subject, html: wrapHtml(contentHtml, subject), text };
 }
 
-// Email B2: "The hidden pattern" (2 hours later)
+// Email B2: "The [DIMENSION] Loop" (1 hour later)
 export function getTeaserB2Email(vars: PersonalizationVars): {
   subject: string;
   html: string;
   text: string;
 } {
-  const subject = "The hidden pattern";
+  const subject = "The loop you're stuck in";
 
-  // Use variables carefully - fallback if answers aren't what we expect, though personalization.ts ensures defaults
-  const specificInsight = vars.has_high_silence_sensitivity
-    ? `You answered "${vars.q4_answer}" to question 4 (about silence making you uncomfortable). This suggests you have high "Disconnect Sensitivity" — you feel emotional distance before it's actually there.`
-    : `You noticed a mismatch in how you and your partner handle conflict.`;
+  const text = `Hey,
 
-  const text = `Hello,
+I was looking at your answers again.
 
-I was looking at your results again...
+You panic when there's unresolved tension.
 
-${specificInsight}
+Not "I'm uncomfortable." More like "I can't think straight until we fix this."
 
-But here's the twist: Your other answers show you have high Conflict Urgency. You don't fear silence, you fear *unresolved tension*.
+That's why you need to talk it out NOW. Your partner probably needs space to process.
 
-This specific combination creates a pattern we call "The Pressure Cooker." You're calm until there's a fight, then you need resolution *immediately*.
+You: "We need to fix this right now."
+Them: *pulls away*
+You: *panic intensifies*
+Them: *pulls away harder*
 
-Your partner probably needs space to process. You need closure now. That's the loop.
+That's the loop.
 
-See Your Full Breakdown ($15, reduced from $49): ${process.env.WASP_WEB_CLIENT_URL}/results
+Your report shows you exactly how to break it.
 
-This isn't a personality quiz. It's a map of your nervous system.
+See Your Full Report (~~$197~~ $29) → ${process.env.WASP_WEB_CLIENT_URL}/results
+
+This isn't a personality quiz. It's a map of what's actually happening.
 
 – The UYP Team
 
 Unsubscribe: ${vars.unsubscribe_url}`;
 
   const contentHtml = `
-      <p><strong>Hello,</strong></p>
+      <p><strong>Hey,</strong></p>
 
-      <p>I was looking at your results again...</p>
+      <p>I was looking at your answers again.</p>
       
-      <div style="background-color: #FAF8F5; border-left: 4px solid #8B55A5; padding: 15px; margin: 20px 0; font-style: italic;">
-        ${vars.has_high_silence_sensitivity
-      ? `You answered "<strong>${vars.q4_answer}</strong>" to question 4 (about silence making you uncomfortable). <br><br>This suggests you have high "Disconnect Sensitivity" — you feel emotional distance before it's actually there.`
-      : `You noticed a mismatch in how you and your partner handle conflict.`
-    }
+      <div style="background-color: #FEF3C7; border-left: 4px solid #F59E0B; padding: 20px; margin: 24px 0; border-radius: 4px;">
+        <p style="margin: 0; font-weight: 600; color: #92400E;">You panic when there's unresolved tension.</p>
       </div>
       
-      <p>But here's the twist: Your other answers show you have <strong>high Conflict Urgency</strong>. You don't just dislike silence, you fear <em>unresolved tension</em>.</p>
+      <p>Not "I'm uncomfortable." More like <strong>"I can't think straight until we fix this."</strong></p>
       
-      <p>This specific combination creates a pattern we call "The Pressure Cooker." You're calm until there's a fight, then you need resolution <em>immediately</em>.</p>
+      <p>That's why you need to talk it out NOW. Your partner probably needs space to process.</p>
       
-      <p>Your partner probably needs space to process. You need closure now. That's the loop.</p>
+      <div style="background-color: #FAF8F5; padding: 20px; margin: 24px 0; border-radius: 8px; font-family: monospace; font-size: 14px; line-height: 1.8;">
+        <p style="margin: 0 0 8px 0; color: #DC2626;"><strong>You:</strong> "We need to fix this right now."</p>
+        <p style="margin: 0 0 8px 0; color: #334155;"><strong>Them:</strong> <em>*pulls away*</em></p>
+        <p style="margin: 0 0 8px 0; color: #DC2626;"><strong>You:</strong> <em>*panic intensifies*</em></p>
+        <p style="margin: 0; color: #334155;"><strong>Them:</strong> <em>*pulls away harder*</em></p>
+      </div>
+      
+      <p style="font-size: 18px; font-weight: 600; color: #122639;">That's the loop.</p>
+      
+      <p>Your report shows you exactly how to break it.</p>
       
       <p style="text-align: center; margin: 30px 0;">
         <a href="${process.env.WASP_WEB_CLIENT_URL}/results" class="button">
-          See Your Full Breakdown (<span style="text-decoration: line-through; opacity: 0.7;">$49</span> $15) →
+          See Your Full Report (<span style="text-decoration: line-through; opacity: 0.6;">$197</span> $29) →
         </a>
       </p>
       
-      <p>This isn't a personality quiz. It's a map of your nervous system.</p>
+      <p style="font-size: 14px; color: #64748B; font-style: italic;">This isn't a personality quiz. It's a map of what's actually happening.</p>
       
       <p>– The UYP Team</p>
       
@@ -129,109 +149,95 @@ Unsubscribe: ${vars.unsubscribe_url}`;
   return { subject, html: wrapHtml(contentHtml, subject), text };
 }
 
-// Email B3: "You surprised me 😮" (3 hours later)
+// Email B3: "Only 18% score like you" (3 hours later)
 export function getTeaserB3Email(vars: PersonalizationVars): {
   subject: string;
   html: string;
   text: string;
 } {
-  const subject = "Your hidden relationship superpower";
+  const subject = "Only 18% score like you";
 
-  const dimensionMap: Record<string, { weakness: string; strength: string; script: string }> = {
+  const dimensionMap: Record<string, { truth: string; fix: string }> = {
     silence: {
-      weakness: "too sensitive",
-      strength: "You feel disconnection before it becomes a crisis. You're the early warning system in your relationship.",
-      script: "The problem isn't that you're \"too sensitive.\" The problem is you don't have a script for *what to do* when you feel it.",
+      truth: "You feel disconnection before it becomes a crisis. You're the early warning system.",
+      fix: "The problem isn't that you're 'too sensitive.' The problem is you don't have a script for what to do when you feel it.",
     },
     conflict: {
-      weakness: "overthink",
-      strength: "You notice tension that others miss. You're emotionally intelligent.",
-      script: "The problem isn't that you \"overthink.\" The problem is you try to fix it alone, without giving your partner the map.",
+      truth: "You notice tension that others miss. You're emotionally intelligent.",
+      fix: "The problem isn't that you 'overthink.' The problem is you try to fix it alone, without giving your partner the map.",
     },
     intentions: {
-      weakness: "read into things",
-      strength: "You assume your partner's actions have meaning. You're looking for connection.",
-      script: "The problem isn't that you \"read into things.\" The problem is you're reading the wrong language.",
+      truth: "You assume your partner's actions have meaning. You're looking for connection.",
+      fix: "The problem isn't that you 'read into things.' The problem is you're reading the wrong language.",
     },
     reassurance: {
-      weakness: "needy",
-      strength: "You value emotional connection and aren't afraid to ask for it.",
-      script: "The problem isn't that you're \"needy.\" The problem is your partner doesn't know your specific reassurance language.",
+      truth: "You value emotional connection and aren't afraid to ask for it.",
+      fix: "The problem isn't that you're 'needy.' The problem is your partner doesn't know your specific reassurance language.",
     },
     repair: {
-      weakness: "hold grudges",
-      strength: "You take emotional repair seriously. You don't sweep things under the rug.",
-      script: "The problem isn't that you \"hold grudges.\" The problem is you need explicit closure that your partner might not know how to give.",
+      truth: "You take emotional repair seriously. You don't sweep things under the rug.",
+      fix: "The problem isn't that you 'hold grudges.' The problem is you need explicit closure that your partner might not know how to give.",
     },
   };
 
   const content = dimensionMap[vars.dominant_dimension] || dimensionMap.silence;
 
-  const text = `Hello,
+  const text = `Hey,
 
-Most people who score high on ${vars.dominant_dimension} see it as a weakness.
+Most people who score high on ${vars.dominant_dimension} think something's wrong with them.
 
 You probably do too.
 
-But here's what you don't know:
+Here's the truth:
 
-${vars.dominant_dimension.toUpperCase()} IS ALSO YOUR GREATEST RELATIONSHIP STRENGTH.
+${content.truth}
 
-Here's why:
-
-${content.strength}
-
-${content.script}
+${content.fix}
 
 Your full report gives you that script.
 
-People pay $200/hour for couples therapy to learn this.
+People pay $200/hour for couples therapy to learn this. You can get it for $29 (normally $197).
 
-You can get it for $15 (normally $49).
-
-Unlock Your Full Analysis: ${process.env.WASP_WEB_CLIENT_URL}/results
+Unlock Your Report → ${process.env.WASP_WEB_CLIENT_URL}/results
 
 – The UYP Team
 
-P.S. — Only 18% of people have your exact profile. You're not broken. You're wired differently.
+P.S. — Only 18% of people have your exact scores. This isn't common. That's why it feels so lonely.
 
 Unsubscribe: ${vars.unsubscribe_url}`;
 
   const contentHtml = `
-      <p>Hello,</p>
+      <p>Hey,</p>
       
-      <p>Most people who score high on <strong>${vars.dominant_dimension}</strong> see it as a weakness.</p>
+      <p>Most people who score high on <strong>${vars.dominant_dimension}</strong> think something's wrong with them.</p>
       
       <p>You probably do too.</p>
       
-      <p>But here's what you don't know:</p>
+      <p>Here's the truth:</p>
       
-      <div style="background-color: #FAF8F5; padding: 20px; border-radius: 8px; margin: 20px 0; border: 1px solid #E2E8F0;">
-        <p style="margin: 0; font-weight: 700; color: #8B55A5; text-transform: uppercase; letter-spacing: 0.05em; text-align: center;">${vars.dominant_dimension} is also your greatest relationship strength.</p>
+      <div style="background-color: #DBEAFE; border-left: 4px solid #3B82F6; padding: 20px; margin: 24px 0; border-radius: 4px;">
+        <p style="margin: 0; font-weight: 600; color: #1E40AF;">${content.truth}</p>
       </div>
       
-      <p>Here's why:</p>
-      
-      <p><strong>${content.strength}</strong></p>
-      
-      <p>${content.script}</p>
+      <p>${content.fix}</p>
       
       <p><strong>Your full report gives you that script.</strong></p>
       
-      <p>People pay $200/hour for couples therapy to learn this.</p>
-      
-      <p>You can get it for <span style="text-decoration: line-through; opacity: 0.7;">$49</span> $15.</p>
+      <div style="background-color: #FAF8F5; padding: 20px; margin: 24px 0; border-radius: 8px; text-align: center;">
+        <p style="margin: 0 0 8px 0; color: #64748B; font-size: 14px;">People pay $200/hour for couples therapy to learn this.</p>
+        <p style="margin: 0; font-size: 18px; font-weight: 600; color: #122639;">You can get it for <span style="text-decoration: line-through; opacity: 0.6; color: #94A3B8;">$197</span> $29.</p>
+      </div>
       
       <p style="text-align: center; margin: 30px 0;">
         <a href="${process.env.WASP_WEB_CLIENT_URL}/results" class="button">
-          Unlock Your Full Analysis →
+          Unlock Your Report →
         </a>
       </p>
       
       <p>– The UYP Team</p>
       
       <p style="font-size: 14px; color: #64748B; margin-top: 30px; border-top: 1px solid #E2E8F0; padding-top: 20px;">
-        <strong>P.S.</strong> — Only 18% of people have your exact profile. You're not broken. You're wired differently.
+        <strong>P.S.</strong> — Only 18% of people have your exact scores. This isn't common. That's why it feels so lonely.
       </p>
       
       <div class="footer">

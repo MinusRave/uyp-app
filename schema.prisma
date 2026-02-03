@@ -93,6 +93,7 @@ model TestSession {
   fightFrequency          String?  // "daily" | "weekly" | "monthly" | "rarely"
   repairFrequency         String?  // "always" | "sometimes" | "rarely" | "never"
   partnerHurtfulBehavior  String?  // open-ended description
+  biggestFear             String?  // NEW: "One thing you are most afraid to tell your partner"
 
   // Retention Email Tracking
   emailSequenceType        String?   // "test_abandonment" | "teaser_viewer" | "checkout_abandonment"

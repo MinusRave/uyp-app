@@ -7,56 +7,52 @@ export function getTeaserB7Email(vars: PersonalizationVars): {
   html: string;
   text: string;
 } {
-  const subject = "The 6-second trick that rewires your brain";
+  const subject = "The 6-second trick";
 
-  const text = `Hello,
+  const text = `Hey,
 
-I want to give you a tool you can use tonight.
+I want to give you something you can use tonight.
 
-It's based on research by Dr. John Gottman, but tailored for your **${vars.dominant_lens.replace(/_/g, " ")}** lens.
-
-It's called the "6-Second Micro-Connection."
+It's called the "6-Second Reset."
 
 Most couples kiss for 1 second. It's a habit, not a connection.
 
-But a 6-second kiss (or hug) releases oxytocin. It tells your amygdala—the part of your brain scanning for threats—that you are safe.
+But a 6-second kiss (or hug) does something different. It tells the part of you that's scanning for threats: "You're safe."
 
-For your specific profile, this is critical because:
+For your specific pattern, this matters because:
 
 ${getLensSpecificTip(vars.dominant_lens)}
 
-Your Relationship Guide is full of these micro-habit adjustments. They take seconds, but they change everything.
+Your report is full of these tiny adjustments. They take seconds, but they change everything.
 
-Get The Full Toolkit ($15, reduced from $49): ${process.env.WASP_WEB_CLIENT_URL}/results
+Get The Full Toolkit (~~$197~~ $29) → ${process.env.WASP_WEB_CLIENT_URL}/results
 
 – The UYP Team
 
 Unsubscribe: ${vars.unsubscribe_url}`;
 
   const contentHtml = `
-  <p><strong>Hello,</strong></p>
+  <p><strong>Hey,</strong></p>
 
-  <p>I want to give you a tool you can use tonight.</p>
+  <p>I want to give you something you can use tonight.</p>
 
-  <p>It's based on research by Dr. John Gottman, but tailored for your <strong style="color: #8B55A5;">${vars.dominant_lens.replace(/_/g, " ")}</strong> lens.</p>
-
-  <p>It's called the <strong>"6-Second Micro-Connection."</strong></p>
+  <p>It's called the <strong>"6-Second Reset."</strong></p>
 
   <p>Most couples kiss for 1 second. It's a habit, not a connection.</p>
 
-  <p>But a 6-second kiss (or hug) releases oxytocin. It tells your amygdala—the part of your brain scanning for threats—that you are safe.</p>
+  <p>But a 6-second kiss (or hug) does something different. It tells the part of you that's scanning for threats: "You're safe."</p>
 
-  <p>For your specific profile, this is critical because:</p>
+  <p>For your specific pattern, this matters because:</p>
 
   <div style="background-color: #FAF8F5; padding: 20px; border-radius: 8px; margin: 20px 0; border-left: 4px solid #8B55A5;">
     <p style="margin: 0; font-style: italic;">${getLensSpecificTip(vars.dominant_lens)}</p>
   </div>
 
-  <p>Your Relationship Guide is full of these micro-habit adjustments. They take seconds, but they change everything.</p>
+  <p>Your report is full of these tiny adjustments. They take seconds, but they change everything.</p>
 
   <p style="text-align: center; margin: 30px 0;">
     <a href="${process.env.WASP_WEB_CLIENT_URL}/results" class="button">
-      Get The Full Toolkit (<span style="text-decoration: line-through; opacity: 0.7;">$49</span> $15) →
+      Get The Full Toolkit (<span style="text-decoration: line-through; opacity: 0.6;">$197</span> $29) →
     </a>
   </p>
 
@@ -72,11 +68,11 @@ Unsubscribe: ${vars.unsubscribe_url}`;
 
 function getLensSpecificTip(lens: string): string {
   const tips: Record<string, string> = {
-    silence: "Your nervous system interprets distance as danger. This physical reset button proves valuable safety instantly.",
-    conflict: "You physically hold tension in your body. This forces your shoulders to drop and your breathing to regulate.",
-    intentions: "You spend a lot of time analyzing words. This bypasses the analytical brain and goes straight to the emotional brain.",
-    reassurance: "You crave verbal validation, but physical validation is actually faster at calming your anxiety spike.",
-    repair: "You wait for the 'perfect moment' to reconnect. This creates a moment without needing to talk it out first."
+    silence: "You feel distance as danger. This physical reset proves safety instantly.",
+    conflict: "You hold tension. This forces your shoulders to drop and your breathing to slow.",
+    intentions: "You analyze words constantly. This bypasses thinking and goes straight to feeling.",
+    reassurance: "You want words, but touch actually calms you faster.",
+    repair: "You wait for the 'perfect moment' to reconnect. This creates one without talking."
   };
   return tips[lens] || tips.silence;
 }
@@ -89,46 +85,52 @@ export function getTeaserB8Email(vars: PersonalizationVars): {
 } {
   const subject = "The cost of waiting";
 
-  const text = `Hello,
+  const text = `Hey,
 
-There is a concept in psychology called "pattern entrenchment."
+Every time you repeat the same loop, it gets harder to break.
 
-Every time you repeat a loop—like the ${vars.dominant_lens} loop you're in—it's like carving a groove deeper into a dirt road.
+It's like a groove in a dirt road.
 
 The first time, it's easy to steer out.
 The 50th time, your wheels just slide into the rut automatically.
 
-You feel like you're choosing to react this way. Actually, you're just sliding into the groove.
+That's why our data shows that 68% of couples in the Yellow Zone move to Crisis (Red Zone) within 18 months if they don't change the pattern.
+
+You feel like you're choosing to react this way. You're not. You're just sliding into the groove.
 
 You've waited long enough. The groove is getting deep.
 
-Your Relationship Guide is the steering wheel.
+Your report is the steering wheel.
 
-Turn the wheel today ($15, reduced from $49): ${process.env.WASP_WEB_CLIENT_URL}/results
+Turn the wheel today (~~$197~~ $29) → ${process.env.WASP_WEB_CLIENT_URL}/results
 
 – The UYP Team
 
 Unsubscribe: ${vars.unsubscribe_url}`;
 
   const contentHtml = `
-  <p><strong>Hello,</strong></p>
+  <p><strong>Hey,</strong></p>
 
-  <p>There is a concept in psychology called "pattern entrenchment."</p>
+  <p>Every time you repeat the same loop, it gets harder to break.</p>
 
-  <p>Every time you repeat a loop—like the <strong>${vars.dominant_lens.replace(/_/g, " ")}</strong> loop you're in—it's like carving a groove deeper into a dirt road.</p>
+  <p>It's like a groove in a dirt road.</p>
 
   <p>The first time, it's easy to steer out.<br>
   The 50th time, your wheels just slide into the rut automatically.</p>
 
-  <p>You feel like you're choosing to react this way. Actually, you're just sliding into the groove.</p>
+  <div style="background-color: #FEF3C7; border-left: 4px solid #F59E0B; padding: 20px; margin: 24px 0; border-radius: 4px;">
+    <p style="margin: 0; font-weight: 600; color: #92400E;">Our data shows that 68% of couples in the Yellow Zone move to Crisis (Red Zone) within 18 months if they don't change the pattern.</p>
+  </div>
+
+  <p>You feel like you're choosing to react this way. You're not. You're just sliding into the groove.</p>
 
   <p><strong>You've waited long enough. The groove is getting deep.</strong></p>
 
-  <p>Your Relationship Guide is the steering wheel.</p>
+  <p>Your report is the steering wheel.</p>
 
   <p style="text-align: center; margin: 30px 0;">
     <a href="${process.env.WASP_WEB_CLIENT_URL}/results" class="button">
-      Turn the wheel today (<span style="text-decoration: line-through; opacity: 0.7;">$49</span> $15) →
+      Turn the wheel today (<span style="text-decoration: line-through; opacity: 0.6;">$197</span> $29) →
     </a>
   </p>
 
@@ -142,7 +144,7 @@ Unsubscribe: ${vars.unsubscribe_url}`;
   return { subject, html: wrapHtml(contentHtml, subject), text };
 }
 
-// Email B9: "This cart is closing" (Day 7 / Final)
+// Email B9: "Last chance" (Day 7 / Final)
 export function getTeaserB9Email(vars: PersonalizationVars): {
   subject: string;
   html: string;
@@ -150,53 +152,53 @@ export function getTeaserB9Email(vars: PersonalizationVars): {
 } {
   const subject = "Your analysis is being archived";
 
-  const text = `Hello,
+  const text = `Hey,
 
-This is the last email regarding your test results.
+This is the last email about your results.
 
-We archive incomplete sessions after 7 days for privacy reasons.
+We archive incomplete sessions after 7 days for privacy.
 
 If you want to understand your pattern, this is your moment.
 
-Here is what you get for $15 (normally $49):
-- Your core "Lens" breakdown
+Here's what you get for $29 (normally $197):
+- Your core pattern breakdown
 - The 3 triggers that set you off (and why)
-- Custom scripts to stop the fights
-- Your personal Relationship Operating Manual
+- Scripts to stop the fights
+- Your personal relationship manual
 
-Unlock Your Full Report ($15, reduced from $49): ${process.env.WASP_WEB_CLIENT_URL}/results
+Unlock Your Report (~~$197~~ $29) → ${process.env.WASP_WEB_CLIENT_URL}/results
 
-Don't let this insight slip away.
+Don't let this slip away.
 
 – The UYP Team
 
 Unsubscribe: ${vars.unsubscribe_url}`;
 
   const contentHtml = `
-  <p><strong>Hello,</strong></p>
+  <p><strong>Hey,</strong></p>
 
-  <p>This is the last email regarding your test results.</p>
+  <p>This is the last email about your results.</p>
 
-  <p>We archive incomplete sessions after 7 days for privacy reasons.</p>
+  <p>We archive incomplete sessions after 7 days for privacy.</p>
 
   <p><strong>If you want to understand your pattern, this is your moment.</strong></p>
 
-  <p>Here is what you get for <span style="text-decoration: line-through; opacity: 0.7;">$49</span> $15:</p>
+  <p>Here's what you get for <span style="text-decoration: line-through; opacity: 0.6;">$197</span> $29:</p>
 
   <ul style="color: #374151;">
-    <li>Your core "Lens" breakdown</li>
+    <li>Your core pattern breakdown</li>
     <li>The 3 triggers that set you off (and why)</li>
-    <li>Custom scripts to stop the fights</li>
-    <li>Your personal Relationship Operating Manual</li>
+    <li>Scripts to stop the fights</li>
+    <li>Your personal relationship manual</li>
   </ul>
 
   <p style="text-align: center; margin: 30px 0;">
     <a href="${process.env.WASP_WEB_CLIENT_URL}/results" class="button">
-      Unlock Your Full Report (<span style="text-decoration: line-through; opacity: 0.7;">$49</span> $15) →
+      Unlock Your Report (<span style="text-decoration: line-through; opacity: 0.6;">$197</span> $29) →
     </a>
   </p>
 
-  <p>Don't let this insight slip away.</p>
+  <p>Don't let this slip away.</p>
 
   <p>– The UYP Team</p>
 

@@ -1,224 +1,208 @@
 
-export type DimensionType = "silence" | "conflict" | "intentions" | "reassurance" | "repair";
+export type DimensionType = "communication" | "emotional_safety" | "physical_intimacy" | "power_fairness" | "future_values";
 
 export type QuadrantType = "Amplified Distress" | "Self-Regulation" | "Detached Cynicism" | "Secure Flow";
 
 export interface Prescription {
-    stateName: string; // The user-facing label (e.g. "The Panic Loop" vs "Amplified Distress")
-    analysis: string; // "You feel unsafe AND you think..."
+    stateName: string;
+    analysis: string;
     scripts: {
         inTheMoment: string;
         repair: string;
     };
-    partnerTranslation: string; // "Read this to your partner..."
+    partnerTranslation: string;
 }
 
 export const EVENT_TRIGGERS: Record<DimensionType, string> = {
-    silence: "your partner becomes quiet or emotionally unavailable",
-    conflict: "a disagreement or tension appears",
-    intentions: "your partner disappoints you or doesn’t meet an expectation",
-    reassurance: "you don’t receive clear signs of care or affection",
-    repair: "a conflict ends without clear emotional closure"
+    communication: "you try to resolve a conflict or get a response",
+    emotional_safety: "you feel hurt, misunderstood, or disconnected",
+    physical_intimacy: "you approach (or avoid) sexual connection",
+    power_fairness: "chores, money, or logistics need to be handled",
+    future_values: "you talk about the future, family, or life goals"
 };
 
 export const CORE_NEEDS: Record<DimensionType, { need: string; fear: string }> = {
-    silence: { need: "connection even in silence", fear: "emotional abandonment" },
-    conflict: { need: "emotional safety during disagreement", fear: "loss of relationship security" },
-    intentions: { need: "trust in partner's good will", fear: "being deliberately hurt" },
-    reassurance: { need: "clear signs of affection", fear: "being unloved or invisible" },
-    repair: { need: "resolved emotional closure", fear: "lingering disconnection" }
+    communication: { need: "to be heard and resolved", fear: "being shut out or ignored" },
+    emotional_safety: { need: "to feel liked and safe", fear: "being rejected or attacked" },
+    physical_intimacy: { need: "to be desired and cherished", fear: "being unwanted or used" },
+    power_fairness: { need: "partnership and support", fear: "being a servant or parent" },
+    future_values: { need: "shared meaning and growth", fear: "drifting apart" }
 };
 
-// The content database
 export const QUADRANT_CONTENT: Record<DimensionType, Record<QuadrantType, Prescription>> = {
-    silence: {
+    communication: {
         "Amplified Distress": {
-            stateName: "The Abandonment Panic",
-            analysis: "You are currently in a high-alert state. You care deeply (High Sensitivity), but you also strongly interpret silence as danger (High Negative Interpretation). This creates a self-reinforcing loop where your partner's need for quiet feels like a direct threat to your safety.",
+            stateName: "The Panic Loop",
+            analysis: "STOP. Your anxiety is lying to you. It says 'if we don't fix this NOW, we are over.' The truth is the opposite: Chasing them forces them to run. YOUR PROTOCOL: When you feel the urge to text/call/fix, put your phone in another room. Set a timer for 20 minutes. Do not speak until your heart rate is normal.",
             scripts: {
-                inTheMoment: "I'm feeling a spike of panic right now because you're quiet. I know my brain does this. Can you just tell me 'We are okay' so I can settle down?",
-                repair: "Earlier, when you went quiet, my brain went to a 'worst-case scenario'. I know that's my lens, not necessarily your intent."
+                inTheMoment: "I'm panicking and need to pause. I'm not leaving you, I'm just calming down.",
+                repair: "When I chase you, it's not control—it's anxiety. I'm working on self-soothing."
             },
-            partnerTranslation: "Your partner isn't trying to control you or demand attention. Their nervous system registers 'Silence' as 'Danger'. A small, verbal reassurance ('I'm just thinking, we're good') works like an off-switch for their anxiety."
+            partnerTranslation: "They aren't trying to control you; they are trying to stop their internal panic. Give them a tiny bit of reassurance before you take space."
         },
         "Self-Regulation": {
-            stateName: "Internal Friction",
-            analysis: "You feel the sting of silence (High Sensitivity), but you know logically your partner isn't trying to hurt you (Low Negative Interpretation). You are doing the hard work of self-soothing, but it generates internal fatigue.",
+            stateName: "White-Knuckling",
+            analysis: "You are holding it together, but you are exhausted. You are swallowing your needs to 'keep the peace.' STOP DOING THAT. Peace built on suppression isn't peace; it's a slow breakup. YOUR PROTOCOL: Say 'I am anxious about X' within 5 minutes of feeling it. Don't let it rot.",
             scripts: {
-                inTheMoment: "I'm feeling a bit anxious about the silence, but I know you just need space. I'm going to take a walk to regulate myself.",
-                repair: "I managed my anxiety when you were quiet today, but it takes energy. It helps if you can give me a heads-up before checking out."
+                inTheMoment: "I'm trying to stay calm, but I'm struggling. Can we slow down?",
+                repair: "I tend to hide my feelings until I explode. I'm trying to speak up sooner."
             },
-            partnerTranslation: "Your partner feels the silence deeply but is working hard not to project that onto you. Acknowledge their effort: 'I appreciate you giving me space even when it's hard for you.'"
+            partnerTranslation: "They are working incredibly hard to stay calm. Acknowledge it."
         },
         "Detached Cynicism": {
-            stateName: "Protective Numbness",
-            analysis: "You don't feel acute anxiety (Low Sensitivity), but you still view your partner's silence negatively (High Negative Interpretation). You likely see them as 'cold' or 'avoidant' and have emotionally checked out to protect yourself.",
+            stateName: "The Wall",
+            analysis: "You have decided they won't listen, so you stopped talking. This is the death knell of a relationship. YOUR PROTOCOL: Break the silence. Say the thing you think is 'useless' to say. Even if they get mad, anger is better than this silence. Anger is alive; this wall is dead.",
             scripts: {
-                inTheMoment: "I'm noticing I'm writing you off as 'avoidant' right now. I want to stay engaged. Can we talk about this later?",
-                repair: "I tend to judge your silence as you being cold. I want to be curious instead of critical."
+                inTheMoment: "I'm shutting down because I don't think you're listening. I want to try again.",
+                repair: "I've built a wall to protect myself. I want to take a brick down."
             },
-            partnerTranslation: "Your partner may seem unbothered, but they are internally categorizing your silence as a character flaw. They need to see you engage warmly to break this cynical assumption."
+            partnerTranslation: "They seem cold, but they are actually protecting themselves from disappointment. Show them you care to melt the wall."
         },
         "Secure Flow": {
-            stateName: "Comfortable Silence",
-            analysis: "You are in a secure state. You notice silence but don't fear it (Low Sensitivity), and you trust your partner's need for space (Low Negative Interpretation).",
-            scripts: {
-                inTheMoment: "Looks like you need some thinking time. I'll be in the other room.",
-                repair: "I felt good about our downtime today. It felt comfortable."
-            },
-            partnerTranslation: "Your partner feels safe with you, even in silence. Continue to protect this safety by being transparent when you need to withdraw."
+            stateName: "Fluid Connection",
+            analysis: "You can handle conflict without panicking.",
+            scripts: { inTheMoment: "Let's take a break.", repair: "Good talk." },
+            partnerTranslation: "Keep it up."
         }
     },
-    conflict: {
+    emotional_safety: {
         "Amplified Distress": {
-            stateName: "The Escalation Loop",
-            analysis: "Conflict feels cataclysmic to you. You feel highly threatened (High Sensitivity) and assume your partner is attacking or dumping you (High Negative Interpretation). You likely fight to survive.",
+            stateName: "Hyper-Vigilance",
+            analysis: "You are scanning for danger 24/7. A sigh, a look, a tone—you treat them all as threats. THIS IS EXHAUSTING YOUR PARTNER. YOUR PROTOCOL: Assume positive intent. Next time they are quiet, do not ask 'Are you mad?'. Instead, say 'I'm telling myself a story that you're mad. Is that true?' Check the facts before you react.",
             scripts: {
-                inTheMoment: "I am feeling flooded and unsafe. I need a 20-minute timeout. I promise to come back.",
-                repair: "When we fight, I lose access to the part of me that knows you love me. I'm working on staying grounded."
+                inTheMoment: "My brain is telling me you hate me. Is that true, or are you just tired?",
+                repair: "I struggle to feel safe when things are off. I need extra reassurance."
             },
-            partnerTranslation: "During conflict, your partner enters 'Fight or Flight'. Logic will not reach them here. Soften your tone and remind them 'We are on the same team' before making your point."
+            partnerTranslation: "They are like a burn victim—even a light touch hurts. Be extra gentle and explicit with your love."
         },
         "Self-Regulation": {
-            stateName: "Holding the Line",
-            analysis: "Conflict hurts (High Sensitivity), but you hold onto the truth that your partner isn't the enemy (Low Negative Interpretation). This is noble but exhausting.",
+            stateName: "Rationalizing",
+            analysis: "You feel hurt, but you dismiss your own feelings: 'Oh, he's just tired.' STOP GASLIGHTING YOURSELF. If it hurt, it hurt. YOUR PROTOCOL: Validate your own reality. Say 'Ouch' when something stings. Don't explain it away.",
             scripts: {
-                inTheMoment: "This is really hard for me to hear, but I'm listening. Give me a second to process.",
-                repair: "I worked hard to stay present today. I need to know you see that effort."
+                inTheMoment: "That comment landed wrong for me. Ouch.",
+                repair: "I try to talk myself out of my feelings. I'm going to stop doing that."
             },
-            partnerTranslation: "Your partner is doing heavy emotional lifting to stay present. Validate them: 'I know this is hard to hear, thank you for staying with me.'"
+            partnerTranslation: "They are trying to trust you. Don't make it hard for them."
         },
         "Detached Cynicism": {
-            stateName: "Dismissive Defense",
-            analysis: "You don't feel overwhelmed (Low Sensitivity), but you view the conflict as your partner's fault/drama (High Negative Interpretation). You likely condescend or withdraw.",
+            stateName: "Protective Distrust",
+            analysis: "You've decided safety is impossible, so you've numbed out. You are in the room, but your heart is in a bunker. YOUR PROTOCOL: Take one risk this week. Share one vulnerable fear. If they drop it, you know where you stand. But give them one chance to catch it.",
             scripts: {
-                inTheMoment: "I'm feeling dismissive right now. That's not helpful. Let me try to actually hear your grievance.",
-                repair: "I tend to treat your concerns as 'drama'. I want to respect your experience more."
+                inTheMoment: "I'm finding it hard to trust you right now.",
+                repair: "I've stopped sharing my real self with you. I want to change that."
             },
-            partnerTranslation: "Your partner may act superior or unbothered. This is a defense. Ask them: 'I need to know his matters to you, even if you don't agree with the facts.'"
+            partnerTranslation: "They are waiting for the other shoe to drop. Prove them wrong with consistency."
         },
         "Secure Flow": {
-            stateName: "Constructive Friction",
-            analysis: "You see conflict as a problem to solve, not a threat to the relationship.",
-            scripts: {
-                inTheMoment: "I disagree with that, but I understand why you feel that way.",
-                repair: "That was a tough talk, but I'm glad we cleared the air."
-            },
-            partnerTranslation: "You have a solid foundation here. Keep it up."
+            stateName: "Deep Safety",
+            analysis: "You are a 'Safe Harbor' for each other. This is the superpower of relationships. Don't get complacent.",
+            scripts: { inTheMoment: "I know you love me.", repair: "All good." },
+            partnerTranslation: "Safety is established."
         }
     },
-    intentions: {
+    physical_intimacy: {
         "Amplified Distress": {
-            stateName: "The Paranoid Spike",
-            analysis: "When hurt, you feel it deeply (High Sensitivity) and immediately assume it was on purpose (High Negative Interpretation).",
+            stateName: "The Starvation Cycle",
+            analysis: "You are chasing sex to feel loved. When they say 'no' to sex, you hear 'I don't love you.' STOP CHASING. The pressure is killing their libido. YOUR PROTOCOL: No sex initiation for 1 week. Focus entirely on non-sexual touch (hugging, holding hands) with zero expectation. Re-wire your brain to feel safe without the orgasm.",
             scripts: {
-                inTheMoment: "My brain is telling me you did this to hurt me. Is that true?",
-                repair: "I struggle to give the benefit of the doubt when I'm in pain."
+                inTheMoment: "I feel rejected right now, but I know you love me.",
+                repair: "I equate sex with love. I'm working on separating them."
             },
-            partnerTranslation: "Your partner's 'Ouch' turns into 'You attacked me' instantly. Over-communicate your good intent: 'I messed up, but I never wanted to hurt you.'"
+            partnerTranslation: "For them, sex isn't just pleasure; it's an oxygen mask for connection. When you say no to sex, they hear 'I don't love you'."
         },
         "Self-Regulation": {
-            stateName: "The Benefit of the Doubt",
-            analysis: "You feel the disappointment (High Sensitivity), but you catch yourself before blaming them (Low Negative Interpretation).",
+            stateName: "The Patient Wait",
+            analysis: "You are waiting for them to want you. It hurts, but you are quiet about it. SILENCE KILLS PASSION. YOUR PROTOCOL: Initiate a conversation about sex *outside the bedroom*. Don't ask for it. Ask about it. 'What was your favorite memory of us?' Spark the mind first.",
             scripts: {
-                inTheMoment: "I'm disappointed, but I know you didn't mean to let me down.",
-                repair: "I'm working on separating the impact of your actions from your intent."
+                inTheMoment: "I miss our connection. Just wanted you to know.",
+                repair: "I've been waiting for you to come to me. I miss being pursued."
             },
-            partnerTranslation: "Your partner feels things deeply but tries to be fair. Acknowledge the impact: 'I know my mistake hurt you, I'm sorry.'"
+            partnerTranslation: "They are being incredibly patient. Don't take it for granted. Initate non-sexual touch."
         },
         "Detached Cynicism": {
-            stateName: "Resentful Scorekeeping",
-            analysis: "You don't show the hurt (Low Sensitivity), but you secretly chalk it up to their incompetence/character (High Negative Interpretation).",
+            stateName: "The Roommate Trap",
+            analysis: "You are business partners. Efficient, polite, and completely sexless. You've suppressed your needs to survive. YOUR PROTOCOL: Ban logistics talk after 8pm. No kids, no bills, no schedules. If you have nothing else to talk about, stare at each other. Boredom is better than 'business'.",
             scripts: {
-                inTheMoment: "I'm tallying this as a failure. I need to stop and tell you I'm annoyed.",
-                repair: "I resent you silently instead of speaking up. I'm trying to change that."
+                inTheMoment: "No more logistics tonight. Let's just hang out.",
+                repair: "We've become roommates. I want to be your lover again."
             },
-            partnerTranslation: "Your partner may seem fine, but they are building a case against you. Encourage them to speak up: 'If you're annoyed, please tell me. I can take it.'"
+            partnerTranslation: "They have given up. If you want the spark back, you have to show them it's safe to try again."
         },
         "Secure Flow": {
-            stateName: "Trusting Resilience",
-            analysis: "You can feel disappointed without doubting the relationship.",
-            scripts: {
-                inTheMoment: "That sucked, but I know you've got my back.",
-                repair: "Thanks for owning that mistake."
-            },
-            partnerTranslation: "You are in a good place."
+            stateName: "Erotic Play",
+            analysis: "You have kept the spark alive. Prioritize this. It is the first thing to go when life gets busy.",
+            scripts: { inTheMoment: "That was fun.", repair: "Let's connect soon." },
+            partnerTranslation: "Keep the fire burning."
         }
     },
-    reassurance: {
+    power_fairness: {
         "Amplified Distress": {
-            stateName: "The Void",
-            analysis: "You have a high hunger for love (High Sensitivity) but don't see it even when it's there (High Negative Interpretation/Blindness).",
+            stateName: "The Parent-Child Trap",
+            analysis: "You are the Manager; they are the Employee. It is unsexy and exhausting. STOP MANAGING. Every time you remind them to do something, you are their mother. YOUR PROTOCOL: Full Handover. Give them one entire domain (e.g., 'Dinner'). They plan it, buy it, cook it. If they fail, they fail. DO NOT RESCUE THEM.",
             scripts: {
-                inTheMoment: "I'm feeling unloved right now. I need a specific reminder that I matter.",
-                repair: "I have a 'bucket with a hole in it' regarding affection. I'm working on patching it."
+                inTheMoment: "I'm not your parent. I need a partner.",
+                repair: "I hate nagging. It makes me feel unsexy and angry."
             },
-            partnerTranslation: "Your partner needs love to be LOUD to hear it. Subtle cues don't work. Be explicit: 'I love you, you matter to me.'"
+            partnerTranslation: "They aren't 'controlling'; they are overwhelmed. Take a task off their plate entirely (conception to execution) to help them breathe."
         },
         "Self-Regulation": {
-            stateName: "Self-Soothing",
-            analysis: "You crave reassurance (High Sensitivity) but recognize your partner's unique way of showing it (Low Negative Interpretation).",
+            stateName: "The Silent Martyr",
+            analysis: "You are doing it all and 'fine' with it... until you resent them. MARTYRDOM IS TOXIC. YOUR PROTOCOL: The 50/50 Audit. Sit down this Sunday. List every regular task. Assign names. If your list is longer, hand 3 items over. Stop being a hero.",
             scripts: {
-                inTheMoment: "I'm craving affection. I'm going to ask for a hug instead of waiting and brooding.",
-                repair: "I know you show love by [Action], even if I crave words."
+                inTheMoment: "I'm overwhelmed. I need you to take this off my plate.",
+                repair: "I've been doing too much silently. That's on me."
             },
-            partnerTranslation: "Your partner needs vocal reassurance but appreciates your efforts. Meet them halfway."
+            partnerTranslation: "They are drowning quietly. Throw them a lifeline before they sink."
         },
         "Detached Cynicism": {
-            stateName: "Dismissive Independence",
-            analysis: "You deny needing love (Low Sensitivity) and view their attempts as weak or annoying (High Negative Interpretation).",
+            stateName: "Resentful Check-Out",
+            analysis: "You've stopped asking for help because 'it's easier to just do it myself'. This is how resentment rots a marriage. YOUR PROTOCOL: Stop doing their laundry. Stop buying their snacks. If you act single, be single. Force the crisis. They need to see the labor you are doing.",
             scripts: {
-                inTheMoment: "I'm pushing you away. I actually do want to connect.",
-                repair: "I act like I don't need anyone. That's a defense mechanism."
+                inTheMoment: "I'm not doing that for you anymore. It's your responsibility.",
+                repair: "I stopped relying on you because I felt let down."
             },
-            partnerTranslation: "Your partner acts tough to avoid being let down. Don't stop trying to reach them."
+            partnerTranslation: "They have stopped relying on you. Re-build trust by doing what you say you will do."
         },
         "Secure Flow": {
-            stateName: "Secure Base",
-            analysis: "You feel loved and can ask when you need a boost.",
-            scripts: {
-                inTheMoment: "I need a hug.",
-                repair: "Thanks for being there."
-            },
-            partnerTranslation: "Keep doing what you're doing."
+            stateName: "True Partnership",
+            analysis: "You are a team. You cover for each other without keeping score. Protect this dynamic.",
+            scripts: { inTheMoment: "Your turn.", repair: "Good teamwork." },
+            partnerTranslation: "Balanced and fair."
         }
     },
-    repair: {
+    future_values: {
         "Amplified Distress": {
-            stateName: "The Grudge Loop",
-            analysis: "Unresolved issues burn you (High Sensitivity) and you assume your partner doesn't care to fix them (High Negative Interpretation).",
+            stateName: "The Divergent Path",
+            analysis: "You are pulling in opposite directions. Every conversation about the future triggers a fight. STOP PULLING. You cannot force them to change their path. YOUR PROTOCOL: The 'No-Change' Date. Go out. Talk about anything EXCEPT the future. Remember why you liked them in the present before you destroy the future.",
             scripts: {
-                inTheMoment: "I can't move on yet. I need us to agree on what happened.",
-                repair: "I get stuck in the past because I'm afraid it will happen again."
+                inTheMoment: "I'm scared we want different things.",
+                repair: "I need to know we are building the same life."
             },
-            partnerTranslation: "Your partner isn't being difficult; they are afraid. They need 'Closure' to feel safe again."
+            partnerTranslation: "They need to know you are on the same team. Dream with them."
         },
         "Self-Regulation": {
-            stateName: "Patient Processing",
-            analysis: "You need closure (High Sensitivity) but trust it will come eventually (Low Negative Interpretation).",
+            stateName: "Compromise Fatigue",
+            analysis: "You are bending over backwards to fit their life. Eventually, you will snap. YOUR PROTOCOL: Draw a Line. What is one non-negotiable for you? (Living city? Kids? Career?). Tell them. 'I can compromise on the drapes, but not on having a dog.' Clarity is kindness.",
             scripts: {
-                inTheMoment: "I'm not over this yet, but I can wait until tomorrow to talk.",
-                repair: "I need us to circle back to this."
+                inTheMoment: "I feel like I'm the only one compromising.",
+                repair: "I've been bending too much. I need to stand firm on this."
             },
-            partnerTranslation: "Your partner is patient but don't forget the follow-up. They are counting on it."
+            partnerTranslation: "They are bending for you. Don't let them break."
         },
         "Detached Cynicism": {
-            stateName: "Pseudo-Forgiveness",
-            analysis: "You claim you don't care (Low Sensitivity) but you actually think 'why bother, nothing changes' (High Negative Interpretation).",
+            stateName: "Parallel Lives",
+            analysis: "You have given up on a shared future. You are just sharing a zip code. YOUR PROTOCOL: Dream Stacking. Spend $50 this weekend on something purely for 'us' (not the kids, not the house). A game, a drink, a drive. You need to remember you are a couple, not just co-tenants.",
             scripts: {
-                inTheMoment: "I'm saying 'it's fine' but it's not. Ideally, we fix this.",
-                repair: "I check out of repair because I don't think it works."
+                inTheMoment: "You do your thing, I'll do mine.",
+                repair: "We need a shared goal to reconnect."
             },
-            partnerTranslation: "Your partner says 'whatever' but means 'this is hopeless'. Prove them wrong by driving the repair yourself."
+            partnerTranslation: "Find one thing you both love and do it together. Re-ignite the shared purpose."
         },
         "Secure Flow": {
-            stateName: "Elastic Repair",
-            analysis: "You bounce back well.",
-            scripts: {
-                inTheMoment: "I'm good if you're good.",
-                repair: "Glad we worked that out."
-            },
-            partnerTranslation: "Great resilience."
+            stateName: "Shared Vision",
+            analysis: "You are building a cathedral together. Keep laying the bricks.",
+            scripts: { inTheMoment: "Let's plan.", repair: "Great vision." },
+            partnerTranslation: "Aligned."
         }
     }
 };

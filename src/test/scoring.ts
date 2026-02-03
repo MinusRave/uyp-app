@@ -14,8 +14,9 @@ export interface DimensionScore {
     PM: number; // 0-100 (Negative Interpretation)
     SL: number; // 0-100 (Sensitivity/Need)
     mismatch: number; // 0-100
-    state: QuadrantType; // New: The 4 Quadrants
-    prescription: Prescription; // The content for this state
+    state: QuadrantType;
+    prescription: Prescription;
+    health: number; // 0-100 (Higher is Better) - NEW for Crisis Triage
 }
 
 export interface ReportSection {
@@ -39,17 +40,13 @@ export interface FullReport {
         activates: string;
         need: string;
         fear: string;
-        stateName: string; // New
-        analysis: string; // New
+        stateName: string;
+        analysis: string;
     };
-    /* Deprecated old lists in favor of detailed Dimension sections */
     dimensionsDetailed: {
         id: string;
         score: DimensionScore;
     }[];
-
-    /* Legacy fields kept for backward compatibility if UI needs them, or we can drop them if we refactor UI completely. 
-       Let's keep the structure compatible but populated with new logic where possible. */
     alignedAreas: {
         dimension: string;
         text: string;
@@ -60,33 +57,25 @@ export interface FullReport {
         assume: string;
         distortion_origin: string;
     }[];
-
-    // New: Data for graphs
     visualData: {
         dimension: string;
         label: string;
-        sensitivity: number; // SL
-        interpretation: number; // PM
+        sensitivity: number;
+        interpretation: number;
     }[];
-
-    // New Prescriptive Sections
     scripts: {
         dimension: string;
         inTheMoment: string;
         repair: string;
     }[];
-
     partnerTranslations: {
         dimension: string;
         text: string;
     }[];
-
     questions: {
         dimension: string;
         questions: string[];
     }[];
-
-    // New: Compatibility Score
     compatibility?: {
         overallScore: number;
         breakdown: {
@@ -98,7 +87,6 @@ export interface FullReport {
         riskLevel: string;
         topRecommendation: string;
     };
-
     closing: string;
 }
 
@@ -114,51 +102,43 @@ export interface ScoreResult {
         hook: string;
         cta: string;
     };
+    attachmentStyle: string;
+    phase: string;
 }
 
 // --- Configuration & Helpers ---
 
 const DIMENSIONS: DimensionType[] = [
-    "silence",
-    "conflict",
-    "intentions",
-    "reassurance",
-    "repair",
+    "communication",
+    "emotional_safety",
+    "physical_intimacy",
+    "power_fairness",
+    "future_values",
 ];
 
-// Mapping Table (Question IDs)
+// Mapping Table (Based on New Question Set)
 const DIMENSION_MAPPING: Record<DimensionType, { PM: number[]; SL: number[] }> = {
-    silence: { PM: [1, 2, 3], SL: [4, 5, 6] },
-    conflict: { PM: [7, 8, 9], SL: [10, 11, 12] },
-    intentions: { PM: [13, 14, 15], SL: [16, 17, 18] },
-    reassurance: { PM: [19, 20, 21], SL: [22, 23, 24] },
-    repair: { PM: [25], SL: [26, 27, 28] },
+    communication: { PM: [2, 4, 5], SL: [1, 3, 6] },
+    emotional_safety: { PM: [8, 11, 12], SL: [7, 9, 10] },
+    physical_intimacy: { PM: [15, 16, 18], SL: [13, 14, 17] },
+    power_fairness: { PM: [20, 24], SL: [19, 21, 22, 23] },
+    future_values: { PM: [26, 28], SL: [25, 27] }
 };
 
-// Reverse Coded Questions (IDs)
-const REVERSE_CODED_IDS = [2, 6, 9, 12, 14, 18, 24, 28];
-
-// --- Lookup Tables (Legacy helpers moved or deprecated, using new Quadrant logic) ---
+// Reverse Coded Questions (IDs) - Updated for new set
+const REVERSE_CODED_IDS = [6, 11, 18, 24, 28];
 
 const QUESTION_BANK: Record<DimensionType, string[]> = {
-    silence: ["When you go quiet, what’s happening inside you?", "What does silence mean to you emotionally?", "What helps you feel safe when you need space?"],
-    conflict: ["What feels hardest for you during disagreements?", "What do you need from me when things get tense?", "How do you protect yourself in conflict?"],
-    intentions: ["When I disappoint you, what do you think I mean?", "What helps you trust someone’s intentions?", "What makes you doubt motives?"],
-    reassurance: ["What makes you feel most loved?", "How do you usually show affection?", "What kind of reassurance matters most?"],
-    repair: ["What helps you feel close again after conflict?", "How do you know when something is resolved?", "What do you need before you can reconnect?"]
+    communication: ["When you argue, what happens physically?", "Does silence feel like safety or danger?"],
+    emotional_safety: ["When do you feel most 'held' by your partner?", "What triggers your distrust?"],
+    physical_intimacy: ["Is sex a way to connect, or the result of connection?", "How do you handle rejection?"],
+    power_fairness: ["Do you feel like a parent or a partner?", "Does the mental load feel shared?"],
+    future_values: ["Are you building the same cathedral?", "Do you have fun together?"]
 };
 
 // --- Helper Functions ---
 
 const determineQuadrant = (sl: number, pm: number): QuadrantType => {
-    // Thresholds: High >= 50, Low < 50. 
-    // Note: User strategy doc suggested 60/40 split. Let's use 50 as the hard line for now, 
-    // or maybe a "Buffer Zone" (40-60).
-    // Let's stick to a clear 50 split for simplicity first.
-
-    // Wait, let's look at the strategy doc:
-    // High (>60), Low (<40). What about 40-60?
-    // Let's assume > 50 is High.
     const isHighSL = sl >= 50;
     const isHighPM = pm >= 50;
 
@@ -171,7 +151,6 @@ const determineQuadrant = (sl: number, pm: number): QuadrantType => {
 // --- Algorithm ---
 
 export function calculateScore(answers: Record<string, any>, userProfile?: any): ScoreResult {
-    // 1. Normalize and aggregate
     const normalizedScores: Record<number, number> = {};
     Object.entries(answers).forEach(([qIdStr, rawVal]) => {
         const qId = parseInt(qIdStr);
@@ -182,7 +161,7 @@ export function calculateScore(answers: Record<string, any>, userProfile?: any):
     });
 
     const dimensions: any = {};
-    const dimensionStats: { id: DimensionType; sl: number; pm: number; mismatch: number; state: QuadrantType; prescription: Prescription }[] = [];
+    const dimensionStats: { id: DimensionType; sl: number; pm: number; mismatch: number; state: QuadrantType; prescription: Prescription; health: number }[] = [];
 
     DIMENSIONS.forEach((dim) => {
         const mapping = DIMENSION_MAPPING[dim];
@@ -192,41 +171,28 @@ export function calculateScore(answers: Record<string, any>, userProfile?: any):
         const slFinal = Math.round((slScores.length > 0 ? slScores.reduce((a, b) => a + b, 0) / slScores.length : 0) * 100);
         const mismatch = Math.abs(slFinal - pmFinal);
 
-        // NEW: Determine State
         const state = determineQuadrant(slFinal, pmFinal);
         const prescription = QUADRANT_CONTENT[dim][state];
+        const health = 100 - Math.round((slFinal + pmFinal) / 2);
 
-        dimensions[dim] = { PM: pmFinal, SL: slFinal, mismatch, state, prescription };
-        dimensionStats.push({ id: dim, sl: slFinal, pm: pmFinal, mismatch, state, prescription });
+        dimensions[dim] = { PM: pmFinal, SL: slFinal, mismatch, state, prescription, health };
+        dimensionStats.push({ id: dim, sl: slFinal, pm: pmFinal, mismatch, state, prescription, health });
     });
 
-    // 2. Dominant Lens Calculation
-    // Logic: Highest "Pain". 
-    // Pain = Amplified Distress > Detached Cynicism > Self Regulation > Secure Flow.
-    // Within same category, highest SL + PM sum?
-
-    const scoreState = (s: QuadrantType) => {
-        if (s === "Amplified Distress") return 4;
-        if (s === "Detached Cynicism") return 3;
-        if (s === "Self-Regulation") return 2;
-        return 1;
-    };
+    // PRIMARY CRISIS CALCULATION
+    const priorityOrder: DimensionType[] = ["physical_intimacy", "power_fairness", "emotional_safety", "future_values", "communication"];
 
     const candidates = [...dimensionStats];
     candidates.sort((a, b) => {
-        const scoreA = scoreState(a.state);
-        const scoreB = scoreState(b.state);
-        if (scoreA !== scoreB) return scoreB - scoreA; // Bio-threat priority
-
-        // Tie-breaker: Intensity (Sum of scores)
-        return (b.sl + b.pm) - (a.sl + a.pm);
+        if (a.health !== b.health) return a.health - b.health;
+        const pA = priorityOrder.indexOf(a.id);
+        const pB = priorityOrder.indexOf(b.id);
+        return pA - pB;
     });
 
     const dominantLensObj = candidates[0];
     const dominantLens = dominantLensObj.id;
 
-    // 3. Lists & Triggers
-    // Triggers are areas with Distress or Self-Regulation (High SL)
     const triggers = dimensionStats
         .filter(d => d.state === "Amplified Distress" || d.state === "Self-Regulation")
         .sort((a, b) => b.sl - a.sl)
@@ -237,18 +203,10 @@ export function calculateScore(answers: Record<string, any>, userProfile?: any):
         .filter(d => d.state === "Detached Cynicism")
         .map(d => d.id);
 
-    // --- Report Generation ---
-
     const dimContent = dominantLensObj.prescription;
     const coreNeed = CORE_NEEDS[dominantLens as DimensionType];
 
-    // Snapshot Summary
-    const snapshotSummary = `Your relationship dynamic is defined by a primary pattern in ${dominantLens}, which is currently in a state of "${dimContent.stateName}".`;
-
-    // Legacy Support (Aligned vs Misread)
-    // We Map "Secure Flow" & "Self-Ref" to Aligned? Or just Secure?
-    // Let's map Secure Flow -> Aligned.
-    // Others -> Misread/Attention Needed.
+    const snapshotSummary = `Your relationship is suffering from a critical breakdown in ${dominantLens.replace('_', ' ').toUpperCase()}. You are currently in the "${dimContent.stateName}" trap.`;
 
     const alignedAreas = dimensionStats
         .filter(d => d.state === "Secure Flow")
@@ -263,10 +221,9 @@ export function calculateScore(answers: Record<string, any>, userProfile?: any):
             dimension: d.id,
             feel: `State: ${d.prescription.stateName}`,
             assume: d.prescription.analysis,
-            distortion_origin: "Based on Quadrant Analysis."
+            distortion_origin: "Based on MRI Scan."
         }));
 
-    // scripts
     const scriptsContent = dimensionStats.map(d => ({
         dimension: d.id,
         inTheMoment: d.prescription.scripts.inTheMoment,
@@ -278,30 +235,27 @@ export function calculateScore(answers: Record<string, any>, userProfile?: any):
         text: d.prescription.partnerTranslation
     }));
 
-    // Question Selection
     const questionSelection = dimensionStats.map(d => {
         const allQs = QUESTION_BANK[d.id as DimensionType];
-        // If secure, maybe easier questions? For now return all.
         return { dimension: d.id, questions: allQs };
     });
 
-    // Calculate Compatibility Score (if partner data available)
     let compatibilityScore: any = undefined;
-    if (userProfile?.partnerConflictStyle || userProfile?.fightFrequency || userProfile?.repairFrequency) {
+    if (userProfile?.partnerConflictStyle) {
         compatibilityScore = calculateCompatibility({
             userDominantLens: dominantLens,
             userState: dimContent.stateName,
             partnerConflictStyle: userProfile.partnerConflictStyle,
-            fightFrequency: userProfile.fightFrequency,
-            repairFrequency: userProfile.repairFrequency
+            fightFrequency: userProfile.fightFrequency || "Monthly",
+            repairFrequency: userProfile.repairFrequency || "Sometimes"
         });
     }
 
     const report: FullReport = {
         cover: {
-            title: "Your Relationship Operating Manual",
-            subtitle: "A physiological map of how you connect",
-            opening: "This is not just a report. It is a user manual for your specific nervous system."
+            title: "Relationship MRI Report",
+            subtitle: "Diagnostic Scan & Treatment Plan",
+            opening: "We have analyzed the 5 Vital Signs of your relationship. Here is the diagnosis."
         },
         snapshot: {
             summary: snapshotSummary,
@@ -324,7 +278,7 @@ export function calculateScore(answers: Record<string, any>, userProfile?: any):
         misreadAreas,
         visualData: dimensionStats.map(d => ({
             dimension: d.id,
-            label: d.id.charAt(0).toUpperCase() + d.id.slice(1).replace('_', ' '),
+            label: d.id.replace('_', ' ').replace(/\b\w/g, l => l.toUpperCase()),
             sensitivity: dimensions[d.id].SL,
             interpretation: dimensions[d.id].PM
         })),
@@ -332,14 +286,14 @@ export function calculateScore(answers: Record<string, any>, userProfile?: any):
         partnerTranslations: partnerTranslations,
         questions: questionSelection,
         compatibility: compatibilityScore,
-        closing: "Use these scripts. They are designed to bypass the defense mechanisms of your partner."
+        closing: "This is your starting point. Use the scripts."
     };
 
     const preview = {
-        headline: `You are currently in a "${dimContent.stateName}" loop regarding ${dominantLens}.`,
-        insight: `Your nervous system perceives ${dominantLens} as a threat to ${coreNeed.need}.`,
-        hook: `We have generated a specific script to say when you feel this panic.`,
-        cta: "Unlock your User Manual to get the scripts."
+        headline: `CRITICAL ALERT: You are in the "${dimContent.stateName}" regarding ${dominantLens.replace('_', ' ')}.`,
+        insight: `Your scan shows this is the #1 threat to your relationship right now.`,
+        hook: `We have a specific protocol to fix this today.`,
+        cta: "Unlock Your Diagnosis"
     };
 
     return {
@@ -348,6 +302,69 @@ export function calculateScore(answers: Record<string, any>, userProfile?: any):
         triggers,
         misreadRisks,
         report,
-        preview
+        preview,
+        attachmentStyle: calculateAttachmentStyle(dimensions), // NEW
+        phase: calculateRelationshipPhase(dimensions, userProfile?.relationshipDuration) // NEW
     };
+}
+
+// --- NEW LOGIC: Attachment & Phase ---
+
+export type AttachmentStyle = "Secure" | "Anxious-Preoccupied" | "Dismissive-Avoidant" | "Fearful-Avoidant";
+
+export function calculateAttachmentStyle(dimensions: Record<string, DimensionScore>): AttachmentStyle {
+    // We derive this primarily from Emotional Safety and Physical Intimacy
+    // Safe = High Trust (Low PM), Moderate/High Intimacy
+    // Anxious = High Safety SL (Need Reassurance) + High Intimacy SL (Need Connection)
+    // Avoidant = High Safety PM (Distrust) + Low Intimacy SL (Distance)
+
+    const safety = dimensions["emotional_safety"];
+    const intimacy = dimensions["physical_intimacy"];
+
+    if (!safety || !intimacy) return "Secure"; // Fallback
+
+    const highNeed = safety.SL > 60 || intimacy.SL > 60;
+    const highDistrust = safety.PM > 60;
+    const lowNeed = intimacy.SL < 40;
+
+    if (!highNeed && !highDistrust) return "Secure";
+
+    if (highNeed && !highDistrust) return "Anxious-Preoccupied";
+
+    if (highDistrust && lowNeed) return "Dismissive-Avoidant";
+
+    if (highDistrust && highNeed) return "Fearful-Avoidant";
+
+    // Default if mixed
+    return highNeed ? "Anxious-Preoccupied" : "Dismissive-Avoidant";
+}
+
+export type RelationshipPhase = "The Honeymoon" | "The Power Struggle" | "The Dead Zone" | "The Partnership";
+
+export function calculateRelationshipPhase(dimensions: Record<string, DimensionScore>, duration?: string): RelationshipPhase {
+    // Simplified logic based on duration and overall "health" (inverse of distress)
+    const avgStates = Object.values(dimensions).map(d => d.state);
+    const distressCount = avgStates.filter(s => s === "Amplified Distress" || s === "Detached Cynicism").length;
+
+    // Use duration as a heuristic base
+    if (!duration || duration.toLowerCase().includes("less than 1")) {
+        return "The Honeymoon";
+    }
+
+    if (distressCount >= 3) {
+        // High distress across board
+        return "The Power Struggle";
+    }
+
+    if (distressCount < 3 && avgStates.includes("Detached Cynicism")) {
+        // Disconnection
+        return "The Dead Zone";
+    }
+
+    if (distressCount === 0) {
+        return "The Partnership";
+    }
+
+    // Default fallback
+    return "The Power Struggle";
 }

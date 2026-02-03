@@ -72,7 +72,7 @@ export const stripeWebhook = async (
           },
           customData: {
             currency: 'usd',
-            value: parseFloat(process.env.REPORT_PRICE || "19.00"),
+            value: parseFloat(process.env.REPORT_PRICE || "29.00"),
             content_name: 'Full Relationship Report',
             content_type: 'product',
             order_id: session.id

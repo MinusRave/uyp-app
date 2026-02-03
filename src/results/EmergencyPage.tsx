@@ -49,7 +49,7 @@ export default function EmergencyPage() {
 
     // Safety check - if data is missing, fallback to generic
     const state = (dimensionData?.state || "Amplified Distress") as QuadrantType;
-    const content = (QUADRANT_CONTENT as any)[dominantLens]?.[state] || QUADRANT_CONTENT["silence"]["Amplified Distress"];
+    const content = (QUADRANT_CONTENT as any)[dominantLens]?.[state] || QUADRANT_CONTENT["communication"]["Amplified Distress"];
 
     return (
         <div className="min-h-screen bg-slate-950 text-slate-50 flex flex-col font-sans selection:bg-blue-500/30">

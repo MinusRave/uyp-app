@@ -180,9 +180,9 @@ export default function TestPage() {
         e.preventDefault();
         if (!sessionId) return;
 
-        // Validation: Min 10 chars (simple check against "bullshit")
-        if (conflictText.length < 10) {
-            alert("Please describe the situation in at least a few words so we can analyze it accurately.");
+        // Validation: Min 50 chars (Relationship Spec)
+        if (conflictText.length < 50) {
+            alert("Please describe the situation in more detail (at least 50 characters) so our AI can analyze it accurately.");
             return;
         }
 
@@ -276,8 +276,8 @@ export default function TestPage() {
                             onChange={(e) => setConflictText(e.target.value)}
                         />
                         <div className="text-xs text-muted-foreground text-right">
-                            {conflictText.length < 10 ?
-                                <span className="text-red-400">Too short ({conflictText.length}/10 chars)</span> :
+                            {conflictText.length < 50 ?
+                                <span className="text-red-400">Too short ({conflictText.length}/50 chars)</span> :
                                 <span className="text-green-500">Good length!</span>
                             }
                         </div>
@@ -456,10 +456,9 @@ function QuizWizard({ onSubmit, isSubmitting, sessionId }: { onSubmit: (data: an
         relationshipDuration: "",
         livingTogether: false,
         hasChildren: false,
-        partnerConflictStyle: "",
-        fightFrequency: "",
-        repairFrequency: "",
-        partnerHurtfulBehavior: ""
+
+        partnerHurtfulBehavior: "",
+        biggestFear: "" // NEW
     });
 
     const updateData = (key: string, value: any) => {
@@ -500,8 +499,8 @@ function QuizWizard({ onSubmit, isSubmitting, sessionId }: { onSubmit: (data: an
         import("../analytics/pixel").then(({ trackPixelEvent }) => {
             trackPixelEvent("CustomEvent", {
                 content_name: "WizardStep",
-                step_number: 4,
-                step_name: "Demographics"
+                step_number: 5,
+                step_name: "BiggestFear"
             });
         });
         onSubmit(formData);
@@ -513,7 +512,7 @@ function QuizWizard({ onSubmit, isSubmitting, sessionId }: { onSubmit: (data: an
             <div className="w-full max-w-lg">
                 {/* Progress Bar (Subtle) */}
                 <div className="mb-8 flex justify-center gap-2">
-                    {[1, 2, 3, 4].map(s => (
+                    {[1, 2, 3, 4, 5].map(s => (
                         <div key={s} className={cn("h-1.5 w-12 rounded-full transition-all duration-500", step >= s ? "bg-primary" : "bg-muted")} />
                     ))}
                 </div>
@@ -549,6 +548,15 @@ function QuizWizard({ onSubmit, isSubmitting, sessionId }: { onSubmit: (data: an
 
                 {step === 4 && (
                     <Step4_Demographics
+                        data={formData}
+                        updateData={updateData}
+                        onNext={() => nextStep()} // Now goes to Step 5
+                        onBack={prevStep}
+                    />
+                )}
+
+                {step === 5 && (
+                    <Step5_Fear
                         data={formData}
                         updateData={updateData}
                         onSubmit={handleFinalSubmit}
@@ -731,7 +739,7 @@ function Step3_Conflict({ data, updateData, onNext, onBack }: { data: any, updat
     );
 }
 
-function Step4_Demographics({ data, updateData, onSubmit, onBack, isSubmitting }: { data: any, updateData: any, onSubmit: () => void, onBack: () => void, isSubmitting: boolean }) {
+function Step4_Demographics({ data, updateData, onNext, onBack }: { data: any, updateData: any, onNext: () => void, onBack: () => void }) {
     const isValid = data.userGender && data.partnerGender && data.userAgeRange && data.partnerAgeRange;
 
     return (
@@ -809,16 +817,105 @@ function Step4_Demographics({ data, updateData, onSubmit, onBack, isSubmitting }
             <div className="flex gap-3">
                 <button onClick={onBack} className="px-6 py-3 rounded-full font-medium text-muted-foreground hover:bg-muted">Back</button>
                 <button
-                    onClick={onSubmit}
-                    disabled={!isValid || isSubmitting}
-                    className="flex-1 py-4 rounded-full bg-primary text-primary-foreground font-bold text-lg hover:opacity-90 disabled:opacity-50 transition-all shadow-lg hover:shadow-xl hover:scale-[1.02]"
+                    onClick={onNext}
+                    disabled={!isValid}
+                    className="flex-1 py-3 rounded-full bg-primary text-primary-foreground font-bold hover:opacity-90 disabled:opacity-50 transition-opacity"
                 >
-                    {isSubmitting ? <Loader2 className="animate-spin mx-auto" /> : "Start Full Analysis →"}
+                    Continue
                 </button>
             </div>
-            <p className="text-center text-xs text-muted-foreground px-4">
-                By starting, you agree to our Terms. Your data is encrypted and private.
-            </p>
+        </div>
+    );
+}
+
+function Step5_Fear({ data, updateData, onSubmit, onBack, isSubmitting }: { data: any, updateData: any, onSubmit: () => void, onBack: () => void, isSubmitting: boolean }) {
+    const options = [
+        "That I'm not happy",
+        "That I don't trust them",
+        "That I'm attracted to someone else",
+        "That I don't love them anymore",
+        "That I'm afraid of them"
+    ];
+
+    const [isOther, setIsOther] = useState(false);
+    const [customFear, setCustomFear] = useState("");
+
+    const handleSelect = (val: string) => {
+        setIsOther(false);
+        updateData('biggestFear', val);
+    };
+
+    const handleOther = () => {
+        setIsOther(true);
+        updateData('biggestFear', customFear);
+    };
+
+    const handleCustomChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+        const val = e.target.value;
+        setCustomFear(val);
+        updateData('biggestFear', val);
+    };
+
+    // Valid if selected from options OR (Other is selected AND text > 3 chars)
+    const isValid = !!data.biggestFear && (isOther ? data.biggestFear.length > 3 : true);
+
+    return (
+        <div className="space-y-6 animate-slide-up">
+            <div className="text-center">
+                <h2 className="text-2xl font-bold mb-1">One last difficult question...</h2>
+                <p className="text-muted-foreground">What is the one thing you are most afraid to tell your partner?</p>
+            </div>
+
+            <div className="space-y-3">
+                {options.map((opt) => (
+                    <button
+                        key={opt}
+                        onClick={() => handleSelect(opt)}
+                        className={cn(
+                            "w-full text-left p-4 rounded-xl border-2 transition-all",
+                            data.biggestFear === opt && !isOther
+                                ? "border-primary bg-primary/5 text-primary font-bold"
+                                : "border-border hover:border-primary/50"
+                        )}
+                    >
+                        {opt}
+                    </button>
+                ))}
+
+                <button
+                    onClick={handleOther}
+                    className={cn(
+                        "w-full text-left p-4 rounded-xl border-2 transition-all",
+                        isOther
+                            ? "border-primary bg-primary/5 text-primary font-bold"
+                            : "border-border hover:border-primary/50"
+                    )}
+                >
+                    Something else...
+                </button>
+
+                {isOther && (
+                    <textarea
+                        autoFocus
+                        placeholder="Type here..."
+                        className="w-full p-4 rounded-xl border border-input bg-background min-h-[100px] resize-none animate-in fade-in zoom-in-95 duration-200"
+                        value={customFear}
+                        onChange={handleCustomChange}
+                    />
+                )}
+            </div>
+
+            <div className="flex gap-3 pt-4">
+                <button onClick={onBack} className="px-6 py-3 rounded-full font-medium text-muted-foreground hover:bg-muted">Back</button>
+                <button
+                    onClick={onSubmit}
+                    disabled={!isValid || isSubmitting}
+                    className="flex-1 py-3 rounded-full bg-primary text-primary-foreground font-bold hover:opacity-90 disabled:opacity-50 transition-opacity"
+                >
+                    {isSubmitting ? <Loader2 className="animate-spin inline mr-2" /> : null}
+                    {isSubmitting ? "Starting Test..." : "Start Assessment"}
+                </button>
+            </div>
         </div>
     );
 }

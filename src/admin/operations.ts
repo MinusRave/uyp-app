@@ -1,6 +1,6 @@
 
 import { type TestSession, type User } from "wasp/entities";
-import { type GetTestSessions, type GetSessionDetail, type GetFunnelStats, type GetDemographicStats } from "wasp/server/operations";
+import { type GetTestSessions, type GetSessionDetail, type GetFunnelStats, type GetDemographicStats, type GetEmailStats } from "wasp/server/operations";
 import { HttpError } from "wasp/server";
 
 // --- Types ---
@@ -35,6 +35,16 @@ type DemographicStats = {
     ageDistribution: { [key: string]: number };
     relationshipStatus: { [key: string]: number };
     partnerConflictStyle: { [key: string]: number };
+};
+
+type EmailStat = {
+    sent: number;
+    opened: number;
+    clicked: number;
+};
+
+type EmailStats = {
+    [emailId: string]: EmailStat;
 };
 
 // --- Queries ---
@@ -208,4 +218,44 @@ export const getDemographicStats: GetDemographicStats<void, DemographicStats> = 
         relationshipStatus: formatGroup(statusGroups, 'relationshipStatus'),
         partnerConflictStyle: formatGroup(conflictGroups, 'partnerConflictStyle'),
     };
+};
+
+export const getEmailStats: GetEmailStats<void, EmailStats> = async (_args, context) => {
+    if (!context.user?.isAdmin) {
+        throw new HttpError(401, "Unauthorized");
+    }
+
+    // Fetch only the emailSentHistory field to minimize data transfer
+    const sessions = await context.entities.TestSession.findMany({
+        select: {
+            emailSentHistory: true
+        }
+    });
+
+    const stats: EmailStats = {};
+
+    for (const session of sessions) {
+        const history = session.emailSentHistory as any[];
+        if (!Array.isArray(history)) continue;
+
+        for (const event of history) {
+            // Determine the key (A1, B3, C2)
+            // Fallback: If emailId is missing (old data), try to guess or skip
+            // New format has emailId. Old format has stage but no scenario context in the event object itself unless we infer it.
+            // But wait, the session was not fetched with sequence type.
+            // Actually, we should assume new data has emailId.
+            const id = event.emailId;
+            if (!id) continue;
+
+            if (!stats[id]) {
+                stats[id] = { sent: 0, opened: 0, clicked: 0 };
+            }
+
+            stats[id].sent++;
+            if (event.opened) stats[id].opened++;
+            if (event.clicked) stats[id].clicked++;
+        }
+    }
+
+    return stats;
 };

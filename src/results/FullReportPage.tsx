@@ -1,12 +1,32 @@
-import React, { useEffect, useState } from "react";
+﻿import React, { useEffect, useState } from "react";
 import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import { useAuth } from "wasp/client/auth";
-import { useQuery, getTestSession, generateExecutiveAnalysis, translateMessage } from "wasp/client/operations";
-import { Loader2, Lock, CheckCircle, CheckCircle2, AlertTriangle, ArrowRight, Heart, MessageCircle, MessageSquare, Eye, Shield, Zap, Quote, BarChart3, BookOpen, Sparkles, FileText, ChevronDown, TrendingDown, Repeat, Target, Lightbulb } from "lucide-react";
+import { useQuery, getTestSession, generateExecutiveAnalysis, translateMessage, claimSession } from "wasp/client/operations";
+import { Loader2, Lock, Clock, CheckCircle, CheckCircle2, AlertTriangle, ArrowRight, Heart, MessageCircle, MessageSquare, Eye, Shield, Zap, Quote, BarChart3, BookOpen, Sparkles, FileText, ChevronDown, TrendingDown, Repeat, Target, Lightbulb, Share2, Brain } from "lucide-react";
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
-import { DistortionGraph } from "../components/DistortionGraph";
+
+import { DistortionGraph } from "../components/DistortionGraph"; // Keep for legacy or replace? User wants grid.
 import { LensRadar } from "../components/LensRadar";
+// import { AttachmentRadar } from "../components/AttachmentRadar"; // Replaced by Dual
+import { RelationshipPhaseChart } from "../components/RelationshipPhaseChart";
+// import { TrajectoryGraph } from '../components/TrajectoryGraph'; // Replaced
+import { RoadmapGantt } from '../components/RoadmapGantt';
+import { RelationshipCycle } from '../components/RelationshipCycle';
+import { TherapyFlowchart } from '../components/TherapyFlowchart';
+import { Activity } from 'lucide-react';
+
+// NEW COMPONENTS
+import { TableOfContents } from "./components/TableOfContents";
+import { CompatibilityPulse } from "./components/CompatibilityPulse";
+import { TrajectoryChart } from "./components/TrajectoryChart";
+import { DistortionGrid } from "./components/DistortionGrid";
+import { DualAttachmentRadar } from "./components/DualAttachmentRadar";
+import { ConflictDecoder } from "./components/ConflictDecoder";
+import { RedFlagsSection } from "./components/RedFlagsSection";
+import { TranslatorTool } from "./components/TranslatorTool";
+import { IntimacyAnalysisSection } from "./components/IntimacyAnalysisSection";
+import { DimensionDeepDive } from "./components/DimensionDeepDive";
 import { trackPixelEvent } from "../analytics/pixel";
 
 import { OnboardingWizard } from "./components/OnboardingWizard";
@@ -86,12 +106,14 @@ export default function FullReportPage() {
     const success = urlSearchParams.get("success");
     const sessionIdParam = urlSearchParams.get("session_id");
 
+    const claimedSessionRef = React.useRef<string | null>(null);
+
     useEffect(() => {
         if (success === "true" && sessionIdParam) {
             const trackedKey = `uyp-tracked-purchase-${sessionIdParam}`;
             if (!localStorage.getItem(trackedKey)) {
                 trackPixelEvent('Purchase', {
-                    value: parseFloat(import.meta.env.REACT_APP_REPORT_PRICE || "19.00"),
+                    value: parseFloat(import.meta.env.REACT_APP_REPORT_PRICE || "29.00"),
                     currency: 'USD',
                     eventID: sessionIdParam
                 });
@@ -101,17 +123,43 @@ export default function FullReportPage() {
     }, [success, sessionIdParam]);
 
     useEffect(() => {
-        if (!isLoading && (!session || !session.isPaid)) {
+        if (!isLoading) {
             if (session && !session.isPaid) {
                 navigate("/results");
             } else if (!session) {
                 // handle no session
             }
+
+            // CLAIM SESSION LOGIC
+            if (user && session && !session.userId && session.id !== claimedSessionRef.current) {
+                claimedSessionRef.current = session.id;
+                claimSession({ sessionId: session.id }).catch(console.error);
+            }
         }
-    }, [isLoading, session, navigate]);
+    }, [isLoading, session, navigate, user]);
 
     const [aiAnalysis, setAiAnalysis] = useState<string | null>(null);
     const [isAiLoading, setIsAiLoading] = useState(false);
+
+    // Parse AI Analysis (Split Executive vs Deep Dives)
+    const [executiveSummary, setExecutiveSummary] = useState<string>("");
+    const [deepDiveContent, setDeepDiveContent] = useState<Record<string, string>>({});
+
+    const [protocolTitle, setProtocolTitle] = useState<string>("The Neural Protocol");
+
+    useEffect(() => {
+        if (aiAnalysis) {
+            // 1. Split Executive (Cold Truth) vs Premium (Protocol)
+            const [executivePart, deepDivePart] = aiAnalysis.split('DEEP DIVE APPENDIX');
+
+            // Simply remove the delimiter to let headers drive the sectioning
+            setExecutiveSummary(executivePart.replace('<<<PREMIUM_SPLIT>>>', '\n\n'));
+
+            if (deepDivePart) {
+                setDeepDiveContent(extractDeepDiveAnalysis(deepDivePart));
+            }
+        }
+    }, [aiAnalysis, protocolTitle]);
 
     useEffect(() => {
         const fetchAI = async () => {
@@ -143,6 +191,37 @@ export default function FullReportPage() {
         };
         fetchAI();
     }, [session]);
+
+    const tocSections = [
+        { id: 'section-executive', label: '01. Executive Summary', time: '2 min' },
+        { id: 'section-health', label: '02. Relationship Health', time: '3 min' },
+        { id: 'section-pattern', label: '03. Your Pattern', time: '3 min' },
+        { id: 'section-communication', label: '04. Bad Fights', time: 'Deep Dive' },
+        { id: 'section-emotional_safety', label: '05. Emotional Safety', time: 'Deep Dive' },
+        { id: 'section-physical_intimacy', label: '06. Intimacy', time: 'Deep Dive' },
+        { id: 'section-power_fairness', label: '07. Fairness', time: 'Deep Dive' },
+        { id: 'section-future_values', label: '08. Future', time: 'Deep Dive' },
+        { id: 'section-bottom_line', label: '09. The Bottom Line', time: 'Final Verdict' },
+    ];
+
+    const [activeSection, setActiveSection] = useState('section-executive');
+
+    useEffect(() => {
+        const handleScroll = () => {
+            const sections = tocSections.map(s => document.getElementById(s.id));
+            const scrollPos = window.scrollY + 300; // Trigger earlier
+
+            for (let i = sections.length - 1; i >= 0; i--) {
+                const section = sections[i];
+                if (section && section.offsetTop <= scrollPos) {
+                    setActiveSection(section.id);
+                    break;
+                }
+            }
+        };
+        window.addEventListener('scroll', handleScroll);
+        return () => window.removeEventListener('scroll', handleScroll);
+    }, []);
 
     if (isLoading) {
         return <div className="min-h-screen flex items-center justify-center"><Loader2 className="animate-spin text-primary" size={48} /></div>;
@@ -182,6 +261,9 @@ export default function FullReportPage() {
     return (
         <div className="min-h-screen bg-background text-foreground font-sans selection:bg-primary/20 pb-24 relative">
 
+            {/* Table of Contents - Sticky Sidebar */}
+            <TableOfContents sections={tocSections} activeSection={activeSection} />
+
             {/* Emergency Button (Floating) */}
             <div className="fixed bottom-6 right-6 z-50">
                 <button
@@ -193,479 +275,425 @@ export default function FullReportPage() {
                 </button>
             </div>
 
-            {/* 1. Cover Section */}
-            <header className="py-20 px-6 md:px-12 text-center max-w-4xl mx-auto border-b border-border/50">
+            {/* Cover Section */}
+            <header className="py-20 px-6 md:px-12 text-center max-w-4xl mx-auto border-b border-border/50 lg:pl-80">
                 <div className="uppercase tracking-widest text-xs font-bold text-primary mb-4">CONFIDENTIAL USER MANUAL</div>
                 <h1 className="text-4xl md:text-6xl font-extrabold mb-6 tracking-tight text-primary">
                     {report.cover.title}
                 </h1>
 
-                {/* BLUNT MIRROR SENTENCE (New) */}
+                {/* BLUNT MIRROR SENTENCE */}
                 <div className="bg-primary/5 border border-primary/20 p-4 rounded-xl mb-8 max-w-2xl mx-auto">
                     <p className="text-lg font-medium text-foreground">
-                        "When conflict shows up, your body reacts before your brain. That’s why this feels out of control — even when you love each other."
+                        "Your body reacts before your brain. That’s why this feels out of control — even when you love each other."
                     </p>
                 </div>
                 <p className="text-xl md:text-2xl text-muted-foreground mb-8 font-light">
                     {report.cover.subtitle}
                 </p>
-                <div className="bg-card p-6 rounded-xl border-l-4 border-primary shadow-sm text-left italic text-foreground/80">
-                    "{report.cover.opening}"
-                </div>
             </header>
 
-            <main className="max-w-3xl mx-auto px-6 py-12 space-y-24">
+            <main className="max-w-5xl mx-auto px-6 py-12 space-y-24 lg:pl-80 relative z-0">
 
-                {/* 1. The Mirror (Executive Synthesis) - ACCORDION */}
-                <section className="mb-16">
+                {/* 01. Executive Summary */}
+                <section id="section-executive" className="scroll-mt-24">
                     <div className="flex items-center gap-2 mb-6">
-                        <Sparkles className="text-purple-500" />
-                        <h2 className="text-sm font-bold uppercase tracking-wider text-muted-foreground">01. The Executive Summary</h2>
+                        <Zap className="text-primary animate-pulse" />
+                        <h2 className="text-sm font-bold uppercase tracking-wider text-muted-foreground">01. Executive Analysis</h2>
                     </div>
 
-                    <div className="relative overflow-hidden bg-gradient-to-br from-purple-50 via-indigo-50 to-purple-50 dark:from-purple-900/20 dark:via-indigo-900/20 dark:to-purple-900/20 p-8 md:p-12 rounded-3xl border border-purple-100 dark:border-purple-800 shadow-xl">
-                        {/* Animated decorative background elements */}
-                        <div className="absolute top-0 right-0 w-96 h-96 bg-purple-500/5 rounded-full blur-3xl -mr-48 -mt-48 pointer-events-none animate-pulse"></div>
-                        <div className="absolute bottom-0 left-0 w-80 h-80 bg-indigo-500/5 rounded-full blur-3xl -ml-40 -mb-40 pointer-events-none animate-pulse" style={{ animationDelay: '1s' }}></div>
-
-
-
+                    <div className="min-h-[200px]">
                         {isAiLoading ? (
-
-                            <div className="flex flex-col items-center justify-center py-16 space-y-4">
-                                <Loader2 className="animate-spin text-purple-500" size={40} />
-                                <p className="text-muted-foreground animate-pulse text-lg">Analyzing your complete profile...</p>
-                            </div>
-                        ) : aiAnalysis ? (
-                            <div className="relative z-10">
-                                <div className="relative z-10">
-                                    <MirrorInsightCards content={aiAnalysis} />
+                            <div className="space-y-4 animate-pulse">
+                                <div className="h-4 bg-muted rounded w-3/4"></div>
+                                <div className="h-4 bg-muted rounded w-1/2"></div>
+                                <div className="h-32 bg-muted rounded-xl mt-4"></div>
+                                <div className="flex justify-center mt-4">
+                                    <span className="text-xs text-muted-foreground flex items-center gap-2">
+                                        <Loader2 className="animate-spin" size={12} />
+                                        Generating your personalized deep dive...
+                                    </span>
                                 </div>
                             </div>
+                        ) : executiveSummary ? (
+                            <MirrorInsightCards content={executiveSummary} />
                         ) : (
-                            <p className="text-muted-foreground italic text-center py-8">Analysis could not be generated at this time.</p>
+                            <div className="bg-card p-8 rounded-3xl border border-destructive/20 text-center">
+                                <p className="text-muted-foreground italic">Analysis could not be generated at this time.</p>
+                            </div>
                         )}
                     </div>
                 </section>
 
-                {/* 2. NEW: Relationship Health (Compatibility) */}
-                {report.compatibility && (
-                    <section className="mb-16">
-                        <div className="flex items-center gap-2 mb-6">
-                            <Heart className="text-red-500" />
-                            <h2 className="text-sm font-bold uppercase tracking-wider text-muted-foreground">02. Relationship Health</h2>
-                        </div>
-                        <CompatibilityCard data={report.compatibility} />
-                    </section>
-                )}
-
-                {/* 3. Primary Lens & State */}
-                <section className="bg-primary/5 rounded-3xl p-8 md:p-10 border border-primary/10">
-                    <h2 className="text-sm font-bold uppercase tracking-wider text-primary mb-4">03. Your Dominant Lens</h2>
-
-                    <div className="mb-8">
-                        <h3 className="text-4xl font-extrabold mb-2 capitalize text-primary">{report.primaryLens.lensName.replace('_', ' ')}</h3>
-                        <div className="inline-block bg-destructive/10 text-destructive px-3 py-1 rounded-full text-sm font-bold uppercase tracking-wide mb-4">
-                            Current State: {report.primaryLens.stateName}
-                        </div>
-                        <p className="text-xl text-foreground/80 leading-relaxed italic">
-                            "{report.primaryLens.analysis}"
-                        </p>
+                {/* 02. Relationship Health (Compatibility) */}
+                <section id="section-health" className="scroll-mt-24">
+                    <div className="flex items-center gap-2 mb-6">
+                        <Heart className="text-red-500" />
+                        <h2 className="text-sm font-bold uppercase tracking-wider text-muted-foreground">02. Relationship Health</h2>
                     </div>
 
-                    <div className="grid gap-6 md:grid-cols-3 pt-6 border-t border-primary/10">
-                        <div className="space-y-2">
-                            <h4 className="font-bold text-sm uppercase text-muted-foreground flex items-center gap-2">
-                                <AlertTriangle size={16} /> Activates
-                            </h4>
-                            <p className="text-sm font-medium">{report.primaryLens.activates}</p>
-                        </div>
-                        <div className="space-y-2">
-                            <h4 className="font-bold text-sm uppercase text-muted-foreground flex items-center gap-2">
-                                <Heart size={16} /> Deep Need
-                            </h4>
-                            <p className="text-sm font-medium">{report.primaryLens.need}</p>
-                        </div>
-                        <div className="space-y-2">
-                            <h4 className="font-bold text-sm uppercase text-muted-foreground flex items-center gap-2">
-                                <Lock size={16} /> Fear
-                            </h4>
-                            <p className="text-sm font-medium">{report.primaryLens.fear}</p>
-                        </div>
-                    </div>
-                </section>
-
-                {/* 4. NEW: Visual Analytics */}
-                {report.visualData && (
-                    <section id="analytics" className="scroll-mt-24">
-                        <div className="flex items-center gap-2 mb-4">
-                            <BarChart3 className="text-primary" />
-                            <h2 className="text-sm font-bold uppercase tracking-wider text-muted-foreground">04. The Distortion Graph</h2>
-                        </div>
-                        <h3 className="text-2xl md:text-3xl font-bold mb-8">What You Feel vs. What Is Real</h3>
-                        <div className="bg-card p-6 md:p-8 rounded-3xl border border-border shadow-sm">
-                            <p className="text-muted-foreground mb-8">
-                                This chart compares the <strong>intensity of your internal feeling</strong> (Fear/Anxiety) with the <strong>actual level of negative intent</strong> you are perceiving. Large gaps indicate where your lens is distorting reality.
-                            </p>
-                            <DistortionGraph data={report.visualData} />
-                        </div>
-                    </section>
-                )}
-
-
-
-                {/* 5. Partner Communication Guide - NEW */}
-                {dominantTranslation && (
-                    <section className="mb-16">
-                        <div className="flex items-center gap-2 mb-6">
-                            <Heart className="text-pink-500" />
-                            <h2 className="text-sm font-bold uppercase tracking-wider text-muted-foreground">05. Partner Communication Guide</h2>
-                        </div>
-
-                        <div className="bg-gradient-to-br from-pink-50 to-rose-50 dark:from-pink-900/10 dark:to-rose-900/10 p-8 md:p-10 rounded-3xl border border-pink-100 dark:border-pink-800 shadow-sm">
-                            <h3 className="text-3xl font-bold mb-6">Share This With Your Partner</h3>
-                            <p className="text-lg text-muted-foreground mb-8">
-                                This section explains your patterns in language your partner can understand.
-                                <br />
-                                <span className="text-sm font-bold text-primary bg-primary/10 px-2 py-1 rounded ml-1">
-                                    Note: This is for YOU to understand them first. You do not have to send this.
-                                </span>
-                            </p>
-
-                            {/* Partner-friendly explanation */}
-                            <div className="bg-white dark:bg-black/20 rounded-2xl p-6 md:p-8 border border-pink-200 dark:border-pink-800 mb-8">
-                                <h4 className="font-bold text-xl mb-4 text-pink-600 dark:text-pink-400">What Your Partner Needs to Know</h4>
-                                <SimpleMarkdown content={dominantTranslation.text} />
-                            </div>
-
-                            {/* Do's and Don'ts */}
-                            <div className="grid md:grid-cols-2 gap-6">
-                                {/* What Helps */}
-                                <div className="bg-green-50 dark:bg-green-900/20 rounded-xl p-6 border border-green-200 dark:border-green-800">
-                                    <h4 className="font-bold text-lg mb-4 flex items-center gap-2 text-green-700 dark:text-green-400">
-                                        <CheckCircle size={20} />
-                                        What Helps
-                                    </h4>
-                                    <ul className="space-y-3">
-                                        <li className="flex gap-2 items-start">
-                                            <span className="text-green-600 mt-1">•</span>
-                                            <span>Acknowledge my {report.primaryLens.need.toLowerCase()}</span>
-                                        </li>
-                                        {dominantScript?.repair && (
-                                            <li className="flex gap-2 items-start">
-                                                <span className="text-green-600 mt-1">•</span>
-                                                <span>Give me time to process and circle back</span>
-                                            </li>
-                                        )}
-                                        <li className="flex gap-2 items-start">
-                                            <span className="text-green-600 mt-1">•</span>
-                                            <span>Be patient when I'm in {report.primaryLens.stateName.toLowerCase()} mode</span>
-                                        </li>
-                                    </ul>
-                                </div>
-
-                                {/* What Hurts */}
-                                <div className="bg-red-50 dark:bg-red-900/20 rounded-xl p-6 border border-red-200 dark:border-red-800">
-                                    <h4 className="font-bold text-lg mb-4 flex items-center gap-2 text-red-700 dark:text-red-400">
-                                        <AlertTriangle size={20} />
-                                        What Hurts
-                                    </h4>
-                                    <ul className="space-y-3">
-                                        <li className="flex gap-2 items-start">
-                                            <span className="text-red-600 mt-1">•</span>
-                                            <span>Triggering my fear of {report.primaryLens.fear.toLowerCase()}</span>
-                                        </li>
-                                        <li className="flex gap-2 items-start">
-                                            <span className="text-red-600 mt-1">•</span>
-                                            <span>Dismissing my feelings when {report.primaryLens.activates.toLowerCase()}</span>
-                                        </li>
-                                        <li className="flex gap-2 items-start">
-                                            <span className="text-red-600 mt-1">•</span>
-                                            <span>Pushing me to respond before I'm ready</span>
-                                        </li>
-                                    </ul>
-                                </div>
-                            </div>
-                        </div>
-                    </section>
-                )}
-
-                {/* 6. Gender Dynamics Analysis - NEW */}
-                {report.primaryLens && (
-                    <section className="mb-16">
-                        <div className="flex items-center gap-2 mb-6">
-                            <Eye className="text-teal-500" />
-                            <h2 className="text-sm font-bold uppercase tracking-wider text-muted-foreground">06. Gender & Socialization Context</h2>
-                        </div>
-
-                        <div className="bg-gradient-to-br from-teal-50 to-cyan-50 dark:from-teal-900/10 dark:to-cyan-900/10 p-8 md:p-10 rounded-3xl border border-teal-100 dark:border-teal-800 shadow-sm">
-                            <h3 className="text-3xl font-bold mb-6">How Socialization Shapes Your Pattern</h3>
-
-                            <div className="bg-white dark:bg-black/20 rounded-2xl p-6 md:p-8 border border-teal-200 dark:border-teal-800 space-y-6">
-                                <div>
-                                    <h4 className="font-bold text-lg mb-3 text-teal-600 dark:text-teal-400">Your Core Pattern</h4>
-                                    <p className="text-lg leading-relaxed italic">
-                                        "{report.primaryLens.analysis}"
-                                    </p>
-                                </div>
-
-                                <div className="border-t border-teal-200 dark:border-teal-800 pt-6">
-                                    <h4 className="font-bold text-lg mb-3 text-teal-600 dark:text-teal-400">The Socialization Layer</h4>
-                                    <p className="leading-relaxed">
-                                        Your <strong className="text-primary">{report.primaryLens.lensName.replace('_', ' ')}</strong> sensitivity
-                                        may have been reinforced by how you were taught to handle {report.primaryLens.lensName.replace('_', ' ')} situations.
-                                        Many people learn early on that {report.primaryLens.activates.toLowerCase()} is dangerous,
-                                        which creates a protective response that persists into adult relationships.
-                                    </p>
-                                </div>
-
-                                <div className="bg-teal-50 dark:bg-teal-900/30 rounded-lg p-4 border border-teal-200 dark:border-teal-700">
-                                    <p className="text-sm">
-                                        <strong>Important:</strong> This isn't about gender stereotypes. It's about recognizing how your unique
-                                        upbringing and social conditioning may have shaped your instinctive response patterns.
-                                    </p>
-                                </div>
-                            </div>
-                        </div>
-                    </section>
-                )}
-
-                {/* 7. Intervention Cards - NEW */}
-                {report.scripts && report.scripts.length > 0 && (
-                    <section className="mb-16">
-                        <div className="flex items-center gap-2 mb-6">
-                            <Shield className="text-blue-500" />
-                            <h2 className="text-sm font-bold uppercase tracking-wider text-muted-foreground">07. Intervention Cards</h2>
-                        </div>
-
-                        <h3 className="text-3xl font-bold mb-8">Your Conflict Scenarios & Responses</h3>
-                        <p className="text-lg text-muted-foreground mb-8">
-                            These scripts aren't just words. They work because they <strong>keep your partner's alarm system from going off</strong>.
-                            Use them to stop the spiral before it starts.
+                    <div className="bg-card rounded-3xl p-8 border border-border shadow-sm">
+                        <h3 className="text-2xl font-bold mb-8 text-center">Compatibility Pulse</h3>
+                        <p className="text-center text-muted-foreground mb-8 max-w-lg mx-auto">
+                            How your nervous systems interact under stress. This score reflects your ability to repair, not just your fight frequency.
                         </p>
+                        <CompatibilityPulse score={report.compatibility?.overallScore || 50} />
 
-                        <div className="grid gap-6">
-                            {report.scripts.map((script, index) => (
-                                <div
-                                    key={script.dimension}
-                                    className={`rounded-2xl border overflow-hidden ${script.dimension === report.snapshot.dominantLens
-                                        ? 'bg-primary/5 border-primary/20 ring-2 ring-primary/10'
-                                        : 'bg-card border-border'
-                                        }`}
-                                >
-                                    <div className={`p-4 border-b ${script.dimension === report.snapshot.dominantLens
-                                        ? 'bg-primary/10 border-primary/10'
-                                        : 'bg-muted border-border'
-                                        }`}>
-                                        <div className="flex items-center justify-between">
-                                            <h4 className="font-bold text-lg capitalize flex items-center gap-2">
-                                                {script.dimension.replace('_', ' ')}
-                                                {script.dimension === report.snapshot.dominantLens && (
-                                                    <span className="text-xs bg-primary text-primary-foreground px-2 py-0.5 rounded-full uppercase">
-                                                        Your Dominant Pattern
-                                                    </span>
-                                                )}
-                                            </h4>
+                        {/* REALITY CHECK / THE VERDICT */}
+                        <div className="mt-8 text-center bg-slate-50 dark:bg-slate-900/50 p-6 rounded-2xl border border-slate-200 dark:border-slate-800">
+                            <h4 className="text-xs font-bold uppercase tracking-widest text-muted-foreground mb-3">The Reality Check</h4>
+                            {(!report.compatibility?.overallScore || report.compatibility.overallScore < 40) ? (
+                                <p className="text-xl font-bold text-red-600 dark:text-red-400">
+                                    "This relationship is currently unsafe for your emotional health. Without radical change, it will not survive."
+                                </p>
+                            ) : report.compatibility.overallScore < 60 ? (
+                                <p className="text-xl font-bold text-orange-600 dark:text-orange-400">
+                                    "You are running on fumes. The resentment is building faster than the love can replenish it."
+                                </p>
+                            ) : report.compatibility.overallScore < 80 ? (
+                                <p className="text-xl font-bold text-yellow-600 dark:text-yellow-400">
+                                    "Workable, but fragile. You have the raw materials for a great relationship, but your patterns are getting in the way."
+                                </p>
+                            ) : (
+                                <p className="text-xl font-bold text-green-600 dark:text-green-400">
+                                    "Thriving. You have a rare and resilient bond that can withstand conflict."
+                                </p>
+                            )}
+                        </div>
+
+                        {/* Breakdown if available */}
+                        {report.compatibility?.breakdown && (
+                            <div className="grid md:grid-cols-2 gap-4 mt-8">
+                                {report.compatibility.breakdown.map((item, idx) => (
+                                    <div key={idx} className="bg-secondary/10 p-4 rounded-xl flex justify-between items-center">
+                                        <span className="font-bold text-sm">{item.dimension}</span>
+                                        <div className={`text-xs font-bold uppercase px-2 py-1 rounded bg-white dark:bg-black/20 ${item.status === 'Strength' ? 'text-green-600' : 'text-orange-600'
+                                            }`}>
+                                            {item.status} ({item.score}%)
                                         </div>
                                     </div>
+                                ))}
+                            </div>
+                        )}
 
-                                    <div className="p-6 space-y-6">
-                                        {/* Scenario */}
-                                        <div>
-                                            <h5 className="text-sm font-bold uppercase tracking-wide text-muted-foreground mb-2">
-                                                When This Happens:
-                                            </h5>
-                                            <p className="text-base">
-                                                When {script.dimension.replace('_', ' ')} is triggered in your relationship...
-                                            </p>
-                                        </div>
-
-                                        {/* In The Moment Response */}
-                                        <div className="bg-orange-50 dark:bg-orange-900/20 rounded-xl p-4 border border-orange-200 dark:border-orange-800">
-                                            <h5 className="text-sm font-bold uppercase tracking-wide text-orange-700 dark:text-orange-400 mb-3 flex items-center gap-2">
-                                                <Zap size={16} />
-                                                Say This In The Moment:
-                                            </h5>
-                                            <p className="text-lg font-medium italic">
-                                                "{script.inTheMoment}"
-                                            </p>
-                                        </div>
-
-                                        {/* Repair Response */}
-                                        <div className="bg-blue-50 dark:bg-blue-900/20 rounded-xl p-4 border border-blue-200 dark:border-blue-800">
-                                            <h5 className="text-sm font-bold uppercase tracking-wide text-blue-700 dark:text-blue-400 mb-3 flex items-center gap-2">
-                                                <CheckCircle size={16} />
-                                                For Repair Later:
-                                            </h5>
-                                            <p className="text-base">
-                                                "{script.repair}"
-                                            </p>
-                                        </div>
-                                    </div>
-                                </div>
-                            ))}
-                        </div>
-                    </section>
-                )}
-
-
-                {/* 8. Full Spectrum Profile (Deep Dive) */}
-                <section>
-                    <h2 className="text-sm font-bold uppercase tracking-wider text-muted-foreground mb-4">08. Full Spectrum Profile</h2>
-                    <h3 className="text-3xl font-bold mb-8">Your Complete Map</h3>
-                    <p className="text-lg text-muted-foreground mb-8">
-                        You are not just one pattern. Here is how your body reacts across all 5 dimensions.
-                    </p>
-
-                    {/* NEW: Radar Chart Visual */}
-                    <div className="mb-12 bg-secondary/5 rounded-3xl p-6 md:p-8 flex flex-col md:flex-row items-center gap-8 border border-secondary/10">
-                        <div className="w-full md:w-1/2 aspect-square max-h-[300px]">
-                            <LensRadar data={[
-                                { dimension: "silence", score: report.dimensionsDetailed?.find(d => d.id === 'silence')?.score.SL || 0 },
-                                { dimension: "conflict", score: report.dimensionsDetailed?.find(d => d.id === 'conflict')?.score.SL || 0 },
-                                { dimension: "pressure", score: report.dimensionsDetailed?.find(d => d.id === 'pressure')?.score.SL || 0 },
-                                { dimension: "disconnection", score: report.dimensionsDetailed?.find(d => d.id === 'disconnection')?.score.SL || 0 },
-                                { dimension: "misunderstanding", score: report.dimensionsDetailed?.find(d => d.id === 'not_heard')?.score.SL || 0 },
-                            ]} />
-                        </div>
-                        <div className="flex-1 text-center md:text-left">
-                            <h4 className="font-bold text-lg mb-2">Your Sensitivity Shape</h4>
-                            <p className="text-sm text-muted-foreground leading-relaxed">
-                                The areas stretching outward represent where your protective system is most active.
-                                Notice how <strong>{report.snapshot.dominantLens.replace('_', ' ')}</strong> spikes?
-                                That's not a flaw—it's where your body is working hardest to keep you safe.
-                            </p>
-                        </div>
-                    </div>
-
-                    <div className="space-y-6">
-                        {report.dimensionsDetailed?.map((dim) => {
-                            const isDominant = dim.id === report.snapshot.dominantLens;
+                        {/* What This Score Means - NEW */}
+                        {(() => {
+                            const overallScore = report.compatibility?.overallScore || 50;
                             return (
-                                <div key={dim.id} className={`p-6 rounded-2xl border ${isDominant ? 'bg-primary/5 border-primary/20 ring-1 ring-primary/10' : 'bg-card border-border'}`}>
-                                    <div className="flex flex-col md:flex-row md:items-center justify-between mb-4 gap-4">
-                                        <div>
-                                            <h4 className="font-bold text-xl capitalize flex items-center gap-2">
-                                                {dim.id.replace('_', ' ')}
-                                                {isDominant && <span className="text-xs bg-primary text-primary-foreground px-2 py-0.5 rounded-full uppercase tracking-wider">Dominant</span>}
-                                            </h4>
-                                            <div className="text-sm font-medium text-muted-foreground mt-1">
-                                                State: <span className={`${isDominant ? 'text-primary' : 'text-foreground'} font-bold`}>{dim.score.state}</span>
-                                            </div>
-                                        </div>
+                                <div className="mt-10 bg-secondary/5 rounded-2xl p-6 border border-border">
+                                    <h4 className="font-bold text-lg mb-4 flex items-center gap-2">
+                                        <Target size={20} className="text-primary" />
+                                        What Does {overallScore}% Mean?
+                                    </h4>
 
-                                        {/* Mini Bar Chart for this dimension */}
-                                        <div className="flex items-center gap-3 text-xs w-full md:w-48">
-                                            <div className="grid grid-cols-2 gap-2 w-full">
-                                                <div>
-                                                    <div className="flex justify-between mb-1 opacity-70"><span>Feel</span><span>{Math.round(dim.score.SL)}%</span></div>
-                                                    <div className="h-1.5 bg-muted rounded-full overflow-hidden"><div className="h-full bg-primary" style={{ width: `${dim.score.SL}%` }}></div></div>
-                                                </div>
-                                                <div>
-                                                    <div className="flex justify-between mb-1 opacity-70"><span>Real</span><span>{Math.round(dim.score.PM)}%</span></div>
-                                                    <div className="h-1.5 bg-muted rounded-full overflow-hidden"><div className="h-full bg-slate-400" style={{ width: `${dim.score.PM}%` }}></div></div>
-                                                </div>
+                                    {overallScore >= 70 ? (
+                                        <div className="space-y-4">
+                                            <p className="text-foreground/90 leading-relaxed">
+                                                <strong className="text-green-600 dark:text-green-400">You're in the Green Zone.</strong> Your relationship has a strong foundation.
+                                                Most couples at this level report feeling "generally happy" but know there's room to grow.
+                                            </p>
+                                            <div className="bg-green-50 dark:bg-green-950/20 rounded-xl p-4 border border-green-200 dark:border-green-900/30">
+                                                <p className="text-sm font-bold text-green-900 dark:text-green-300 mb-2">Your Focus:</p>
+                                                <p className="text-sm text-green-900 dark:text-green-200">
+                                                    Maintain your repair rituals and address the 1-2 friction points before they become patterns.
+                                                    The scripts below will help you fine-tune your communication.
+                                                </p>
                                             </div>
                                         </div>
+                                    ) : overallScore >= 40 ? (
+                                        <div className="space-y-4">
+                                            <p className="text-foreground/90 leading-relaxed">
+                                                <strong className="text-yellow-600 dark:text-yellow-400">You're in the Yellow Zone.</strong> Your relationship is functional but strained.
+                                                You're likely feeling "stuck" or "disconnected" more often than not.
+                                            </p>
+                                            <div className="bg-yellow-50 dark:bg-yellow-950/20 rounded-xl p-4 border border-yellow-200 dark:border-yellow-900/30">
+                                                <p className="text-sm font-bold text-yellow-900 dark:text-yellow-300 mb-2">Your Focus:</p>
+                                                <p className="text-sm text-yellow-900 dark:text-yellow-200">
+                                                    Break the 1-2 dominant patterns causing the most pain. The Deep Dive sections and Circuit Breaker script
+                                                    are your starting point. Consistency over the next 30 days is key.
+                                                </p>
+                                            </div>
+                                        </div>
+                                    ) : (
+                                        <div className="space-y-4">
+                                            <p className="text-foreground/90 leading-relaxed">
+                                                <strong className="text-red-600 dark:text-red-400">You're in the Red Zone.</strong> Your relationship is in crisis mode.
+                                                You're likely asking yourself "Is this worth it?" more than you'd like to admit.
+                                            </p>
+                                            <div className="bg-red-50 dark:bg-red-950/20 rounded-xl p-4 border border-red-200 dark:border-red-900/30">
+                                                <p className="text-sm font-bold text-red-900 dark:text-red-300 mb-2">Your Focus:</p>
+                                                <p className="text-sm text-red-900 dark:text-red-200">
+                                                    Stop the bleeding. Use the Circuit Breaker Script when things escalate.
+                                                    If you can't de-escalate within 48 hours, consider professional support. This report gives you the roadmap,
+                                                    but you may need a guide.
+                                                </p>
+                                            </div>
+                                        </div>
+                                    )}
+
+                                    <div className="mt-6 pt-6 border-t border-border">
+                                        <p className="text-xs text-muted-foreground leading-relaxed">
+                                            <strong>Benchmark:</strong> The average couple scores 55-65%. Couples in therapy average 35-50%.
+                                            Thriving couples (the top 15%) score 75%+. Your score isn't a judgment—it's a starting line.
+                                        </p>
                                     </div>
-
-                                    <p className="text-foreground/80 leading-relaxed text-sm md:text-base border-t border-border/50 pt-4">
-                                        "{dim.score.prescription.analysis}"
-                                    </p>
                                 </div>
                             );
-                        })}
+                        })()}
                     </div>
                 </section>
 
-                {/* 9. Toolkit (Scripts) */}
-                <section id="toolkit">
-                    <h2 className="text-sm font-bold uppercase tracking-wider text-muted-foreground mb-4">09. Your Toolkit</h2>
-                    <h3 className="text-3xl font-bold mb-8">De-Escalation Scripts</h3>
+                {/* 03. Your Pattern (Cycle) */}
+                <section id="section-pattern" className="scroll-mt-24">
+                    <div className="flex items-center gap-2 mb-6">
+                        <Repeat className="text-orange-500" />
+                        <h2 className="text-sm font-bold uppercase tracking-wider text-muted-foreground">03. Your Pattern: "The Loop"</h2>
+                    </div>
 
-                    <div className="grid gap-8">
-                        {/* Current Crisis Script */}
-                        <div className="bg-card rounded-2xl border-2 border-primary/20 shadow-lg overflow-hidden">
-                            <div className="bg-primary/10 p-4 border-b border-primary/10">
-                                <h4 className="font-bold text-lg flex items-center gap-2 text-primary">
-                                    <Zap size={20} /> In The Moment
-                                </h4>
+                    {/* Pattern Context - NEW */}
+                    <div className="mb-8 bg-rose-50 dark:bg-rose-900/10 rounded-2xl p-6 border border-rose-100 dark:border-rose-800">
+                        <h4 className="font-bold text-lg mb-3 text-rose-700 dark:text-rose-300">
+                            Why This Pattern Exists
+                        </h4>
+                        <p className="text-foreground/80 mb-4 leading-relaxed">
+                            This isn't about blame. This pattern formed because <strong>both of you are trying to feel safe</strong>,
+                            but your strategies are opposite. When you {
+                                report.snapshot.dominantLens === 'communication' ? 'pursue clarity' :
+                                    report.snapshot.dominantLens === 'emotional_safety' ? 'seek reassurance' :
+                                        report.snapshot.dominantLens === 'physical_intimacy' ? 'initiate connection' :
+                                            report.snapshot.dominantLens === 'power_fairness' ? 'demand fairness' : 'push for alignment'
+                            }, they feel pressured. When they withdraw, you panic. Repeat.
+                        </p>
+
+                        <div className="bg-white dark:bg-black/20 rounded-xl p-4 border border-rose-200 dark:border-rose-900">
+                            <p className="text-sm font-bold text-rose-800 dark:text-rose-200 mb-2">The Hidden Cost:</p>
+                            <p className="text-sm text-foreground/80 leading-relaxed">
+                                Every time this loop runs, you lose a little trust. A little intimacy. A little hope.
+                                If this continues for 6-12 months, one of you will emotionally check out.
+                                <strong> That's when "I love you but I'm not in love with you" starts.</strong>
+                            </p>
+                        </div>
+                    </div>
+
+                    <div className="bg-background rounded-3xl p-6 md:p-12 shadow-xl border border-border mb-12 relative overflow-hidden">
+                        <div className="absolute top-0 left-0 w-full h-2 bg-gradient-to-r from-red-500 via-purple-500 to-blue-500" />
+                        <h3 className="text-2xl font-bold mb-8 text-center capitalize">The {report.snapshot.dominantLens.replace('_', ' ')} Cycle</h3>
+                        <RelationshipCycle
+                            myLens={report.snapshot.dominantLens}
+                            partnerLens={report.snapshot.dominantLens.includes('anxiety') ? 'avoidant' : 'anxious'}
+                        />
+                    </div>
+
+                    {/* Conflict Decoder Logic */}
+                    <ConflictDecoder conflictText={(session as any).conflictDescription || "We fight about small things"} />
+                </section>
+
+                {/* 04. Emergency Scripts (Moved UP) */}
+                {report.scripts && report.scripts.length > 0 && (
+                    <section id="section-scripts" className="scroll-mt-24">
+                        <div className="text-center mb-10">
+                            <div className="inline-flex items-center gap-2 bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-300 px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wide mb-4 animate-pulse">
+                                <Zap size={12} fill="currentColor" /> Priority Action
                             </div>
-                            <div className="p-6 md:p-8">
-                                <p className="text-muted-foreground mb-4 text-sm uppercase tracking-wide font-bold">Say this when you feel the panic rising:</p>
-                                <blockquote className="text-xl md:text-2xl font-serif italic text-foreground leading-relaxed border-l-4 border-primary pl-6 py-2">
-                                    "{dominantScript?.inTheMoment || "I need a moment to regulate."}"
-                                </blockquote>
-                            </div>
+                            <h2 className="text-3xl md:text-5xl font-bold font-display mb-4">Emergency Scripts</h2>
+                            <p className="text-lg text-muted-foreground">Stop the spiral before it takes over. Use these immediately.</p>
                         </div>
 
-                        {/* Repair Script */}
-                        <div className="bg-card rounded-2xl border border-border shadow-sm overflow-hidden">
-                            <div className="bg-muted p-4 border-b border-border">
-                                <h4 className="font-bold text-lg flex items-center gap-2 text-muted-foreground">
-                                    <CheckCircle size={20} /> For Repair
-                                </h4>
-                            </div>
-                            <div className="p-6 md:p-8">
-                                <p className="text-muted-foreground mb-4 text-sm uppercase tracking-wide font-bold">Say this when things have calmed down:</p>
-                                <div className="bg-muted/30 p-4 rounded-lg">
-                                    <p className="text-lg text-foreground/90">
-                                        "{dominantScript?.repair || "I want to circle back to what happened."}"
-                                    </p>
+                        <div className="grid gap-8 md:grid-cols-1">
+                            {/* Only show the dominant script prominently here */}
+                            {dominantScript && (
+                                <div className="group relative">
+                                    <div className="absolute -inset-0.5 bg-gradient-to-r from-red-500 to-orange-500 rounded-[2rem] blur opacity-30"></div>
+                                    <div className="relative bg-background rounded-[1.75rem] p-8 md:p-12 border border-red-100 dark:border-red-900/30 shadow-2xl">
+                                        <div className="flex items-center gap-3 mb-8">
+                                            <div className="p-3 bg-red-100 text-red-600 rounded-xl"><Zap size={24} /></div>
+                                            <div>
+                                                <h4 className="font-bold text-xl">Protocol: {dominantScript.dimension.replace('_', ' ')}</h4>
+                                                <div className="text-xs text-red-500 font-bold uppercase tracking-wide">Primary Trigger Response</div>
+                                            </div>
+                                        </div>
+
+                                        <div className="space-y-6">
+                                            {/* When to Use */}
+                                            <div>
+                                                <h5 className="font-bold text-lg mb-3 flex items-center gap-2">
+                                                    <AlertTriangle size={18} className="text-red-600" />
+                                                    When to Use This:
+                                                </h5>
+                                                <ul className="space-y-2 text-foreground/80">
+                                                    <li className="flex items-start gap-2">
+                                                        <span className="text-red-600 font-bold mt-1 shrink-0">•</span>
+                                                        <span>You feel your heart racing or your voice getting louder</span>
+                                                    </li>
+                                                    <li className="flex items-start gap-2">
+                                                        <span className="text-red-600 font-bold mt-1 shrink-0">•</span>
+                                                        <span>You're about to say something you'll regret</span>
+                                                    </li>
+                                                    <li className="flex items-start gap-2">
+                                                        <span className="text-red-600 font-bold mt-1 shrink-0">•</span>
+                                                        <span>You notice the same fight starting AGAIN</span>
+                                                    </li>
+                                                </ul>
+                                            </div>
+
+                                            {/* The Script */}
+                                            <div className="bg-red-50 dark:bg-red-900/10 p-6 md:p-8 rounded-2xl border-2 border-red-500">
+                                                <div className="text-xs font-bold uppercase text-red-600 mb-3 tracking-wide">SAY THIS OUT LOUD:</div>
+                                                <p className="font-serif italic text-2xl md:text-3xl leading-relaxed text-foreground">
+                                                    "{dominantScript.inTheMoment}"
+                                                </p>
+                                            </div>
+
+                                            {/* What Happens Next */}
+                                            <div>
+                                                <h5 className="font-bold text-lg mb-3 flex items-center gap-2">
+                                                    <ArrowRight size={18} className="text-blue-600" />
+                                                    What Happens Next:
+                                                </h5>
+                                                <ol className="space-y-3 text-foreground/80">
+                                                    <li className="flex items-start gap-3">
+                                                        <span className="font-bold text-blue-600 shrink-0">1.</span>
+                                                        <span><strong>They might resist.</strong> "No, we need to talk NOW." Stay firm. Repeat the script.</span>
+                                                    </li>
+                                                    <li className="flex items-start gap-3">
+                                                        <span className="font-bold text-blue-600 shrink-0">2.</span>
+                                                        <span><strong>Take 20 minutes.</strong> Walk, breathe, splash water on your face. Do NOT rehearse your argument.</span>
+                                                    </li>
+                                                    <li className="flex items-start gap-3">
+                                                        <span className="font-bold text-blue-600 shrink-0">3.</span>
+                                                        <span><strong>Come back.</strong> Start with "I want to understand you" instead of "You need to understand me."</span>
+                                                    </li>
+                                                </ol>
+                                            </div>
+
+                                            {/* Why It Works */}
+                                            <div className="bg-purple-50 dark:bg-purple-900/10 rounded-xl p-5 border border-purple-200 dark:border-purple-800">
+                                                <h5 className="text-sm font-bold text-purple-900 dark:text-purple-100 mb-2 flex items-center gap-2">
+                                                    <Brain size={16} />
+                                                    Why This Works:
+                                                </h5>
+                                                <p className="text-sm text-foreground/80 leading-relaxed">
+                                                    When you're flooded (heart rate above 100bpm), your prefrontal cortex shuts down.
+                                                    You literally cannot think clearly. This script buys you time to get your brain back online
+                                                    so you can actually solve the problem instead of making it worse.
+                                                </p>
+                                            </div>
+
+                                            {/* Repair Script */}
+                                            <div className="bg-blue-50 dark:bg-blue-900/10 p-6 rounded-2xl border-l-4 border-blue-500">
+                                                <div className="text-xs font-bold uppercase text-blue-600 mb-2">THE REPAIR (Use This Later):</div>
+                                                <p className="text-lg leading-relaxed text-foreground/90">
+                                                    "{dominantScript.repair}"
+                                                </p>
+                                            </div>
+                                        </div>
+                                    </div>
                                 </div>
+                            )}
+
+                            {/* Detailed Breakdown & Recommendation (NEW VALUE ADD) */}
+                            {report.compatibility && report.compatibility.breakdown ? (
+                                <div className="mt-8 grid md:grid-cols-2 gap-6">
+                                    <div className="bg-background/50 rounded-2xl p-6 border border-border/50">
+                                        <h4 className="font-bold text-lg mb-4 flex items-center gap-2">
+                                            <Share2 size={18} className="text-primary" />
+                                            Data Breakdown
+                                        </h4>
+                                        <div className="space-y-4">
+                                            {report.compatibility.breakdown.map((item: any, idx: number) => (
+                                                <div key={idx} className="bg-white dark:bg-black/20 p-3 rounded-xl border border-black/5">
+                                                    <div className="flex justify-between items-center mb-1">
+                                                        <span className="text-xs font-bold uppercase text-muted-foreground">{item.dimension}</span>
+                                                        <span className={`text-xs font-bold px-2 py-0.5 rounded-full ${item.status === 'aligned' ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400' :
+                                                            item.status === 'opposite' ? 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400' :
+                                                                'bg-orange-100 text-orange-700 dark:bg-orange-900/30 dark:text-orange-400'
+                                                            }`}>
+                                                            {item.status === 'aligned' ? 'Strong Match' : item.status === 'opposite' ? 'Friction Point' : 'Tension'}
+                                                        </span>
+                                                    </div>
+                                                    <p className="text-sm font-medium leading-tight opacity-90">{item.insight}</p>
+                                                </div>
+                                            ))}
+                                        </div>
+                                    </div>
+
+                                    <div className="bg-background/50 rounded-2xl p-6 border border-border/50 flex flex-col justify-center">
+                                        <div className="text-center">
+                                            <div className="w-12 h-12 bg-primary/10 text-primary rounded-full flex items-center justify-center mx-auto mb-4">
+                                                <Target size={24} />
+                                            </div>
+                                            <h4 className="font-bold text-lg mb-2">Top Recommendation</h4>
+                                            <p className="text-xl font-serif italic text-foreground/80 leading-relaxed">
+                                                "{report.compatibility.topRecommendation}"
+                                            </p>
+                                        </div>
+                                    </div>
+                                </div>
+                            ) : (
+                                <div className="mt-8 p-6 bg-yellow-50 dark:bg-yellow-900/10 rounded-2xl border border-yellow-100 text-center">
+                                    <p className="text-sm font-bold text-yellow-800 dark:text-yellow-400 mb-1">Compatibility Insight Unavailable</p>
+                                    <p className="text-xs text-muted-foreground">We need your conflict details (Wizard Step 3) to generate this breakdown.</p>
+                                </div>
+                            )}
+                        </div>
+                    </section>
+                )}
+
+                {/* --- 5 DIMENSION DEEP DIVES --- */}
+
+                {/* --- 5 DIMENSION DEEP DIVES --- */}
+
+                {/* Helper to extract AI content safely */}
+
+                <DimensionDeepDive
+                    dimensionKey="communication"
+                    answers={(session as any)?.answers || {}}
+                    aiAnalysis={deepDiveContent['communication'] || report.dimensionsDetailed?.find(d => d.id === 'communication')?.score.prescription.analysis}
+                />
+
+                <DimensionDeepDive
+                    dimensionKey="emotional_safety"
+                    answers={(session as any)?.answers || {}}
+                    aiAnalysis={deepDiveContent['emotional_safety'] || report.dimensionsDetailed?.find(d => d.id === 'emotional_safety')?.score.prescription.analysis}
+                />
+
+                <DimensionDeepDive
+                    dimensionKey="physical_intimacy"
+                    answers={(session as any)?.answers || {}}
+                    aiAnalysis={deepDiveContent['physical_intimacy'] || report.dimensionsDetailed?.find(d => d.id === 'physical_intimacy')?.score.prescription.analysis}
+                />
+
+                <DimensionDeepDive
+                    dimensionKey="power_fairness"
+                    answers={(session as any)?.answers || {}}
+                    aiAnalysis={deepDiveContent['power_fairness'] || report.dimensionsDetailed?.find(d => d.id === 'power_fairness')?.score.prescription.analysis}
+                />
+
+                <DimensionDeepDive
+                    dimensionKey="future_values"
+                    answers={(session as any)?.answers || {}}
+                    aiAnalysis={deepDiveContent['future_values'] || report.dimensionsDetailed?.find(d => d.id === 'future_values')?.score.prescription.analysis}
+                />
+
+                {/* THE BOTTOM LINE */}
+                {deepDiveContent['bottom_line'] && (
+                    <section className="bg-primary/5 rounded-3xl p-8 md:p-12 border border-primary/20 mt-12 mb-20 relative overflow-hidden">
+                        <div className="absolute top-0 right-0 p-6 opacity-5 pointer-events-none">
+                            <Quote size={120} />
+                        </div>
+                        <div className="relative z-10 max-w-3xl mx-auto text-center space-y-6">
+                            <h3 className="text-2xl md:text-3xl font-bold uppercase tracking-tight text-primary">The Bottom Line</h3>
+                            <div className="w-16 h-1 bg-primary/20 mx-auto rounded-full"></div>
+                            <div className="prose prose-lg prose-invert dark:prose-invert mx-auto text-foreground/90 font-medium leading-relaxed">
+                                {deepDiveContent['bottom_line'].split('\n').map((line, i) => (
+                                    <p key={i} className="mb-4">{line}</p>
+                                ))}
                             </div>
                         </div>
+                    </section>
+                )}
 
-                        {/* Partner Translation Card */}
-                        <div className="bg-blue-50 dark:bg-blue-900/10 rounded-2xl border border-blue-100 dark:border-blue-900/30 p-8 text-center relative overflow-hidden">
-                            <div className="absolute top-0 right-0 p-3 opacity-10">
-                                <Quote size={100} />
-                            </div>
-                            <h4 className="text-blue-600 dark:text-blue-400 font-bold uppercase tracking-widest text-xs mb-4">Partner Translation Layer</h4>
-                            <h3 className="text-2xl font-bold mb-6">Show this to your Partner</h3>
-                            <div className="bg-white dark:bg-black/20 p-6 rounded-xl shadow-sm text-left relative z-10 max-w-lg mx-auto">
-                                <p className="text-lg leading-relaxed font-medium">
-                                    "{dominantTranslation?.text || "Please be patient with me."}"
-                                </p>
-                            </div>
-                        </div>
-                    </div>
-                </section>
-
-                {/* 7. NEW: The Translator Tool */}
-                <section>
-                    <div className="flex items-center gap-2 mb-4">
-                        <MessageCircle className="text-green-500" />
-                        <h2 className="text-sm font-bold uppercase tracking-wider text-muted-foreground">10. The Translator</h2>
-                    </div>
-                    <TranslatorTool
-                        myLens={report.snapshot.dominantLens}
-                        partnerLens={report.snapshot.dominantLens.includes('silence') ? 'conflict_engulfment' : 'silence_distance'}
-                        sessionId={session?.id}
-                    />
-                </section>
-
-                {/* 6. Integration Questions */}
-                <section className="border-t border-border pt-12">
-                    <h2 className="text-sm font-bold uppercase tracking-wider text-muted-foreground mb-4">11. Deepening</h2>
-                    <h3 className="text-2xl font-bold mb-6">Questions for Clarity</h3>
-                    <div className="grid gap-4 md:grid-cols-2">
-                        {report.questions.map((qGroup, i) => (
-                            <div key={i} className="bg-muted/30 p-5 rounded-lg border border-border/50">
-                                <h4 className="font-bold capitalize mb-2 text-primary text-sm">{qGroup.dimension.replace('_', ' ')}</h4>
-                                <ul className="space-y-2">
-                                    {qGroup.questions.slice(0, 2).map((q, j) => (
-                                        <li key={j} className="flex gap-2 items-start text-xs md:text-sm text-muted-foreground">
-                                            <span className="opacity-50">•</span> {q}
-                                        </li>
-                                    ))}
-                                </ul>
-                            </div>
-                        ))}
-                    </div>
-                </section>
-
-                {/* 7. Closing */}
+                {/* Closing */}
                 <footer className="text-center py-20 bg-gradient-to-b from-transparent to-primary/5 rounded-t-3xl mt-12">
                     <p className="text-2xl font-serif italic max-w-2xl mx-auto mb-8">
                         "{report.closing}"
@@ -680,108 +708,7 @@ export default function FullReportPage() {
     );
 }
 
-function TranslatorTool({ myLens, partnerLens, sessionId }: { myLens: string; partnerLens: string; sessionId?: string }) {
-    const [message, setMessage] = useState("");
-    const [result, setResult] = useState<{ translatedMessage: string; analysis: string } | null>(null);
-    const [loading, setLoading] = useState(false);
 
-    const handleTranslate = async () => {
-        if (!message) return;
-        setLoading(true);
-        try {
-            const res = await translateMessage({
-                message,
-                userLens: myLens,
-                partnerLens: partnerLens,
-                sessionId: sessionId
-            });
-
-            // Parse the response - handle both direct JSON and markdown-wrapped JSON
-            let parsed = res;
-
-            // If translatedMessage is a string that looks like JSON, try to parse it
-            if (typeof res.translatedMessage === 'string' && res.translatedMessage.includes('```json')) {
-                try {
-                    // Remove markdown code blocks
-                    const cleanJson = res.translatedMessage
-                        .replace(/```json\s*/g, '')
-                        .replace(/```\s*/g, '')
-                        .trim();
-
-                    const jsonData = JSON.parse(cleanJson);
-                    parsed = {
-                        translatedMessage: jsonData.translatedMessage || jsonData.message || res.translatedMessage,
-                        analysis: jsonData.analysis || jsonData.explanation || res.analysis
-                    };
-                } catch (parseError) {
-                    console.error('Failed to parse JSON from response:', parseError);
-                    // Keep original response if parsing fails
-                }
-            }
-
-            setResult(parsed);
-        } catch (e) {
-            console.error(e);
-        } finally {
-            setLoading(false);
-        }
-    };
-
-    return (
-        <div className="bg-card rounded-3xl border border-border overflow-hidden shadow-sm">
-            <div className="p-8 md:p-10">
-                <h3 className="text-2xl font-bold mb-2">The Translator</h3>
-                <p className="text-muted-foreground mb-6">
-                    Type what you <em>want</em> to say. AI will rewrite it so your partner can actually hear it (bypassing their "{partnerLens}" defense).
-                </p>
-
-                <div className="grid md:grid-cols-2 gap-8">
-                    {/* Input */}
-                    <div className="space-y-4">
-                        <label className="text-sm font-bold uppercase tracking-wide text-muted-foreground">My Draft</label>
-                        <textarea
-                            className="w-full p-4 rounded-xl border border-input bg-background min-h-[200px] resize-none focus:ring-2 ring-primary/20 outline-none"
-                            placeholder="e.g., 'You never listen to me and I'm sick of it!'"
-                            value={message}
-                            onChange={(e) => setMessage(e.target.value)}
-                        />
-                        <button
-                            onClick={handleTranslate}
-                            disabled={loading || !message}
-                            className="w-full py-4 rounded-full bg-primary text-primary-foreground font-bold shadow-lg hover:opacity-90 transition-all disabled:opacity-50 flex items-center justify-center gap-2"
-                        >
-                            {loading ? <Loader2 className="animate-spin" /> : <Sparkles size={18} />}
-                            Translate
-                        </button>
-                    </div>
-
-                    {/* Output */}
-                    <div className="bg-muted/30 rounded-xl p-6 border border-border relative">
-                        <label className="text-sm font-bold uppercase tracking-wide text-green-600 mb-4 block flex items-center gap-2">
-                            <CheckCircle2 size={16} /> Safe Version
-                        </label>
-
-                        {result ? (
-                            <div className="animate-fade-in space-y-4">
-                                <div className="p-4 bg-background rounded-lg border border-border shadow-sm text-lg font-medium leading-relaxed">
-                                    "{result.translatedMessage}"
-                                </div>
-                                <div className="text-sm text-muted-foreground bg-blue-50 dark:bg-blue-900/20 p-3 rounded-lg text-blue-800 dark:text-blue-200">
-                                    <strong>Why this works:</strong> {result.analysis}
-                                </div>
-                            </div>
-                        ) : (
-                            <div className="h-full flex flex-col items-center justify-center text-muted-foreground opacity-50">
-                                <MessageCircle size={48} className="mb-4" />
-                                <p>Translation will appear here.</p>
-                            </div>
-                        )}
-                    </div>
-                </div>
-            </div>
-        </div>
-    );
-}
 
 // MirrorInsightCards - Displays analysis as a series of beautiful therapeutic insight cards
 function MirrorInsightCards({ content }: { content: string }) {
@@ -987,7 +914,26 @@ function parseInsights(content: string): { title: string; content: string }[] {
         pushSection(currentTitle, currentContent);
     }
 
-    return sections;
+    // Filter out completely empty or garbage sections
+    const validSections = sections.filter(s => {
+        const cleanContent = s.content.trim();
+        // Drop if empty
+        if (cleanContent.length === 0 && !s.title) return false;
+        // Drop if just a stray character like # or -
+        if (cleanContent.length < 3 && /^[\W_]+$/.test(cleanContent)) return false;
+        // Drop if title is "Insight" (default) but content is empty
+        if (s.title === "Insight" && cleanContent.length === 0) return false;
+
+        return true;
+    });
+
+    // FALLBACK: If parsing led to zero valid sections (but we had content), 
+    // it probably means the format wasn't markdown headers. Treat whole thing as one block.
+    if (validSections.length === 0 && content.trim().length > 0) {
+        return [{ title: "Executive Analysis", content: content }];
+    }
+
+    return validSections;
 }
 
 function SimpleMarkdown({ content }: { content: string }) {
@@ -1027,7 +973,7 @@ function SimpleMarkdown({ content }: { content: string }) {
                 }
 
                 // Lists
-                // Handle "✅ **Title**" specific style
+                // Handle "âœ… **Title**" specific style
                 if (trimmed.startsWith('✅')) {
                     return (
                         <div key={i} className="bg-green-50 dark:bg-green-900/10 p-4 rounded-xl border border-green-100 dark:border-green-900/30 my-4">
@@ -1060,8 +1006,29 @@ function SimpleMarkdown({ content }: { content: string }) {
                     );
                 }
 
+                // Blockquotes / Truth Bombs
+                if (trimmed.startsWith('> ')) {
+                    return (
+                        <div key={i} className="my-8 relative pl-6 border-l-4 border-primary/30">
+                            <Quote className="absolute -top-2 -left-3 bg-background text-primary" size={20} fill="currentColor" />
+                            <p className="text-2xl md:text-3xl font-serif italic text-primary/90 leading-tight">
+                                "{formatText(trimmed.replace('> ', ''))}"
+                            </p>
+                        </div>
+                    );
+                }
+
                 // Standard Paragraph
-                return <p key={i} className="text-gray-700 dark:text-gray-300">{formatText(trimmed)}</p>;
+                // Check if it's a short "Punch" line (under 60 chars) to make it stand out more?
+                const isPunchLine = trimmed.length < 80 && !trimmed.includes('.') && i > 0;
+
+                return (
+                    <p key={i} className={`
+                        ${isPunchLine ? 'text-xl md:text-2xl font-bold text-foreground/80 my-6' : 'text-lg md:text-xl text-foreground/80 leading-relaxed mb-6'}
+                    `}>
+                        {formatText(trimmed)}
+                    </p>
+                );
             })}
         </div>
     );
@@ -1076,7 +1043,7 @@ function formatText(text: string): React.ReactNode[] {
         // Handle Bold
         if (part.startsWith('**') && part.endsWith('**')) {
             const content = part.slice(2, -2);
-            return <strong key={i} className="font-bold text-primary/90">{formatItalics(content)}</strong>;
+            return <strong key={i} className="font-bold text-primary bg-primary/10 px-1 rounded mx-0.5">{formatItalics(content)}</strong>;
         }
         // Handle Iterables within non-bold text
         return <span key={i}>{formatItalics(part)}</span>;
@@ -1091,4 +1058,69 @@ function formatItalics(text: string): React.ReactNode[] {
         }
         return part;
     });
+}
+
+// Helper to extract the Deep Dive map from the appendix
+// Helper to extract the Deep Dive map from the appendix
+// Helper to extract the Deep Dive map and Bottom Line
+function extractDeepDiveAnalysis(appendix: string): Record<string, string> {
+    const map: Record<string, string> = {};
+
+    // Standardize newlines
+    const text = appendix.replace(/\r\n/g, '\n');
+
+    // Regex to match "[[TAG:KEY]]" blocks
+    // Matches: [[DIMENSION:COMMUNICATION]] or [[SECTION:BOTTOM_LINE]]
+    const blockRegex = /\[\[(DIMENSION|SECTION):([A-Z_]+)\]\]/g;
+
+    // Find all matches
+    let match;
+    const matches: { key: string, start: number, end: number }[] = [];
+
+    while ((match = blockRegex.exec(text)) !== null) {
+        matches.push({
+            key: match[2].toLowerCase(), // e.g., "communication" or "bottom_line"
+            start: match.index,
+            end: match.index + match[0].length
+        });
+    }
+
+    // Extract content between matches
+    for (let i = 0; i < matches.length; i++) {
+        const current = matches[i];
+        const next = matches[i + 1];
+
+        // Content starts after the current tag ends
+        const contentStart = current.end;
+        // Content ends at the start of the next tag, or end of string
+        const contentEnd = next ? next.start : text.length;
+
+        const content = text.slice(contentStart, contentEnd).trim();
+        if (content) {
+            map[current.key] = content;
+        }
+    }
+
+    // BACKWARD COMPATIBILITY: If no strict tags found, fall back to "## DIMENSION:" split
+    if (Object.keys(map).length === 0) {
+        const sections = appendix.split('## DIMENSION:');
+        const keyMap: Record<string, string> = {
+            "communication": "communication",
+            "emotional safety": "emotional_safety",
+            "physical intimacy": "physical_intimacy",
+            "power dynamics": "power_fairness",
+            "future values": "future_values"
+        };
+        sections.forEach(section => {
+            const trimmed = section.trim();
+            if (!trimmed) return;
+            const lines = trimmed.split('\n');
+            const rawKey = lines[0].trim().toLowerCase();
+            const mappedKey = keyMap[rawKey] || rawKey.replace(/ /g, '_');
+            const content = lines.slice(1).join('\n').trim();
+            if (mappedKey && content) map[mappedKey] = content;
+        });
+    }
+
+    return map;
 }

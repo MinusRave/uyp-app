@@ -123,7 +123,7 @@ export const createCheckoutSession: CreateCheckoutSession<
       },
       customData: {
         currency: 'usd',
-        value: parseFloat(process.env.REPORT_PRICE || "19.00"),
+        value: parseFloat(process.env.REPORT_PRICE || "29.00"),
         content_name: 'Full Relationship Report',
         content_category: 'Report',
         content_ids: ['report-full'],
@@ -132,24 +132,32 @@ export const createCheckoutSession: CreateCheckoutSession<
     });
   }
 
+  // 4. Log price for verification
+  const reportPrice = parseFloat(process.env.REPORT_PRICE || "29.00");
+  console.log(`[createCheckoutSession] Charging price: $${reportPrice}`);
+
+  // 5. Create Stripe Checkout Session
   const session = await stripeClient.checkout.sessions.create({
     payment_method_types: ["card"],
+    billing_address_collection: 'auto', // Reduces friction
+    phone_number_collection: { enabled: false }, // Don't ask for phone
+    submit_type: 'pay', // Button says "Pay" not "Subscribe"
     line_items: [
       {
         price_data: {
           currency: "usd",
           product_data: {
-            name: "UnderstandYourPartner - Full Report",
-            description: "Detailed analysis of your relationship dynamics.",
+            name: "Your Relationship MRI Report",
+            description: "Get answers: Why you fight, why they shut down, and exactly what to do next. 5-dimension analysis + emergency scripts.",
           },
-          unit_amount: Math.round(parseFloat(process.env.REPORT_PRICE || "19.00") * 100),
+          unit_amount: Math.round(reportPrice * 100),
         },
         quantity: 1,
       },
     ],
     mode: "payment",
     success_url: `${config.frontendUrl}/report?success=true&session_id={CHECKOUT_SESSION_ID}`,
-    cancel_url: `${config.frontendUrl}/results`,
+    cancel_url: `${config.frontendUrl}/results?checkout_cancelled=true`,
     customer_email: customerEmail,
     metadata: {
       testSessionId: sessionId,

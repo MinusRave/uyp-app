@@ -25,10 +25,17 @@ export function calculateCompatibility(input: CompatibilityInput): Compatibility
     let baseScore = 50; // Start neutral
     const breakdown: CompatibilityResult['breakdown'] = [];
 
+    // Helper to safely check potential string matches
+    // Wizard sends "Withdraws / Goes silent", "Daily", "Always - We make up quickly"
+    const pStyle = (input.partnerConflictStyle || "").toLowerCase();
+    const fightFreq = (input.fightFrequency || "").toLowerCase();
+    const repairFreq = (input.repairFrequency || "").toLowerCase();
+    const userState = (input.userState || "").toLowerCase();
+
     // Factor 1: Conflict Style Compatibility
-    if (input.partnerConflictStyle) {
-        const userIsWithdrawer = input.userDominantLens === 'silence';
-        const partnerIsWithdrawer = input.partnerConflictStyle === 'withdraws';
+    if (pStyle) {
+        const userIsWithdrawer = input.userDominantLens === 'communication';
+        const partnerIsWithdrawer = pStyle.includes('withdraw');
 
         if (userIsWithdrawer && partnerIsWithdrawer) {
             // Both withdraw = low conflict but low connection
@@ -61,9 +68,8 @@ export function calculateCompatibility(input: CompatibilityInput): Compatibility
     }
 
     // Factor 2: Fight Frequency
-    if (input.fightFrequency) {
-        const freq = input.fightFrequency;
-        if (freq === 'daily') {
+    if (fightFreq) {
+        if (fightFreq.includes('daily')) {
             baseScore -= 20;
             breakdown.push({
                 dimension: 'Conflict Frequency',
@@ -71,7 +77,7 @@ export function calculateCompatibility(input: CompatibilityInput): Compatibility
                 status: 'mismatched',
                 insight: 'Daily conflicts indicate high stress. Your nervous systems are in constant activation.'
             });
-        } else if (freq === 'weekly') {
+        } else if (fightFreq.includes('weekly')) {
             baseScore -= 10;
             breakdown.push({
                 dimension: 'Conflict Frequency',
@@ -79,7 +85,7 @@ export function calculateCompatibility(input: CompatibilityInput): Compatibility
                 status: 'mismatched',
                 insight: 'Weekly conflicts are manageable but suggest ongoing tension.'
             });
-        } else if (freq === 'monthly') {
+        } else if (fightFreq.includes('monthly')) {
             baseScore += 10;
             breakdown.push({
                 dimension: 'Conflict Frequency',
@@ -99,9 +105,8 @@ export function calculateCompatibility(input: CompatibilityInput): Compatibility
     }
 
     // Factor 3: Repair Ability (MOST IMPORTANT)
-    if (input.repairFrequency) {
-        const repair = input.repairFrequency;
-        if (repair === 'always') {
+    if (repairFreq) {
+        if (repairFreq.includes('always')) {
             baseScore += 25;
             breakdown.push({
                 dimension: 'Repair Ability',
@@ -109,7 +114,7 @@ export function calculateCompatibility(input: CompatibilityInput): Compatibility
                 status: 'aligned',
                 insight: 'Strong repair ability is the #1 predictor of relationship success. You have this.'
             });
-        } else if (repair === 'sometimes') {
+        } else if (repairFreq.includes('sometimes')) {
             baseScore += 5;
             breakdown.push({
                 dimension: 'Repair Ability',
@@ -117,7 +122,7 @@ export function calculateCompatibility(input: CompatibilityInput): Compatibility
                 status: 'aligned',
                 insight: 'Inconsistent repair. When you do reconnect, it works. The challenge is consistency.'
             });
-        } else if (repair === 'rarely') {
+        } else if (repairFreq.includes('rarely')) {
             baseScore -= 15;
             breakdown.push({
                 dimension: 'Repair Ability',
@@ -136,8 +141,9 @@ export function calculateCompatibility(input: CompatibilityInput): Compatibility
         }
     }
 
-    // Factor 4: User's State
-    if (input.userState === 'Amplified Distress') {
+    // Factor 4: User's State (userState is from backend enum, so we keep exact check or normalize)
+    // Backend sends "Amplified Distress", "Secure Flow", etc.
+    if (userState.includes('amplified')) {
         baseScore -= 10;
         breakdown.push({
             dimension: 'Your Nervous System',
@@ -145,7 +151,7 @@ export function calculateCompatibility(input: CompatibilityInput): Compatibility
             status: 'mismatched',
             insight: 'Your heightened sensitivity makes conflicts feel more intense than they are.'
         });
-    } else if (input.userState === 'Secure Flow') {
+    } else if (userState.includes('secure')) {
         baseScore += 10;
         breakdown.push({
             dimension: 'Your Nervous System',
@@ -166,11 +172,12 @@ export function calculateCompatibility(input: CompatibilityInput): Compatibility
 
     // Generate top recommendation
     let topRecommendation: string;
-    if (input.repairFrequency === 'never' || input.repairFrequency === 'rarely') {
+    // Use normalized variables for robust matching!
+    if (repairFreq.includes('never') || repairFreq.includes('rarely')) {
         topRecommendation = 'Learn repair skills. This is your #1 priority. Use the scripts in your report.';
-    } else if (input.fightFrequency === 'daily') {
+    } else if (fightFreq.includes('daily')) {
         topRecommendation = 'Reduce conflict frequency by addressing triggers before they escalate.';
-    } else if (input.partnerConflictStyle === 'withdraws' && input.userDominantLens !== 'silence') {
+    } else if (pStyle.includes('withdraw') && input.userDominantLens !== 'communication') {
         topRecommendation = 'Break the pursuer-withdrawer cycle. Give your partner space, then reconnect.';
     } else {
         topRecommendation = 'Focus on maintaining your repair rituals. This is your strength.';

@@ -6,110 +6,52 @@ export const getLevel = (score: number): ScoreLevel => {
     return "HIGH";
 };
 
+
 export const DIMENSIONS = {
-    silence_distance: {
-        title: "The Silence Trap",
-        description: "How you react when they pull away.",
+    communication: {
+        title: "Communication Style",
+        description: "How you handle conflict and silence.",
         levels: {
-            LOW: {
-                title: "Secure with Space",
-                text: "You're okay when they need space. You don't panic.",
-                advice: "Keep respecting their space, but say something when you need connection."
-            },
-            MEDIUM: {
-                title: "Occasional Doubt",
-                text: "You sometimes wonder 'Are we okay?' when they are quiet, but you can talk yourself down.",
-                advice: "When you feel that doubt, just ask: 'We good?' instead of guessing."
-            },
-            HIGH: {
-                title: "Panic Mode",
-                text: "When they go silent, your body screams 'Danger'. You feel like they are leaving you.",
-                advice: "Practice 'pausing'. When they go silent, tell yourself: 'They are overwhelmed, not leaving'. ask: 'Do you need a minute?'"
-            }
+            LOW: { title: "Secure Flow", text: "You communicate well.", advice: "Keep it up." },
+            MEDIUM: { title: "Friction", text: "You have some bad habits.", advice: "Watch out for the Four Horsemen." },
+            HIGH: { title: "Toxic Loop", text: "You are in a cycle of attack/defend.", advice: "You need to stop the bleeding immediately." }
         }
     },
-    conflict_tension: {
-        title: "The Blow-up",
-        description: "How you handle it when things get heated.",
+    emotional_safety: {
+        title: "Emotional Safety",
+        description: "Do you trust they have your back?",
         levels: {
-            LOW: {
-                title: "Peacekeeper",
-                text: "You swallow your feelings just to keep things calm.",
-                advice: "Swallowing your feelings creates resentment. You need to speak up even if it's scary."
-            },
-            MEDIUM: {
-                title: "Balanced",
-                text: "You can handle a fight without thinking the world is ending.",
-                advice: "Keep focusing on 'repair'—making jokes or apologizing after a fight."
-            },
-            HIGH: {
-                title: "Urgent Fixer",
-                text: "You feel physically sick if a fight isn't resolved RIGHT NOW. You can't sleep until it's fixed.",
-                advice: "Learn to self-soothe. Sometimes they need to cool down before they can talk. Pushing them pushes them away."
-            }
+            LOW: { title: "Deep Trust", text: "You feel safe.", advice: "This is rare. Protect it." },
+            MEDIUM: { title: "Wary", text: "You are waiting for the other shoe to drop.", advice: "Check your assumptions." },
+            HIGH: { title: "Hyper-Vigilant", text: "You feel unsafe constantly.", advice: "You need to rebuild trust from zero." }
         }
     },
-    intentional_attribution: {
-        title: "The Blame Game",
-        description: "Do you think they hurt you on purpose?",
+    physical_intimacy: {
+        title: "Sex & Intimacy",
+        description: "The spark and connection.",
         levels: {
-            LOW: {
-                title: "Benefit of the Doubt",
-                text: "You know they aren't trying to be mean.",
-                advice: "This is a superpower. Keep assuming they mean well."
-            },
-            MEDIUM: {
-                title: "Skeptic",
-                text: "When you're mad, you start to think: 'They are doing this just to annoy me.'",
-                advice: "Check the story in your head. Are they evil, or just careless?"
-            },
-            HIGH: {
-                title: "The Prosecutor",
-                text: "You feel like everything they do is a personal attack.",
-                advice: "This kills love. Ask yourself: 'Could this be a mistake rather than an attack?'"
-            }
+            LOW: { title: "Alive & Well", text: "The spark is there.", advice: "Keep prioritizing this." },
+            MEDIUM: { title: "Drifting", text: "It's becoming routine.", advice: "Don't let it fade." },
+            HIGH: { title: "Roommate Syndrome", text: "The spark is gone.", advice: "You must prioritize touch today." }
         }
     },
-    reassurance_need: {
-        title: "Feeling Unloved",
-        description: "How often you need to hear 'I love you'.",
+    power_fairness: {
+        title: "Power & Fairness",
+        description: "Who carries the load?",
         levels: {
-            LOW: {
-                title: "Secure",
-                text: "You know they love you, even if they don't say it constantly.",
-                advice: "Make sure you still appreciate when they DO say it."
-            },
-            MEDIUM: {
-                title: "Normal Needs",
-                text: "You like hearing it, but you don't panic without it.",
-                advice: "Tell them clearly: 'I need a little boost today'."
-            },
-            HIGH: {
-                title: "Starving for Signal",
-                text: "If they are quiet, you feel unloved. You need constant proof.",
-                advice: "Work on believing you are worthy, with or without their constant praise."
-            }
+            LOW: { title: "True Partners", text: "You share the load.", advice: "Great teamwork." },
+            MEDIUM: { title: "Imbalanced", text: "One of you does more.", advice: "Talk about the 'Mental Load'." },
+            HIGH: { title: "Parent/Child", text: "One manages, one follows.", advice: "This kills desire. Fix the balance." }
         }
     },
-    repair_closure: {
-        title: "Making Up",
-        description: "Can you let it go?",
+    future_values: {
+        title: "Values & Future",
+        description: "Are you going to the same place?",
         levels: {
-            LOW: {
-                title: "Grudge Holder",
-                text: "You hold onto the pain long after the fight is over.",
-                advice: "Holding a grudge hurts YOU, not them. Let it go for your own sake."
-            },
-            MEDIUM: {
-                title: "Steady",
-                text: "You can move on, but it takes you a minute.",
-                advice: "Focus on small jokes to break the tension."
-            },
-            HIGH: {
-                title: "Rug Sweeper",
-                text: "You pretend nothing happened just to stop the bad feelings.",
-                advice: "Don't just pretend. Actually say 'Are we good?' then really let it go."
-            }
+            LOW: { title: "Aligned", text: "Shared vision.", advice: "Dream big together." },
+            MEDIUM: { title: "Drifting", text: "Some different goals.", advice: "Re-align your compass." },
+            HIGH: { title: "Divergent", text: "Growing apart.", advice: "Find common ground fast." }
         }
     }
 };
+
