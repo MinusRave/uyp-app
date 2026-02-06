@@ -66,6 +66,13 @@ model TestSession {
   
   // NEW: Persisted AI Analysis
   executiveAnalysis    String?
+  
+  // NEW: Calculated Relationship Health Metrics (The 12 Vital Signs)
+  advancedMetrics      Json?
+
+  // NEW: Cached AI Results (Prevent duplicate calls)
+  quickOverview        Json?
+  fullReport           Json?
 
   // Meta CAPI Cookies tracking
   fbp                  String?
@@ -163,6 +170,27 @@ model Logs {
 
   message                  String
   level                    String
+}
+
+model AiLog {
+  id          String   @id @default(uuid())
+  createdAt   DateTime @default(now())
+  
+  action      String   // "quickOverview" | "fullReport" | "executiveAnalysis"
+  model       String   // "claude-3-haiku" | "claude-3-5-sonnet"
+  duration    Float    @default(0) // Duration in seconds
+  tokensUsed  Int?     // Total tokens
+  inputTokens Int?
+  outputTokens Int?
+  cost        Float?   // Cost in USD
+  
+  status      String   // "success" | "error"
+  errorMessage String?
+  
+  requestPrompt String? @db.Text
+  response      String? @db.Text
+  
+  sessionId   String?
 }
 
 model ContactFormMessage {

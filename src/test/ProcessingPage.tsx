@@ -28,11 +28,7 @@ export default function ProcessingPage() {
 
         // Redirect after fake processing (4.5s)
         const redirectTimer = setTimeout(() => {
-            if (session?.isPaid) {
-                navigate(routes.ReportRoute.to);
-            } else {
-                navigate(routes.TeaserRoute.to);
-            }
+            navigate(routes.TeaserRoute.to);
         }, 4500);
 
         return () => {

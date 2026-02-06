@@ -1,15 +1,17 @@
 
 import { type AuthUser } from "wasp/auth";
-import { useQuery, getSessionDetail } from "wasp/client/operations";
+import { useQuery, getSessionDetail, retriggerAiProcessing } from "wasp/client/operations";
 import { Link } from "wasp/client/router";
 import { useParams } from "react-router-dom";
+import { useState } from "react";
 import DefaultLayout from "../../layout/DefaultLayout";
-import { Loader2, ArrowLeft, CheckCircle, XCircle, DollarSign, Mail } from "lucide-react";
+import { Loader2, ArrowLeft, CheckCircle, XCircle, DollarSign, Mail, RefreshCw } from "lucide-react";
 import { cn } from "../../../client/utils";
 
 const SessionDetailPage = ({ user }: { user: AuthUser }) => {
     const { sessionId } = useParams();
     const { data: session, isLoading, error } = useQuery(getSessionDetail, { sessionId: sessionId || "" });
+    const [isRetriggering, setIsRetriggering] = useState(false);
 
     if (isLoading) {
         return <DefaultLayout user={user}><div className="flex justify-center p-10"><Loader2 className="animate-spin" /></div></DefaultLayout>;
@@ -22,17 +24,41 @@ const SessionDetailPage = ({ user }: { user: AuthUser }) => {
     const answers = session.answers as Record<string, any>;
     const scores = session.scores as Record<string, number> | null;
 
+    const handleRetrigger = async () => {
+        if (!confirm("Are you sure? This will delete existing reports and regenerate them.")) return;
+        setIsRetriggering(true);
+        try {
+            await retriggerAiProcessing({ sessionId: session.id });
+            alert("AI Processing Started! Wait 30-60 seconds, then manually refresh this page to see the new results.");
+            // Don't auto-reload - it causes race conditions with TeaserPage useEffect
+        } catch (e: any) {
+            alert("Error: " + e.message);
+        } finally {
+            setIsRetriggering(false);
+        }
+    };
+
     return (
         <DefaultLayout user={user}>
             <div className="flex flex-col gap-6">
-                <div className="flex items-center gap-4">
-                    <Link to="/admin/sessions" className="p-2 hover:bg-gray-100 rounded-full">
-                        <ArrowLeft className="w-5 h-5" />
-                    </Link>
-                    <div>
-                        <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Session Details</h1>
-                        <p className="text-sm text-gray-500">ID: {session.id}</p>
+                <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+                    <div className="flex items-center gap-4">
+                        <Link to="/admin/sessions" className="p-2 hover:bg-gray-100 rounded-full">
+                            <ArrowLeft className="w-5 h-5" />
+                        </Link>
+                        <div>
+                            <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Session Details</h1>
+                            <p className="text-sm text-gray-500">ID: {session.id}</p>
+                        </div>
                     </div>
+                    <button
+                        onClick={handleRetrigger}
+                        disabled={isRetriggering}
+                        className="flex items-center gap-2 bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded-lg disabled:opacity-50 transition-colors"
+                    >
+                        {isRetriggering ? <Loader2 className="w-4 h-4 animate-spin" /> : <RefreshCw className="w-4 h-4" />}
+                        {isRetriggering ? "Processing..." : "Retrigger AI Analysis"}
+                    </button>
                 </div>
 
                 {/* Status Cards */}
@@ -105,7 +131,11 @@ const SessionDetailPage = ({ user }: { user: AuthUser }) => {
                             {Object.entries(scores).map(([key, value]) => (
                                 <div key={key} className="p-4 bg-gray-50 dark:bg-meta-4 rounded-lg">
                                     <p className="text-sm text-gray-500 capitalize">{key.replace(/_/g, " ")}</p>
-                                    <p className="text-2xl font-bold text-primary">{typeof value === 'number' ? value.toFixed(1) : value}</p>
+                                    <p className="text-2xl font-bold text-primary">
+                                        {typeof value === 'number'
+                                            ? value.toFixed(1)
+                                            : (typeof value === 'object' ? JSON.stringify(value) : value)}
+                                    </p>
                                 </div>
                             ))}
                         </div>
@@ -140,7 +170,9 @@ const StatusCard = ({ label, value, icon }: { label: string, value: string, icon
 const InfoItem = ({ label, value }: { label: string, value: any }) => (
     <div>
         <p className="text-sm font-medium text-gray-500 dark:text-gray-400">{label}</p>
-        <p className="text-black dark:text-white font-medium">{value || "-"}</p>
+        <p className="text-black dark:text-white font-medium">
+            {typeof value === 'object' && value !== null ? JSON.stringify(value) : (value || "-")}
+        </p>
     </div>
 );
 

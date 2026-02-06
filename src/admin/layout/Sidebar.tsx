@@ -228,6 +228,20 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
                               Demographics
                             </NavLink>
                           </li>
+                          <li>
+                            <NavLink
+                              to="/admin/ai"
+                              end
+                              className={({ isActive }) =>
+                                cn(
+                                  "text-muted-foreground hover:text-accent group relative flex items-center gap-2.5 rounded-md px-4 font-medium duration-300 ease-in-out",
+                                  { "!text-accent": isActive },
+                                )
+                              }
+                            >
+                              AI Logs
+                            </NavLink>
+                          </li>
                         </ul>
                       </div>
                       {/* <!-- Dropdown Menu End --> */}

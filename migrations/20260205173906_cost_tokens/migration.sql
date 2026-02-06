@@ -1,0 +1,2 @@
+-- AlterTable
+ALTER TABLE "AiLog" ADD COLUMN     "cost" DOUBLE PRECISION;

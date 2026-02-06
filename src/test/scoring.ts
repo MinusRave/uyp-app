@@ -289,10 +289,46 @@ export function calculateScore(answers: Record<string, any>, userProfile?: any):
         closing: "This is your starting point. Use the scripts."
     };
 
+    // SALES COPY LOOKUP TABLE
+    const HEADLINE_LOOKUP: Record<DimensionType, Record<QuadrantType, string>> = {
+        communication: {
+            "Amplified Distress": "Why every small disagreement turns into a blowout fight.",
+            "Detached Cynicism": "Why you feel lonely even when you are sitting right next to them.",
+            "Self-Regulation": "Why you feel like you're walking on eggshells to keep the peace.",
+            "Secure Flow": "Your communication is safe, but hidden resentment is building elsewhere."
+        },
+        emotional_safety: {
+            "Amplified Distress": "Why you can't stop scanning for danger, even when things are 'fine'.",
+            "Detached Cynicism": "Why you have stopped trusting them with your real feelings.",
+            "Self-Regulation": "Why you are exhausting yourself trying to manage their emotions.",
+            "Secure Flow": "You feel safe, but are you confusing safety with distance?"
+        },
+        physical_intimacy: {
+            "Amplified Distress": "Why the bedroom has become a battlefield of rejection and pressure.",
+            "Detached Cynicism": "Why you feel more like roommates than lovers.",
+            "Self-Regulation": "Why you are settling for 'maintenance sex' instead of real connection.",
+            "Secure Flow": "Your physical bond is strong, but is it masking other cracks?"
+        },
+        power_fairness: {
+            "Amplified Distress": "Why you feel like a parent managing a rebellious child, not a partner.",
+            "Detached Cynicism": "Why you have secretly accepted that you have to do everything alone.",
+            "Self-Regulation": "Why you 'just do it yourself' to avoid the conflict of asking.",
+            "Secure Flow": "You share the load well, but are you keeping score?"
+        },
+        future_values: {
+            "Amplified Distress": "Why you are terrified that you are wasting your life with the wrong person.",
+            "Detached Cynicism": "Why you have stopped dreaming about a future together.",
+            "Self-Regulation": "Why you are sacrificing your own goals to keep the relationship alive.",
+            "Secure Flow": "You are aligned on the future, but are you enjoying the present?"
+        }
+    };
+
+    const specificHeadline = HEADLINE_LOOKUP[dominantLens]?.[dimContent.stateName as QuadrantType] || `Why your ${dominantLens.replace('_', ' ')} keeps breaking down.`;
+
     const preview = {
-        headline: `CRITICAL ALERT: You are in the "${dimContent.stateName}" regarding ${dominantLens.replace('_', ' ')}.`,
-        insight: `Your scan shows this is the #1 threat to your relationship right now.`,
-        hook: `We have a specific protocol to fix this today.`,
+        headline: specificHeadline,
+        insight: `It's not a personality flaw. You are caught in the "${dimContent.stateName}" Cycle.`,
+        hook: `We found the exact hidden mechanic driving this pattern—and why your current attempts to fix it are backfiring.`,
         cta: "Unlock Your Diagnosis"
     };
 

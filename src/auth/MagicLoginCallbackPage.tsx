@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { Link, useSearchParams, useNavigate } from "react-router-dom";
 import { login } from "wasp/client/auth";
+import { claimSession } from "wasp/client/operations"; // Import claimSession
 
 export default function MagicLoginCallbackPage() {
     const [searchParams] = useSearchParams();
@@ -25,6 +26,20 @@ export default function MagicLoginCallbackPage() {
                 // Use the standard Wasp Email Login
                 // The 'token' param here is the temporary password set by the server
                 await login({ email, password: token });
+
+                // 2. Claim Session if it exists in LocalStorage
+                // This links the anonymous session taken before login to the now logged-in user
+                const localSessionId = localStorage.getItem("uyp-session-id");
+                if (localSessionId) {
+                    try {
+                        setStatus("Linking your test results...");
+                        await claimSession({ sessionId: localSessionId });
+                        console.log("Session claimed successfully:", localSessionId);
+                    } catch (claimErr) {
+                        // We don't block login if claiming fails (e.g. session already owned)
+                        console.warn("Failed to claim session:", claimErr);
+                    }
+                }
 
                 // If success (no error thrown), redirect to results or home
                 setStatus("Success! Redirecting...");

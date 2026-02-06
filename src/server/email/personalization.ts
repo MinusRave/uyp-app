@@ -2,6 +2,7 @@ import { type TestSession } from "wasp/entities";
 
 // Personalization variable types
 export interface PersonalizationVars {
+    // Legacy / Basic
     current_question: number;
     dominant_lens: string;
     dominant_dimension: string;
@@ -16,6 +17,25 @@ export interface PersonalizationVars {
     lens_short_description: string;
     has_high_mismatch: boolean;
     unsubscribe_url: string;
+    ai_cold_truth?: string;
+    user_email: string;
+
+    // NEW: Quick Overview Data
+    quick_overview_headline: string;
+    quick_overview_result_badge: string;
+    pulse_summary: string;
+
+    // NEW: Metrics (Scores 0-100)
+    metric_repair_efficiency: number;
+    metric_sustainability_score: number;
+    metric_parent_trap_score: number; // Aka CEO vs Intern usually, or derived
+    metric_erotic_potential: number;
+    metric_betrayal_vulnerability: number;
+    metric_compatibility_quotient: number;
+    metric_ceo_vs_intern: number;
+
+    // NEW: Forecasts & Insights
+    forecast_short_term_teaser: string;
 }
 
 // Likert scale mapping (1-5 to human-readable labels)
@@ -111,13 +131,48 @@ export function buildPersonalizationData(
     const lens_short_description = getLensDescription(dominant_lens);
 
     // Calculate if high mismatch (any dimension > 75)
+    // Safe access
     const has_high_mismatch = Object.values(scores || {}).some(
-        (dimScore: any) => dimScore?.mismatch > 75
+        (dimScore: any) => (dimScore?.mismatch || 0) > 75
     );
 
     // Generate unsubscribe URL
     // MUST point to the API endpoint which handles the DB update and redirects
     const unsubscribe_url = `${apiUrl}/api/unsubscribe?token=${session.id}`;
+
+    // --- NEW DATA EXTRACTION ---
+    const quickOverview = (session.quickOverview as any) || {};
+    const metrics = (session.advancedMetrics as any) || {};
+    const fullReport = (session.fullReport as any) || {};
+
+    const quick_overview_headline = quickOverview?.hero?.headline || "Analysis Complete";
+    const quick_overview_result_badge = quickOverview?.hero?.result_badge || "CALCULATING...";
+    const pulse_summary = quickOverview?.pulse?.summary || "Your relationship pattern is showing signs of critical strain.";
+
+    const metric_repair_efficiency = Math.round(metrics.repair_efficiency || 35);
+    const metric_sustainability_score = Math.round(metrics.sustainability_forecast || 65);
+    const metric_parent_trap_score = Math.round(metrics.erotic_death_spiral || 68); // Using Erotic Death Spiral as Parent Trap proxy based on mapping in doc
+    const metric_erotic_potential = Math.round(metrics.erotic_potential || 52);
+    const metric_betrayal_vulnerability = Math.round(metrics.betrayal_vulnerability || 72);
+    const metric_compatibility_quotient = Math.round(metrics.compatibility_quotient || 85);
+    const metric_ceo_vs_intern = Math.round(metrics.ceo_vs_intern || 58);
+
+    // Use nullish coalescing to avoid errors if object path doesn't exist
+    const forecast_short_term_teaser = fullReport?.chapter1_pulse?.short_term_forecast || "Without intervention, the current conflict loops will likely intensify...";
+
+    // Extract AI Cold Truth
+    let ai_cold_truth = "";
+    if ((session as any).executiveAnalysis) {
+        const analysis = (session as any).executiveAnalysis;
+        const [publicPart] = analysis.split("<<<PREMIUM_SPLIT>>>");
+        // Remove the Header line ("# Diagnosis: ...")
+        const body = publicPart.replace(/^#\s*Diagnosis:.*$/m, "").trim();
+        // Take the first paragraph (or up to 200 chars to be safe)
+        const firstPara = body.split('\n').find((l: string) => l.trim().length > 20);
+        if (firstPara) {
+            ai_cold_truth = firstPara.trim();
+        }
+    }
 
     return {
         current_question: session.currentQuestionIndex,
@@ -134,6 +189,21 @@ export function buildPersonalizationData(
         lens_short_description,
         has_high_mismatch,
         unsubscribe_url,
+        ai_cold_truth,
+        user_email: email,
+
+        // New Data
+        quick_overview_headline,
+        quick_overview_result_badge,
+        pulse_summary,
+        metric_repair_efficiency,
+        metric_sustainability_score,
+        metric_parent_trap_score,
+        metric_erotic_potential,
+        metric_betrayal_vulnerability,
+        metric_compatibility_quotient,
+        metric_ceo_vs_intern,
+        forecast_short_term_teaser
     };
 }
 

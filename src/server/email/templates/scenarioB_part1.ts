@@ -11,13 +11,20 @@ export function getTeaserB1Email(vars: PersonalizationVars): {
 
   const lensName = vars.dominant_lens.replace(/_/g, " ");
 
+  // SNIPER INJECTION: Use AI Cold Truth if available, otherwise fallback to generic
+  const openingHook = vars.ai_cold_truth
+    ? `I was analyzing your answers and I need to be direct:
+    
+    "${vars.ai_cold_truth}"`
+    : `You're seeing the relationship through the lens of ${lensName}.
+    
+    That's not a flaw. It's how you learned to stay safe.`;
+
   const text = `Hey,
 
 I saw your results.
 
-You're seeing the relationship through the lens of ${lensName}.
-
-That's not a flaw. It's how you learned to stay safe.
+${openingHook}
 
 But here's the problem: Your partner doesn't know this is happening. They just see you reacting.
 
@@ -35,14 +42,21 @@ Unlock Your Report (~~$197~~ $29) → ${process.env.WASP_WEB_CLIENT_URL}/results
 
 Unsubscribe: ${vars.unsubscribe_url}`;
 
+  // HTML VERSION
+  const htmlHook = vars.ai_cold_truth
+    ? `<p>I was analyzing your answers and I need to be direct:</p>
+       <div style="background-color: #FEF2F2; border-left: 4px solid #EF4444; padding: 20px; margin: 24px 0; font-style: italic; color: #7F1D1D;">
+          "${vars.ai_cold_truth}"
+       </div>`
+    : `<p>You're seeing the relationship through the lens of <strong style="color: #8B55A5;">${lensName}</strong>.</p>
+       <p>That's not a flaw. It's how you learned to stay safe.</p>`;
+
   const contentHtml = `
       <p><strong>Hey,</strong></p>
       
       <p>I saw your results.</p>
       
-      <p>You're seeing the relationship through the lens of <strong style="color: #8B55A5;">${lensName}</strong>.</p>
-      
-      <p>That's not a flaw. It's how you learned to stay safe.</p>
+      ${htmlHook}
       
       <p>But here's the problem: <strong>Your partner doesn't know this is happening.</strong> They just see you reacting.</p>
       

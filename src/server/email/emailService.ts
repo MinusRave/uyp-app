@@ -2,88 +2,39 @@ import { emailSender } from "wasp/server/email";
 import { type PersonalizationVars, buildPersonalizationData } from "./personalization";
 import { type TestSession } from "wasp/entities";
 
-// Import all email templates
+// Import new Mirror Sequence templates
 import {
-    getTestAbandon1Email,
-    getTestAbandon2Email,
-    getTestAbandon3Email,
-} from "./templates/scenarioA";
-
-import {
-    getTeaserB1Email,
-    getTeaserB2Email,
-    getTeaserB3Email,
-} from "./templates/scenarioB_part1";
-
-import {
-    getTeaserB4Email,
-    getTeaserB5Email,
-    getTeaserB6Email,
-} from "./templates/scenarioB_part2";
-
-import {
-    getTeaserB7Email,
-    getTeaserB8Email,
-    getTeaserB9Email,
-} from "./templates/scenarioB_part3";
-
-import {
-    getCheckoutC1Email,
-    getCheckoutC2Email,
-    getCheckoutC3Email,
-} from "./templates/scenarioC";
+    getMirror1_ColdTruth,
+    getMirror2_VitalSign,
+    getMirror3_Forecast,
+    getMirror4_Manager,
+    getMirror5_Hope,
+    getMirror6_Loop,
+    getMirror7_Archive
+} from "./templates/mirrorSequence";
 
 // Email template selector
 function getEmailTemplate(
     scenario: string,
     stage: number
 ): ((vars: PersonalizationVars) => { subject: string; html: string; text: string }) | null {
-    if (scenario === "test_abandonment") {
-        switch (stage) {
-            case 1:
-                return getTestAbandon1Email;
-            case 2:
-                return getTestAbandon2Email;
-            case 3:
-                return getTestAbandon3Email;
-            default:
-                return null;
-        }
-    }
-
+    // We only support "teaser_viewer" now (The Mirror Strategy)
     if (scenario === "teaser_viewer") {
         switch (stage) {
             case 1:
-                return getTeaserB1Email;
+                return getMirror1_ColdTruth;
             case 2:
-                return getTeaserB2Email;
+                return getMirror2_VitalSign;
             case 3:
-                return getTeaserB3Email;
+                return getMirror3_Forecast;
             case 4:
-                return getTeaserB4Email;
+                return getMirror4_Manager;
             case 5:
-                return getTeaserB5Email;
+                return getMirror5_Hope;
             case 6:
-                return getTeaserB6Email;
+                return getMirror6_Loop;
             case 7:
-                return getTeaserB7Email;
-            case 8:
-                return getTeaserB8Email;
-            case 9:
-                return getTeaserB9Email;
-            default:
-                return null;
-        }
-    }
-
-    if (scenario === "checkout_abandonment") {
-        switch (stage) {
-            case 1:
-                return getCheckoutC1Email;
-            case 2:
-                return getCheckoutC2Email;
-            case 3:
-                return getCheckoutC3Email;
+                return getMirror7_Archive;
             default:
                 return null;
         }
@@ -137,11 +88,10 @@ export async function sendRetentionEmail(
         // Generate email content
         const emailContent = templateFn(personalizationData);
 
-        // Derive Tracking ID (e.g., A1, B3, C2)
+        // Derive Tracking ID (e.g., M1, M2... using M for Mirror to distinguish from old B series if needed, or keep B)
+        // Let's use M to be clear it's the new sequence
         let emailCode = "X0";
-        if (session.emailSequenceType === "test_abandonment") emailCode = `A${stage}`;
-        if (session.emailSequenceType === "teaser_viewer") emailCode = `B${stage}`;
-        if (session.emailSequenceType === "checkout_abandonment") emailCode = `C${stage}`;
+        if (session.emailSequenceType === "teaser_viewer") emailCode = `M${stage}`;
 
         // Send email with Custom Args for Tracking
         await emailSender.send({
@@ -207,73 +157,43 @@ async function trackEmailSent(
 // Get delay in milliseconds for each stage
 export function getDelayForStage(scenario: string, stage: number): number {
     const HOUR = 60 * 60 * 1000;
-    const DAY = 24 * HOUR;
 
     // Check if in test mode (shorter delays for testing)
     const isTestMode = process.env.EMAIL_RETENTION_TEST_MODE === "true";
     const MINUTE = 60 * 1000;
-
-    if (scenario === "test_abandonment") {
-        if (isTestMode) {
-            // Test mode: 1 min, 2 min, 3 min
-            return stage * MINUTE;
-        }
-        // Production: 2 hours, 24 hours, 48 hours
-        switch (stage) {
-            case 1:
-                return 2 * HOUR;
-            case 2:
-                return 24 * HOUR;
-            case 3:
-                return 48 * HOUR;
-            default:
-                return 0;
-        }
-    }
 
     if (scenario === "teaser_viewer") {
         if (isTestMode) {
             // Test mode: immediate, 1min, 2min, 3min, etc.
             return stage === 1 ? 0 : stage * MINUTE;
         }
-        // Production timing
+
+        // New Mirror Strategy Timing:
+        // Stage 1: Immediate (0)
+        // Stage 2: 1 Hour
+        // Stage 3: Day 1 (24h)
+        // Stage 4: Day 2 (48h)
+        // Stage 5: Day 3 (72h)
+        // Stage 6: Day 4 (96h)
+        // Stage 7: Day 6 (144h) - Final "24h left" warning
         switch (stage) {
             case 1:
                 return 0; // Immediate
             case 2:
+                // 1 Hour after the first email/event
+                // Note: The job calculates delay from LAST email or updatedAt.
+                // If stage 1 is sent at T=0. Stage 2 requires 1 hour delay from T=0.
                 return 1 * HOUR;
             case 3:
-                return 3 * HOUR;
+                return 24 * HOUR; // Day 1
             case 4:
-                return 24 * HOUR; // Day 2
+                return 48 * HOUR; // Day 2
             case 5:
-                return 48 * HOUR; // Day 3
+                return 72 * HOUR; // Day 3
             case 6:
-                return 72 * HOUR; // Day 4
+                return 96 * HOUR; // Day 4
             case 7:
-                return 96 * HOUR; // Day 5
-            case 8:
-                return 120 * HOUR; // Day 6
-            case 9:
-                return 144 * HOUR; // Day 7
-            default:
-                return 0;
-        }
-    }
-
-    if (scenario === "checkout_abandonment") {
-        if (isTestMode) {
-            // Test mode: 1 min, 2 min, 3 min
-            return stage * MINUTE;
-        }
-        // Production: 15 minutes, 2 hours, 6 hours
-        switch (stage) {
-            case 1:
-                return 15 * MINUTE;
-            case 2:
-                return 2 * HOUR;
-            case 3:
-                return 6 * HOUR;
+                return 144 * HOUR; // Day 6
             default:
                 return 0;
         }

@@ -1,6 +1,6 @@
 
 import { type TestSession, type User } from "wasp/entities";
-import { type GetTestSessions, type GetSessionDetail, type GetFunnelStats, type GetDemographicStats, type GetEmailStats } from "wasp/server/operations";
+import { type GetTestSessions, type GetSessionDetail, type GetFunnelStats, type GetDemographicStats, type GetEmailStats, type GetAiLogs } from "wasp/server/operations";
 import { HttpError } from "wasp/server";
 
 // --- Types ---
@@ -258,4 +258,51 @@ export const getEmailStats: GetEmailStats<void, EmailStats> = async (_args, cont
     }
 
     return stats;
+};
+
+// --- AI Logs ---
+type GetAiLogsArgs = {
+    skip?: number;
+    take?: number;
+};
+type GetAiLogsResult = {
+    logs: any[];
+    totalCount: number;
+};
+
+export const getAiLogs: GetAiLogs<GetAiLogsArgs, GetAiLogsResult> = async (args, context) => {
+    if (!context.user?.isAdmin) throw new HttpError(401, "Unauthorized");
+    const { skip = 0, take = 50 } = args;
+
+    const [logs, totalCount] = await Promise.all([
+        context.entities.AiLog.findMany({
+            skip, take, orderBy: { createdAt: 'desc' }
+        }),
+        context.entities.AiLog.count()
+    ]);
+    return { logs, totalCount };
+};
+
+// --- Retrigger AI ---
+import { generateQuickOverview, generateFullReport } from "../server/ai";
+
+export const retriggerAiProcessing = async ({ sessionId }: { sessionId: string }, context: any) => {
+    if (!context.user?.isAdmin) throw new HttpError(401, "Unauthorized");
+
+    await context.entities.TestSession.update({
+        where: { id: sessionId },
+        data: {
+            executiveAnalysis: null, // We keep the field nulling for cleanup
+            quickOverview: null,
+            fullReport: null,
+        }
+    });
+
+    // Run in parallel
+    await Promise.all([
+        generateQuickOverview({ sessionId }, context),
+        generateFullReport({ sessionId }, context)
+    ]);
+
+    return { success: true };
 };

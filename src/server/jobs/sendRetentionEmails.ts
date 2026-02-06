@@ -3,15 +3,16 @@ import { sendRetentionEmail, getDelayForStage } from "../email/emailService";
 
 // Main job function that runs every 15 minutes
 export async function sendRetentionEmails(args: any, context: any) {
-    console.log("Running retention email job...");
+    console.log("Running retention email job (Mirror Strategy)...");
 
     try {
         // Find all sessions eligible for retention emails
+        // We only care about sessions that have an emailSequenceType (which should only be 'teaser_viewer' now)
         const sessions = await context.entities.TestSession.findMany({
             where: {
                 isPaid: false,
                 email: { not: null },
-                emailSequenceType: { not: null },
+                emailSequenceType: "teaser_viewer", // Filter directly in DB for efficiency
                 unsubscribedFromEmails: false,
                 isArchived: false,
             },
@@ -40,24 +41,8 @@ export async function sendRetentionEmails(args: any, context: any) {
                 let timeSinceLastEmail: number;
 
                 if (currentStage === 0) {
-                    // First email - check time since session creation or completion
-                    if (session.emailSequenceType === "teaser_viewer") {
-                        // For teaser viewers, send immediately after completion
-                        timeSinceLastEmail = now.getTime() - new Date(session.updatedAt).getTime();
-                    } else if (session.emailSequenceType === "test_abandonment") {
-                        // For test abandoners, wait 2 hours after last activity
-                        timeSinceLastEmail = now.getTime() - new Date(session.updatedAt).getTime();
-                    } else if (session.emailSequenceType === "checkout_abandonment") {
-                        // For checkout abandoners, wait 15 minutes after checkout started
-                        if (session.checkoutStartedAt) {
-                            timeSinceLastEmail =
-                                now.getTime() - new Date(session.checkoutStartedAt).getTime();
-                        } else {
-                            continue;
-                        }
-                    } else {
-                        continue;
-                    }
+                    // Start of sequence: check time since updatedAt (when they finished/updated the test)
+                    timeSinceLastEmail = now.getTime() - new Date(session.updatedAt).getTime();
                 } else {
                     // Subsequent emails - check time since last email sent
                     if (!session.lastRetentionEmailSentAt) {
@@ -67,12 +52,14 @@ export async function sendRetentionEmails(args: any, context: any) {
                         now.getTime() - new Date(session.lastRetentionEmailSentAt).getTime();
                 }
 
-                // Check if enough time has passed (with 2-hour tolerance window)
-                const TOLERANCE = 2 * 60 * 60 * 1000; // 2 hours
-                if (
-                    timeSinceLastEmail >= requiredDelay &&
-                    timeSinceLastEmail < requiredDelay + TOLERANCE
-                ) {
+                // Check if enough time has passed (with 2-hour tolerance window to prevent double sends if job lags, though updated status prevents it too)
+                // Actually tolerance isn't needed for prevention, it's just to say "if it's been ready for a while, send it"
+                // But we don't want to send if it's WAY too late? No, usually we do want to catch up.
+                // The original code had a tolerance, likely to avoid sending old emails? 
+                // Let's keep a reasonable check: if time >= requiredDelay, send it.
+                // The only risk is if the job runs every 15 mins, and requiredDelay is 1 hour.
+
+                if (timeSinceLastEmail >= requiredDelay) {
                     // Send email
                     const success = await sendRetentionEmail(session, nextStage, context);
                     if (success) {

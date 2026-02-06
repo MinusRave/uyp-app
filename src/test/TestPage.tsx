@@ -77,12 +77,7 @@ export default function TestPage() {
                     // Set Q index
                     const savedIndex = existingSession.currentQuestionIndex || 0;
                     if (savedIndex >= QUESTIONS.length) {
-                        if (existingSession.conflictDescription) {
-                            setShowConflictGate(false);
-                            setShowEmailGate(true);
-                        } else {
-                            setShowConflictGate(true);
-                        }
+                        setShowEmailGate(true);
                     } else {
                         setCurrentQIndex(savedIndex);
                     }
@@ -164,8 +159,8 @@ export default function TestPage() {
                 setCurrentQIndex(prev => prev + 1);
                 setSelectedAnswer(null);
             } else {
-                // Finished Questions -> Go to Conflict Gate
-                setShowConflictGate(true);
+                // Finished Questions -> Go STRAIGHT to Email Gate (Conflict Gate Removed)
+                setShowEmailGate(true);
             }
 
         } catch (e) {

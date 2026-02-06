@@ -100,6 +100,8 @@ app OpenSaaS {
   },
 }
 
+
+
 route LandingPageRoute { path: "/", to: LandingPage }
 page LandingPage {
   component: import LandingPage from "@src/landing-page/LandingPage"
@@ -167,11 +169,7 @@ page TeaserPage {
   component: import TeaserPage from "@src/results/TeaserPage"
 }
 
-// Placeholder for Report (implemented next)
-route ReportRoute { path: "/report", to: ReportPage }
-page ReportPage {
-  component: import ReportPage from "@src/results/FullReportPage"
-}
+
 
 route EmergencyRoute { path: "/emergency", to: EmergencyPage }
 page EmergencyPage {
@@ -225,10 +223,7 @@ query getTestSession {
   entities: [TestSession]
 }
 
-action generateExecutiveAnalysis {
-  fn: import { generateExecutiveAnalysis } from "@src/server/ai",
-  entities: [TestSession, User]
-}
+
 
 action updateConflictDescription {
   fn: import { updateConflictDescription } from "@src/test/operations",
@@ -240,10 +235,25 @@ action translateMessage {
   entities: [User, TestSession]
 }
 
+action generateFullReport {
+  fn: import { generateFullReport } from "@src/server/ai",
+  entities: [TestSession, AiLog]
+}
+
+action generateQuickOverview {
+  fn: import { generateQuickOverview } from "@src/server/ai",
+  entities: [TestSession, AiLog]
+}
+
 // Onboarding operations
 action updateOnboardingStep {
   fn: import { updateOnboardingStep } from "@src/results/onboardingOperations",
   entities: [TestSession]
+}
+
+action retriggerAiProcessing {
+  fn: import { retriggerAiProcessing } from "@src/admin/operations",
+  entities: [TestSession, User, AiLog]
 }
 
 action skipOnboarding {
@@ -526,3 +536,14 @@ query getEmailStats {
 }
 
 
+
+query getAiLogs {
+  fn: import { getAiLogs } from "@src/admin/operations",
+  entities: [AiLog]
+}
+
+route AdminAiLogsRoute { path: "/admin/ai", to: AdminAiLogsPage }
+page AdminAiLogsPage {
+  authRequired: true,
+  component: import AiLogsPage from "@src/admin/dashboards/ai/AiLogsPage"
+}

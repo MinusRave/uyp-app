@@ -229,6 +229,7 @@ type CompleteTestArgs = {
 };
 
 import { calculateScore } from "./scoring";
+import { calculateAdvancedMetrics } from "./calculateMetrics";
 
 export const completeTest: CompleteTest<CompleteTestArgs, void> = async (
     args,
@@ -266,17 +267,20 @@ export const completeTest: CompleteTest<CompleteTestArgs, void> = async (
         partnerConflictStyle: session.partnerConflictStyle,
         fightFrequency: session.fightFrequency,
         repairFrequency: session.repairFrequency,
-        partnerHurtfulBehavior: session.partnerHurtfulBehavior
+        partnerHurtfulBehavior: session.partnerHurtfulBehavior,
+        biggestFear: session.biggestFear
     };
 
     // Calculate detailed scores WITH user profile data
     const scoreResult = calculateScore(answersMap, userProfile);
+    const advancedMetrics = calculateAdvancedMetrics(answers, userProfile);
 
     await context.entities.TestSession.update({
         where: { id: sessionId },
         data: {
             isCompleted: true,
             scores: scoreResult as any,
+            advancedMetrics: advancedMetrics as any,
             // Set email sequence type for teaser viewers (if not already paid)
             emailSequenceType: !session.isPaid ? "teaser_viewer" : undefined,
         },

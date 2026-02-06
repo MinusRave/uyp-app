@@ -147,8 +147,8 @@ export const createCheckoutSession: CreateCheckoutSession<
         price_data: {
           currency: "usd",
           product_data: {
-            name: "Your Relationship MRI Report",
-            description: "Get answers: Why you fight, why they shut down, and exactly what to do next. 5-dimension analysis + emergency scripts.",
+            name: "Understand Your Partner - Full Analysis",
+            description: "Complete psychological profile, collision dynamics analysis, and personalized resolution roadmap.",
           },
           unit_amount: Math.round(reportPrice * 100),
         },
@@ -156,7 +156,7 @@ export const createCheckoutSession: CreateCheckoutSession<
       },
     ],
     mode: "payment",
-    success_url: `${config.frontendUrl}/report?success=true&session_id={CHECKOUT_SESSION_ID}`,
+    success_url: `${config.frontendUrl}/results?success=true&session_id={CHECKOUT_SESSION_ID}`,
     cancel_url: `${config.frontendUrl}/results?checkout_cancelled=true`,
     customer_email: customerEmail,
     metadata: {

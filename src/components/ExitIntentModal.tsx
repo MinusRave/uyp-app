@@ -1,6 +1,6 @@
 
 import React, { useEffect, useState } from 'react';
-import { X, Clock, AlertTriangle, ArrowRight, Loader2 } from 'lucide-react';
+import { X, AlertTriangle, ArrowRight, Loader2 } from 'lucide-react';
 
 interface ExitIntentModalProps {
     show: boolean;
@@ -26,10 +26,7 @@ const ExitIntentModal: React.FC<ExitIntentModalProps> = ({ show, onClose, onSave
         <div className="fixed inset-0 bg-black/70 backdrop-blur-sm z-[100] flex items-center justify-center p-4 animate-fade-in">
             <div className="bg-background rounded-2xl p-0 max-w-[500px] w-full relative shadow-2xl border-0 overflow-hidden">
                 {/* Header */}
-                <div className="bg-red-600 text-white p-4 text-center font-bold text-sm md:text-base flex items-center justify-center gap-2">
-                    <Clock size={16} />
-                    YOUR ANALYSIS EXPIRES IN 23 HOURS
-                </div>
+
 
                 <button
                     onClick={onClose}
