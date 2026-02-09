@@ -539,7 +539,7 @@ query getEmailStats {
 
 query getAiLogs {
   fn: import { getAiLogs } from "@src/admin/operations",
-  entities: [AiLog]
+  entities: [AiLog, TestSession]
 }
 
 route AdminAiLogsRoute { path: "/admin/ai", to: AdminAiLogsPage }

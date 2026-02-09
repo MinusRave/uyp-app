@@ -142,6 +142,57 @@ const SessionDetailPage = ({ user }: { user: AuthUser }) => {
                     </div>
                 )}
 
+                {/* Email History (SendGrid) */}
+                <div className="bg-white dark:bg-boxdark rounded-lg shadow-sm p-6 border border-gray-200 dark:border-strokedark">
+                    <h2 className="text-xl font-semibold mb-4 text-black dark:text-white">Email History (SendGrid)</h2>
+                    {(!session.emailSentHistory || (session.emailSentHistory as any[]).length === 0) ? (
+                        <p className="text-sm text-gray-500">No emails sent yet.</p>
+                    ) : (
+                        <div className="overflow-x-auto">
+                            <table className="w-full text-left border-collapse">
+                                <thead>
+                                    <tr className="border-b border-gray-200 dark:border-gray-700">
+                                        <th className="py-2 text-sm font-medium text-gray-500">Msg ID</th>
+                                        <th className="py-2 text-sm font-medium text-gray-500">Stage</th>
+                                        <th className="py-2 text-sm font-medium text-gray-500">Sent At</th>
+                                        <th className="py-2 text-sm font-medium text-gray-500">Opened</th>
+                                        <th className="py-2 text-sm font-medium text-gray-500">Clicked</th>
+                                        <th className="py-2 text-sm font-medium text-gray-500">Link</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {(session.emailSentHistory as any[]).map((email, idx) => (
+                                        <tr key={idx} className="border-b border-gray-100 dark:border-gray-800 last:border-0 hover:bg-gray-50 dark:hover:bg-meta-4">
+                                            <td className="py-3 text-sm text-black dark:text-white font-mono">{email.emailId || "-"}</td>
+                                            <td className="py-3 text-sm text-black dark:text-white">{email.stage}</td>
+                                            <td className="py-3 text-sm text-gray-600 dark:text-gray-400">
+                                                {email.sentAt ? new Date(email.sentAt).toLocaleString() : "-"}
+                                            </td>
+                                            <td className="py-3">
+                                                {email.opened ? (
+                                                    <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300">
+                                                        Opened {email.openedAt ? `(${new Date(email.openedAt).toLocaleTimeString()})` : ""}
+                                                    </span>
+                                                ) : <span className="text-gray-400 text-sm">-</span>}
+                                            </td>
+                                            <td className="py-3">
+                                                {email.clicked ? (
+                                                    <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-300">
+                                                        Clicked {email.clickedAt ? `(${new Date(email.clickedAt).toLocaleTimeString()})` : ""}
+                                                    </span>
+                                                ) : <span className="text-gray-400 text-sm">-</span>}
+                                            </td>
+                                            <td className="py-3 text-xs text-blue-500 truncate max-w-[200px]">
+                                                {email.clickedUrl || "-"}
+                                            </td>
+                                        </tr>
+                                    ))}
+                                </tbody>
+                            </table>
+                        </div>
+                    )}
+                </div>
+
                 {/* JSON Dump of Answers (Collapsible or just raw for now) */}
                 <div className="bg-white dark:bg-boxdark rounded-lg shadow-sm p-6 border border-gray-200 dark:border-strokedark">
                     <h2 className="text-xl font-semibold mb-4 text-black dark:text-white">Raw Answers Log</h2>

@@ -1,4 +1,4 @@
-# The Relationship MRI: Metrics Documentation
+# Metrics Documentation
 
 This document outlines the 12 "Advanced Vital Signs" calculated after the test usage. These metrics provide a dimensional health check of the relationship.
 

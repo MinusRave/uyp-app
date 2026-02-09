@@ -280,7 +280,38 @@ export const getAiLogs: GetAiLogs<GetAiLogsArgs, GetAiLogsResult> = async (args,
         }),
         context.entities.AiLog.count()
     ]);
-    return { logs, totalCount };
+
+    // Enrich logs with User/Session info
+    // Since AiLog.sessionId is loose (no relation), we fetch manually
+    const sessionIds = logs.map(l => l.sessionId).filter(Boolean) as string[];
+
+    let sessionMap: Record<string, any> = {};
+    if (sessionIds.length > 0) {
+        const sessions = await context.entities.TestSession.findMany({
+            where: { id: { in: sessionIds } },
+            select: {
+                id: true,
+                email: true,
+                user: { select: { email: true } }
+            }
+        });
+
+        sessions.forEach(s => {
+            sessionMap[s.id] = s;
+        });
+    }
+
+    const enrichedLogs = logs.map((log: any) => {
+        const session = log.sessionId ? sessionMap[log.sessionId] : null;
+        const userEmail = session?.user?.email || session?.email || null;
+
+        return {
+            ...log,
+            userEmail
+        };
+    });
+
+    return { logs: enrichedLogs, totalCount };
 };
 
 // --- Retrigger AI ---

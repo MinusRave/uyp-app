@@ -44,8 +44,10 @@ export default function AiLogsPage() {
                             <thead className="bg-slate-50 dark:bg-slate-800 text-slate-900 dark:text-white font-semibold border-b border-slate-200 dark:border-slate-700">
                                 <tr>
                                     <th className="p-4">Time</th>
+                                    <th className="p-4">User</th>
                                     <th className="p-4">Action</th>
                                     <th className="p-4">Model</th>
+                                    <th className="p-4 text-right">Cost</th>
                                     <th className="p-4">Duration</th>
                                     <th className="p-4">Status</th>
                                     <th className="p-4 text-right">Tokens</th>
@@ -58,7 +60,7 @@ export default function AiLogsPage() {
                                 ))}
                                 {logs.length === 0 && (
                                     <tr>
-                                        <td colSpan={6} className="p-8 text-center text-slate-400">No logs found.</td>
+                                        <td colSpan={9} className="p-8 text-center text-slate-400">No logs found.</td>
                                     </tr>
                                 )}
                             </tbody>
@@ -99,6 +101,9 @@ function LogRow({ log }: { log: any }) {
                 <td className="p-4 whitespace-nowrap text-xs text-slate-500">
                     {new Date(log.createdAt).toLocaleString()}
                 </td>
+                <td className="p-4 text-xs text-slate-700 dark:text-slate-300 max-w-[150px] truncate" title={log.userEmail}>
+                    {log.userEmail || '-'}
+                </td>
                 <td className="p-4 font-medium text-slate-900 dark:text-white">
                     {log.action}
                 </td>
@@ -106,6 +111,9 @@ function LogRow({ log }: { log: any }) {
                     <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-indigo-50 text-indigo-700 border border-indigo-100">
                         {log.model}
                     </span>
+                </td>
+                <td className="p-4 text-xs font-mono text-right text-emerald-600 font-medium">
+                    {log.cost !== null && log.cost !== undefined ? `$${log.cost.toFixed(4)}` : '-'}
                 </td>
                 <td className="p-4 text-xs font-mono">
                     {log.duration ? `${log.duration.toFixed(2)}s` : '-'}

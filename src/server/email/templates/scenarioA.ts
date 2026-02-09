@@ -19,7 +19,7 @@ We saved your answers so you don't have to start over.
 
 You were getting to the important part. The part effectively tells you why you keep having the same fight.
 
-Finish Your Test → ${process.env.WASP_WEB_CLIENT_URL}/test
+Finish Your Test → ${vars.app_url}/test
 
 It takes about 3 minutes from where you left off.
 
@@ -39,7 +39,7 @@ Unsubscribe: ${vars.unsubscribe_url}`;
       <p>You were getting to the important part. The part that effectively tells you <strong>why you keep having the same fight.</strong></p>
       
       <p style="text-align: center; margin: 30px 0;">
-        <a href="${process.env.WASP_WEB_CLIENT_URL}/test" class="button">
+        <a href="${vars.app_url}/test" class="button">
           Finish Your Test →
         </a>
       </p>
@@ -80,7 +80,7 @@ But you can't fix what you don't name.
 
 Name the problem. Break the loop.
 
-Continue Your Test → ${process.env.WASP_WEB_CLIENT_URL}/test
+Continue Your Test → ${vars.app_url}/test
 
 – The UYP Team
 
@@ -106,7 +106,7 @@ Unsubscribe: ${vars.unsubscribe_url}`;
       <p>Name the problem. Break the loop.</p>
       
       <p style="text-align: center; margin: 30px 0;">
-        <a href="${process.env.WASP_WEB_CLIENT_URL}/test" class="button">
+        <a href="${vars.app_url}/test" class="button">
           Continue Your Test →
         </a>
       </p>
@@ -139,7 +139,7 @@ Your answers are scheduled for deletion tomorrow.
 
 If you don't finish now, you'll have to start over from question #1.
 
-Finish Your Test (3 minutes) → ${process.env.WASP_WEB_CLIENT_URL}/test
+Finish Your Test (3 minutes) → ${vars.app_url}/test
 
 – The UYP Team
 
@@ -157,7 +157,7 @@ Unsubscribe: ${vars.unsubscribe_url}`;
       <p>If you don't finish now, you'll have to start over from question #1.</p>
       
       <p style="text-align: center; margin: 30px 0;">
-        <a href="${process.env.WASP_WEB_CLIENT_URL}/test" class="button">
+        <a href="${vars.app_url}/test" class="button">
           Finish Your Test (3 minutes) →
         </a>
       </p>

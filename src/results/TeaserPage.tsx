@@ -143,13 +143,22 @@ export default function TeaserPage() {
         }
     }, [session?.id, quickOverview, loadingQuick, fullReport, loadingFull]);
 
-    const handleUnlock = () => {
-        // Track Meta InitiateCheckout event
+    // Generate Event ID for consistent InitiateCheckout deduplication
+    const [checkoutEventID, setCheckoutEventID] = useState<string | null>(null);
+
+    const handleUnlock = async () => {
+        // Generate a fresh ID for this checkout attempt
+        const { generateEventId } = await import("../analytics/eventId");
+        const eventID = generateEventId();
+        setCheckoutEventID(eventID);
+
+        // Track Pixel Event with ID
         trackPixelEvent('InitiateCheckout', {
             content_name: 'Full Relationship Report',
             content_category: 'Report',
             value: 47,
-            currency: 'USD'
+            currency: 'USD',
+            eventID: eventID // Crucial for deduplication
         });
 
         // Show modal instead of going directly to Stripe
@@ -161,7 +170,12 @@ export default function TeaserPage() {
         setIsCheckoutLoading(true);
 
         try {
-            const checkout = await createCheckoutSession({ sessionId: session.id });
+            // Pass the generated eventID to the server for CAPI 
+            const checkout = await createCheckoutSession({
+                sessionId: session.id,
+                eventID: checkoutEventID || undefined
+            });
+
             if (checkout.sessionUrl) {
                 window.location.href = checkout.sessionUrl;
             }

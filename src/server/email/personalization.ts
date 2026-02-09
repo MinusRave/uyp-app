@@ -36,6 +36,8 @@ export interface PersonalizationVars {
 
     // NEW: Forecasts & Insights
     forecast_short_term_teaser: string;
+    // NEW: App URL for links
+    app_url: string;
 }
 
 // Likert scale mapping (1-5 to human-readable labels)
@@ -203,7 +205,8 @@ export function buildPersonalizationData(
         metric_betrayal_vulnerability,
         metric_compatibility_quotient,
         metric_ceo_vs_intern,
-        forecast_short_term_teaser
+        forecast_short_term_teaser,
+        app_url: appUrl
     };
 }
 

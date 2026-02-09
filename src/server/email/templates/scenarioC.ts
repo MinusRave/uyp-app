@@ -22,7 +22,7 @@ Inside, you'll find:
 
 Your session is still active.
 
-Unlock Your Report (~~$197~~ $29) → ${process.env.WASP_WEB_CLIENT_URL}/results
+Unlock Your Report (~~$197~~ $29) → ${vars.app_url}/results
 
 If you had a technical issue, just reply to this email.
 
@@ -47,7 +47,7 @@ Unsubscribe: ${vars.unsubscribe_url}`;
       <p>Your session is still active.</p>
       
       <p style="text-align: center; margin: 30px 0;">
-        <a href="${process.env.WASP_WEB_CLIENT_URL}/results" class="button">
+        <a href="${vars.app_url}/results" class="button">
           Unlock Your Report (<span style="text-decoration: line-through; opacity: 0.6;">$197</span> $29) →
         </a>
       </p>
@@ -90,7 +90,7 @@ Path B: Spend $29. Get the map. Change the pattern.
 
 It's up to you.
 
-Finish Your Purchase (~~$197~~ $29) → ${process.env.WASP_WEB_CLIENT_URL}/results
+Finish Your Purchase (~~$197~~ $29) → ${vars.app_url}/results
 
 – The UYP Team
 
@@ -120,7 +120,7 @@ Unsubscribe: ${vars.unsubscribe_url}`;
       <p>It's up to you.</p>
 
       <p style="text-align: center; margin: 30px 0;">
-        <a href="${process.env.WASP_WEB_CLIENT_URL}/results" class="button">
+        <a href="${vars.app_url}/results" class="button">
           Finish Your Purchase (<span style="text-decoration: line-through; opacity: 0.6;">$197</span> $29) →
         </a>
       </p>
@@ -155,7 +155,7 @@ If you want to understand your relationship pattern—and actually fix it—this
 
 Tomorrow, you'll have to start over.
 
-Unlock Your Results Now (~~$197~~ $29) → ${process.env.WASP_WEB_CLIENT_URL}/results
+Unlock Your Results Now (~~$197~~ $29) → ${vars.app_url}/results
 
 – The UYP Team
 
@@ -175,7 +175,7 @@ Unsubscribe: ${vars.unsubscribe_url}`;
       <p>Tomorrow, you'll have to start over.</p>
       
       <p style="text-align: center; margin: 30px 0;">
-        <a href="${process.env.WASP_WEB_CLIENT_URL}/results" class="button">
+        <a href="${vars.app_url}/results" class="button">
           Unlock Your Results Now (<span style="text-decoration: line-through; opacity: 0.6;">$197</span> $29) →
         </a>
       </p>

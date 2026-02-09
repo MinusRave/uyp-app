@@ -9,12 +9,19 @@ export default function CheckoutResultPage() {
   const navigate = useNavigate();
   const [urlSearchParams] = useSearchParams();
   const status = urlSearchParams.get("status");
+  const sessionId = urlSearchParams.get("session_id");
 
   useEffect(() => {
     if (status === "success") {
-      trackPixelEvent('Purchase', { value: parseFloat(import.meta.env.REACT_APP_REPORT_PRICE || "29.00"), currency: 'USD' });
+      // Use the Stripe Session ID as the EventID for deduplication
+      // This matches the backend logic in reportWebhook.ts
+      trackPixelEvent('Purchase', {
+        value: parseFloat(import.meta.env.REACT_APP_REPORT_PRICE || "29.00"),
+        currency: 'USD',
+        eventID: sessionId || undefined
+      });
     }
-  }, [status]);
+  }, [status, sessionId]);
 
   useEffect(() => {
     const accountPageRedirectTimeoutId = setTimeout(() => {

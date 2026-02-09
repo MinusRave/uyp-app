@@ -25,7 +25,7 @@ ${getLensSpecificTip(vars.dominant_lens)}
 
 Your report is full of these tiny adjustments. They take seconds, but they change everything.
 
-Get The Full Toolkit (~~$197~~ $29) → ${process.env.WASP_WEB_CLIENT_URL}/results
+Get The Full Toolkit (~~$197~~ $29) → ${vars.app_url}/results
 
 – The UYP Team
 
@@ -51,7 +51,7 @@ Unsubscribe: ${vars.unsubscribe_url}`;
   <p>Your report is full of these tiny adjustments. They take seconds, but they change everything.</p>
 
   <p style="text-align: center; margin: 30px 0;">
-    <a href="${process.env.WASP_WEB_CLIENT_URL}/results" class="button">
+    <a href="${vars.app_url}/results" class="button">
       Get The Full Toolkit (<span style="text-decoration: line-through; opacity: 0.6;">$197</span> $29) →
     </a>
   </p>
@@ -102,7 +102,7 @@ You've waited long enough. The groove is getting deep.
 
 Your report is the steering wheel.
 
-Turn the wheel today (~~$197~~ $29) → ${process.env.WASP_WEB_CLIENT_URL}/results
+Turn the wheel today (~~$197~~ $29) → ${vars.app_url}/results
 
 – The UYP Team
 
@@ -129,7 +129,7 @@ Unsubscribe: ${vars.unsubscribe_url}`;
   <p>Your report is the steering wheel.</p>
 
   <p style="text-align: center; margin: 30px 0;">
-    <a href="${process.env.WASP_WEB_CLIENT_URL}/results" class="button">
+    <a href="${vars.app_url}/results" class="button">
       Turn the wheel today (<span style="text-decoration: line-through; opacity: 0.6;">$197</span> $29) →
     </a>
   </p>
@@ -166,7 +166,7 @@ Here's what you get for $29 (normally $197):
 - Scripts to stop the fights
 - Your personal relationship manual
 
-Unlock Your Report (~~$197~~ $29) → ${process.env.WASP_WEB_CLIENT_URL}/results
+Unlock Your Report (~~$197~~ $29) → ${vars.app_url}/results
 
 Don't let this slip away.
 
@@ -193,7 +193,7 @@ Unsubscribe: ${vars.unsubscribe_url}`;
   </ul>
 
   <p style="text-align: center; margin: 30px 0;">
-    <a href="${process.env.WASP_WEB_CLIENT_URL}/results" class="button">
+    <a href="${vars.app_url}/results" class="button">
       Unlock Your Report (<span style="text-decoration: line-through; opacity: 0.6;">$197</span> $29) →
     </a>
   </p>

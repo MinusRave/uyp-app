@@ -122,9 +122,17 @@ export type UserProfile = {
 };
 
 // Update startTest signature
-// args: UserProfile & { fbclid?: string } | void
+// args: UserProfile & { fbclid?: string, utm_source?: string, utm_medium?: string, utm_campaign?: string, utm_content?: string, utm_term?: string, referrer?: string } | void
 
-export const startTest: StartTest<UserProfile & { fbclid?: string } | void, TestSession> = async (args, context) => {
+export const startTest: StartTest<UserProfile & {
+    fbclid?: string;
+    utm_source?: string;
+    utm_medium?: string;
+    utm_campaign?: string;
+    utm_content?: string;
+    utm_term?: string;
+    referrer?: string;
+} | void, TestSession> = async (args, context) => {
     // Create a new test session with profile data
     const session = await context.entities.TestSession.create({
         data: {
@@ -151,6 +159,13 @@ export const startTest: StartTest<UserProfile & { fbclid?: string } | void, Test
             partnerHurtfulBehavior: args?.partnerHurtfulBehavior,
             // Meta Attribution
             fbclid: args?.fbclid,
+            // UTMs & Referrer
+            utm_source: args?.utm_source,
+            utm_medium: args?.utm_medium,
+            utm_campaign: args?.utm_campaign,
+            utm_content: args?.utm_content,
+            utm_term: args?.utm_term,
+            referrer: args?.referrer,
         },
     });
 

@@ -85,6 +85,7 @@ const SessionsPage = ({ user }: { user: AuthUser }) => {
                                 <tr className="bg-gray-2 text-left dark:bg-meta-4 text-sm uppercase font-bold text-muted-foreground">
                                     <th className="py-4 px-4 min-w-[120px]">Date</th>
                                     <th className="py-4 px-4 min-w-[200px]">User / Source</th>
+                                    <th className="py-4 px-4 min-w-[150px]">Max Meta Event</th>
                                     <th className="py-4 px-4 min-w-[180px]">Demographics</th>
                                     <th className="py-4 px-4 min-w-[200px]">State & Progress</th>
                                     <th className="py-4 px-4 min-w-[140px]">Mailing</th>
@@ -95,7 +96,7 @@ const SessionsPage = ({ user }: { user: AuthUser }) => {
                             <tbody>
                                 {isLoading && (
                                     <tr>
-                                        <td colSpan={7} className="py-10 text-center">
+                                        <td colSpan={8} className="py-10 text-center">
                                             <div className="flex justify-center items-center gap-2">
                                                 <Loader2 className="animate-spin h-5 w-5" /> Loading...
                                             </div>
@@ -124,6 +125,11 @@ const SessionsPage = ({ user }: { user: AuthUser }) => {
                                                 )}
                                                 {session.user?.username && <span className="text-xs text-gray-400">@{session.user.username}</span>}
                                             </div>
+                                        </td>
+
+                                        {/* MAX META EVENT */}
+                                        <td className="py-4 px-4">
+                                            <MaxMetaEventBadge session={session} />
                                         </td>
 
                                         {/* DEMOGRAPHICS */}
@@ -299,6 +305,43 @@ const EmailHistoryBadge = ({ session }: { session: any }) => {
                 ))}
             </div>
         </div>
+    );
+};
+
+const MaxMetaEventBadge = ({ session }: { session: any }) => {
+    // Priority Order: Purchase > InitiateCheckout > Lead > ViewContent
+
+    if (session.isPaid) {
+        return (
+            <span className="inline-flex items-center gap-1 rounded-md bg-green-50 text-green-700 py-0.5 px-2.5 text-xs font-bold border border-green-200">
+                PURCHASE
+            </span>
+        );
+    }
+
+    // Check if checkout was started (even if not paid)
+    if (session.checkoutStartedAt) {
+        return (
+            <span className="inline-flex items-center gap-1 rounded-md bg-orange-50 text-orange-700 py-0.5 px-2.5 text-xs font-bold border border-orange-200">
+                INITIATE CHECKOUT
+            </span>
+        );
+    }
+
+    // Check if email was captured
+    if (session.email) {
+        return (
+            <span className="inline-flex items-center gap-1 rounded-md bg-blue-50 text-blue-700 py-0.5 px-2.5 text-xs font-bold border border-blue-200">
+                LEAD
+            </span>
+        );
+    }
+
+    // Default fallback
+    return (
+        <span className="inline-flex items-center gap-1 rounded-md bg-gray-50 text-gray-500 py-0.5 px-2.5 text-[10px] font-bold border border-gray-200">
+            VIEW CONTENT
+        </span>
     );
 };
 

@@ -98,11 +98,15 @@ export default function TestPage() {
                 isCreatingSession.current = true;
 
                 try {
-                    // Get fbclid from local storage if available
-                    const { getFbclid } = await import("../analytics/utils");
+                    // Get fbclid and UTMs from local storage if available
+                    const { getFbclid, getUtmParams } = await import("../analytics/utils");
                     const fbclid = getFbclid();
+                    const utms = getUtmParams();
 
-                    const newSession = await startTest({ fbclid: fbclid || undefined } as any);
+                    const newSession = await startTest({
+                        fbclid: fbclid || undefined,
+                        ...utms
+                    } as any);
                     setSessionId(newSession.id);
                     localStorage.setItem("uyp-session-id", newSession.id);
                     setShowProfileForm(true);

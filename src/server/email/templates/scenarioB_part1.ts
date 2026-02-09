@@ -36,7 +36,7 @@ Remember the blurred section on your report? Here's what's inside:
 
 This isn't therapy. It's a map of what's actually happening when you fight.
 
-Unlock Your Report (~~$197~~ $29) → ${process.env.WASP_WEB_CLIENT_URL}/results
+Unlock Your Report (~~$197~~ $29) → ${vars.app_url}/results
 
 – The UYP Team
 
@@ -71,7 +71,7 @@ Unsubscribe: ${vars.unsubscribe_url}`;
       <p>This isn't therapy. It's a map of what's actually happening when you fight.</p>
       
       <p style="text-align: center; margin: 30px 0;">
-        <a href="${process.env.WASP_WEB_CLIENT_URL}/results" class="button">
+        <a href="${vars.app_url}/results" class="button">
           Unlock Your Report (<span style="text-decoration: line-through; opacity: 0.6;">$197</span> $29) →
         </a>
       </p>
@@ -113,7 +113,7 @@ That's the loop.
 
 Your report shows you exactly how to break it.
 
-See Your Full Report (~~$197~~ $29) → ${process.env.WASP_WEB_CLIENT_URL}/results
+See Your Full Report (~~$197~~ $29) → ${vars.app_url}/results
 
 This isn't a personality quiz. It's a map of what's actually happening.
 
@@ -146,7 +146,7 @@ Unsubscribe: ${vars.unsubscribe_url}`;
       <p>Your report shows you exactly how to break it.</p>
       
       <p style="text-align: center; margin: 30px 0;">
-        <a href="${process.env.WASP_WEB_CLIENT_URL}/results" class="button">
+        <a href="${vars.app_url}/results" class="button">
           See Your Full Report (<span style="text-decoration: line-through; opacity: 0.6;">$197</span> $29) →
         </a>
       </p>
@@ -212,7 +212,7 @@ Your full report gives you that script.
 
 People pay $200/hour for couples therapy to learn this. You can get it for $29 (normally $197).
 
-Unlock Your Report → ${process.env.WASP_WEB_CLIENT_URL}/results
+Unlock Your Report → ${vars.app_url}/results
 
 – The UYP Team
 
@@ -243,7 +243,7 @@ Unsubscribe: ${vars.unsubscribe_url}`;
       </div>
       
       <p style="text-align: center; margin: 30px 0;">
-        <a href="${process.env.WASP_WEB_CLIENT_URL}/results" class="button">
+        <a href="${vars.app_url}/results" class="button">
           Unlock Your Report →
         </a>
       </p>

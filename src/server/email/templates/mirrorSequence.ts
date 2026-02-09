@@ -6,10 +6,15 @@ import { wrapHtml } from "../emailLayout";
 // Trigger: 5 min after completion
 // Goal: Validation. "We see the pattern you can't see."
 // ==========================================
+// ==========================================
+// EMAIL 1: THE COLD TRUTH (Immediate)
+// Trigger: 5 min after completion
+// Goal: Validation. "We see the pattern you can't see."
+// ==========================================
 export function getMirror1_ColdTruth(vars: PersonalizationVars) {
-    const subject = `Analysis Result: ${vars.quick_overview_headline}`;
+  const subject = `Analysis Result: ${vars.quick_overview_headline}`;
 
-    const text = `
+  const text = `
 You just finished the assessment. That wasn't easy.
 
 Your result badge is: [ ${vars.quick_overview_result_badge} ]
@@ -19,15 +24,15 @@ You told us: "${vars.pulse_summary}"
 
 Right now, you are too close to the problem to see the pattern. We are the mirror.
 
-See The Pattern: ${process.env.WASP_WEB_CLIENT_URL}/results
+See The Pattern: ${vars.app_url}/results
 
 – The UYP Team
 
 Unsubscribe: ${vars.unsubscribe_url}
   `;
 
-    // HTML Content
-    const contentHtml = `
+  // HTML Content
+  const contentHtml = `
       <p>You just finished the assessment. That wasn't easy.</p>
       
       <p>Your result badge is:</p>
@@ -48,7 +53,7 @@ Unsubscribe: ${vars.unsubscribe_url}
       <p>Right now, you are too close to the problem to see the pattern. We are the mirror.</p>
       
       <p style="text-align: center; margin: 40px 0;">
-        <a href="${process.env.WASP_WEB_CLIENT_URL}/results" class="button">
+        <a href="${vars.app_url}/results" class="button">
           See The Pattern →
         </a>
       </p>
@@ -60,7 +65,7 @@ Unsubscribe: ${vars.unsubscribe_url}
       </div>
   `;
 
-    return { subject, html: wrapHtml(contentHtml, subject), text };
+  return { subject, html: wrapHtml(contentHtml, subject), text };
 }
 
 // ==========================================
@@ -69,9 +74,9 @@ Unsubscribe: ${vars.unsubscribe_url}
 // Goal: The Hook. Specific Metric.
 // ==========================================
 export function getMirror2_VitalSign(vars: PersonalizationVars) {
-    const subject = `It’s not "communication issues" (It’s this score)`;
+  const subject = `It’s not "communication issues" (It’s this score)`;
 
-    const text = `
+  const text = `
 "We have communication issues."
 
 Everyone says that. It's too vague to fix.
@@ -84,14 +89,14 @@ The good news? High-efficiency repair is a skill, not a personality trait. Coupl
 
 We listed them in Chapter 2 of your report.
 
-Read Chapter 2: The Communication Loop: ${process.env.WASP_WEB_CLIENT_URL}/results
+Read Chapter 2: The Communication Loop: ${vars.app_url}/results
 
 – The UYP Team
 
 Unsubscribe: ${vars.unsubscribe_url}
   `;
 
-    const contentHtml = `
+  const contentHtml = `
       <p><strong>"We have communication issues."</strong></p>
       
       <p>Everyone says that. It's too vague to fix.</p>
@@ -109,7 +114,7 @@ Unsubscribe: ${vars.unsubscribe_url}
       <p>We listed them in Chapter 2 of your report.</p>
       
       <p style="text-align: center; margin: 40px 0;">
-        <a href="${process.env.WASP_WEB_CLIENT_URL}/results" class="button">
+        <a href="${vars.app_url}/results" class="button">
           Read Chapter 2: The Communication Loop →
         </a>
       </p>
@@ -121,7 +126,7 @@ Unsubscribe: ${vars.unsubscribe_url}
       </div>
   `;
 
-    return { subject, html: wrapHtml(contentHtml, subject), text };
+  return { subject, html: wrapHtml(contentHtml, subject), text };
 }
 
 // ==========================================
@@ -130,9 +135,9 @@ Unsubscribe: ${vars.unsubscribe_url}
 // Goal: Rational Fear. Crystal Ball.
 // ==========================================
 export function getMirror3_Forecast(vars: PersonalizationVars) {
-    const subject = `A 5-year forecast for your relationship`;
+  const subject = `A 5-year forecast for your relationship`;
 
-    const text = `
+  const text = `
 In relationships, "drifting apart" isn't an accident. It's a mathematical trajectory.
 
 We calculated your Sustainability Score at ${vars.metric_sustainability_score}%.
@@ -144,14 +149,14 @@ If you change nothing today, here is the AI model's prediction for your relation
 It's hard to read. But it's harder to live through.
 The turn-by-turn roadmap to change this trajectory is waiting for you.
 
-Change The Trajectory: ${process.env.WASP_WEB_CLIENT_URL}/results
+Change The Trajectory: ${vars.app_url}/results
 
 – The UYP Team
 
 Unsubscribe: ${vars.unsubscribe_url}
   `;
 
-    const contentHtml = `
+  const contentHtml = `
       <p>In relationships, "drifting apart" isn't an accident. It's a mathematical trajectory.</p>
       
       <p>We calculated your <strong>Sustainability Score</strong> at <strong>${vars.metric_sustainability_score}%</strong>.</p>
@@ -166,7 +171,7 @@ Unsubscribe: ${vars.unsubscribe_url}
       <p>The turn-by-turn roadmap to change this trajectory is waiting for you.</p>
       
       <p style="text-align: center; margin: 40px 0;">
-        <a href="${process.env.WASP_WEB_CLIENT_URL}/results" class="button">
+        <a href="${vars.app_url}/results" class="button">
           Change The Trajectory →
         </a>
       </p>
@@ -178,7 +183,7 @@ Unsubscribe: ${vars.unsubscribe_url}
       </div>
   `;
 
-    return { subject, html: wrapHtml(contentHtml, subject), text };
+  return { subject, html: wrapHtml(contentHtml, subject), text };
 }
 
 // ==========================================
@@ -187,9 +192,9 @@ Unsubscribe: ${vars.unsubscribe_url}
 // Goal: The dynamic. Manager vs Partner.
 // ==========================================
 export function getMirror4_Manager(vars: PersonalizationVars) {
-    const subject = `Why you feel more like a manager than a partner`;
+  const subject = `Why you feel more like a manager than a partner`;
 
-    const text = `
+  const text = `
 You act like a Manager because you're afraid if you stop, everything will collapse.
 
 Your data proves it:
@@ -201,14 +206,14 @@ This imbalance is the #1 killer of intimacy (your Erotic Potential is ${vars.met
 
 Chapter 5 isn't advice. It's a resignation letter for your role as "The Manager".
 
-Quit The Manager Role: ${process.env.WASP_WEB_CLIENT_URL}/results
+Quit The Manager Role: ${vars.app_url}/results
 
 – The UYP Team
 
 Unsubscribe: ${vars.unsubscribe_url}
   `;
 
-    const contentHtml = `
+  const contentHtml = `
       <p>You act like a "Manager" because you're afraid if you stop, everything will collapse.</p>
       
       <p>Your data proves it:</p>
@@ -224,7 +229,7 @@ Unsubscribe: ${vars.unsubscribe_url}
       <p>Chapter 5 isn't advice. It's a resignation letter for your role as "The Manager".</p>
       
       <p style="text-align: center; margin: 40px 0;">
-        <a href="${process.env.WASP_WEB_CLIENT_URL}/results" class="button">
+        <a href="${vars.app_url}/results" class="button">
           Quit The Manager Role →
         </a>
       </p>
@@ -236,7 +241,7 @@ Unsubscribe: ${vars.unsubscribe_url}
       </div>
   `;
 
-    return { subject, html: wrapHtml(contentHtml, subject), text };
+  return { subject, html: wrapHtml(contentHtml, subject), text };
 }
 
 // ==========================================
@@ -245,9 +250,9 @@ Unsubscribe: ${vars.unsubscribe_url}
 // Goal: Pivot from pain to potential.
 // ==========================================
 export function getMirror5_Hope(vars: PersonalizationVars) {
-    const subject = `You are actually compatible (Data proof)`;
+  const subject = `You are actually compatible (Data proof)`;
 
-    const text = `
+  const text = `
 I want to show you one number that should give you hope.
 
 Compatibility Quotient: ${vars.metric_compatibility_quotient}%
@@ -258,14 +263,14 @@ Many couples break up because they are incompatible. You are at risk of breaking
 
 Don't throw away a high-compatibility match because of a fixable mechanical error.
 
-Calibrate The Relationship: ${process.env.WASP_WEB_CLIENT_URL}/results
+Calibrate The Relationship: ${vars.app_url}/results
 
 – The UYP Team
 
 Unsubscribe: ${vars.unsubscribe_url}
   `;
 
-    const contentHtml = `
+  const contentHtml = `
       <p>I want to show you one number that should give you hope.</p>
       
       <div style="background-color: #ECFDF5; border-left: 4px solid #10B981; padding: 20px; margin: 24px 0;">
@@ -279,7 +284,7 @@ Unsubscribe: ${vars.unsubscribe_url}
       <p>Don't throw away a high-compatibility match because of a fixable mechanical error.</p>
       
       <p style="text-align: center; margin: 40px 0;">
-        <a href="${process.env.WASP_WEB_CLIENT_URL}/results" class="button">
+        <a href="${vars.app_url}/results" class="button">
           Calibrate The Relationship →
         </a>
       </p>
@@ -291,7 +296,7 @@ Unsubscribe: ${vars.unsubscribe_url}
       </div>
   `;
 
-    return { subject, html: wrapHtml(contentHtml, subject), text };
+  return { subject, html: wrapHtml(contentHtml, subject), text };
 }
 
 // ==========================================
@@ -300,9 +305,9 @@ Unsubscribe: ${vars.unsubscribe_url}
 // Goal: Logic. Remove shame.
 // ==========================================
 export function getMirror6_Loop(vars: PersonalizationVars) {
-    const subject = `It’s a loop, not a flaw`;
+  const subject = `It’s a loop, not a flaw`;
 
-    const text = `
+  const text = `
 You've probably tried talking. You've probably tried "trying harder."
 
 The reason it failed isn't because you didn't try enough. It's because you are stuck in a Feedback Loop.
@@ -316,34 +321,23 @@ Reaction C (The Shutdown)
 Your report doesn't judge you. It maps the loop.
 Once you see the map, you can stop walking in the circle.
 
-See The Map: ${process.env.WASP_WEB_CLIENT_URL}/results
+See The Map: ${vars.app_url}/results
 
 – The UYP Team
 
 Unsubscribe: ${vars.unsubscribe_url}
   `;
 
-    const contentHtml = `
+  const contentHtml = `
       <p>You've probably tried talking. You've probably tried "trying harder."</p>
       
       <p>The reason it failed isn't because you didn't try enough. It's because you are stuck in a <strong>Feedback Loop</strong>.</p>
-      
-      <div style="text-align: center; background: #F8FAFC; padding: 30px; border-radius: 12px; margin: 30px 0;">
-        <p style="color: #0F172A; font-weight: bold; margin-bottom: 5px;">Trigger A</p>
-        <p style="color: #64748B; font-size: 14px;">(The Silence)</p>
-        <p style="font-size: 24px; color: #94A3B8; margin: 5px 0;">↓</p>
-        <p style="color: #0F172A; font-weight: bold; margin-bottom: 5px;">Reaction B</p>
-        <p style="color: #64748B; font-size: 14px;">(The Panic)</p>
-        <p style="font-size: 24px; color: #94A3B8; margin: 5px 0;">↓</p>
-        <p style="color: #0F172A; font-weight: bold; margin-bottom: 5px;">Reaction C</p>
-        <p style="color: #64748B; font-size: 14px;">(The Shutdown)</p>
-      </div>
       
       <p>Your report doesn't judge you. It maps the loop.</p>
       <p>Once you see the map, you can stop walking in the circle.</p>
       
       <p style="text-align: center; margin: 40px 0;">
-        <a href="${process.env.WASP_WEB_CLIENT_URL}/results" class="button">
+        <a href="${vars.app_url}/results" class="button">
           See The Map →
         </a>
       </p>
@@ -355,7 +349,7 @@ Unsubscribe: ${vars.unsubscribe_url}
       </div>
   `;
 
-    return { subject, html: wrapHtml(contentHtml, subject), text };
+  return { subject, html: wrapHtml(contentHtml, subject), text };
 }
 
 // ==========================================
@@ -364,9 +358,9 @@ Unsubscribe: ${vars.unsubscribe_url}
 // Goal: Privacy Scarcity.
 // ==========================================
 export function getMirror7_Archive(vars: PersonalizationVars) {
-    const subject = `Protecting your data (Deletion Warning)`;
+  const subject = `Protecting your data (Deletion Warning)`;
 
-    const text = `
+  const text = `
 We handle sensitive psychological profiles, and we take privacy seriously.
 
 We do not keep detailed user reports on our active servers indefinitely.
@@ -376,14 +370,14 @@ If you don't unlock it, the data will be lost. You will have to retake the test 
 
 This is the owner's manual for your relationship. Don't let it be deleted.
 
-Secure My Report: ${process.env.WASP_WEB_CLIENT_URL}/results
+Secure My Report: ${vars.app_url}/results
 
 – The UYP Team
 
 Unsubscribe: ${vars.unsubscribe_url}
   `;
 
-    const contentHtml = `
+  const contentHtml = `
       <p>We handle sensitive psychological profiles, and we take privacy seriously.</p>
       
       <div style="background-color: #FEF2F2; border: 1px solid #FCA5A5; padding: 20px; border-radius: 8px; margin: 24px 0;">
@@ -396,7 +390,7 @@ Unsubscribe: ${vars.unsubscribe_url}
       <p>This is the owner's manual for your relationship. Don't let it be deleted.</p>
       
       <p style="text-align: center; margin: 40px 0;">
-        <a href="${process.env.WASP_WEB_CLIENT_URL}/results" class="button">
+        <a href="${vars.app_url}/results" class="button">
           Secure My Report →
         </a>
       </p>
@@ -408,5 +402,5 @@ Unsubscribe: ${vars.unsubscribe_url}
       </div>
   `;
 
-    return { subject, html: wrapHtml(contentHtml, subject), text };
+  return { subject, html: wrapHtml(contentHtml, subject), text };
 }

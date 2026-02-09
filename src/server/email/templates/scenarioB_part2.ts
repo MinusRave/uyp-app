@@ -25,7 +25,7 @@ You're drawn to people who trigger this specific thing because it feels "familia
 
 Your report explains this—and how to break it.
 
-Unlock The Answer (~~$197~~ $29) → ${process.env.WASP_WEB_CLIENT_URL}/results
+Unlock The Answer (~~$197~~ $29) → ${vars.app_url}/results
 
 We've already done the work. You just need to see it.
 
@@ -49,7 +49,7 @@ Unsubscribe: ${vars.unsubscribe_url}`;
       <p>Your report explains this—and how to break it.</p>
       
       <p style="text-align: center; margin: 30px 0;">
-        <a href="${process.env.WASP_WEB_CLIENT_URL}/results" class="button">
+        <a href="${vars.app_url}/results" class="button">
           Unlock The Answer (<span style="text-decoration: line-through; opacity: 0.6;">$197</span> $29) →
         </a>
       </p>
@@ -92,7 +92,7 @@ In your report, there's a section called "The Resentment Meter." It shows you ex
 
 Stop working so hard. Start being real.
 
-Get Your Report (~~$197~~ $29) → ${process.env.WASP_WEB_CLIENT_URL}/results
+Get Your Report (~~$197~~ $29) → ${vars.app_url}/results
 
 – The UYP Team
 
@@ -120,7 +120,7 @@ Unsubscribe: ${vars.unsubscribe_url}`;
       <p>Stop working so hard. Start being real.</p>
       
       <p style="text-align: center; margin: 30px 0;">
-        <a href="${process.env.WASP_WEB_CLIENT_URL}/results" class="button">
+        <a href="${vars.app_url}/results" class="button">
           Get Your Report (<span style="text-decoration: line-through; opacity: 0.6;">$197</span> $29) →
         </a>
       </p>
@@ -165,7 +165,7 @@ Your report translates their silence into English. And it translates your need i
 
 Stop guessing. Start understanding.
 
-Get The Translator (~~$197~~ $29) → ${process.env.WASP_WEB_CLIENT_URL}/results
+Get The Translator (~~$197~~ $29) → ${vars.app_url}/results
 
 – The UYP Team
 
@@ -199,7 +199,7 @@ Unsubscribe: ${vars.unsubscribe_url}`;
       <p><strong>Stop guessing. Start understanding.</strong></p>
       
       <p style="text-align: center; margin: 30px 0;">
-        <a href="${process.env.WASP_WEB_CLIENT_URL}/results" class="button">
+        <a href="${vars.app_url}/results" class="button">
           Get The Translator (<span style="text-decoration: line-through; opacity: 0.6;">$197</span> $29) →
         </a>
       </p>

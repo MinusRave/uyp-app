@@ -78,6 +78,14 @@ model TestSession {
   fbp                  String?
   fbc                  String?
   fbclid               String? // Captured from URL query param
+  
+  // Traffic Attribution (UTMs)
+  utm_source           String?
+  utm_medium           String?
+  utm_campaign         String?
+  utm_content          String?
+  utm_term             String?
+  referrer             String? // document.referrer on first load
 
   // Onboarding tracking
   onboardingCompleted    Boolean   @default(false)
