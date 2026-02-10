@@ -275,6 +275,7 @@ type CompleteTestArgs = {
 
 import { calculateScore } from "./scoring";
 import { calculateAdvancedMetrics } from "./calculateMetrics";
+import { assessNarcissism } from "../server/narcissism";
 
 export const completeTest: CompleteTest<CompleteTestArgs, void> = async (
     args,
@@ -326,9 +327,14 @@ export const completeTest: CompleteTest<CompleteTestArgs, void> = async (
             isCompleted: true,
             scores: scoreResult as any,
             advancedMetrics: advancedMetrics as any,
-            // Set email sequence type for teaser viewers (if not already paid)
             emailSequenceType: !session.isPaid ? "teaser_viewer" : undefined,
         },
+    });
+
+    // TRIGGER AI ANALYSIS IN BACKGROUND (non-blocking)
+    // Fire-and-forget: don't await, let it run asynchronously
+    Promise.resolve(assessNarcissism({ sessionId }, context)).catch((e) => {
+        console.error("Failed to trigger Narcissism Assessment:", e);
     });
 };
 

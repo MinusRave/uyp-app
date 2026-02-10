@@ -7,6 +7,7 @@ import GaugeChart from "../components/GaugeChart";
 import Confetti from "react-confetti";
 import { CheckoutModal } from './CheckoutModal';
 import { trackPixelEvent } from '../analytics/pixel';
+import { NarcissismSection } from "./sections/NarcissismSection";
 
 
 // --- TYPES (Mirroring AI Output) ---
@@ -112,7 +113,6 @@ export default function TeaserPage() {
     // 3. Trigger AI Calls on Load
     useEffect(() => {
 
-
         if (!session || !session.id) return;
 
         // Quick Overview (Fast Model)
@@ -148,7 +148,7 @@ export default function TeaserPage() {
                 .catch((err: any) => console.error("Full Report Error", err))
                 .finally(() => setLoadingFull(false));
         }
-    }, [session?.id, quickOverview, loadingQuick, fullReport, loadingFull]);
+    }, [session?.id]); // FIXED: Only depend on session.id to prevent infinite loops
 
     // Generate Event ID for consistent InitiateCheckout deduplication
     const [checkoutEventID, setCheckoutEventID] = useState<string | null>(null);
@@ -390,6 +390,13 @@ export default function TeaserPage() {
                         )}
                     </div>
                 </section>
+
+                {/* 3.5 NARCISSISM / TOXICITY ANALYSIS (NEW) */}
+                <NarcissismSection
+                    analysis={session.narcissismAnalysis as any}
+                    isPaid={isPaid}
+                    onUnlock={handleUnlock}
+                />
 
                 {/* 4. DIMENSION BREAKDOWN (DEEP DIVE) */}
                 <div className="space-y-6">

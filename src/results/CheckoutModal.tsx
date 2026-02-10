@@ -42,6 +42,8 @@ export function CheckoutModal({ isOpen, onClose, onCheckout, isLoading = false }
                         <h3 className="font-bold text-slate-900 dark:text-white text-xs md:text-base">Here's what you'll get instantly:</h3>
                         <ul className="space-y-1 md:space-y-2">
                             {[
+                                '🚩 Toxicity Analysis (gaslighting & narcissism)',
+                                '📈 5-Year Relationship Forecast',
                                 'All 5 Core Dimensions (deep dive analysis)',
                                 'Connecting the Dots (why problems repeat)',
                                 '30-Day Action Plan (exact steps)',

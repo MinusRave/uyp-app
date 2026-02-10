@@ -7,7 +7,7 @@ import { cn } from "../client/utils";
 import { trackPixelEvent } from "../analytics/pixel";
 import { generateEventId } from "../analytics/eventId";
 import { getDeviceInfo } from "../client/utils/deviceDetection";
-import { useSessionTracking } from "../client/hooks/useSessionTracking";
+// import { useSessionTracking } from "../client/hooks/useSessionTracking"; // DISABLED - causing excessive DB writes
 
 // --- Data: Questions ---
 // Imported from config
@@ -40,7 +40,9 @@ export default function TestPage() {
     const [conflictText, setConflictText] = useState("");
     const [showConflictGate, setShowConflictGate] = useState(false);
 
-    // Session tracking - send updates every 30 seconds
+    // Session tracking - DISABLED due to excessive database writes
+    // TODO: Optimize this to batch updates or reduce frequency
+    /*
     const { trackPageView, getTrackingData } = useSessionTracking({
         sessionId: sessionId || '',
         onUpdate: async (data) => {
@@ -59,6 +61,7 @@ export default function TestPage() {
         },
         updateInterval: 30000, // 30 seconds
     });
+    */
 
     // Sync session ID to local storage whenever it changes
     useEffect(() => {

@@ -92,7 +92,7 @@ export default function LandingPage() {
             </p>
           </div>
 
-          <div className="grid md:grid-cols-3 gap-8">
+          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
             <PathologyCard
               title="The Pursuit-Withdrawal Loop"
               subtitle="System: Communication"
@@ -110,6 +110,12 @@ export default function LandingPage() {
               subtitle="System: Desire & Power"
               description="One carries the mental load (Manager). The other feels nagged (Employee). Intimacy cannot survive in a parent-child dynamic."
               icon={<Zap className="text-purple-500" size={32} />}
+            />
+            <PathologyCard
+              title="Toxicity & Narcissism Screen"
+              subtitle="System: Relationship Health"
+              description="Are you walking on eggshells? We screen for gaslighting, emotional manipulation, and narcissistic patterns. Get your Toxicity Score."
+              icon={<AlertTriangle className="text-red-600" size={32} />}
             />
           </div>
         </div>

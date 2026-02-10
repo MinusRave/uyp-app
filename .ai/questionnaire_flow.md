@@ -8,7 +8,7 @@
 *   In Crisis (We're on the brink of breaking up)
 *   Unstable (Frequent fights or emotional distance)
 *   Stable but Stuck (We're okay, but something is missing)
-*   Recently Separated (Trying to understand what happened)
+*  Healthy
 
 ### 2. Relationship History & Facts
 **Question:** "How long have you been together?"
@@ -83,33 +83,35 @@
 4.  We often have the same exact argument over and over again.
 5.  My partner avoids difficult conversations/conflict to keep the peace.
 6.  I can handle unresolved tension without falling apart. (Reverse coded)
+7.  During conflicts, I am often told that I am 'too sensitive,' 'crazy,' or remembering things wrong.
 
 ### Dimension 2: Emotional Safety (Bond/Trust)
-7.  I barely feel 'heard' or understood by my partner.
-8.  When my partner hurts me, I sometimes feel they did it on purpose.
-9.  I need frequent reassurance (words of affirmation) to feel safe.
-10. I often replay our conversations in my head, analyzing what went wrong.
-11. I generally assume my partner has my best interests at heart. (Reverse coded)
-12. It takes us a long time to reconnect after a fight.
+8.  I barely feel 'heard' or understood by my partner.
+9.  When my partner hurts me, I sometimes feel they did it on purpose.
+10. I need frequent reassurance (words of affirmation) to feel safe.
+11. I often replay our conversations in my head, analyzing what went wrong.
+12. I generally assume my partner has my best interests at heart. (Reverse coded)
+13. It takes us a long time to reconnect after a fight.
+14. The relationship feels like a rollercoaster: my partner switches between intense affection and sudden coldness or disdain.
 
 ### Dimension 3: Physical Intimacy (Spark/Sex)
-13. I feel we have become more like roommates than lovers.
-14. I feel rejected as a person when my partner turns down sex.
-15. I need to feel emotionally close *before* I can get physically close.
-16. One of us wants sex significantly more than the other (mismatched desire).
-17. I sometimes agree to sex just to keep the peace.
-18. We touch affectionately (hugs, holding hands) often, even without sex. (Reverse coded)
+15. I feel we have become more like roommates than lovers.
+16. I feel rejected as a person when my partner turns down sex.
+17. I need to feel emotionally close *before* I can get physically close.
+18. One of us wants sex significantly more than the other (mismatched desire).
+19. I sometimes agree to sex just to keep the peace.
+20. We touch affectionately (hugs, holding hands) often, even without sex. (Reverse coded)
 
 ### Dimension 4: Priorities & Fairness (Power)
-19. I carry the 'mental load' (remembering schedules, planning) for our household.
-20. I often feel like I am my partner's parent or manager.
-21. Disagreements about money/spending make me feel unsafe.
-22. I feel my partner doesn't truly understand how much I do for us.
-23. I feel guilty when I rest, while my partner seems to relax easily.
-24. We share decisions equally; neither of us dominates. (Reverse coded)
+21. I carry the 'mental load' (remembering schedules, planning) for our household.
+22. I often feel like I am my partner's parent or manager.
+23. Disagreements about money/spending make me feel unsafe.
+24. I feel my partner doesn't truly understand how much I do for us.
+25. I feel guilty when I rest, while my partner seems to relax easily.
+26. We share decisions equally; neither of us dominates. (Reverse coded)
 
 ### Dimension 5: Future & Values (Vision)
-25. I worry that we are growing in different directions.
-26. I feel my partner prioritizes their parents/family over me.
-27. We rarely 'dream' or purely have fun together anymore.
-28. Our life goals (kids, career, lifestyle) feel very aligned. (Reverse coded)
+27. I worry that we are growing in different directions.
+28. I feel my partner prioritizes their parents/family over me.
+29. We rarely 'dream' or purely have fun together anymore.
+30. Our life goals (kids, career, lifestyle) feel very aligned. (Reverse coded)

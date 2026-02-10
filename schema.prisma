@@ -73,6 +73,7 @@ model TestSession {
   // NEW: Cached AI Results (Prevent duplicate calls)
   quickOverview        Json?
   fullReport           Json?
+  narcissismAnalysis   Json? // NEW: Input for "Narcissism Assessment"
 
   // Meta CAPI Cookies tracking
   fbp                  String?

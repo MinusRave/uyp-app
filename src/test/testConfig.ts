@@ -51,6 +51,14 @@ export const TEST_CONFIG = {
             type: "SL",
             isReverseCoded: true,
         },
+        // NEW: Gaslighting (Narcissism Marker)
+        {
+            id: 29,
+            text: "During conflicts, I am often told that I am 'too sensitive,' 'crazy,' or remembering things wrong.",
+            dimension: "communication",
+            type: "PM",
+            isReverseCoded: false,
+        },
 
         // --- DIMENSION 2: EMOTIONAL SAFETY (Bond/Trust) ---
         {
@@ -91,6 +99,14 @@ export const TEST_CONFIG = {
         {
             id: 12,
             text: "It takes us a long time to reconnect after a fight.",
+            dimension: "emotional_safety",
+            type: "PM",
+            isReverseCoded: false,
+        },
+        // NEW: Narcissistic Cycle (Idealization/Devaluation)
+        {
+            id: 30,
+            text: "The relationship feels like a rollercoaster: my partner switches between intense affection and sudden coldness or disdain.",
             dimension: "emotional_safety",
             type: "PM",
             isReverseCoded: false,
