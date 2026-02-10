@@ -130,6 +130,26 @@ model TestSession {
 
   // Archive status for data retention policy
   isArchived               Boolean   @default(false)
+
+  // Device Information
+  deviceType               String?   // "mobile" | "tablet" | "desktop"
+  deviceOS                 String?   // "iOS" | "Android" | "Windows" | "MacOS" | "Linux" | "Other"
+  deviceOSVersion          String?   // e.g., "17.2", "14.0"
+  deviceBrand              String?   // e.g., "Apple", "Samsung", "Google"
+  deviceModel              String?   // e.g., "iPhone 15 Pro", "Galaxy S24"
+  browser                  String?   // "Chrome" | "Safari" | "Firefox" | "Edge" | "Other"
+  browserVersion           String?   // e.g., "120.0.6099.109"
+  screenResolution         String?   // e.g., "1920x1080"
+  viewportSize             String?   // e.g., "390x844"
+  deviceLanguage           String?   // e.g., "en-US"
+  deviceTimezone           String?   // e.g., "America/New_York"
+
+  // Behavioral Tracking
+  sessionStartedAt         DateTime?
+  sessionDuration          Int?      @default(0) // Total time spent in seconds
+  lastActivityAt           DateTime?
+  pageViews                Json?     @default("[]") // Array of {page, timestamp}
+  interactionEvents        Json?     @default("[]") // Array of {type, target, timestamp}
 }
 
 

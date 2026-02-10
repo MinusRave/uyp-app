@@ -266,6 +266,12 @@ action updateWizardProgress {
   entities: [TestSession]
 }
 
+action updateSessionActivity {
+  fn: import { updateSessionActivity } from "@src/test/operations",
+  entities: [TestSession]
+}
+
+
 api systemCheck {
   fn: import { systemCheck } from "@src/server/test/systemCheck",
   entities: [TestSession],
@@ -522,6 +528,11 @@ query getSessionDetail {
 
 query getFunnelStats {
   fn: import { getFunnelStats } from "@src/admin/operations",
+  entities: [TestSession]
+}
+
+query getConversionFunnelMetrics {
+  fn: import { getConversionFunnelMetrics } from "@src/admin/operations",
   entities: [TestSession]
 }
 

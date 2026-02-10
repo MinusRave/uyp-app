@@ -154,21 +154,17 @@ export default function TeaserPage() {
     const [checkoutEventID, setCheckoutEventID] = useState<string | null>(null);
 
     const handleUnlock = async () => {
-        // Generate a fresh ID for this checkout attempt
-        const { generateEventId } = await import("../analytics/eventId");
-        const eventID = generateEventId();
-        setCheckoutEventID(eventID);
-
-        // Track Pixel Event with ID
-        trackPixelEvent('InitiateCheckout', {
+        // Track unlock intent with AddToCart event
+        trackPixelEvent('AddToCart', {
             content_name: 'Full Relationship Report',
             content_category: 'Report',
             value: 47,
             currency: 'USD',
-            eventID: eventID // Crucial for deduplication
+            content_ids: ['relationship_report'],
+            content_type: 'product'
         });
 
-        // Show modal instead of going directly to Stripe
+        // Show modal
         setShowCheckoutModal(true);
     };
 
@@ -176,11 +172,25 @@ export default function TeaserPage() {
         if (!session) return;
         setIsCheckoutLoading(true);
 
+        // Generate event ID and fire InitiateCheckout when user commits to checkout
+        const { generateEventId } = await import("../analytics/eventId");
+        const eventID = generateEventId();
+        setCheckoutEventID(eventID);
+
+        // Track InitiateCheckout when user actually commits
+        trackPixelEvent('InitiateCheckout', {
+            content_name: 'Full Relationship Report',
+            content_category: 'Report',
+            value: 47,
+            currency: 'USD',
+            eventID: eventID // Crucial for deduplication with Purchase event
+        });
+
         try {
             // Pass the generated eventID to the server for CAPI 
             const checkout = await createCheckoutSession({
                 sessionId: session.id,
-                eventID: checkoutEventID || undefined
+                eventID: eventID
             });
 
             if (checkout.sessionUrl) {

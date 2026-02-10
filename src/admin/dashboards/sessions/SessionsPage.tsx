@@ -1,12 +1,13 @@
 
 import { useState } from "react";
 import { type AuthUser } from "wasp/auth";
-import { useQuery, getTestSessions } from "wasp/client/operations";
+import { useQuery, getTestSessions, getConversionFunnelMetrics } from "wasp/client/operations";
 import { Link } from "react-router-dom";
 import DefaultLayout from "../../layout/DefaultLayout";
 import { Loader2 } from "lucide-react";
 import { cn } from "../../../client/utils";
 import { type TestSession } from "wasp/entities";
+import { FunnelMetrics } from "./FunnelMetrics";
 
 // Define a type that includes the relation, as Wasp/Prisma clients types usually return the raw model
 // but the query is configured to include user.
@@ -34,6 +35,15 @@ const SessionsPage = ({ user }: { user: AuthUser }) => {
     const [statusFilter, setStatusFilter] = useState<'all' | 'completed' | 'paid' | 'abandoned'>('all');
     const [emailFilter, setEmailFilter] = useState("");
 
+    // Funnel metrics filters
+    const [funnelFilters, setFunnelFilters] = useState({
+        trafficSource: 'all' as 'all' | 'meta' | 'direct',
+        dateFrom: '',
+        dateTo: '',
+        deviceType: 'all' as 'all' | 'mobile' | 'desktop' | 'tablet',
+        excludeBots: true
+    });
+
     const take = 10;
     const skip = (page - 1) * take;
 
@@ -42,6 +52,15 @@ const SessionsPage = ({ user }: { user: AuthUser }) => {
         take,
         statusFilter,
         emailFilter: emailFilter || undefined,
+    });
+
+    // Fetch funnel metrics with filters
+    const { data: funnelMetrics, isLoading: isLoadingMetrics } = useQuery(getConversionFunnelMetrics, {
+        trafficSource: funnelFilters.trafficSource,
+        dateFrom: funnelFilters.dateFrom || undefined,
+        dateTo: funnelFilters.dateTo || undefined,
+        deviceType: funnelFilters.deviceType,
+        excludeBots: funnelFilters.excludeBots
     });
 
     // Cast the data to include the user relation
@@ -54,6 +73,98 @@ const SessionsPage = ({ user }: { user: AuthUser }) => {
                     <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Sessions Explorer</h1>
                     <p className="text-gray-500">Deep dive into user journeys and results.</p>
                 </div>
+
+                {/* Funnel Metrics Filters */}
+                <div className="bg-white dark:bg-boxdark p-4 rounded-lg shadow-sm border border-gray-200 dark:border-strokedark">
+                    <h3 className="text-sm font-bold text-gray-700 dark:text-gray-300 mb-3 uppercase tracking-wide">
+                        Funnel Analytics Filters
+                    </h3>
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-3">
+                        {/* Traffic Source */}
+                        <div>
+                            <label className="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">
+                                Traffic Source
+                            </label>
+                            <select
+                                value={funnelFilters.trafficSource}
+                                onChange={(e) => setFunnelFilters({ ...funnelFilters, trafficSource: e.target.value as any })}
+                                className="w-full rounded-lg border-[1.5px] border-stroke bg-transparent py-2 px-3 text-sm outline-none transition focus:border-primary dark:border-form-strokedark dark:bg-form-input"
+                            >
+                                <option value="all">All Traffic</option>
+                                <option value="meta">Meta Ads Only</option>
+                                <option value="direct">Direct/Organic Only</option>
+                            </select>
+                        </div>
+
+                        {/* Date From */}
+                        <div>
+                            <label className="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">
+                                From Date
+                            </label>
+                            <input
+                                type="date"
+                                value={funnelFilters.dateFrom}
+                                onChange={(e) => setFunnelFilters({ ...funnelFilters, dateFrom: e.target.value })}
+                                className="w-full rounded-lg border-[1.5px] border-stroke bg-transparent py-2 px-3 text-sm outline-none transition focus:border-primary dark:border-form-strokedark dark:bg-form-input"
+                            />
+                        </div>
+
+                        {/* Date To */}
+                        <div>
+                            <label className="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">
+                                To Date
+                            </label>
+                            <input
+                                type="date"
+                                value={funnelFilters.dateTo}
+                                onChange={(e) => setFunnelFilters({ ...funnelFilters, dateTo: e.target.value })}
+                                className="w-full rounded-lg border-[1.5px] border-stroke bg-transparent py-2 px-3 text-sm outline-none transition focus:border-primary dark:border-form-strokedark dark:bg-form-input"
+                            />
+                        </div>
+
+                        {/* Device Type */}
+                        <div>
+                            <label className="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">
+                                Device Type
+                            </label>
+                            <select
+                                value={funnelFilters.deviceType}
+                                onChange={(e) => setFunnelFilters({ ...funnelFilters, deviceType: e.target.value as any })}
+                                className="w-full rounded-lg border-[1.5px] border-stroke bg-transparent py-2 px-3 text-sm outline-none transition focus:border-primary dark:border-form-strokedark dark:bg-form-input"
+                            >
+                                <option value="all">All Devices</option>
+                                <option value="mobile">Mobile Only</option>
+                                <option value="desktop">Desktop Only</option>
+                                <option value="tablet">Tablet Only</option>
+                            </select>
+                        </div>
+
+                        {/* Exclude Bots */}
+                        <div className="flex items-end">
+                            <label className="flex items-center gap-2 cursor-pointer">
+                                <input
+                                    type="checkbox"
+                                    checked={funnelFilters.excludeBots}
+                                    onChange={(e) => setFunnelFilters({ ...funnelFilters, excludeBots: e.target.checked })}
+                                    className="w-4 h-4 rounded border-gray-300 text-primary focus:ring-primary"
+                                />
+                                <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                                    Exclude Bots
+                                </span>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+
+                {/* Funnel Metrics */}
+                {isLoadingMetrics ? (
+                    <div className="bg-white dark:bg-boxdark p-8 rounded-lg shadow-sm border border-gray-200 dark:border-strokedark flex items-center justify-center">
+                        <Loader2 className="animate-spin h-6 w-6 text-primary" />
+                        <span className="ml-2 text-gray-500">Loading funnel metrics...</span>
+                    </div>
+                ) : funnelMetrics ? (
+                    <FunnelMetrics metrics={funnelMetrics} filters={funnelFilters} />
+                ) : null}
 
                 {/* Filters */}
                 <div className="flex flex-col md:flex-row gap-4 bg-white dark:bg-boxdark p-4 rounded-lg shadow-sm border border-gray-200 dark:border-strokedark">

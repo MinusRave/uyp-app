@@ -172,6 +172,73 @@ export const getFunnelStats: GetFunnelStats<void, FunnelStats> = async (_args, c
     };
 };
 
+// Conversion Funnel Metrics for Analytics Dashboard
+type ConversionFunnelMetrics = {
+    totalSessions: number;
+    testStarted: number;
+    emailCaptured: number;
+    resultsViewed: number;
+    checkoutStarted: number;
+    purchased: number;
+};
+
+export const getConversionFunnelMetrics = async (_args: void, context: any): Promise<ConversionFunnelMetrics> => {
+    if (!context.user?.isAdmin) {
+        throw new HttpError(401, "Unauthorized");
+    }
+
+    const [
+        totalSessions,
+        testStarted,
+        emailCaptured,
+        resultsViewed,
+        checkoutStarted,
+        purchased
+    ] = await Promise.all([
+        // Total sessions created
+        context.entities.TestSession.count(),
+
+        // Test started = anyone who progressed past initial creation (onboardingStep > 0 OR currentQuestionIndex > 0)
+        context.entities.TestSession.count({
+            where: {
+                OR: [
+                    { onboardingStep: { gt: 0 } },
+                    { currentQuestionIndex: { gt: 0 } }
+                ]
+            }
+        }),
+
+        // Email captured
+        context.entities.TestSession.count({
+            where: { email: { not: null } }
+        }),
+
+        // Results viewed = completed test
+        context.entities.TestSession.count({
+            where: { isCompleted: true }
+        }),
+
+        // Checkout started
+        context.entities.TestSession.count({
+            where: { checkoutStartedAt: { not: null } }
+        }),
+
+        // Purchased
+        context.entities.TestSession.count({
+            where: { isPaid: true }
+        })
+    ]);
+
+    return {
+        totalSessions,
+        testStarted,
+        emailCaptured,
+        resultsViewed,
+        checkoutStarted,
+        purchased
+    };
+};
+
 export const getDemographicStats: GetDemographicStats<void, DemographicStats> = async (_args, context) => {
     if (!context.user?.isAdmin) {
         throw new HttpError(401, "Unauthorized");

@@ -4,6 +4,7 @@
 type PixelEventName =
     | 'PageView'
     | 'ViewContent'
+    | 'AddToCart'
     | 'Lead'
     | 'InitiateCheckout'
     | 'Purchase'

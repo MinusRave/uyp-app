@@ -1,11 +1,13 @@
 import React, { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { startTest, submitAnswer, completeTest, getTestSession, useQuery, captureLead, updateConflictDescription, updateWizardProgress } from "wasp/client/operations";
+import { startTest, submitAnswer, completeTest, getTestSession, useQuery, captureLead, updateConflictDescription, updateWizardProgress, updateSessionActivity } from "wasp/client/operations";
 import { routes } from "wasp/client/router";
 import { Loader2, Mail, MessageSquare, ChevronLeft } from "lucide-react";
 import { cn } from "../client/utils";
 import { trackPixelEvent } from "../analytics/pixel";
 import { generateEventId } from "../analytics/eventId";
+import { getDeviceInfo } from "../client/utils/deviceDetection";
+import { useSessionTracking } from "../client/hooks/useSessionTracking";
 
 // --- Data: Questions ---
 // Imported from config
@@ -37,6 +39,26 @@ export default function TestPage() {
     // NEW: Conflict Gate
     const [conflictText, setConflictText] = useState("");
     const [showConflictGate, setShowConflictGate] = useState(false);
+
+    // Session tracking - send updates every 30 seconds
+    const { trackPageView, getTrackingData } = useSessionTracking({
+        sessionId: sessionId || '',
+        onUpdate: async (data) => {
+            if (sessionId) {
+                try {
+                    await updateSessionActivity({
+                        sessionId,
+                        sessionDuration: data.sessionDuration,
+                        pageViews: data.pageViews,
+                        interactionEvents: data.interactionEvents,
+                    });
+                } catch (e) {
+                    console.error('Failed to update session activity', e);
+                }
+            }
+        },
+        updateInterval: 30000, // 30 seconds
+    });
 
     // Sync session ID to local storage whenever it changes
     useEffect(() => {
@@ -105,9 +127,13 @@ export default function TestPage() {
                     const fbclid = getFbclid();
                     const utms = getUtmParams();
 
+                    // Capture device information
+                    const deviceInfo = getDeviceInfo();
+
                     const newSession = await startTest({
                         fbclid: fbclid || undefined,
-                        ...utms
+                        ...utms,
+                        ...deviceInfo
                     } as any);
                     setSessionId(newSession.id);
                     localStorage.setItem("uyp-session-id", newSession.id);

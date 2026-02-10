@@ -1,0 +1,17 @@
+-- AlterTable
+ALTER TABLE "TestSession" ADD COLUMN     "browser" TEXT,
+ADD COLUMN     "browserVersion" TEXT,
+ADD COLUMN     "deviceBrand" TEXT,
+ADD COLUMN     "deviceLanguage" TEXT,
+ADD COLUMN     "deviceModel" TEXT,
+ADD COLUMN     "deviceOS" TEXT,
+ADD COLUMN     "deviceOSVersion" TEXT,
+ADD COLUMN     "deviceTimezone" TEXT,
+ADD COLUMN     "deviceType" TEXT,
+ADD COLUMN     "interactionEvents" JSONB DEFAULT '[]',
+ADD COLUMN     "lastActivityAt" TIMESTAMP(3),
+ADD COLUMN     "pageViews" JSONB DEFAULT '[]',
+ADD COLUMN     "screenResolution" TEXT,
+ADD COLUMN     "sessionDuration" INTEGER DEFAULT 0,
+ADD COLUMN     "sessionStartedAt" TIMESTAMP(3),
+ADD COLUMN     "viewportSize" TEXT;

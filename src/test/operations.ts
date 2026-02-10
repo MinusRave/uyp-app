@@ -121,10 +121,25 @@ export type UserProfile = {
     partnerHurtfulBehavior?: string;
 };
 
+// --- Device Info Type ---
+type DeviceInfo = {
+    deviceType?: string;
+    deviceOS?: string;
+    deviceOSVersion?: string;
+    deviceBrand?: string;
+    deviceModel?: string;
+    browser?: string;
+    browserVersion?: string;
+    screenResolution?: string;
+    viewportSize?: string;
+    deviceLanguage?: string;
+    deviceTimezone?: string;
+};
+
 // Update startTest signature
 // args: UserProfile & { fbclid?: string, utm_source?: string, utm_medium?: string, utm_campaign?: string, utm_content?: string, utm_term?: string, referrer?: string } | void
 
-export const startTest: StartTest<UserProfile & {
+export const startTest: StartTest<UserProfile & DeviceInfo & {
     fbclid?: string;
     utm_source?: string;
     utm_medium?: string;
@@ -166,6 +181,21 @@ export const startTest: StartTest<UserProfile & {
             utm_content: args?.utm_content,
             utm_term: args?.utm_term,
             referrer: args?.referrer,
+            // Device Information
+            deviceType: args?.deviceType,
+            deviceOS: args?.deviceOS,
+            deviceOSVersion: args?.deviceOSVersion,
+            deviceBrand: args?.deviceBrand,
+            deviceModel: args?.deviceModel,
+            browser: args?.browser,
+            browserVersion: args?.browserVersion,
+            screenResolution: args?.screenResolution,
+            viewportSize: args?.viewportSize,
+            deviceLanguage: args?.deviceLanguage,
+            deviceTimezone: args?.deviceTimezone,
+            // Session tracking
+            sessionStartedAt: new Date(),
+            lastActivityAt: new Date(),
         },
     });
 
@@ -328,8 +358,45 @@ export const claimSession = async ({ sessionId }: ClaimSessionArgs, context: any
 type UpdateConflictArgs = { sessionId: string; description: string };
 
 export const updateConflictDescription = async ({ sessionId, description }: UpdateConflictArgs, context: any) => {
-    await context.entities.TestSession.update({
+    const session = await context.entities.TestSession.update({
         where: { id: sessionId },
-        data: { conflictDescription: description }
+        data: { conflictDescription: description },
     });
+    return session;
+};
+
+// --- Update Session Activity ---
+type UpdateSessionActivityArgs = {
+    sessionId: string;
+    sessionDuration?: number;
+    pageViews?: Array<{ page: string; timestamp: string }>;
+    interactionEvents?: Array<{ type: string; target?: string; timestamp: string }>;
+};
+
+export const updateSessionActivity = async (
+    { sessionId, sessionDuration, pageViews, interactionEvents }: UpdateSessionActivityArgs,
+    context: any
+) => {
+    const updateData: any = {
+        lastActivityAt: new Date(),
+    };
+
+    if (sessionDuration !== undefined) {
+        updateData.sessionDuration = sessionDuration;
+    }
+
+    if (pageViews) {
+        updateData.pageViews = pageViews;
+    }
+
+    if (interactionEvents) {
+        updateData.interactionEvents = interactionEvents;
+    }
+
+    const session = await context.entities.TestSession.update({
+        where: { id: sessionId },
+        data: updateData,
+    });
+
+    return session;
 };
