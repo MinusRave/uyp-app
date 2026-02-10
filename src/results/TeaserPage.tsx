@@ -13,7 +13,14 @@ import { trackPixelEvent } from '../analytics/pixel';
 type QuickOverviewData = {
     hero: { headline: string; subheadline: string; result_badge: string };
     pulse: { summary: string };
-    forecast: { short_term: string; long_term_teaser: string };
+    forecast: { short_term: string };
+    dimensions: {
+        communication: { status: string; teaser: string; metric_insight: string };
+        security: { status: string; teaser: string; metric_insight: string };
+        erotic: { status: string; teaser: string; metric_insight: string };
+        balance: { status: string; teaser: string; metric_insight: string };
+        compass: { status: string; teaser: string; metric_insight: string };
+    };
 };
 
 type FullReportData = {
@@ -265,8 +272,8 @@ export default function TeaserPage() {
                         </p>
                     </div>
 
-                    <div className="p-6 md:p-8 space-y-8">
-                        {/* Charts */}
+                    {/* Scores Section - Always Visible */}
+                    <div className="p-6 md:p-8 pb-4">
                         <div className="space-y-4">
                             <ScoreRow label="Communication" score={metrics.repair_efficiency || 40} />
                             <ScoreRow label="Trust & Safety" score={metrics.betrayal_vulnerability || 65} />
@@ -274,8 +281,10 @@ export default function TeaserPage() {
                             <ScoreRow label="Fairness & Balance" score={metrics.ceo_vs_intern || 45} />
                             <ScoreRow label="Shared Future" score={metrics.compatibility_quotient || 90} />
                         </div>
+                    </div>
 
-                        {/* Summary Section - Locked for non-paid users */}
+                    {/* Summary Section - Separate container for overlay */}
+                    <div className="px-6 md:px-8 pb-6 md:pb-8">
                         {isPaid ? (
                             <div className="bg-slate-50 dark:bg-slate-800 p-6 rounded-2xl border border-slate-100 dark:border-slate-700">
                                 <p className="text-slate-700 dark:text-slate-300 italic leading-relaxed font-medium">
@@ -283,31 +292,32 @@ export default function TeaserPage() {
                                 </p>
                             </div>
                         ) : (
-                            <div className="relative">
+                            <div className="relative min-h-[280px] md:min-h-[320px]">
                                 {/* Blurred Summary */}
-                                <div className="bg-slate-50 dark:bg-slate-800 p-6 rounded-2xl border border-slate-100 dark:border-slate-700 blur-[6px] opacity-40 select-none pointer-events-none">
+                                <div className="bg-slate-50 dark:bg-slate-800 p-6 md:p-8 rounded-2xl border border-slate-100 dark:border-slate-700 blur-[6px] opacity-40 select-none pointer-events-none">
                                     <p className="text-slate-700 dark:text-slate-300 italic leading-relaxed font-medium">
-                                        "{summary}"
+                                        "{fullReport?.chapter1_pulse?.summary || "These scores reveal a specific pattern that's quietly eroding your relationship. You're not broken—you're stuck in a loop with a clinical name, a predictable trajectory, and a clear way out. But first, you need to see what you can't see from inside it. The pattern has been running for months, maybe years. It's creating distance where there should be intimacy, resentment where there should be trust, and silence where there should be conversation. Every fight feels different, but they're all symptoms of the same core dynamic. And that dynamic has a name, a cause, and most importantly—a solution."}"
                                     </p>
                                 </div>
 
-                                {/* Unlock Overlay */}
-                                <div className="absolute inset-0 flex items-center justify-center">
-                                    <div className="bg-gradient-to-br from-indigo-50 to-purple-50 dark:from-indigo-950/50 dark:to-purple-950/50 border-2 border-indigo-400/30 rounded-2xl p-6 max-w-md mx-4 text-center space-y-4 shadow-xl">
-                                        <Lock size={32} className="mx-auto text-indigo-600 dark:text-indigo-400" />
+                                {/* Unlock Overlay - Only covers this summary div */}
+                                <div className="absolute inset-0 flex items-center justify-center p-4 pt-8 sm:pt-12 pb-8 sm:pb-12">
+                                    <div className="bg-gradient-to-br from-indigo-50 to-purple-50 dark:from-indigo-950/50 dark:to-purple-950/50 border-2 border-indigo-400/30 rounded-2xl p-4 sm:p-6 w-full max-w-md text-center space-y-3 sm:space-y-4 shadow-xl">
+                                        <Lock size={28} className="mx-auto text-indigo-600 dark:text-indigo-400" />
                                         <div className="space-y-2">
-                                            <h3 className="text-lg font-black text-slate-900 dark:text-white">
+                                            <h3 className="text-base sm:text-lg font-black text-slate-900 dark:text-white">
                                                 See What These Scores Mean
                                             </h3>
-                                            <p className="text-sm text-slate-700 dark:text-slate-300">
+                                            <p className="text-xs sm:text-sm text-slate-700 dark:text-slate-300">
                                                 These numbers show WHAT is broken. The full report shows WHY it keeps happening—and the exact conversation to have tonight.
                                             </p>
                                         </div>
                                         <button
                                             onClick={handleUnlock}
-                                            className="w-full bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 text-white font-black text-base py-3 px-6 rounded-xl flex items-center justify-center gap-2 transition-all shadow-lg hover:shadow-xl group"
+                                            className="w-full bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 text-white font-black text-sm sm:text-base py-2.5 sm:py-3 px-4 sm:px-6 rounded-xl flex items-center justify-center gap-2 transition-all shadow-lg hover:shadow-xl group"
                                         >
-                                            UNLOCK YOUR PERSONALIZED REPORT
+                                            <span className="hidden sm:inline">UNLOCK YOUR PERSONALIZED REPORT</span>
+                                            <span className="sm:hidden">UNLOCK REPORT</span>
                                             <ArrowRight className="group-hover:translate-x-1 transition-transform" size={18} />
                                         </button>
                                     </div>
@@ -326,13 +336,13 @@ export default function TeaserPage() {
                         </p>
                     </div>
                     <div className="grid md:grid-cols-2 gap-4">
-                        {/* Short Term - FREE from Chapter 1 */}
+                        {/* Short Term - FREE from Quick Overview */}
                         <div className="bg-white dark:bg-slate-900 p-6 rounded-3xl shadow-sm border border-slate-200 dark:border-slate-800">
                             <h3 className="text-xs font-bold text-slate-500 uppercase mb-4 flex items-center gap-2">
                                 <Clock size={14} /> 6-Month Forecast
                             </h3>
                             <p className="text-slate-900 dark:text-white text-base leading-relaxed max-w-prose">
-                                {loadingFull ? "Calculating..." : (fullReport?.chapter1_pulse?.short_term_forecast || "Based on your current patterns, the next 6 months will be challenging without intervention.")}
+                                {quickOverview?.forecast?.short_term || "Based on your current patterns, the next 6 months will be challenging without intervention."}
                             </p>
                         </div>
 
@@ -385,10 +395,10 @@ export default function TeaserPage() {
                         title="How You Communicate"
                         description="This section analyzes how information and emotion flow between you. It focuses on how you handle friction and whether you can 'reset' after a fight."
                         icon={<TrendingUp />}
-                        status={fullReport?.chapter2_communication?.conflict_style || "Analyzing...it may take a few minutes to complete your report"}
-                        teaser={fullReport?.chapter2_communication?.teaser}
-                        metricInsight={fullReport?.chapter2_communication?.metric_insight}
-                        blurredText={fullReport?.chapter2_communication?.repeat_loop?.[0]}
+                        status={quickOverview?.dimensions?.communication?.status || "Analyzing..."}
+                        teaser={quickOverview?.dimensions?.communication?.teaser}
+                        metricInsight={quickOverview?.dimensions?.communication?.metric_insight}
+                        blurredText={fullReport?.chapter2_communication?.repeat_loop?.[0] || "You're stuck in the same fight on repeat. It has a name, a script, and a 24-hour fix—but first you need to see the pattern you can't see from inside it."}
                         onUnlock={handleUnlock}
                         visible={isPaid}
                         metricName="Repair Efficiency"
@@ -405,10 +415,10 @@ export default function TeaserPage() {
                         title="Emotional Safety"
                         description="This explores the 'Invisible Net' of the relationship. It measures if you feel safe enough to be vulnerable or if you are living in a state of 'high alert.'"
                         icon={<Shield />}
-                        status={fullReport?.chapter3_security?.anxiety_hypervigilance || "Analyzing...it may take a few minutes to complete your report"}
-                        teaser={fullReport?.chapter3_security?.teaser}
-                        metricInsight={fullReport?.chapter3_security?.metric_insight}
-                        blurredText={fullReport?.chapter3_security?.silent_secret}
+                        status={quickOverview?.dimensions?.security?.status || "Analyzing..."}
+                        teaser={quickOverview?.dimensions?.security?.teaser}
+                        metricInsight={quickOverview?.dimensions?.security?.metric_insight}
+                        blurredText={fullReport?.chapter3_security?.silent_secret || "There's something you haven't said out loud—a fear so deep you've built your entire relationship around avoiding it. It's costing you more than you know."}
                         onUnlock={handleUnlock}
                         visible={isPaid}
                         metricName="Betrayal Vulnerability"
@@ -426,10 +436,10 @@ export default function TeaserPage() {
                         title="The Spark: Sex & Intimacy"
                         description="This moves beyond 'how many times a week' to analyze the emotional mechanics of desire and physical affection."
                         icon={<Heart />}
-                        status={fullReport?.chapter4_erotic?.roommate_risk || "Analyzing...it may take a few minutes to complete your report"}
-                        teaser={fullReport?.chapter4_erotic?.teaser}
-                        metricInsight={fullReport?.chapter4_erotic?.metric_insight}
-                        blurredText={fullReport?.chapter4_erotic?.desire_gap}
+                        status={quickOverview?.dimensions?.erotic?.status || "Analyzing..."}
+                        teaser={quickOverview?.dimensions?.erotic?.teaser}
+                        metricInsight={quickOverview?.dimensions?.erotic?.metric_insight}
+                        blurredText={fullReport?.chapter4_erotic?.desire_gap || "The desire gap isn't about frequency—it's about what's killing the spark. There's a specific blocker, and it's not what you think."}
                         onUnlock={handleUnlock}
                         visible={isPaid}
                         metricName="Erotic Death Spiral"
@@ -447,10 +457,10 @@ export default function TeaserPage() {
                         title="Power & Fairness"
                         description="This chapter audits the 'Social Contract.' It looks at who carries the burden of planning, worrying, and managing life."
                         icon={<BadgeCheck />}
-                        status={fullReport?.chapter5_balance?.parent_child_dynamic || "Analyzing...it may take a few minutes to complete your report"}
-                        teaser={fullReport?.chapter5_balance?.teaser}
-                        metricInsight={fullReport?.chapter5_balance?.metric_insight}
-                        blurredText={fullReport?.chapter5_balance?.parent_child_dynamic}
+                        status={quickOverview?.dimensions?.balance?.status || "Analyzing..."}
+                        teaser={quickOverview?.dimensions?.balance?.teaser}
+                        metricInsight={quickOverview?.dimensions?.balance?.metric_insight}
+                        blurredText={fullReport?.chapter5_balance?.parent_child_dynamic || "One of you is managing the relationship like a CEO manages an intern. This power imbalance is quietly destroying your attraction—and neither of you sees it."}
                         onUnlock={handleUnlock}
                         visible={isPaid}
                         metricName="CEO vs Intern"
@@ -468,10 +478,10 @@ export default function TeaserPage() {
                         title="Your Shared Future"
                         description="This section determines if you are traveling the same road. It's about meaning, dreams, and long-term compatibility."
                         icon={<Compass />}
-                        status={fullReport?.chapter6_compass?.existential_alignment || "Analyzing...it may take a few minutes to complete your report"}
-                        teaser={fullReport?.chapter6_compass?.teaser}
-                        metricInsight={fullReport?.chapter6_compass?.metric_insight}
-                        blurredText={fullReport?.chapter6_compass?.detachment_warning}
+                        status={quickOverview?.dimensions?.compass?.status || "Analyzing..."}
+                        teaser={quickOverview?.dimensions?.compass?.teaser}
+                        metricInsight={quickOverview?.dimensions?.compass?.metric_insight}
+                        blurredText={fullReport?.chapter6_compass?.detachment_warning || "You're traveling parallel roads that are slowly diverging. The question isn't if you want the same things—it's whether you're willing to build them together."}
                         onUnlock={handleUnlock}
                         visible={isPaid}
                         metricName="Soulmate Sync"
@@ -1151,29 +1161,23 @@ function DimensionCard({
                         </p>
                     </div>
                 )}
-
-                {/* Fallback to old blurredText if teaser not provided */}
-                {!teaser && blurredText && (
-                    <div>
-                        {visible ? (
-                            <p className="text-slate-700 dark:text-slate-300 leading-relaxed">
-                                {blurredText}
-                            </p>
-                        ) : (
-                            <div className="relative cursor-pointer group" onClick={onUnlock}>
-                                <p className="text-slate-800 dark:text-slate-200 leading-relaxed blur-[6px] opacity-60 select-none transition group-hover:blur-[4px]">
-                                    {blurredText}
-                                </p>
-                                <div className="absolute inset-0 flex items-center justify-center">
-                                    <div className="bg-white/90 dark:bg-slate-800/90 backdrop-blur-md px-4 py-2 rounded-full flex items-center gap-2 text-sm font-bold text-slate-900 dark:text-white border border-slate-200 dark:border-slate-700 shadow-lg group-hover:scale-105 transition-transform">
-                                        <Lock size={14} /> Unlock Your Personalized Report
-                                    </div>
-                                </div>
-                            </div>
-                        )}
-                    </div>
-                )}
             </div>
+
+            {/* BLURRED PAID PREVIEW - Always show if blurredText exists and user hasn't paid */}
+            {blurredText && !visible && (
+                <div className="p-6 border-t border-slate-200 dark:border-slate-700">
+                    <div className="relative cursor-pointer group" onClick={onUnlock}>
+                        <p className="text-slate-800 dark:text-slate-200 leading-relaxed blur-[6px] opacity-60 select-none transition group-hover:blur-[4px]">
+                            {blurredText}
+                        </p>
+                        <div className="absolute inset-0 flex items-center justify-center">
+                            <div className="bg-white/90 dark:bg-slate-800/90 backdrop-blur-md px-4 py-2 rounded-full flex items-center gap-2 text-sm font-bold text-slate-900 dark:text-white border border-slate-200 dark:border-slate-700 shadow-lg group-hover:scale-105 transition-transform">
+                                <Lock size={14} /> Unlock Your Personalized Report
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            )}
 
             {/* PAID CONTENT SECTION */}
             {visible && (deepDive || specificItems?.length > 0 || impactText) && (

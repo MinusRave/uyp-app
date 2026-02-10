@@ -517,14 +517,55 @@ export const generateQuickOverview: GenerateFullReport<GenerateQuickOverviewArgs
     const model = process.env.ANTHROPIC_MODEL_FAST || 'claude-3-haiku-20240307';
 
     const systemPrompt = `You are an expert Relationship Psychologist. Provide a "Quick Overview" of the relationship based on the metrics. 
+    
+    This must generate FAST (under 3 seconds). Be CONCISE.
+    
     OUTPUT INSTRUCTIONS:
-    - You must output VALID JSON only.
-    - No Markdown. No introductory text. No "Here is the JSON".
-    - Structure:
+    - Output VALID JSON only. No markdown, no intro text.
+    - ESCAPE double quotes in strings.
+    
+    JSON STRUCTURE:
     {
-      "hero": { "headline": "string", "result_badge": "string" },
-      "pulse": { "summary": "string" }
-    }`;
+      "hero": {
+        "headline": "One punchy sentence (max 15 words)",
+        "result_badge": "2-4 words (e.g. 'HIGH RISK', 'REPAIRABLE')"
+      },
+      "pulse": {
+        "summary": "One clinical sentence about overall health"
+      },
+      "forecast": {
+        "short_term": "What happens in 6 months if nothing changes (2 sentences max)"
+      },
+      "dimensions": {
+        "communication": {
+          "status": "Pattern label (2-4 words, e.g. 'Pursuer-Withdrawer')",
+          "teaser": "ONE sentence creating curiosity",
+          "metric_insight": "ONE sentence about Repair Efficiency metric"
+        },
+        "security": {
+          "status": "Anxiety level (2-4 words, e.g. 'High Alert')",
+          "teaser": "ONE sentence about core fear",
+          "metric_insight": "ONE sentence about Betrayal Vulnerability"
+        },
+        "erotic": {
+          "status": "Roommate risk (2-4 words, e.g. 'High Risk')",
+          "teaser": "ONE sentence about intimacy blocker",
+          "metric_insight": "ONE sentence about Erotic Death Spiral"
+        },
+        "balance": {
+          "status": "Power dynamic (2-4 words, e.g. 'Manager-Employee')",
+          "teaser": "ONE sentence about imbalance",
+          "metric_insight": "ONE sentence about CEO vs Intern"
+        },
+        "compass": {
+          "status": "Alignment (2-4 words, e.g. 'Aligned values')",
+          "teaser": "ONE sentence about future",
+          "metric_insight": "ONE sentence about Soulmate Sync"
+        }
+      }
+    }
+    
+    Use their ACTUAL data. Be SPECIFIC and CONCISE.`;
 
     // Note: We use the system prompt variable now
     const userPrompt = `User Profile: ${userProfile} ... MRI Metrics: ${formattedMetrics}`;
@@ -539,7 +580,7 @@ export const generateQuickOverview: GenerateFullReport<GenerateQuickOverviewArgs
     try {
         const msg = await anthropic.messages.create({
             model: model,
-            max_tokens: 1000,
+            max_tokens: 1500, // Reduced from 2500 for faster generation (2-3 seconds target)
             temperature: 0.5,
             system: systemPrompt,
             messages: [{ role: "user", content: userPrompt }]
