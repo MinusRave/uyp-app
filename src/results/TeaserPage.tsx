@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { Lock, BadgeCheck, Zap, ArrowRight, Shield, Clock, TrendingUp, Heart, Brain, Activity, Play, X, MessageCircle, Compass, TrendingDown, Star, Quote } from "lucide-react";
 import { useQuery, generateQuickOverview, generateFullReport, createCheckoutSession, getTestSession } from "wasp/client/operations";
@@ -107,6 +107,10 @@ export default function TeaserPage() {
     const [fullReport, setFullReport] = useState<FullReportData | null>(null);
     const [loadingQuick, setLoadingQuick] = useState(false);
     const [loadingFull, setLoadingFull] = useState(false);
+
+    // Guards to prevent duplicate AI calls (React Strict Mode + re-renders)
+    const quickOverviewInitiated = useRef(false);
+    const fullReportInitiated = useRef(false);
     const [isCheckoutLoading, setIsCheckoutLoading] = useState(false);
     const [showCheckoutModal, setShowCheckoutModal] = useState(false);
 
@@ -118,37 +122,43 @@ export default function TeaserPage() {
         // Quick Overview (Fast Model)
         // First check if session already has cached data
         if (session.quickOverview && Object.keys(session.quickOverview as object).length > 0) {
-
             setQuickOverview(session.quickOverview as any);
-        } else if (!quickOverview && !loadingQuick) {
-
+            quickOverviewInitiated.current = true; // Mark as done
+        } else if (!quickOverviewInitiated.current && !loadingQuick) {
+            // Use ref guard to prevent duplicate calls
+            quickOverviewInitiated.current = true;
             setLoadingQuick(true);
             generateQuickOverview({ sessionId: session.id })
                 .then((res: any) => {
-
                     setQuickOverview(res.json);
                 })
-                .catch((err: any) => console.error("Quick Overview Error", err))
+                .catch((err: any) => {
+                    console.error("Quick Overview Error", err);
+                    quickOverviewInitiated.current = false; // Reset on error to allow retry
+                })
                 .finally(() => setLoadingQuick(false));
         }
 
         // Full Report (Background Generation)
         // First check if session already has cached data
         if (session.fullReport && Object.keys(session.fullReport as object).length > 0) {
-
             setFullReport(session.fullReport as any);
-        } else if (!fullReport && !loadingFull) {
-
+            fullReportInitiated.current = true; // Mark as done
+        } else if (!fullReportInitiated.current && !loadingFull) {
+            // Use ref guard to prevent duplicate calls
+            fullReportInitiated.current = true;
             setLoadingFull(true);
             generateFullReport({ sessionId: session.id })
                 .then((res: any) => {
-
                     setFullReport(res.json);
                 })
-                .catch((err: any) => console.error("Full Report Error", err))
+                .catch((err: any) => {
+                    console.error("Full Report Error", err);
+                    fullReportInitiated.current = false; // Reset on error to allow retry
+                })
                 .finally(() => setLoadingFull(false));
         }
-    }, [session?.id]); // FIXED: Only depend on session.id to prevent infinite loops
+    }, [session?.id]); // Only depend on session.id to prevent infinite loops
 
     // Generate Event ID for consistent InitiateCheckout deduplication
     const [checkoutEventID, setCheckoutEventID] = useState<string | null>(null);
