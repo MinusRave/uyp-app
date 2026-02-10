@@ -495,19 +495,21 @@ export default function TeaserPage() {
                 </div>
 
                 {/* 5. ADVANCED DIAGNOSTICS (12 MRI Metrics) */}
-                <section className="bg-slate-900 dark:bg-slate-950 rounded-3xl p-8 shadow-2xl mt-12 border border-slate-800 relative overflow-hidden">
-                    <div className="text-center space-y-4 mb-8">
-                        <h2 className="text-3xl font-black text-white">
+                <section className={`bg-slate-900 dark:bg-slate-950 rounded-3xl shadow-2xl mt-12 border border-slate-800 relative overflow-hidden ${isPaid ? 'p-8' : 'p-4 md:p-6'}`}>
+                    <div className={`text-center space-y-4 ${isPaid ? 'mb-8' : 'mb-4'}`}>
+                        <h2 className="text-2xl md:text-3xl font-black text-white">
                             🔬 Advanced Diagnostics
                         </h2>
-                        <p className="text-slate-300 max-w-2xl mx-auto">
-                            The 12 "Vital Signs" that reveal the hidden mechanics of your relationship. These metrics go beyond surface-level symptoms to measure the underlying health of your bond.
-                        </p>
+                        {isPaid && (
+                            <p className="text-slate-300 max-w-2xl mx-auto">
+                                The 12 "Vital Signs" that reveal the hidden mechanics of your relationship. These metrics go beyond surface-level symptoms to measure the underlying health of your bond.
+                            </p>
+                        )}
                     </div>
 
                     <div className={`grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 ${!isPaid ? 'blur-[4px] opacity-50 select-none pointer-events-none' : ''}`}>
                         {/* Metric Cards */}
-                        {[
+                        {(isPaid ? [
                             {
                                 name: "Crystal Ball",
                                 subtitle: "Sustainability Forecast",
@@ -616,7 +618,36 @@ export default function TeaserPage() {
                                 highMeaning: "Strong resilience. Years of shared history and deep trust create a buffer against storms.",
                                 isGood: true
                             }
-                        ].map((metric, idx) => {
+                        ] : [
+                            // Show only 3 cards for unpaid users to reduce scroll height
+                            {
+                                name: "Crystal Ball",
+                                subtitle: "Sustainability Forecast",
+                                description: "Predicts if your current path leads to long-term growth or a dead end.",
+                                score: metrics.sustainability_forecast || 65,
+                                lowMeaning: "Your current path leads to a dead end.",
+                                highMeaning: "Strong foundation for long-term growth.",
+                                isGood: true
+                            },
+                            {
+                                name: "Erotic Death Spiral",
+                                subtitle: "Parent-Trap",
+                                description: "Measures how much 'managing' your partner is killing your sex life.",
+                                score: metrics.erotic_death_spiral || 68,
+                                lowMeaning: "Healthy balance of autonomy.",
+                                highMeaning: "One partner is 'managing' the other like a child.",
+                                isGood: false
+                            },
+                            {
+                                name: "Soulmate Sync",
+                                subtitle: "Compatibility Quotient",
+                                description: "Measures if your core life values and 'future dreams' actually match.",
+                                score: metrics.compatibility_quotient || 85,
+                                lowMeaning: "Fundamental misalignment on life values.",
+                                highMeaning: "Deep alignment on what matters.",
+                                isGood: true
+                            }
+                        ]).map((metric, idx) => {
                             const getColor = (score: number, isGood: boolean) => {
                                 if (isGood) {
                                     if (score >= 70) return "bg-green-500";
@@ -690,9 +721,9 @@ export default function TeaserPage() {
 
                     {/* Unlock Overlay for Non-Paid Users */}
                     {!isPaid && (
-                        <div className="absolute inset-0 flex items-center justify-center bg-slate-900/80 backdrop-blur-sm z-10">
-                            <div className="max-w-lg mx-auto px-6 text-center space-y-6">
-                                <div className="bg-gradient-to-br from-indigo-500/20 to-purple-500/20 border-2 border-indigo-400/30 rounded-2xl p-8 space-y-4">
+                        <div className="absolute inset-0 flex items-center justify-center bg-slate-900/90 backdrop-blur-sm z-10">
+                            <div className="max-w-lg mx-auto px-4 md:px-6 text-center space-y-4">
+                                <div className="bg-gradient-to-br from-indigo-500/20 to-purple-500/20 border-2 border-indigo-400/30 rounded-2xl p-6 md:p-8 space-y-4">
                                     <Lock size={48} className="mx-auto text-indigo-300" />
                                     <h3 className="text-2xl font-black text-white">
                                         Unlock Your Complete MRI Scan
@@ -1227,8 +1258,8 @@ function DimensionCard({
                 </div>
             )}
 
-            {/* UNLOCK CTA (for non-paid users) */}
-            {!visible && (deepDive || specificItems?.length > 0 || impactText) && (
+            {/* UNLOCK CTA (for non-paid users) - Always show if not paid, even while loading */}
+            {!visible && (
                 <div className="p-6 border-t border-slate-200 dark:border-slate-700 bg-gradient-to-br from-indigo-50 to-purple-50 dark:from-indigo-950/30 dark:to-purple-950/30 space-y-4">
                     <div className="text-center space-y-3">
                         <Lock size={32} className="mx-auto text-indigo-600 dark:text-indigo-400" />

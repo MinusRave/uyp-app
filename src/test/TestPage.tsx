@@ -55,6 +55,8 @@ export default function TestPage() {
 
     // Guard against double-initialization
     const isCreatingSession = React.useRef(false);
+    // Guard against double-advance
+    const isAdvancing = React.useRef(false);
 
     useEffect(() => {
         const handleSessionCheck = async () => {
@@ -142,18 +144,39 @@ export default function TestPage() {
     const currentQuestion = QUESTIONS[currentQIndex];
     const progressPercentage = ((currentQIndex) / QUESTIONS.length) * 100;
 
-    const handleNext = async () => {
-        if (!sessionId || selectedAnswer === null) return;
-        if (!currentQuestion) return;
+    const handleOptionClick = (answerId: number) => {
+        if (isSubmitting || isAdvancing.current) return;
+
+        setSelectedAnswer(answerId);
+        isAdvancing.current = true;
+
+        // Auto-advance after small delay for visual feedback
+        setTimeout(() => {
+            handleNext(answerId);
+        }, 250);
+    };
+
+    const handleNext = async (answerIdOverride?: number) => {
+        // Use override if provided (for auto-advance), otherwise state
+        const answerId = answerIdOverride ?? selectedAnswer;
+
+        if (!sessionId || answerId === null) {
+            isAdvancing.current = false;
+            return;
+        }
+        if (!currentQuestion) {
+            isAdvancing.current = false;
+            return;
+        }
 
         setIsSubmitting(true);
         try {
-            const answerObj = ANSWERS.find(a => a.id === selectedAnswer);
+            const answerObj = ANSWERS.find(a => a.id === answerId);
 
             await submitAnswer({
                 sessionId,
                 questionId: currentQuestion.id,
-                answerId: selectedAnswer,
+                answerId: answerId,
                 score: answerObj?.score || 3, // Raw score 1-5
                 dimension: currentQuestion.dimension,
                 type: currentQuestion.type
@@ -172,6 +195,7 @@ export default function TestPage() {
             alert("Errore di connessione. Riprova.");
         } finally {
             setIsSubmitting(false);
+            isAdvancing.current = false;
         }
     };
 
@@ -230,7 +254,7 @@ export default function TestPage() {
 
     if (isLoading) {
         return (
-            <div className="flex h-screen w-full items-center justify-center bg-background">
+            <div className="flex h-[100dvh] w-full items-center justify-center bg-background">
                 <Loader2 className="animate-spin text-primary" size={48} />
             </div>
         );
@@ -244,7 +268,7 @@ export default function TestPage() {
     // CONFLICT GATE UI (New)
     if (showConflictGate && sessionId) {
         return (
-            <div className="min-h-screen bg-background flex items-center justify-center p-6 animate-fade-in">
+            <div className="min-h-[100dvh] bg-background flex items-center justify-center p-6 animate-fade-in">
                 <div className="max-w-md w-full bg-card p-8 rounded-2xl shadow-xl border border-border">
                     <div className="w-16 h-16 bg-purple-100 dark:bg-purple-900/30 rounded-full flex items-center justify-center mx-auto mb-6 text-purple-600">
                         <MessageSquare size={32} />
@@ -304,38 +328,66 @@ export default function TestPage() {
     // EMAIL GATE UI
     if (showEmailGate || (!currentQuestion && !isLoading && sessionId)) {
         return (
-            <div className="min-h-screen bg-background flex items-center justify-center p-6 animate-fade-in">
-                <div className="max-w-md w-full bg-card p-8 rounded-2xl shadow-xl border border-border text-center">
+            <div className="min-h-[100dvh] bg-background flex flex-col items-center justify-start pt-8 md:pt-12 p-4 md:p-6 animate-fade-in overflow-y-auto">
+                <div className="max-w-lg w-full bg-card p-6 md:p-8 rounded-2xl shadow-xl border border-border">
                     <div className="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-6 text-primary">
                         <Mail size={32} />
                     </div>
-                    <h2 className="text-2xl font-bold mb-4">Almost done!</h2>
-                    <p className="text-muted-foreground mb-8">
-                        Enter your email to save results and calculate compatibility.
-                    </p>
-                    <form onSubmit={handleEmailSubmit} className="space-y-4">
-                        <input
-                            type="email"
-                            required
-                            placeholder="your@email.com"
-                            className="w-full p-4 rounded-xl border border-input bg-background"
-                            value={email}
-                            onChange={(e) => setEmail(e.target.value)}
-                        />
-                        <p className="text-xs text-muted-foreground flex items-center justify-center gap-1">
-                            <MessageSquare size={12} />
-                            We won't spam you. Promise. Unsubscribe anytime.
+
+                    <h2 className="text-2xl md:text-3xl font-bold mb-4 md:mb-6 text-center">Generating Your Relationship Profile</h2>
+
+
+                    <div className="bg-muted/30 rounded-xl p-4 md:p-5 mb-6 text-left space-y-3">
+                        <p className="text-sm font-semibold text-foreground">Your personalized analysis will include:</p>
+                        <p className="text-sm text-muted-foreground leading-relaxed">
+                            A comprehensive psychological assessment of your relationship dynamics, based on validated frameworks used by couples therapists. This isn't generic advice—it's a clinical-grade analysis of your specific patterns, blind spots, and next steps.
                         </p>
+                    </div>
+
+                    <form onSubmit={handleEmailSubmit} className="space-y-4">
+                        <div>
+                            <label className="text-sm font-medium text-muted-foreground block mb-2 text-left">
+                                Enter your email to access your confidential report:
+                            </label>
+                            <input
+                                type="email"
+                                required
+                                placeholder="your@email.com"
+                                className="w-full p-4 rounded-xl border border-input bg-background text-base"
+                                value={email}
+                                onChange={(e) => setEmail(e.target.value)}
+                            />
+                        </div>
+
                         <button
                             type="submit"
                             disabled={isSubmitting}
-                            className="w-full py-4 rounded-full bg-primary text-primary-foreground font-bold text-lg hover:opacity-90 transition-opacity disabled:opacity-50"
+                            className="w-full py-4 rounded-full bg-primary text-primary-foreground font-bold text-base md:text-lg hover:opacity-90 transition-opacity disabled:opacity-50 shadow-lg"
                         >
-                            {isSubmitting ? "Calculating..." : "See Results →"}
+                            {isSubmitting ? (
+                                <span className="flex items-center justify-center gap-2">
+                                    <Loader2 className="animate-spin" size={20} />
+                                    Generating Report...
+                                </span>
+                            ) : (
+                                "View My Report →"
+                            )}
                         </button>
-                        <p className="text-xs text-muted-foreground">
-                            We won't spam you. Promise.
-                        </p>
+
+                        <div className="bg-blue-50 dark:bg-blue-950/20 rounded-lg p-3 text-left space-y-1.5">
+                            <div className="flex items-center gap-2 text-xs text-blue-900 dark:text-blue-100">
+                                <span className="text-blue-600 dark:text-blue-400">✓</span>
+                                <span className="font-medium">Fully encrypted & confidential</span>
+                            </div>
+                            <div className="flex items-center gap-2 text-xs text-blue-900 dark:text-blue-100">
+                                <span className="text-blue-600 dark:text-blue-400">✓</span>
+                                <span className="font-medium">Never shared with third parties</span>
+                            </div>
+                            <div className="flex items-center gap-2 text-xs text-blue-900 dark:text-blue-100">
+                                <span className="text-blue-600 dark:text-blue-400">✓</span>
+                                <span className="font-medium">Delete anytime from your account</span>
+                            </div>
+                        </div>
                     </form>
                 </div>
             </div>
@@ -352,23 +404,24 @@ export default function TestPage() {
     if (!currentQuestion) return null;
 
     return (
-        <div className="min-h-screen bg-background text-foreground flex flex-col">
+        <div className="min-h-[100dvh] bg-background text-foreground flex flex-col justify-between">
             <header className="sticky top-0 z-50 bg-background/80 backdrop-blur-md border-b border-border">
-                <div className="max-w-3xl mx-auto px-6 h-16 flex items-center justify-between">
+                <div className="max-w-3xl mx-auto px-4 md:px-6 h-14 md:h-16 flex items-center justify-between">
                     <div className="flex items-center gap-2">
                         {currentQIndex > 0 && (
                             <button
                                 onClick={handleBack}
-                                className="p-2 -ml-2 hover:bg-muted rounded-full transition-colors text-muted-foreground hover:text-foreground"
+                                className="flex items-center gap-1 pl-0 pr-3 py-2 -ml-2 text-muted-foreground hover:text-foreground transition-colors"
                                 aria-label="Go back"
                             >
-                                <ChevronLeft size={24} />
+                                <ChevronLeft size={20} />
+                                <span className="text-sm font-medium">Back</span>
                             </button>
                         )}
                         <div className="font-bold text-lg text-primary">UYP Test</div>
                     </div>
                     <div className="text-sm font-medium text-muted-foreground">
-                        Question {currentQIndex + 1}/{QUESTIONS.length}
+                        {currentQIndex + 1}/{QUESTIONS.length}
                     </div>
                 </div>
                 <div className="h-1.5 w-full bg-muted">
@@ -379,64 +432,50 @@ export default function TestPage() {
                 </div>
             </header>
 
-            <main className="flex-1 flex flex-col items-center justify-center p-6 max-w-2xl mx-auto w-full">
-                <div className="mb-12 text-center">
-                    <h2 className="text-3xl md:text-4xl font-bold leading-tight mb-4 text-foreground">
-                        {currentQuestion.text}
-                    </h2>
-                    <p className="text-muted-foreground text-sm uppercase tracking-wide">
-                        Answer instinctively
-                    </p>
-                </div>
+            <main className="flex-1 flex flex-col items-center justify-start pt-8 md:pt-12 p-4 md:p-6 max-w-2xl mx-auto w-full overflow-y-auto">
+                <div key={currentQIndex} className="w-full flex flex-col items-center animate-in slide-in-from-right-8 fade-in duration-300 fill-mode-both">
+                    <div className="mb-6 md:mb-10 text-center">
+                        <h2 className="text-xl md:text-3xl lg:text-4xl font-bold leading-snug mb-2 md:mb-4 text-foreground">
+                            {currentQuestion.text}
+                        </h2>
+                        <p className="text-muted-foreground text-xs md:text-sm uppercase tracking-wide">
+                            Answer instinctively
+                        </p>
+                    </div>
 
-                <div className="w-full space-y-3">
-                    {ANSWERS.map((option) => (
-                        <button
-                            key={option.id}
-                            onClick={() => setSelectedAnswer(option.id)}
-                            className={cn(
-                                "w-full p-4 rounded-xl border-2 text-left transition-all duration-200 flex items-center group",
-                                selectedAnswer === option.id
-                                    ? "border-primary bg-primary/5 text-foreground ring-1 ring-primary"
-                                    : "border-border hover:border-primary/50 bg-card hover:bg-muted"
-                            )}
-                        >
-                            <div className={cn(
-                                "w-6 h-6 rounded-full border-2 mr-4 flex items-center justify-center transition-colors",
-                                selectedAnswer === option.id
-                                    ? "border-primary bg-primary"
-                                    : "border-muted-foreground/30 group-hover:border-primary"
-                            )}>
-                                {selectedAnswer === option.id && (
-                                    <div className="w-2.5 h-2.5 rounded-full bg-white" />
+                    <div className="w-full space-y-3 md:space-y-4">
+                        {ANSWERS.map((option) => (
+                            <button
+                                key={option.id}
+                                onClick={() => handleOptionClick(option.id)}
+                                className={cn(
+                                    "w-full p-4 md:p-5 rounded-xl border-2 text-left transition-all duration-200 flex items-center group touch-manipulation",
+                                    selectedAnswer === option.id
+                                        ? "border-primary bg-primary/5 text-foreground ring-1 ring-primary transform scale-[0.98]"
+                                        : "border-border hover:border-primary/50 bg-card hover:bg-muted active:scale-[0.98]"
                                 )}
-                            </div>
-                            <span className="text-lg font-medium">{option.text}</span>
-                        </button>
-                    ))}
+                            >
+                                <div className={cn(
+                                    "w-6 h-6 md:w-6 md:h-6 rounded-full border-2 mr-3 md:mr-4 flex items-center justify-center transition-colors shrink-0",
+                                    selectedAnswer === option.id
+                                        ? "border-primary bg-primary"
+                                        : "border-muted-foreground/30 group-hover:border-primary"
+                                )}>
+                                    {selectedAnswer === option.id && (
+                                        <div className="w-2.5 h-2.5 md:w-3 md:h-3 rounded-full bg-white" />
+                                    )}
+                                </div>
+                                <span className="text-base md:text-lg font-medium leading-tight">{option.text}</span>
+                            </button>
+                        ))}
+                    </div>
                 </div>
             </main>
 
-            <footer className="p-6 border-t border-border bg-background/50 max-w-3xl mx-auto w-full">
-                <button
-                    onClick={handleNext}
-                    disabled={selectedAnswer === null || isSubmitting}
-                    className={cn(
-                        "w-full py-4 rounded-full text-lg font-bold shadow-lg transition-all transform",
-                        selectedAnswer === null
-                            ? "bg-muted text-muted-foreground cursor-not-allowed opacity-50"
-                            : "bg-primary text-primary-foreground hover:scale-[1.02] hover:shadow-xl active:scale-[0.98]"
-                    )}
-                >
-                    {isSubmitting ? (
-                        <span className="flex items-center justify-center gap-2">
-                            <Loader2 className="animate-spin" size={20} /> Saving...
-                        </span>
-                    ) : (
-                        currentQIndex < QUESTIONS.length - 1 ? "NEXT →" : "COMPLETE TEST"
-                    )}
-                </button>
-            </footer>
+            {/* Hidden Footer Space to ensure scrolling if needed, but no button to save vertical space */}
+            <div className="h-6 w-full md:hidden"></div>
+
+            {/* Desktop-only back/next controls if we wanted them, but for now we hide completely for mobile-first focus */}
         </div>
     );
 }
