@@ -572,16 +572,16 @@ function QuizWizard({ onSubmit, isSubmitting, sessionId }: { onSubmit: (data: an
 
 function Step1_Status({ value, onChange }: { value: string, onChange: (val: string) => void }) {
     const options = [
-        { id: "In Crisis", label: "In Crisis", icon: "💔", desc: "We're on the brink of breaking up" },
-        { id: "Unstable", label: "Unstable", icon: "⚠️", desc: "Frequent fights or emotional distance" },
-        { id: "Together", label: "Stable but Stuck", icon: "😐", desc: "We're okay, but something is missing" },
-        { id: "Recently Separated", label: "Recently Separated", icon: "🏚️", desc: "Trying to understand what happened" },
+        { id: "In Crisis", label: "In crisis", icon: "💔", desc: "Breaking up, separated, or barely holding on" },
+        { id: "Unstable", label: "Unstable", icon: "⚠️", desc: "Frequent fights, emotional distance, or chronic tension" },
+        { id: "Stable but Stuck", label: "Stable but stuck", icon: "😐", desc: "No major issues, but missing something important" },
+        { id: "Healthy", label: "Healthy", icon: "✨", desc: "We're good; we want to understand our patterns better" },
     ];
 
     return (
         <div className="space-y-6 animate-slide-up">
             <div className="text-center space-y-2">
-                <h2 className="text-3xl font-bold">First, how would you describe your relationship right now?</h2>
+                <h2 className="text-3xl font-bold">Where is your relationship right now?</h2>
                 <p className="text-muted-foreground">Select the one that fits best.</p>
             </div>
             <div className="grid gap-3">
