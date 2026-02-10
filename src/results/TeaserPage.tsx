@@ -275,11 +275,45 @@ export default function TeaserPage() {
                             <ScoreRow label="Shared Future" score={metrics.compatibility_quotient || 90} />
                         </div>
 
-                        <div className="bg-slate-50 dark:bg-slate-800 p-6 rounded-2xl border border-slate-100 dark:border-slate-700">
-                            <p className="text-slate-700 dark:text-slate-300 italic leading-relaxed font-medium">
-                                "{summary}"
-                            </p>
-                        </div>
+                        {/* Summary Section - Locked for non-paid users */}
+                        {isPaid ? (
+                            <div className="bg-slate-50 dark:bg-slate-800 p-6 rounded-2xl border border-slate-100 dark:border-slate-700">
+                                <p className="text-slate-700 dark:text-slate-300 italic leading-relaxed font-medium">
+                                    "{summary}"
+                                </p>
+                            </div>
+                        ) : (
+                            <div className="relative">
+                                {/* Blurred Summary */}
+                                <div className="bg-slate-50 dark:bg-slate-800 p-6 rounded-2xl border border-slate-100 dark:border-slate-700 blur-[6px] opacity-40 select-none pointer-events-none">
+                                    <p className="text-slate-700 dark:text-slate-300 italic leading-relaxed font-medium">
+                                        "{summary}"
+                                    </p>
+                                </div>
+
+                                {/* Unlock Overlay */}
+                                <div className="absolute inset-0 flex items-center justify-center">
+                                    <div className="bg-gradient-to-br from-indigo-50 to-purple-50 dark:from-indigo-950/50 dark:to-purple-950/50 border-2 border-indigo-400/30 rounded-2xl p-6 max-w-md mx-4 text-center space-y-4 shadow-xl">
+                                        <Lock size={32} className="mx-auto text-indigo-600 dark:text-indigo-400" />
+                                        <div className="space-y-2">
+                                            <h3 className="text-lg font-black text-slate-900 dark:text-white">
+                                                See What These Scores Mean
+                                            </h3>
+                                            <p className="text-sm text-slate-700 dark:text-slate-300">
+                                                These numbers show WHAT is broken. The full report shows WHY it keeps happening—and the exact conversation to have tonight.
+                                            </p>
+                                        </div>
+                                        <button
+                                            onClick={handleUnlock}
+                                            className="w-full bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 text-white font-black text-base py-3 px-6 rounded-xl flex items-center justify-center gap-2 transition-all shadow-lg hover:shadow-xl group"
+                                        >
+                                            UNLOCK YOUR PERSONALIZED REPORT
+                                            <ArrowRight className="group-hover:translate-x-1 transition-transform" size={18} />
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        )}
                     </div>
                 </section>
 
@@ -326,10 +360,10 @@ export default function TeaserPage() {
 
                                 <div className="absolute inset-0 z-20 flex flex-col items-center justify-center bg-black/20 backdrop-blur-[1px] group-hover:bg-black/10 transition px-6">
                                     <p className="text-white text-sm mb-3 text-center max-w-xs font-medium">
-                                        See exactly where you'll be in 5 years if nothing changes
+                                        Most breakups are predictable. See the trajectory now—before the damage is permanent.
                                     </p>
                                     <div className="bg-white/10 backdrop-blur-md border border-white/20 px-4 py-2 rounded-full flex items-center gap-2 text-sm font-bold shadow-2xl">
-                                        <Lock size={14} /> Unlock Full Report
+                                        <Lock size={14} /> Unlock Your Personalized Report
                                     </div>
                                 </div>
                             </div>
@@ -363,7 +397,7 @@ export default function TeaserPage() {
                         specificItems={fullReport?.chapter2_communication?.specific_triggers}
                         specificItemsLabel="Specific Triggers"
                         impactText={fullReport?.chapter2_communication?.impact_on_other_dimensions}
-                        unlockCopy="You'll see why your fights never end, the exact phrases that trigger escalation, and how to break the cycle tonight"
+                        unlockCopy="You've had this exact fight 47 times. It has a clinical name, a predictable script, and a 24-hour fix. See the loop you're trapped in—and the one sentence that breaks it."
                     />
 
                     {/* B. Emotional Safety (Chapter 3 - PAID) */}
@@ -384,7 +418,7 @@ export default function TeaserPage() {
                         specificItems={fullReport?.chapter3_security?.hypervigilance_triggers}
                         specificItemsLabel="Hypervigilance Triggers"
                         impactText={fullReport?.chapter3_security?.impact_on_daily_life}
-                        unlockCopy="Discover what's making you walk on eggshells, the specific moments that trigger your anxiety, and whether this relationship is safe for you"
+                        unlockCopy="Why do you replay conversations for hours? Why does your chest tighten when you hear their key in the door? See what's hijacking your nervous system—and what it's costing you."
                     />
 
                     {/* C. Sex & Intimacy (Chapter 4 - MIXED) */}
@@ -405,7 +439,7 @@ export default function TeaserPage() {
                         specificItems={fullReport?.chapter4_erotic?.specific_blockers}
                         specificItemsLabel="Desire Blockers"
                         impactText={fullReport?.chapter4_erotic?.polarity_analysis}
-                        unlockCopy="Find out why you're not having sex, what's killing the desire, and whether the spark can actually come back"
+                        unlockCopy="When did you stop wanting them? See the exact moment desire died—and whether you can resurrect it or need to let go."
                     />
 
                     {/* D. Power & Fairness (Chapter 5 - PAID) */}
@@ -426,7 +460,7 @@ export default function TeaserPage() {
                         specificItems={[fullReport?.chapter5_balance?.mental_load_breakdown, fullReport?.chapter5_balance?.resentment_pattern].filter(Boolean)}
                         specificItemsLabel="Mental Load & Resentment"
                         impactText={fullReport?.chapter5_balance?.impact_on_attraction}
-                        unlockCopy="See who's really doing the work, why you feel like their parent, and how this imbalance is killing your attraction"
+                        unlockCopy="You can't desire someone you have to manage. See the invisible scorecard destroying your attraction—and the one boundary that resets it."
                     />
 
                     {/* E. Shared Future (Chapter 6 - FREE) */}
@@ -439,19 +473,19 @@ export default function TeaserPage() {
                         metricInsight={fullReport?.chapter6_compass?.metric_insight}
                         blurredText={fullReport?.chapter6_compass?.detachment_warning}
                         onUnlock={handleUnlock}
-                        visible={true}
+                        visible={isPaid}
                         metricName="Soulmate Sync"
                         metricScore={metrics.soulmate_sync || 90}
                         deepDive={fullReport?.chapter6_compass?.deep_dive}
                         specificItems={[fullReport?.chapter6_compass?.vision_compatibility, fullReport?.chapter6_compass?.dream_erosion, fullReport?.chapter6_compass?.trajectory_warning].filter(Boolean)}
                         specificItemsLabel="Vision & Trajectory"
                         impactText={fullReport?.chapter6_compass?.impact_on_daily_life}
-                        unlockCopy="Learn if you're actually building the same future, where your dreams don't match, and whether you're wasting your time"
+                        unlockCopy="Are you building the same future—or are you wasting your best years? See where your visions diverge and whether this is fixable."
                     />
                 </div>
 
                 {/* 5. ADVANCED DIAGNOSTICS (12 MRI Metrics) */}
-                <section className="bg-slate-900 dark:bg-slate-950 rounded-3xl p-8 shadow-2xl mt-12 border border-slate-800">
+                <section className="bg-slate-900 dark:bg-slate-950 rounded-3xl p-8 shadow-2xl mt-12 border border-slate-800 relative overflow-hidden">
                     <div className="text-center space-y-4 mb-8">
                         <h2 className="text-3xl font-black text-white">
                             🔬 Advanced Diagnostics
@@ -461,7 +495,7 @@ export default function TeaserPage() {
                         </p>
                     </div>
 
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    <div className={`grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 ${!isPaid ? 'blur-[4px] opacity-50 select-none pointer-events-none' : ''}`}>
                         {/* Metric Cards */}
                         {[
                             {
@@ -643,6 +677,53 @@ export default function TeaserPage() {
                             );
                         })}
                     </div>
+
+                    {/* Unlock Overlay for Non-Paid Users */}
+                    {!isPaid && (
+                        <div className="absolute inset-0 flex items-center justify-center bg-slate-900/80 backdrop-blur-sm z-10">
+                            <div className="max-w-lg mx-auto px-6 text-center space-y-6">
+                                <div className="bg-gradient-to-br from-indigo-500/20 to-purple-500/20 border-2 border-indigo-400/30 rounded-2xl p-8 space-y-4">
+                                    <Lock size={48} className="mx-auto text-indigo-300" />
+                                    <h3 className="text-2xl font-black text-white">
+                                        Unlock Your Complete MRI Scan
+                                    </h3>
+                                    <p className="text-indigo-100 text-sm leading-relaxed">
+                                        See your scores for: Repair Efficiency, Betrayal Vulnerability, Erotic Death Spiral, CEO vs Intern, Soulmate Sync, and 7 more clinical markers
+                                    </p>
+
+                                    <div className="text-left space-y-2 pt-4">
+                                        <p className="text-indigo-200 font-bold text-sm mb-3">🔓 WHAT YOU'LL GET:</p>
+                                        <div className="space-y-2 text-sm text-indigo-100">
+                                            <div className="flex gap-2 items-start">
+                                                <span className="text-green-400 shrink-0">✓</span>
+                                                <span>Your exact scores on all 12 "vital signs"</span>
+                                            </div>
+                                            <div className="flex gap-2 items-start">
+                                                <span className="text-green-400 shrink-0">✓</span>
+                                                <span>What each score means for your relationship's future</span>
+                                            </div>
+                                            <div className="flex gap-2 items-start">
+                                                <span className="text-green-400 shrink-0">✓</span>
+                                                <span>Which metrics are in the "danger zone" and why</span>
+                                            </div>
+                                            <div className="flex gap-2 items-start">
+                                                <span className="text-green-400 shrink-0">✓</span>
+                                                <span>The hidden connections between your scores</span>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <button
+                                        onClick={handleUnlock}
+                                        className="w-full bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 text-white font-black text-lg px-8 py-4 rounded-xl shadow-lg hover:shadow-xl transition-all flex items-center justify-center gap-2 group"
+                                    >
+                                        UNLOCK YOUR PERSONALIZED REPORT
+                                        <ArrowRight className="group-hover:translate-x-1 transition-transform" size={20} />
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    )}
                 </section>
 
                 {/* 6. SYSTEMIC ANALYSIS (Chapter 7 - FULLY PAID) */}
@@ -678,7 +759,7 @@ export default function TeaserPage() {
                                     className="group relative inline-flex items-center justify-center gap-3 bg-white text-indigo-950 font-black text-lg px-8 py-4 rounded-full shadow-[0_0_40px_-5px_rgba(255,255,255,0.3)] hover:scale-105 transition-all"
                                 >
                                     <Lock size={20} />
-                                    Unlock Full Report
+                                    Unlock Your Personalized Report
                                 </button>
                             </div>
                         )}
@@ -786,7 +867,7 @@ export default function TeaserPage() {
                                         onClick={handleUnlock}
                                         className="group relative inline-flex items-center justify-center gap-3 bg-white text-emerald-950 font-black text-lg px-8 py-4 rounded-full shadow-[0_0_40px_-5px_rgba(255,255,255,0.3)] hover:scale-105 transition-all"
                                     >
-                                        {isCheckoutLoading ? "Loading..." : "Unlock Full Report"}
+                                        {isCheckoutLoading ? "Loading..." : "Unlock Your Personalized Report"}
                                         <ArrowRight className="group-hover:translate-x-1 transition-transform" />
                                     </button>
                                 </div>
@@ -794,6 +875,78 @@ export default function TeaserPage() {
                         )}
                     </div>
                 </section>
+
+                {/* VALUE STACKING SECTION - "What You're Missing" */}
+                {!isPaid && (
+                    <section className="bg-slate-900 dark:bg-slate-950 rounded-3xl p-8 md:p-12 shadow-2xl mt-16 border-2 border-indigo-500/30 relative overflow-hidden">
+                        {/* Decorative gradient background */}
+                        <div className="absolute inset-0 bg-gradient-to-br from-indigo-900/20 to-purple-900/20 pointer-events-none"></div>
+
+                        <div className="relative z-10 max-w-3xl mx-auto text-center space-y-8">
+                            <div className="space-y-4">
+                                <div className="inline-block px-4 py-2 bg-indigo-500/20 border border-indigo-400/30 rounded-full">
+                                    <span className="text-indigo-300 font-bold text-sm uppercase tracking-wider">🔒 What You're Missing</span>
+                                </div>
+                                <h2 className="text-3xl md:text-4xl font-black text-white leading-tight">
+                                    The free analysis showed you WHAT is broken.
+                                </h2>
+                                <p className="text-xl text-indigo-200 font-semibold">
+                                    The full report shows you:
+                                </p>
+                            </div>
+
+                            <div className="grid md:grid-cols-2 gap-4 text-left">
+                                <div className="bg-white/5 backdrop-blur-sm border border-white/10 rounded-xl p-6 space-y-2">
+                                    <div className="flex items-start gap-3">
+                                        <span className="text-2xl shrink-0">✓</span>
+                                        <div>
+                                            <h3 className="text-white font-bold text-lg mb-1">WHY it's happening</h3>
+                                            <p className="text-indigo-200 text-sm">The hidden pattern with a clinical name</p>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div className="bg-white/5 backdrop-blur-sm border border-white/10 rounded-xl p-6 space-y-2">
+                                    <div className="flex items-start gap-3">
+                                        <span className="text-2xl shrink-0">✓</span>
+                                        <div>
+                                            <h3 className="text-white font-bold text-lg mb-1">HOW to fix it</h3>
+                                            <p className="text-indigo-200 text-sm">Exact scripts and actionable steps</p>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div className="bg-white/5 backdrop-blur-sm border border-white/10 rounded-xl p-6 space-y-2">
+                                    <div className="flex items-start gap-3">
+                                        <span className="text-2xl shrink-0">✓</span>
+                                        <div>
+                                            <h3 className="text-white font-bold text-lg mb-1">WHEN it will break</h3>
+                                            <p className="text-indigo-200 text-sm">5-year trajectory if nothing changes</p>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div className="bg-white/5 backdrop-blur-sm border border-white/10 rounded-xl p-6 space-y-2">
+                                    <div className="flex items-start gap-3">
+                                        <span className="text-2xl shrink-0">✓</span>
+                                        <div>
+                                            <h3 className="text-white font-bold text-lg mb-1">WHETHER it's worth saving</h3>
+                                            <p className="text-indigo-200 text-sm">Clinical prognosis and honest assessment</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div className="pt-4">
+                                <button
+                                    onClick={handleUnlock}
+                                    className="bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 text-white font-black text-xl px-12 py-5 rounded-xl shadow-2xl hover:shadow-indigo-500/50 transition-all flex items-center justify-center gap-3 mx-auto group"
+                                >
+                                    UNLOCK FULL ANALYSIS
+                                    <ArrowRight className="group-hover:translate-x-1 transition-transform" size={24} />
+                                </button>
+                                <p className="text-indigo-300 text-sm mt-4">30-Day Money Back Guarantee • Secure SSL Payment</p>
+                            </div>
+                        </div>
+                    </section>
+                )}
 
                 {/* 7. TESTIMONIALS (Social Proof) */}
                 <section className="mt-16 mb-8">
@@ -836,6 +989,30 @@ export default function TeaserPage() {
                 </div>
 
             </main>
+
+            {/* STICKY CTA BAR (Mobile & Desktop) */}
+            {!isPaid && (
+                <div className="fixed bottom-0 left-0 right-0 z-50 bg-slate-900/95 backdrop-blur-md border-t border-slate-700 shadow-2xl">
+                    <div className="max-w-7xl mx-auto px-4 py-3 md:py-4">
+                        <div className="flex flex-col md:flex-row items-center justify-between gap-3">
+                            <div className="flex items-center gap-3 text-white">
+                                <Lock size={20} className="text-indigo-400 shrink-0" />
+                                <div className="text-sm md:text-base">
+                                    <span className="font-bold">You're viewing 30% of your report.</span>
+                                    <span className="hidden md:inline text-slate-300 ml-2">Unlock: Root causes, action plans, and exact scripts to fix this</span>
+                                </div>
+                            </div>
+                            <button
+                                onClick={handleUnlock}
+                                className="w-full md:w-auto bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 text-white font-black text-sm md:text-base px-6 md:px-8 py-3 rounded-lg flex items-center justify-center gap-2 transition-all shadow-lg group shrink-0"
+                            >
+                                UNLOCK NOW
+                                <ArrowRight className="group-hover:translate-x-1 transition-transform" size={18} />
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
 
             {/* Checkout Modal */}
             <CheckoutModal
@@ -989,7 +1166,7 @@ function DimensionCard({
                                 </p>
                                 <div className="absolute inset-0 flex items-center justify-center">
                                     <div className="bg-white/90 dark:bg-slate-800/90 backdrop-blur-md px-4 py-2 rounded-full flex items-center gap-2 text-sm font-bold text-slate-900 dark:text-white border border-slate-200 dark:border-slate-700 shadow-lg group-hover:scale-105 transition-transform">
-                                        <Lock size={14} /> Unlock Full Report
+                                        <Lock size={14} /> Unlock Your Personalized Report
                                     </div>
                                 </div>
                             </div>
@@ -1048,16 +1225,19 @@ function DimensionCard({
 
             {/* UNLOCK CTA (for non-paid users) */}
             {!visible && (deepDive || specificItems?.length > 0 || impactText) && (
-                <div className="p-6 border-t border-slate-200 dark:border-slate-700 bg-primary/5 space-y-3">
-                    <p className="text-sm text-slate-700 dark:text-slate-300 text-center leading-relaxed font-medium">
-                        {unlockCopy || "You'll discover what's really causing this, the specific triggers that set it off, and how it's affecting everything else in your relationship"}
-                    </p>
+                <div className="p-6 border-t border-slate-200 dark:border-slate-700 bg-gradient-to-br from-indigo-50 to-purple-50 dark:from-indigo-950/30 dark:to-purple-950/30 space-y-4">
+                    <div className="text-center space-y-3">
+                        <Lock size={32} className="mx-auto text-indigo-600 dark:text-indigo-400" />
+                        <p className="text-base text-slate-800 dark:text-slate-200 font-semibold leading-relaxed">
+                            {unlockCopy || "You'll discover what's really causing this, the specific triggers that set it off, and how it's affecting everything else in your relationship"}
+                        </p>
+                    </div>
                     <button
                         onClick={onUnlock}
-                        className="w-full bg-primary text-primary-foreground hover:opacity-90 font-bold py-3 px-6 rounded-xl flex items-center justify-center gap-2 transition-all shadow-lg hover:shadow-xl"
+                        className="w-full bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 text-white font-black text-base py-4 px-6 rounded-xl flex items-center justify-center gap-2 transition-all shadow-lg hover:shadow-xl group"
                     >
-                        <Lock size={16} />
-                        Unlock Full Report
+                        UNLOCK YOUR PERSONALIZED REPORT
+                        <ArrowRight className="group-hover:translate-x-1 transition-transform" size={20} />
                     </button>
                 </div>
             )}
