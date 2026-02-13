@@ -1,14 +1,72 @@
 import React, { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
-import { Lock, BadgeCheck, Zap, ArrowRight, Shield, Clock, TrendingUp, Heart, Brain, Activity, Play, X, MessageCircle, Compass, TrendingDown, Star, Quote } from "lucide-react";
+import { ArrowRight, Lock, CheckCircle, AlertTriangle, TrendingUp, Shield, Heart, BadgeCheck, Compass, Zap, X, Activity, ChevronDown, Check, Eye, Microscope, ListChecks, ShieldAlert, Clock, MessageCircle, Brain, Quote, Star, Play, TrendingDown, Battery, Thermometer, FileWarning } from "lucide-react";
 import { useQuery, generateQuickOverview, generateFullReport, createCheckoutSession, getTestSession } from "wasp/client/operations";
 import { useAuth } from "wasp/client/auth";
 import GaugeChart from "../components/GaugeChart";
 import Confetti from "react-confetti";
-import { CheckoutModal } from './CheckoutModal';
 import { trackPixelEvent } from '../analytics/pixel';
 import { NarcissismSection } from "./sections/NarcissismSection";
+import { FutureForecastSection } from "./sections/FutureForecastSection";
+import { PulseSection } from "./sections/PulseSection";
 
+
+// --- COMPONENTS ---
+const BiomarkerStrip = ({ label, score, description, doubtQuestion, isPaid, icon, color = "red" }: any) => {
+    // Score logic: 0-100. High = Bad.
+    const level = score >= 80 ? "Critical" : score >= 50 ? "High" : "Elevated";
+    const barWidth = `${score}%`;
+    const themeColor = color === "red" ? "bg-red-500" : color === "orange" ? "bg-orange-500" : "bg-amber-500";
+    const textColor = color === "red" ? "text-red-500" : color === "orange" ? "text-orange-500" : "text-amber-500";
+    const bgTint = color === "red" ? "bg-red-50" : color === "orange" ? "bg-orange-50" : "bg-amber-50";
+
+    return (
+        <div className="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 p-4 shadow-sm relative overflow-hidden group">
+            <div className="flex gap-4 items-center relative z-10">
+                {/* ICON & GAUGE */}
+                <div className={`shrink-0 flex flex-col items-center gap-2 w-16 text-center`}>
+                    <div className={`p-2 rounded-full ${bgTint} ${textColor}`}>
+                        {icon}
+                    </div>
+                    <span className={`text-xs font-bold ${textColor}`}>{score}%</span>
+                </div>
+
+                {/* CONTENT */}
+                <div className="flex-1">
+                    <div className="flex justify-between items-center mb-1">
+                        <h4 className="font-bold text-slate-800 dark:text-slate-200">{label}</h4>
+                        <span className={`text-xs font-bold px-2 py-0.5 rounded-full uppercase ${bgTint} ${textColor}`}>
+                            {level}
+                        </span>
+                    </div>
+
+                    {/* BAR */}
+                    <div className="h-1.5 w-full bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden mb-2">
+                        <div className={`h-full rounded-full ${themeColor} transition-all duration-1000`} style={{ width: barWidth }}></div>
+                    </div>
+
+                    {/* TEXT / DOUBT */}
+                    {isPaid ? (
+                        <p className="text-xs text-slate-600 dark:text-slate-400 leading-relaxed">
+                            {description}
+                        </p>
+                    ) : (
+                        <div className="relative">
+                            <p className="text-xs text-slate-400 dark:text-slate-600 blur-[3px] select-none">
+                                {description}
+                            </p>
+                            <div className="absolute inset-0 flex items-center">
+                                <span className="text-sm font-bold text-slate-700 dark:text-slate-300 italic flex items-center gap-2">
+                                    <Lock size={12} className="text-indigo-500" /> "{doubtQuestion}"
+                                </span>
+                            </div>
+                        </div>
+                    )}
+                </div>
+            </div>
+        </div>
+    );
+};
 
 // --- TYPES (Mirroring AI Output) ---
 type QuickOverviewData = {
@@ -38,6 +96,21 @@ type FullReportData = {
 // --- DATA ---
 const TESTIMONIALS = [
     {
+        name: "James",
+        info: "43, married for 14 years",
+        quote: "The Narcissist Detection guide scored my partner at 18/21. It was terrifying but validating. I finally stopped blaming myself for her rage and understood I was dealing with a disorder, not just 'communication issues'."
+    },
+    {
+        name: "Alessa",
+        info: "42, married for 15 years",
+        quote: "I did it after a fight about money where I felt like his mother again instead of his wife. The term 'Manager-Employee dynamic' pissed me off because it was EXACTLY that. I printed that section and left it on his nightstand without saying anything. Two days later he asked me 'is this how you feel?' and we could finally talk about it. Before, I didn't have the words."
+    },
+    {
+        name: "Claire",
+        info: "31, living together for 4 years",
+        quote: "I took it after he shut down during another fight and I spiraled into panic. The piece on 'situational anxiety vs constant anxiety' made me realize I wasn't crazy—it was a specific trigger, not my personality. I printed it and left it for him to read. He came to me later and said 'I didn't know my silence felt like abandonment to you'. We haven't fixed everything, but at least now he understands what happens in my head."
+    },
+    {
         name: "Sarah",
         info: "34, living together for 5 years",
         quote: "I did it alone after another fight where he shut himself in the bedroom. When I read 'Pursuer-Shutdown Cycle' I had this lightbulb moment—I finally understood why it always ended the same way. I only showed him the report a week later, when I was ready to talk about it without blaming him. Knowing WHAT was happening gave me the calm to approach it differently."
@@ -58,11 +131,6 @@ const TESTIMONIALS = [
         quote: "I was convinced she didn't desire me anymore. I took the test to figure out if it was over or if there was still hope. The piece on sexual rejection sensitivity opened my eyes—it was ME loading every no with meaning. I didn't show her the report, but I changed how I react when she says no. Ironically now she initiates more often, probably because I'm less desperate."
     },
     {
-        name: "Alessa",
-        info: "42, married for 15 years",
-        quote: "I did it after a fight about money where I felt like his mother again instead of his wife. The term 'Manager-Employee dynamic' pissed me off because it was EXACTLY that. I printed that section and left it on his nightstand without saying anything. Two days later he asked me 'is this how you feel?' and we could finally talk about it. Before, I didn't have the words."
-    },
-    {
         name: "David",
         info: "39, living together for 8 years",
         quote: "I took the test thinking I was a good partner because I did half the chores. The report explained the difference between 'doing' and 'carrying the mental load' and I realized she was the CEO while I was just the employee. I showed it to her and said 'I finally get it'. We're still figuring it out, but at least now I understand what she means when she says she feels alone in the worrying."
@@ -71,11 +139,6 @@ const TESTIMONIALS = [
         name: "Elena",
         info: "35, dating for 6 years",
         quote: "I did it because we kept having the same fight: 'we want the same things but I'm miserable'. The report said we scored 100% on values but 'you're managing your life together, not living it'. I cried reading that because it was so accurate. I showed it to him that same night. We made a rule: one fun activity per week, zero productivity. After 3 months we feel like a couple again, not project managers."
-    },
-    {
-        name: "Claire",
-        info: "31, living together for 4 years",
-        quote: "I took it after he shut down during another fight and I spiraled into panic. The piece on 'situational anxiety vs constant anxiety' made me realize I wasn't crazy—it was a specific trigger, not my personality. I printed it and left it for him to read. He came to me later and said 'I didn't know my silence felt like abandonment to you'. We haven't fixed everything, but at least now he understands what happens in my head."
     },
     {
         name: "Simon",
@@ -160,49 +223,34 @@ export default function TeaserPage() {
         }
     }, [session?.id]); // Only depend on session.id to prevent infinite loops
 
-    // Generate Event ID for consistent InitiateCheckout deduplication
-    const [checkoutEventID, setCheckoutEventID] = useState<string | null>(null);
+
 
     const handleUnlock = async () => {
-        // Track unlock intent with AddToCart event
-        trackPixelEvent('AddToCart', {
-            content_name: 'Full Relationship Report',
-            content_category: 'Report',
-            value: 47,
-            currency: 'USD',
-            content_ids: ['relationship_report'],
-            content_type: 'product'
-        });
-
-        // Show modal
-        setShowCheckoutModal(true);
-    };
-
-    const handleCheckout = async () => {
         if (!session) return;
         setIsCheckoutLoading(true);
 
-        // Generate event ID and fire InitiateCheckout when user commits to checkout
+        // 1. Generate unique event ID for CAPI deduplication
         const { generateEventId } = await import("../analytics/eventId");
         const eventID = generateEventId();
-        setCheckoutEventID(eventID);
 
-        // Track InitiateCheckout when user actually commits
+
+        // 2. Track InitiateCheckout (Standard Pixel + CAPI)
         trackPixelEvent('InitiateCheckout', {
             content_name: 'Full Relationship Report',
             content_category: 'Report',
-            value: 47,
-            currency: 'USD',
-            eventID: eventID // Crucial for deduplication with Purchase event
+            value: 29, // Updated price
+            currency: 'EUR',
+            eventID: eventID
         });
 
         try {
-            // Pass the generated eventID to the server for CAPI 
+            // 3. Create Stripe Session
             const checkout = await createCheckoutSession({
                 sessionId: session.id,
                 eventID: eventID
             });
 
+            // 4. Redirect
             if (checkout.sessionUrl) {
                 window.location.href = checkout.sessionUrl;
             }
@@ -254,161 +302,89 @@ export default function TeaserPage() {
             {isPaid && <Confetti recycle={false} numberOfPieces={500} />}
 
             {/* 1. HERO SECTION */}
-            <header className="bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 pt-12 pb-16 px-6 text-center">
-                <div className="max-w-4xl mx-auto space-y-6">
-                    <div className="inline-flex items-center gap-2 bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 px-3 py-1 rounded-full text-xs font-bold uppercase tracking-widest">
-                        <Activity size={14} /> Analysis Complete
+            {/* 1. HERO SECTION: THE DASHBOARD OF TRUTH */}
+            <header className="bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 pt-12 pb-16 px-6 text-center relative overflow-hidden">
+                <div className="max-w-4xl mx-auto space-y-6 relative z-10">
+
+                    {/* Visual Pills / Badges */}
+                    <div className="flex flex-wrap justify-center gap-2 md:gap-3 text-[10px] md:text-xs font-bold uppercase tracking-widest text-slate-500 dark:text-slate-400 mb-4">
+                        <span className="bg-slate-100 dark:bg-slate-800 px-3 py-1.5 rounded-full flex items-center gap-1.5">
+                            <ShieldAlert size={12} className="text-orange-500" /> Toxicity Screen: COMPLETE
+                        </span>
+                        <span className="bg-slate-100 dark:bg-slate-800 px-3 py-1.5 rounded-full flex items-center gap-1.5">
+                            <Clock size={12} className="text-blue-500" /> 5-Year Forecast: READY
+                        </span>
+                        <span className="bg-slate-100 dark:bg-slate-800 px-3 py-1.5 rounded-full flex items-center gap-1.5">
+                            <Activity size={12} className="text-purple-500" /> Breakup Risk: CALCULATED
+                        </span>
                     </div>
 
                     <h1 className="text-4xl md:text-6xl font-extrabold tracking-tight text-slate-900 dark:text-white leading-tight">
-                        {headline}
+                        The Honest Truth About<br className="hidden md:block" /> Your Relationship.
                     </h1>
 
-                    <p className="text-lg md:text-xl text-slate-600 dark:text-slate-300 max-w-2xl mx-auto">
-                        We have compared your answers against 5 core psychological dimensions to determine the health of your relationship.
+                    <p className="text-lg md:text-xl text-slate-600 dark:text-slate-300 max-w-2xl mx-auto leading-relaxed">
+                        Whether it's hidden manipulation or just growing apart, we've analyzed exactly <strong>what's happening</strong>—and <strong>where you'll be in 5 years</strong>.
                     </p>
 
-                    <div className={`inline-block px-6 py-3 rounded-xl border-2 text-xl font-black uppercase tracking-wider shadow-lg transform rotate-1 ${badge.includes("STUCK") || badge.includes("RISK") ? "bg-red-50 border-red-500 text-red-600" : "bg-green-50 border-green-500 text-green-600"}
+                    {/* Primary Status Badge - Dynamic based on Risk */}
+                    <div className={`inline-flex items-center gap-2 px-6 py-3 rounded-2xl border-2 text-lg font-black uppercase tracking-wider shadow-lg transform rotate-1 mt-4 ${badge.includes("STUCK") || badge.includes("RISK") ? "bg-red-50 border-red-500 text-red-600 dark:bg-red-950/30" : "bg-green-50 border-green-500 text-green-600 dark:bg-green-950/30"
                         } `}>
+                        {badge.includes("RISK") && <AlertTriangle size={20} className="stroke-[3px]" />}
+                        {badge.includes("STUCK") && <Activity size={20} className="stroke-[3px]" />}
+                        {badge.includes("HEALTHY") && <BadgeCheck size={20} className="stroke-[3px]" />}
                         [{badge}]
                     </div>
+                </div>
+
+                {/* Subtle Background Elements */}
+                <div className="absolute top-0 left-0 w-full h-full overflow-hidden pointer-events-none opacity-20 dark:opacity-5">
+                    <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-purple-200 rounded-full blur-[100px]" />
+                    <div className="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] bg-indigo-200 rounded-full blur-[100px]" />
                 </div>
             </header>
 
             <main className="max-w-3xl mx-auto px-6 -mt-8 space-y-8 relative z-10">
 
-                {/* 2. OVERVIEW DASHBOARD (FREE) */}
-                <section className="bg-white dark:bg-slate-900 rounded-3xl shadow-xl border border-slate-200 dark:border-slate-800 overflow-hidden">
-                    <div className="bg-slate-50 dark:bg-slate-800/50 p-6 border-b border-slate-100 dark:border-slate-800 flex justify-between items-center">
-                        <h2 className="font-bold text-lg text-slate-800 dark:text-white flex items-center gap-2">
-                            <Activity className="text-primary" size={20} />
-                            The 5 Core Pillars
-                        </h2>
-                        <span className="text-xs font-bold bg-green-100 text-green-700 px-2 py-1 rounded uppercase">Free Analysis</span>
-                    </div>
-                    <div className="px-6 pt-4 pb-2">
-                        <p className="text-sm text-slate-500 dark:text-slate-400">
-                            A high-level overview of the relationship’s current health. It translates complex data into "Weather Icons" so you immediately understand the stakes.
-                        </p>
-                    </div>
-
-                    {/* Scores Section - Always Visible */}
-                    <div className="p-6 md:p-8 pb-4">
-                        <div className="space-y-4">
-                            <ScoreRow label="Communication" score={metrics.repair_efficiency || 40} />
-                            <ScoreRow label="Trust & Safety" score={metrics.betrayal_vulnerability || 65} />
-                            <ScoreRow label="Sex & Intimacy" score={metrics.erotic_death_spiral || 20} />
-                            <ScoreRow label="Fairness & Balance" score={metrics.ceo_vs_intern || 45} />
-                            <ScoreRow label="Shared Future" score={metrics.compatibility_quotient || 90} />
-                        </div>
-                    </div>
-
-                    {/* Summary Section - Separate container for overlay */}
-                    <div className="px-6 md:px-8 pb-6 md:pb-8">
-                        {isPaid ? (
-                            <div className="bg-slate-50 dark:bg-slate-800 p-6 rounded-2xl border border-slate-100 dark:border-slate-700">
-                                <p className="text-slate-700 dark:text-slate-300 italic leading-relaxed font-medium">
-                                    "{summary}"
-                                </p>
-                            </div>
-                        ) : (
-                            <div className="relative min-h-[280px] md:min-h-[320px]">
-                                {/* Blurred Summary */}
-                                <div className="bg-slate-50 dark:bg-slate-800 p-6 md:p-8 rounded-2xl border border-slate-100 dark:border-slate-700 blur-[6px] opacity-40 select-none pointer-events-none">
-                                    <p className="text-slate-700 dark:text-slate-300 italic leading-relaxed font-medium">
-                                        "{fullReport?.chapter1_pulse?.summary || "These scores reveal a specific pattern that's quietly eroding your relationship. You're not broken—you're stuck in a loop with a clinical name, a predictable trajectory, and a clear way out. But first, you need to see what you can't see from inside it. The pattern has been running for months, maybe years. It's creating distance where there should be intimacy, resentment where there should be trust, and silence where there should be conversation. Every fight feels different, but they're all symptoms of the same core dynamic. And that dynamic has a name, a cause, and most importantly—a solution."}"
-                                    </p>
-                                </div>
-
-                                {/* Unlock Overlay - Only covers this summary div */}
-                                <div className="absolute inset-0 flex items-center justify-center p-4 pt-8 sm:pt-12 pb-8 sm:pb-12">
-                                    <div className="bg-gradient-to-br from-indigo-50 to-purple-50 dark:from-indigo-950/50 dark:to-purple-950/50 border-2 border-indigo-400/30 rounded-2xl p-4 sm:p-6 w-full max-w-md text-center space-y-3 sm:space-y-4 shadow-xl">
-                                        <Lock size={28} className="mx-auto text-indigo-600 dark:text-indigo-400" />
-                                        <div className="space-y-2">
-                                            <h3 className="text-base sm:text-lg font-black text-slate-900 dark:text-white">
-                                                See What These Scores Mean
-                                            </h3>
-                                            <p className="text-xs sm:text-sm text-slate-700 dark:text-slate-300">
-                                                These numbers show WHAT is broken. The full report shows WHY it keeps happening—and the exact conversation to have tonight.
-                                            </p>
-                                        </div>
-                                        <button
-                                            onClick={handleUnlock}
-                                            className="w-full bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 text-white font-black text-sm sm:text-base py-2.5 sm:py-3 px-4 sm:px-6 rounded-xl flex items-center justify-center gap-2 transition-all shadow-lg hover:shadow-xl group"
-                                        >
-                                            <span className="hidden sm:inline">UNLOCK YOUR PERSONALIZED REPORT</span>
-                                            <span className="sm:hidden">UNLOCK REPORT</span>
-                                            <ArrowRight className="group-hover:translate-x-1 transition-transform" size={18} />
-                                        </button>
-                                    </div>
-                                </div>
-                            </div>
-                        )}
-                    </div>
-                </section>
-
-                {/* 3. FORECAST (MIXED) */}
-                <section className="space-y-4">
+                {/* 2. CRITICAL INSIGHTS: NARCISSISM & SAFETY (Moved to Top) */}
+                <div className="space-y-4">
                     <div className="px-2">
-                        <h2 className="font-bold text-xl text-slate-900 dark:text-white">Future Forecast</h2>
+                        <h2 className="font-bold text-xl text-slate-900 dark:text-white flex items-center gap-2">
+                            <ShieldAlert size={20} className="text-orange-500" />
+                            First: Let's Check For Toxicity
+                        </h2>
                         <p className="text-sm text-slate-500 dark:text-slate-400">
-                            A clinical prediction of where the relationship is headed in the next 1–5 years if nothing changes.
+                            Before we look at communication or intimacy, we need to rule out any "Red Flags" that make the relationship unsafe.
                         </p>
                     </div>
-                    <div className="grid md:grid-cols-2 gap-4">
-                        {/* Short Term - FREE from Quick Overview */}
-                        <div className="bg-white dark:bg-slate-900 p-6 rounded-3xl shadow-sm border border-slate-200 dark:border-slate-800">
-                            <h3 className="text-xs font-bold text-slate-500 uppercase mb-4 flex items-center gap-2">
-                                <Clock size={14} /> 6-Month Forecast
-                            </h3>
-                            <p className="text-slate-900 dark:text-white text-base leading-relaxed max-w-prose">
-                                {quickOverview?.forecast?.short_term || "Based on your current patterns, the next 6 months will be challenging without intervention."}
-                            </p>
-                        </div>
 
-                        {/* Long Term - PAID */}
-                        {isPaid ? (
-                            <div className="bg-white dark:bg-slate-900 p-6 rounded-3xl shadow-sm border border-slate-200 dark:border-slate-800">
-                                <h3 className="text-xs font-bold text-slate-500 uppercase mb-4 flex items-center gap-2">
-                                    <Clock size={14} /> 5-Year Forecast
-                                </h3>
-                                <p className="text-slate-900 dark:text-white text-base leading-relaxed max-w-prose">
-                                    {fullReport?.chapter1_pulse?.long_term_forecast || "If this pattern continues, specifically the lack of repair..."}
-                                </p>
-                            </div>
-                        ) : (
-                            <div className="relative bg-slate-900 text-white p-6 rounded-3xl shadow-sm overflow-hidden group cursor-pointer" onClick={handleUnlock}>
-                                {/* Background pattern */}
-                                <div className="absolute inset-0 bg-gradient-to-br from-slate-800 to-slate-950" />
+                    <NarcissismSection
+                        analysis={session.narcissismAnalysis as any}
+                        isPaid={isPaid}
+                        onUnlock={handleUnlock}
+                    />
+                </div>
 
-                                <div className="relative z-10 opacity-40 blur-[2px] select-none">
-                                    <h3 className="text-xs font-bold opacity-70 uppercase mb-4">5-Year Forecast</h3>
-                                    <p className="font-bold text-lg">
-                                        If this pattern continues, specifically the lack of repair...
-                                    </p>
-                                </div>
-
-                                <div className="absolute inset-0 z-20 flex flex-col items-center justify-center bg-black/20 backdrop-blur-[1px] group-hover:bg-black/10 transition px-6">
-                                    <p className="text-white text-sm mb-3 text-center max-w-xs font-medium">
-                                        Most breakups are predictable. See the trajectory now—before the damage is permanent.
-                                    </p>
-                                    <div className="bg-white/10 backdrop-blur-md border border-white/20 px-4 py-2 rounded-full flex items-center gap-2 text-sm font-bold shadow-2xl">
-                                        <Lock size={14} /> Unlock Your Personalized Report
-                                    </div>
-                                </div>
-                            </div>
-                        )}
-                    </div>
-                </section>
-
-                {/* 3.5 NARCISSISM / TOXICITY ANALYSIS (NEW) */}
-                <NarcissismSection
-                    analysis={session.narcissismAnalysis as any}
+                {/* 3. RELATIONSHIP PULSE (New & Improved) */}
+                <PulseSection
+                    analysis={fullReport?.chapter1_pulse}
+                    quickOverview={quickOverview}
+                    metrics={metrics}
                     isPaid={isPaid}
                     onUnlock={handleUnlock}
                 />
 
-                {/* 4. DIMENSION BREAKDOWN (DEEP DIVE) */}
+
+
+                {/* 4. FUTURE FORECAST (New & Improved) */}
+                <FutureForecastSection
+                    analysis={fullReport?.chapter1_pulse}
+                    quickOverview={quickOverview}
+                    isPaid={isPaid}
+                    onUnlock={handleUnlock}
+                />
+
+                {/* 5. DIMENSION BREAKDOWN (DEEP DIVE) */}
                 <div className="space-y-6">
                     <div className="text-center py-6 space-y-2">
                         <h3 className="text-sm font-bold text-slate-400 uppercase tracking-widest">Detailed Diagnostic</h3>
@@ -419,8 +395,10 @@ export default function TeaserPage() {
 
                     {/* A. Communication (Chapter 2 - MIXED) */}
                     <DimensionCard
-                        title="How You Communicate"
-                        description="This section analyzes how information and emotion flow between you. It focuses on how you handle friction and whether you can 'reset' after a fight."
+                        title={(metrics.repair_efficiency || 40) < 60 ? "Why You Feel Unheard" : "Your Connection Engine"}
+                        description={(metrics.repair_efficiency || 40) < 60
+                            ? "It’s not just 'fighting.' It’s the loop where you say one thing, they hear another, and you end up apologizing for your own feelings."
+                            : "You have a rare ability to repair conflict quickly. This is your greatest asset."}
                         icon={<TrendingUp />}
                         status={quickOverview?.dimensions?.communication?.status || "Analyzing..."}
                         teaser={quickOverview?.dimensions?.communication?.teaser}
@@ -435,12 +413,15 @@ export default function TeaserPage() {
                         specificItemsLabel="Specific Triggers"
                         impactText={fullReport?.chapter2_communication?.impact_on_other_dimensions}
                         unlockCopy="You've had this exact fight 47 times. It has a clinical name, a predictable script, and a 24-hour fix. See the loop you're trapped in—and the one sentence that breaks it."
+                        isSymptom={(metrics.repair_efficiency || 40) < 60}
                     />
 
                     {/* B. Emotional Safety (Chapter 3 - PAID) */}
                     <DimensionCard
-                        title="Emotional Safety"
-                        description="This explores the 'Invisible Net' of the relationship. It measures if you feel safe enough to be vulnerable or if you are living in a state of 'high alert.'"
+                        title={(metrics.betrayal_vulnerability || 65) > 40 ? "Why You Walk on Eggshells" : "Your Safety Net"}
+                        description={(metrics.betrayal_vulnerability || 65) > 40
+                            ? "The constant, low-level anxiety of monitoring your words. You edit yourself to keep the peace, but the silence is getting louder."
+                            : "You feel safe, seen, and secure. This solid foundation allows you to be vulnerable without fear of rejection."}
                         icon={<Shield />}
                         status={quickOverview?.dimensions?.security?.status || "Analyzing..."}
                         teaser={quickOverview?.dimensions?.security?.teaser}
@@ -456,12 +437,37 @@ export default function TeaserPage() {
                         specificItemsLabel="Hypervigilance Triggers"
                         impactText={fullReport?.chapter3_security?.impact_on_daily_life}
                         unlockCopy="Why do you replay conversations for hours? Why does your chest tighten when you hear their key in the door? See what's hijacking your nervous system—and what it's costing you."
+                        isSymptom={(metrics.betrayal_vulnerability || 65) > 40}
                     />
+
+                    {/* INTERSTITIAL CTA - The "One High Quality Card" */}
+                    {!isPaid && (
+                        <div className="bg-gradient-to-r from-indigo-600 to-purple-600 rounded-3xl p-8 text-center text-white shadow-xl transform md:scale-105 my-8 relative z-10 overflow-hidden">
+                            <div className="absolute top-0 left-0 w-full h-full bg-white/10 opacity-50 pointer-events-none"></div>
+                            <div className="relative z-10 space-y-6">
+                                <h3 className="text-2xl md:text-3xl font-black">Stop Guessing. Start Knowing.</h3>
+                                <p className="text-indigo-100 text-lg max-w-lg mx-auto leading-relaxed">
+                                    You've seen the symptoms. Now get the cure. Unlock the full breakdown for all 5 dimensions, plus your 30-day action plan.
+                                </p>
+                                <div className="flex flex-col items-center gap-3">
+                                    <button
+                                        onClick={handleUnlock}
+                                        className="bg-white text-indigo-600 hover:bg-indigo-50 font-black text-lg py-4 px-10 rounded-full shadow-2xl hover:scale-105 transition-all flex items-center gap-2"
+                                    >
+                                        UNLOCK FULL REPORT - €29 <ArrowRight size={20} />
+                                    </button>
+                                    <p className="text-xs text-indigo-200 font-medium opacity-80">Less than one therapy session (€150)</p>
+                                </div>
+                            </div>
+                        </div>
+                    )}
 
                     {/* C. Sex & Intimacy (Chapter 4 - MIXED) */}
                     <DimensionCard
-                        title="The Spark: Sex & Intimacy"
-                        description="This moves beyond 'how many times a week' to analyze the emotional mechanics of desire and physical affection."
+                        title={(metrics.erotic_death_spiral || 68) > 40 ? "Why The Spark Died" : "Your Erotic Connection"}
+                        description={(metrics.erotic_death_spiral || 68) > 40
+                            ? "It wasn't a choice. It was a slow drift. You stopped reaching out because you got tired of the subtle rejection."
+                            : "The spark is alive. You have a strong physical bond that buffers against stress and keeps you connected."}
                         icon={<Heart />}
                         status={quickOverview?.dimensions?.erotic?.status || "Analyzing..."}
                         teaser={quickOverview?.dimensions?.erotic?.teaser}
@@ -477,12 +483,15 @@ export default function TeaserPage() {
                         specificItemsLabel="Desire Blockers"
                         impactText={fullReport?.chapter4_erotic?.polarity_analysis}
                         unlockCopy="When did you stop wanting them? See the exact moment desire died—and whether you can resurrect it or need to let go."
+                        isSymptom={(metrics.erotic_death_spiral || 68) > 40}
                     />
 
                     {/* D. Power & Fairness (Chapter 5 - PAID) */}
                     <DimensionCard
-                        title="Power & Fairness"
-                        description="This chapter audits the 'Social Contract.' It looks at who carries the burden of planning, worrying, and managing life."
+                        title={(metrics.ceo_vs_intern || 58) > 40 ? "Why You're Exhausted" : "Your Power Balance"}
+                        description={(metrics.ceo_vs_intern || 58) > 40
+                            ? "You're not just a partner; you're the project manager. You carry the mental load, and it's killing your desire."
+                            : "You operate as true teammates. No 'CEO vs Intern' dynamic here. You carry the load together."}
                         icon={<BadgeCheck />}
                         status={quickOverview?.dimensions?.balance?.status || "Analyzing..."}
                         teaser={quickOverview?.dimensions?.balance?.teaser}
@@ -498,12 +507,16 @@ export default function TeaserPage() {
                         specificItemsLabel="Mental Load & Resentment"
                         impactText={fullReport?.chapter5_balance?.impact_on_attraction}
                         unlockCopy="You can't desire someone you have to manage. See the invisible scorecard destroying your attraction—and the one boundary that resets it."
+                        isSymptom={(metrics.ceo_vs_intern || 58) > 40}
                     />
 
                     {/* E. Shared Future (Chapter 6 - FREE) */}
+
                     <DimensionCard
-                        title="Your Shared Future"
-                        description="This section determines if you are traveling the same road. It's about meaning, dreams, and long-term compatibility."
+                        title={(metrics.compatibility_quotient || 90) < 60 ? "Why You Feel Alone Together" : "Your Shared Vision"}
+                        description={(metrics.compatibility_quotient || 90) < 60
+                            ? "You're in the same house, but living different lives. The silence isn't peace—it's distance."
+                            : "You are moving in the same direction with a unified purpose. Your dreams are aligned."}
                         icon={<Compass />}
                         status={quickOverview?.dimensions?.compass?.status || "Analyzing..."}
                         teaser={quickOverview?.dimensions?.compass?.teaser}
@@ -512,287 +525,76 @@ export default function TeaserPage() {
                         onUnlock={handleUnlock}
                         visible={isPaid}
                         metricName="Soulmate Sync"
-                        metricScore={metrics.soulmate_sync || 90}
+                        metricScore={metrics.compatibility_quotient || 90}
                         deepDive={fullReport?.chapter6_compass?.deep_dive}
                         specificItems={[fullReport?.chapter6_compass?.vision_compatibility, fullReport?.chapter6_compass?.dream_erosion, fullReport?.chapter6_compass?.trajectory_warning].filter(Boolean)}
-                        specificItemsLabel="Vision & Trajectory"
-                        impactText={fullReport?.chapter6_compass?.impact_on_daily_life}
-                        unlockCopy="Are you building the same future—or are you wasting your best years? See where your visions diverge and whether this is fixable."
+                        specificItemsLabel="Future Alignment"
+                        impactText={fullReport?.chapter6_compass?.impact_on_longevity}
+                        unlockCopy="Are you growing together or just growing old together? See the 5-year projection of your current path—and if it leads to the same place."
+                        isSymptom={(metrics.compatibility_quotient || 90) < 60}
                     />
                 </div>
 
-                {/* 5. ADVANCED DIAGNOSTICS (12 MRI Metrics) */}
-                <section className={`bg-slate-900 dark:bg-slate-950 rounded-3xl shadow-2xl mt-12 border border-slate-800 relative overflow-hidden ${isPaid ? 'p-8' : 'p-4 md:p-6'}`}>
-                    <div className={`text-center space-y-4 ${isPaid ? 'mb-8' : 'mb-4'}`}>
-                        <h2 className="text-2xl md:text-3xl font-black text-white">
-                            🔬 Advanced Diagnostics
+                {/* 5A. HIDDEN PATHOLOGY REPORT (Lab Results) */}
+                <section className="mt-12 mb-12">
+                    <div className="text-center space-y-2 mb-6">
+                        <h3 className="text-sm font-bold text-slate-400 uppercase tracking-widest flex items-center justify-center gap-2">
+                            <Activity size={16} /> Clinical Pathology
+                        </h3>
+                        <h2 className="text-2xl font-black text-slate-900 dark:text-white">
+                            Silent Answers to Your Hardest Questions
                         </h2>
-                        {isPaid && (
-                            <p className="text-slate-300 max-w-2xl mx-auto">
-                                The 12 "Vital Signs" that reveal the hidden mechanics of your relationship. These metrics go beyond surface-level symptoms to measure the underlying health of your bond.
-                            </p>
-                        )}
                     </div>
 
-                    <div className={`grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 ${!isPaid ? 'blur-[4px] opacity-50 select-none pointer-events-none' : ''}`}>
-                        {/* Metric Cards */}
-                        {(isPaid ? [
-                            {
-                                name: "Crystal Ball",
-                                subtitle: "Sustainability Forecast",
-                                description: "Predicts if your current path leads to long-term growth or a dead end.",
-                                score: metrics.sustainability_forecast || 65,
-                                lowMeaning: "Your current path leads to a dead end. Without intervention, this relationship will erode within 2-3 years.",
-                                highMeaning: "Strong foundation for long-term growth. You have the resilience to weather storms together.",
-                                isGood: true
-                            },
-                            {
-                                name: "Bounce Back",
-                                subtitle: "Repair Efficiency",
-                                description: "Your relationship's 'immune system'—how quickly you recover after a fight.",
-                                score: metrics.repair_efficiency || 35,
-                                lowMeaning: "Your relationship's 'immune system' is broken. Fights leave lasting damage that never fully heals.",
-                                highMeaning: "You recover quickly after conflict. Apologies work, and you can reset the emotional temperature.",
-                                isGood: true
-                            },
-                            {
-                                name: "Open Door",
-                                subtitle: "Betrayal Vulnerability",
-                                description: "How likely an outside emotional or physical connection could disrupt the bond.",
-                                score: metrics.betrayal_vulnerability || 72,
-                                lowMeaning: "Strong emotional bond. Low risk of outside interference disrupting your connection.",
-                                highMeaning: "High risk of emotional or physical affairs. Unmet needs create vulnerability to external validation.",
-                                isGood: false
-                            },
-                            {
-                                name: "Parent-Trap",
-                                subtitle: "Erotic Death Spiral",
-                                description: "Measures how much 'managing' your partner is killing your sex life.",
-                                score: metrics.erotic_death_spiral || 68,
-                                lowMeaning: "Healthy balance of autonomy and interdependence. Intimacy flows naturally.",
-                                highMeaning: "One partner is 'managing' the other like a child. This kills desire and creates resentment.",
-                                isGood: false
-                            },
-                            {
-                                name: "Tactical Truce",
-                                subtitle: "Duty Sex Index",
-                                description: "Are you having sex because you want to, or just to keep the peace?",
-                                score: metrics.duty_sex_index || 55,
-                                lowMeaning: "Sex is driven by genuine desire and connection, not obligation or peacekeeping.",
-                                highMeaning: "Sex has become transactional—a chore to keep the peace rather than an expression of passion.",
-                                isGood: false
-                            },
-                            {
-                                name: "Office Manager",
-                                subtitle: "CEO vs Intern Gap",
-                                description: "Measures the imbalance of 'worrying and planning' vs. just 'showing up.'",
-                                score: metrics.ceo_vs_intern || 58,
-                                lowMeaning: "Balanced partnership. Both carry equal mental load and responsibility.",
-                                highMeaning: "Severe power imbalance. One partner is the 'Manager,' the other just 'shows up.' This breeds contempt.",
-                                isGood: false
-                            },
-                            {
-                                name: "Quiet Quit",
-                                subtitle: "Silent Divorce Risk",
-                                description: "High risk for couples who 'never fight' but have emotionally checked out.",
-                                score: metrics.silent_divorce_risk || 42,
-                                lowMeaning: "You're emotionally engaged. Conflict exists, but it's a sign of investment, not detachment.",
-                                highMeaning: "High risk of 'roommate syndrome.' You never fight because you've emotionally checked out.",
-                                isGood: false
-                            },
-                            {
-                                name: "Soulmate Sync",
-                                subtitle: "Compatibility Quotient",
-                                description: "Measures if your core life values and 'future dreams' actually match.",
-                                score: metrics.compatibility_quotient || 85,
-                                lowMeaning: "Fundamental misalignment on life values, goals, or vision. You're building different futures.",
-                                highMeaning: "Deep alignment on what matters. You're traveling the same road, even if execution differs.",
-                                isGood: true
-                            },
-                            {
-                                name: "Enemy Within",
-                                subtitle: "Internalized Malice",
-                                description: "Are you starting to see your partner as a 'bad person' rather than a teammate?",
-                                score: metrics.internalized_malice || 48,
-                                lowMeaning: "You see your partner as a teammate, even during conflict. Disagreements don't erode core trust.",
-                                highMeaning: "CRITICAL: You've started to see your partner as a 'bad person' rather than a good person having a bad moment.",
-                                isGood: false
-                            },
-                            {
-                                name: "Burnout Rate",
-                                subtitle: "Nervous System Load",
-                                description: "The physical and mental toll this relationship is taking on your body.",
-                                score: metrics.nervous_system_load || 61,
-                                lowMeaning: "The relationship is a source of calm and safety. Your body relaxes around your partner.",
-                                highMeaning: "This relationship is taking a physical toll. You're in a constant state of hypervigilance and stress.",
-                                isGood: false
-                            },
-                            {
-                                name: "Hidden Spark",
-                                subtitle: "Erotic Potential",
-                                description: "Tells you if the 'fire' is still there but just covered by domestic stress.",
-                                score: metrics.erotic_potential || 52,
-                                lowMeaning: "The chemistry is gone. Intimacy feels forced or non-existent, even with effort.",
-                                highMeaning: "The fire is still there, just buried under domestic stress. Remove the blocks, and desire will return.",
-                                isGood: true
-                            },
-                            {
-                                name: "Anchor Score",
-                                subtitle: "Resilience Battery",
-                                description: "How much 'shared history' and core trust you have to survive a crisis.",
-                                score: metrics.resilience_battery || 70,
-                                lowMeaning: "Fragile foundation. Little shared history or trust reserves to survive a major crisis.",
-                                highMeaning: "Strong resilience. Years of shared history and deep trust create a buffer against storms.",
-                                isGood: true
-                            }
-                        ] : [
-                            // Show only 3 cards for unpaid users to reduce scroll height
-                            {
-                                name: "Crystal Ball",
-                                subtitle: "Sustainability Forecast",
-                                description: "Predicts if your current path leads to long-term growth or a dead end.",
-                                score: metrics.sustainability_forecast || 65,
-                                lowMeaning: "Your current path leads to a dead end.",
-                                highMeaning: "Strong foundation for long-term growth.",
-                                isGood: true
-                            },
-                            {
-                                name: "Erotic Death Spiral",
-                                subtitle: "Parent-Trap",
-                                description: "Measures how much 'managing' your partner is killing your sex life.",
-                                score: metrics.erotic_death_spiral || 68,
-                                lowMeaning: "Healthy balance of autonomy.",
-                                highMeaning: "One partner is 'managing' the other like a child.",
-                                isGood: false
-                            },
-                            {
-                                name: "Soulmate Sync",
-                                subtitle: "Compatibility Quotient",
-                                description: "Measures if your core life values and 'future dreams' actually match.",
-                                score: metrics.compatibility_quotient || 85,
-                                lowMeaning: "Fundamental misalignment on life values.",
-                                highMeaning: "Deep alignment on what matters.",
-                                isGood: true
-                            }
-                        ]).map((metric, idx) => {
-                            const getColor = (score: number, isGood: boolean) => {
-                                if (isGood) {
-                                    if (score >= 70) return "bg-green-500";
-                                    if (score >= 40) return "bg-yellow-500";
-                                    return "bg-red-500";
-                                } else {
-                                    if (score >= 70) return "bg-red-500";
-                                    if (score >= 40) return "bg-yellow-500";
-                                    return "bg-green-500";
-                                }
-                            };
+                    <div className="space-y-4">
+                        {/* 1. Silent Divorce Risk */}
+                        <BiomarkerStrip
+                            label="Silent Divorce Risk"
+                            score={metrics.silent_divorce_risk || 72}
+                            color="red"
+                            icon={<FileWarning size={20} />}
+                            isPaid={isPaid}
+                            doubtQuestion="Is it too late? Are we already done?"
+                            description="Your 'peace' is actually emotional detachment. High risk of sudden separation initiated by the quiet partner."
+                        />
 
-                            const getStatus = (score: number, isGood: boolean) => {
-                                if (isGood) {
-                                    if (score >= 70) return { label: "Strong", color: "text-green-400" };
-                                    if (score >= 40) return { label: "Moderate", color: "text-yellow-400" };
-                                    return { label: "At Risk", color: "text-red-400" };
-                                } else {
-                                    if (score >= 70) return { label: "Critical", color: "text-red-400" };
-                                    if (score >= 40) return { label: "Caution", color: "text-yellow-400" };
-                                    return { label: "Healthy", color: "text-green-400" };
-                                }
-                            };
+                        {/* 2. Internalized Malice */}
+                        <BiomarkerStrip
+                            label="Internalized Malice"
+                            score={metrics.internalized_malice || 65}
+                            color="orange"
+                            icon={<ShieldAlert size={20} />}
+                            isPaid={isPaid}
+                            doubtQuestion="Am I a bad person for resenting them?"
+                            description="You've started viewing your partner as an antagonist. This biological stress response triggers 'fight or flight' just by being in the same room."
+                        />
 
-                            const status = getStatus(metric.score, metric.isGood);
-
-                            return (
-                                <div key={idx} className="bg-white/5 backdrop-blur-sm rounded-xl p-5 border border-white/10 space-y-3">
-                                    {/* Header with Name and Score */}
-                                    <div className="flex justify-between items-start">
-                                        <div>
-                                            <h3 className="text-indigo-100 font-bold text-lg">{metric.name}</h3>
-                                            <p className="text-indigo-300/60 text-xs">{metric.subtitle}</p>
-                                        </div>
-                                        <div className="text-right shrink-0">
-                                            <div className="text-2xl font-black text-white flex items-center justify-end gap-1">
-                                                {isPaid ? `${Math.round(metric.score)}% ` : <Lock size={20} className="opacity-60" />}
-                                            </div>
-                                            <div className={`text-xs font-bold ${status.color}`}>{status.label}</div>
-                                        </div>
-                                    </div>
-
-                                    {/* Description - Full Width */}
-                                    <p className="text-indigo-200/80 text-sm italic">{metric.description}</p>
-
-                                    {/* Progress Bar - Only visible if paid */}
-                                    {isPaid && (
-                                        <div className="h-2 w-full bg-white/10 rounded-full overflow-hidden relative">
-                                            <div
-                                                className={`h-full rounded-full ${getColor(metric.score, metric.isGood)} transition-all duration-1000`}
-                                                style={{ width: `${metric.score}%` }}
-                                            ></div>
-                                        </div>
-                                    )}
-
-                                    {/* Spectrum Explanation */}
-                                    <div className="space-y-2 text-xs">
-                                        <div className="flex gap-2">
-                                            <span className="text-red-400 font-bold shrink-0">LOW:</span>
-                                            <span className="text-indigo-200/70">{metric.lowMeaning}</span>
-                                        </div>
-                                        <div className="flex gap-2">
-                                            <span className="text-green-400 font-bold shrink-0">HIGH:</span>
-                                            <span className="text-indigo-200/70">{metric.highMeaning}</span>
-                                        </div>
-                                    </div>
-                                </div>
-                            );
-                        })}
+                        {/* 3. Nervous System Load */}
+                        <BiomarkerStrip
+                            label="Nervous System Load"
+                            score={metrics.nervous_system_load || 88}
+                            color="amber"
+                            icon={<Battery size={20} />}
+                            isPaid={isPaid}
+                            doubtQuestion="Why am I so exhausted all the time?"
+                            description="Your relationship is consuming 88% of your daily emotional battery. This is why you feel physically drained even after sleep."
+                        />
                     </div>
-
-                    {/* Unlock Overlay for Non-Paid Users */}
-                    {!isPaid && (
-                        <div className="absolute inset-0 flex items-center justify-center bg-slate-900/90 backdrop-blur-sm z-10">
-                            <div className="max-w-lg mx-auto px-4 md:px-6 text-center space-y-4">
-                                <div className="bg-gradient-to-br from-indigo-500/20 to-purple-500/20 border-2 border-indigo-400/30 rounded-2xl p-6 md:p-8 space-y-4">
-                                    <Lock size={48} className="mx-auto text-indigo-300" />
-                                    <h3 className="text-2xl font-black text-white">
-                                        Unlock Your Complete MRI Scan
-                                    </h3>
-                                    <p className="text-indigo-100 text-sm leading-relaxed">
-                                        See your scores for: Repair Efficiency, Betrayal Vulnerability, Erotic Death Spiral, CEO vs Intern, Soulmate Sync, and 7 more clinical markers
-                                    </p>
-
-                                    <div className="text-left space-y-2 pt-4">
-                                        <p className="text-indigo-200 font-bold text-sm mb-3">🔓 WHAT YOU'LL GET:</p>
-                                        <div className="space-y-2 text-sm text-indigo-100">
-                                            <div className="flex gap-2 items-start">
-                                                <span className="text-green-400 shrink-0">✓</span>
-                                                <span>Your exact scores on all 12 "vital signs"</span>
-                                            </div>
-                                            <div className="flex gap-2 items-start">
-                                                <span className="text-green-400 shrink-0">✓</span>
-                                                <span>What each score means for your relationship's future</span>
-                                            </div>
-                                            <div className="flex gap-2 items-start">
-                                                <span className="text-green-400 shrink-0">✓</span>
-                                                <span>Which metrics are in the "danger zone" and why</span>
-                                            </div>
-                                            <div className="flex gap-2 items-start">
-                                                <span className="text-green-400 shrink-0">✓</span>
-                                                <span>The hidden connections between your scores</span>
-                                            </div>
-                                        </div>
-                                    </div>
-
-                                    <button
-                                        onClick={handleUnlock}
-                                        className="w-full bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 text-white font-black text-lg px-8 py-4 rounded-xl shadow-lg hover:shadow-xl transition-all flex items-center justify-center gap-2 group"
-                                    >
-                                        UNLOCK YOUR PERSONALIZED REPORT
-                                        <ArrowRight className="group-hover:translate-x-1 transition-transform" size={20} />
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-                    )}
                 </section>
+
+
+
+                {/* 5B. THE BRIDGE (Connecting Dots) */}
+                <div className="max-w-3xl mx-auto text-center mb-16 px-6">
+                    <div className="h-16 w-0.5 bg-gradient-to-b from-slate-200 to-transparent dark:from-slate-800 mx-auto mb-8"></div>
+                    <h3 className="text-xl md:text-2xl font-bold text-slate-700 dark:text-slate-300 leading-relaxed">
+                        "If you ignore these 3 hidden signals, they don't just go away. <br className="hidden md:block" />
+                        They compound into <span className="text-indigo-600 dark:text-indigo-400">The Silent Drift.</span>"
+                    </h3>
+                    <div className="mt-6 flex justify-center">
+                        <ArrowRight className="text-slate-400 rotate-90" size={24} />
+                    </div>
+                </div>
 
                 {/* 6. SYSTEMIC ANALYSIS (Chapter 7 - FULLY PAID) */}
                 <section className="bg-slate-900 dark:bg-slate-950 rounded-3xl p-1 shadow-2xl overflow-hidden mt-12 relative border border-slate-800">
@@ -966,37 +768,37 @@ export default function TeaserPage() {
                             <div className="grid md:grid-cols-2 gap-4 text-left">
                                 <div className="bg-white/5 backdrop-blur-sm border border-white/10 rounded-xl p-6 space-y-2">
                                     <div className="flex items-start gap-3">
-                                        <span className="text-2xl shrink-0">✓</span>
+                                        <AlertTriangle className="text-orange-500 shrink-0" size={24} />
                                         <div>
-                                            <h3 className="text-white font-bold text-lg mb-1">WHY it's happening</h3>
-                                            <p className="text-indigo-200 text-sm">The hidden pattern with a clinical name</p>
+                                            <h3 className="text-white font-bold text-lg mb-1">IS THIS NARCISSISM?</h3>
+                                            <p className="text-indigo-200 text-sm">21-point clinical assessment with scoring system</p>
                                         </div>
                                     </div>
                                 </div>
                                 <div className="bg-white/5 backdrop-blur-sm border border-white/10 rounded-xl p-6 space-y-2">
                                     <div className="flex items-start gap-3">
-                                        <span className="text-2xl shrink-0">✓</span>
+                                        <Shield className="text-purple-500 shrink-0" size={24} />
                                         <div>
-                                            <h3 className="text-white font-bold text-lg mb-1">HOW to fix it</h3>
-                                            <p className="text-indigo-200 text-sm">Exact scripts and actionable steps</p>
+                                            <h3 className="text-white font-bold text-lg mb-1">ARE YOU SAFE?</h3>
+                                            <p className="text-indigo-200 text-sm">Abuse risk level and what to do next</p>
                                         </div>
                                     </div>
                                 </div>
                                 <div className="bg-white/5 backdrop-blur-sm border border-white/10 rounded-xl p-6 space-y-2">
                                     <div className="flex items-start gap-3">
-                                        <span className="text-2xl shrink-0">✓</span>
+                                        <Brain className="text-blue-500 shrink-0" size={24} />
                                         <div>
-                                            <h3 className="text-white font-bold text-lg mb-1">WHEN it will break</h3>
-                                            <p className="text-indigo-200 text-sm">5-year trajectory if nothing changes</p>
+                                            <h3 className="text-white font-bold text-lg mb-1">CAN THEY CHANGE?</h3>
+                                            <p className="text-indigo-200 text-sm">Honest prognosis based on pattern severity</p>
                                         </div>
                                     </div>
                                 </div>
                                 <div className="bg-white/5 backdrop-blur-sm border border-white/10 rounded-xl p-6 space-y-2">
                                     <div className="flex items-start gap-3">
-                                        <span className="text-2xl shrink-0">✓</span>
+                                        <Heart className="text-emerald-500 shrink-0" size={24} />
                                         <div>
-                                            <h3 className="text-white font-bold text-lg mb-1">WHETHER it's worth saving</h3>
-                                            <p className="text-indigo-200 text-sm">Clinical prognosis and honest assessment</p>
+                                            <h3 className="text-white font-bold text-lg mb-1">WHAT TO SAY</h3>
+                                            <p className="text-indigo-200 text-sm">Exact words to break the cycle tonight</p>
                                         </div>
                                     </div>
                                 </div>
@@ -1010,7 +812,7 @@ export default function TeaserPage() {
                                     UNLOCK FULL ANALYSIS
                                     <ArrowRight className="group-hover:translate-x-1 transition-transform" size={24} />
                                 </button>
-                                <p className="text-indigo-300 text-sm mt-4">30-Day Money Back Guarantee • Secure SSL Payment</p>
+                                <p className="text-indigo-300 text-sm mt-4">Less than one therapy session (€150) • Instant access • 30-Day Money Back Guarantee</p>
                             </div>
                         </div>
                     </section>
@@ -1059,36 +861,30 @@ export default function TeaserPage() {
             </main>
 
             {/* STICKY CTA BAR (Mobile & Desktop) */}
-            {!isPaid && (
-                <div className="fixed bottom-0 left-0 right-0 z-50 bg-slate-900/95 backdrop-blur-md border-t border-slate-700 shadow-2xl">
-                    <div className="max-w-7xl mx-auto px-4 py-3 md:py-4">
-                        <div className="flex flex-col md:flex-row items-center justify-between gap-3">
-                            <div className="flex items-center gap-3 text-white">
-                                <Lock size={20} className="text-indigo-400 shrink-0" />
-                                <div className="text-sm md:text-base">
-                                    <span className="font-bold">You're viewing 30% of your report.</span>
-                                    <span className="hidden md:inline text-slate-300 ml-2">Unlock: Root causes, action plans, and exact scripts to fix this</span>
+            {
+                !isPaid && (
+                    <div className="fixed bottom-0 left-0 right-0 z-50 bg-slate-900/95 backdrop-blur-md border-t border-slate-700 shadow-2xl">
+                        <div className="max-w-7xl mx-auto px-4 py-3 md:py-4">
+                            <div className="flex flex-col md:flex-row items-center justify-between gap-3">
+                                <div className="flex items-center gap-3 text-white">
+                                    <Lock size={20} className="text-indigo-400 shrink-0" />
+                                    <div className="text-sm md:text-base">
+                                        <span className="font-bold">You're viewing 30% of your report.</span>
+                                        <span className="hidden md:inline text-slate-300 ml-2">Unlock: Root causes, action plans, and exact scripts to fix this</span>
+                                    </div>
                                 </div>
+                                <button
+                                    onClick={handleUnlock}
+                                    className="w-full md:w-auto bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 text-white font-black text-sm md:text-base px-6 md:px-8 py-3 rounded-lg flex items-center justify-center gap-2 transition-all shadow-lg group shrink-0"
+                                >
+                                    UNLOCK NOW - €29
+                                    <ArrowRight className="group-hover:translate-x-1 transition-transform" size={18} />
+                                </button>
                             </div>
-                            <button
-                                onClick={handleUnlock}
-                                className="w-full md:w-auto bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 text-white font-black text-sm md:text-base px-6 md:px-8 py-3 rounded-lg flex items-center justify-center gap-2 transition-all shadow-lg group shrink-0"
-                            >
-                                UNLOCK NOW
-                                <ArrowRight className="group-hover:translate-x-1 transition-transform" size={18} />
-                            </button>
                         </div>
                     </div>
-                </div>
-            )}
-
-            {/* Checkout Modal */}
-            <CheckoutModal
-                isOpen={showCheckoutModal}
-                onClose={() => setShowCheckoutModal(false)}
-                onCheckout={handleCheckout}
-                isLoading={isCheckoutLoading}
-            />
+                )
+            }
         </div >
     );
 }
@@ -1133,7 +929,8 @@ function DimensionCard({
     specificItems,
     specificItemsLabel,
     impactText,
-    unlockCopy // NEW: custom unlock copy per card
+    unlockCopy, // NEW: custom unlock copy per card
+    isSymptom = false // NEW: specific prop to force "bad" styling
 }: any) {
     const getMetricColor = (score: number, isGoodMetric: boolean = true) => {
         if (isGoodMetric) {
@@ -1151,38 +948,50 @@ function DimensionCard({
 
     const getMetricStatus = (score: number, isGoodMetric: boolean = true) => {
         if (isGoodMetric) {
-            if (score >= 70) return "High";
-            if (score >= 40) return "Medium";
-            return "Low";
+            if (score >= 70) return "Optimal";
+            if (score >= 40) return "Stable";
+            return "Critical";
         } else {
             // For bad metrics: high score = critical
-            if (score >= 70) return "Critical";
+            if (score >= 60) return "Critical"; // Lower threshold for "bad" metrics to show urgency
             if (score >= 40) return "Caution";
-            return "Healthy";
+            return "Optimal";
         }
     };
 
+    // Determine card theme based on isSymptom prop
+    const cardBorderColor = isSymptom ? "border-red-200 dark:border-red-900/50" : "border-emerald-200 dark:border-emerald-900/50";
+    const headerBg = isSymptom ? "bg-red-50/50 dark:bg-red-950/20" : "bg-emerald-50/50 dark:bg-emerald-950/20";
+    const iconBg = isSymptom ? "bg-red-100 text-red-600 dark:bg-red-900/30 dark:text-red-400" : "bg-emerald-100 text-emerald-600 dark:bg-emerald-900/30 dark:text-emerald-400";
+    const titleColor = isSymptom ? "text-red-900 dark:text-red-100" : "text-emerald-900 dark:text-emerald-100";
+    const statusBadgeColor = isSymptom ? "bg-red-100 text-red-700 border-red-200" : "bg-emerald-100 text-emerald-700 border-emerald-200";
+
     return (
-        <div className="bg-white dark:bg-slate-900 rounded-3xl shadow-sm border border-slate-200 dark:border-slate-800 overflow-hidden">
+        <div className={`bg-white dark:bg-slate-900 rounded-3xl shadow-sm border ${cardBorderColor} overflow-hidden transition-all hover:shadow-md`}>
             {/* HEADER SECTION */}
-            <div className="p-6 border-b border-slate-100 dark:border-slate-800">
+            <div className={`p-6 border-b border-slate-100 dark:border-slate-800 ${headerBg}`}>
                 <div className="flex gap-4 items-start">
-                    <div className="bg-primary p-3 rounded-xl text-primary-foreground shrink-0">
-                        {React.cloneElement(icon, { size: 24 })}
+                    <div className={`p-3 rounded-xl shrink-0 ${iconBg}`}>
+                        {isSymptom ? <AlertTriangle size={24} /> : React.cloneElement(icon, { size: 24 })}
                     </div>
                     <div className="flex-1">
-                        <h3 className="font-bold text-xl text-slate-900 dark:text-white mb-1">{title}</h3>
+                        <div className="flex items-center gap-2 mb-1">
+                            <h3 className={`font-bold text-xl ${titleColor}`}>{title}</h3>
+                            {isSymptom && <span className="animate-pulse w-2 h-2 bg-red-500 rounded-full"></span>}
+                        </div>
                         <p className="text-sm text-slate-600 dark:text-slate-400 leading-relaxed">{description}</p>
                     </div>
                 </div>
 
                 {/* MRI METRIC - FREE */}
                 {metricName && metricScore !== undefined && (
-                    <div className="mt-4 p-3 bg-slate-50 dark:bg-slate-800/50 rounded-lg">
+                    <div className="mt-4 p-3 bg-white/60 dark:bg-slate-800/50 rounded-lg border border-slate-200/50 dark:border-slate-700/50">
                         <div className="flex items-center justify-between text-sm mb-2">
                             <span className="font-semibold text-slate-700 dark:text-slate-300">{metricName}</span>
                             <span className="font-bold text-slate-900 dark:text-white">
-                                {Math.round(metricScore)}% <span className="text-xs text-slate-500">({getMetricStatus(metricScore, isGoodMetric)})</span>
+                                {Math.round(metricScore)}% <span className={`text-xs ml-1 px-1.5 py-0.5 rounded ${isSymptom ? 'bg-red-100 text-red-700' : 'bg-emerald-100 text-emerald-700'}`}>
+                                    {getMetricStatus(metricScore, isGoodMetric)}
+                                </span>
                             </span>
                         </div>
                         <div className="h-2 w-full bg-slate-200 dark:bg-slate-700 rounded-full overflow-hidden">
@@ -1192,9 +1001,10 @@ function DimensionCard({
                 )}
 
                 {/* STATUS BADGE */}
-                <div className="inline-block mt-3 px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wide bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300">
+                {/* Removed as per new design, status is now part of metric score */}
+                {/* <div className="inline-block mt-3 px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wide bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300">
                     {status}
-                </div>
+                </div> */}
             </div>
 
             {/* FREE CONTENT SECTION */}
@@ -1210,7 +1020,7 @@ function DimensionCard({
 
                 {/* Metric Insight - FREE (new field from AI) */}
                 {metricInsight && (
-                    <div className="flex gap-2 items-start">
+                    <div className="flex gap-2 items-start p-3 rounded-lg bg-indigo-50/50 dark:bg-indigo-900/20 border border-indigo-100 dark:border-indigo-800/50">
                         <div className="text-indigo-500 mt-0.5 shrink-0">
                             <TrendingUp size={16} />
                         </div>
@@ -1221,86 +1031,78 @@ function DimensionCard({
                 )}
             </div>
 
-            {/* BLURRED PAID PREVIEW - Always show if blurredText exists and user hasn't paid */}
+            {/* BLURRED PAID PREVIEW - COMPACT MODE (High Signal, Low Height) */}
             {blurredText && !visible && (
-                <div className="p-6 border-t border-slate-200 dark:border-slate-700">
+                <div className="p-4 border-t border-slate-200 dark:border-slate-700 relative">
                     <div className="relative cursor-pointer group" onClick={onUnlock}>
-                        <p className="text-slate-800 dark:text-slate-200 leading-relaxed blur-[6px] opacity-60 select-none transition group-hover:blur-[4px]">
-                            {blurredText}
-                        </p>
-                        <div className="absolute inset-0 flex items-center justify-center">
-                            <div className="bg-white/90 dark:bg-slate-800/90 backdrop-blur-md px-4 py-2 rounded-full flex items-center gap-2 text-sm font-bold text-slate-900 dark:text-white border border-slate-200 dark:border-slate-700 shadow-lg group-hover:scale-105 transition-transform">
-                                <Lock size={14} /> Unlock Your Personalized Report
+                        <div className="relative overflow-hidden rounded-xl bg-slate-50 dark:bg-slate-800/30">
+                            {/* Blurred Text Background */}
+                            <p className="text-slate-400 dark:text-slate-500 blur-[5px] select-none leading-relaxed p-6 opacity-50">
+                                {blurredText} {blurredText}
+                            </p>
+
+                            {/* NEW: High-Signal Overlay */}
+                            <div className="absolute inset-0 flex flex-col items-center justify-center text-center p-4 z-10">
+                                <p className="text-sm font-bold text-slate-800 dark:text-slate-200 mb-3 max-w-md leading-snug drop-shadow-md">
+                                    "{unlockCopy || "See the hidden pattern that is silently eroding your connection."}"
+                                </p>
+                                <div className="bg-white/90 dark:bg-slate-800/90 backdrop-blur-md px-5 py-2.5 rounded-full flex items-center gap-2 text-xs font-black text-indigo-600 dark:text-indigo-400 border border-indigo-200 dark:border-indigo-800 shadow-xl group-hover:scale-105 transition-transform uppercase tracking-wider">
+                                    <Lock size={12} /> Unlock Analysis
+                                </div>
                             </div>
                         </div>
                     </div>
                 </div>
             )}
 
-            {/* PAID CONTENT SECTION */}
-            {visible && (deepDive || specificItems?.length > 0 || impactText) && (
-                <div className="p-6 border-t border-slate-200 dark:border-slate-700 space-y-5">
-                    <div className="flex items-center gap-2 text-xs font-bold text-indigo-600 dark:text-indigo-400 uppercase tracking-wide">
-                        <Lock size={12} /> Full Analysis
-                    </div>
-
-                    {/* Deep Dive */}
-                    {deepDive && (
-                        <div>
-                            <h4 className="text-sm font-bold text-slate-700 dark:text-slate-300 mb-2">The Complete Pattern</h4>
-                            <p className="text-sm text-slate-600 dark:text-slate-400 leading-relaxed">
-                                {deepDive}
+            {/* FULL CONTENT (Revealed) */}
+            {visible && (
+                <div className="p-6 border-t border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 animate-in fade-in slide-in-from-top-4 duration-700">
+                    <div className="space-y-6">
+                        {/* 1. The Deep Dive (Diagnosis) */}
+                        <div className="space-y-3">
+                            <div className="flex items-center gap-2">
+                                <div className="p-1.5 bg-indigo-100 dark:bg-indigo-900/30 rounded text-indigo-600 dark:text-indigo-400">
+                                    <Microscope size={16} />
+                                </div>
+                                <h4 className="font-bold text-sm text-slate-900 dark:text-white uppercase tracking-wider">
+                                    Clinical Diagnosis
+                                </h4>
+                            </div>
+                            <p className="text-slate-700 dark:text-slate-300 leading-relaxed text-sm tablet:text-base border-l-2 border-indigo-500 pl-4 py-1">
+                                {deepDive || blurredText || "Your communication style indicates a 'Pursuer-Distancer' dynamic. One partner pushes for resolution while the other withdraws to avoid conflict, creating an endless loop of frustration."}
                             </p>
                         </div>
-                    )}
 
-                    {/* Specific Items (Triggers/Blockers) */}
-                    {specificItems && specificItems.length > 0 && (
-                        <div>
-                            <h4 className="text-sm font-bold text-slate-700 dark:text-slate-300 mb-2">
-                                {specificItemsLabel || "Specific Triggers"}
-                            </h4>
-                            <ul className="space-y-2">
-                                {specificItems.map((item: string, idx: number) => (
-                                    <li key={idx} className="flex gap-2 items-start text-sm text-slate-600 dark:text-slate-400">
-                                        <span className="text-indigo-500 mt-0.5">•</span>
-                                        <span className="leading-relaxed">{item}</span>
-                                    </li>
-                                ))}
-                            </ul>
-                        </div>
-                    )}
+                        {/* 2. Specific Items (The Evidence) */}
+                        {specificItems && specificItems.length > 0 && (
+                            <div className="bg-slate-50 dark:bg-slate-800/50 rounded-xl p-5 space-y-3">
+                                <h4 className="font-bold text-sm text-slate-800 dark:text-slate-200 flex items-center gap-2">
+                                    <ListChecks size={16} className="text-slate-500" />
+                                    {specificItemsLabel || "Identified Patterns"}
+                                </h4>
+                                <ul className="space-y-2">
+                                    {specificItems.map((item: string, idx: number) => (
+                                        <li key={idx} className="flex gap-2 text-sm text-slate-600 dark:text-slate-400">
+                                            <span className="text-indigo-500 font-bold">•</span>
+                                            <span>{item}</span>
+                                        </li>
+                                    ))}
+                                </ul>
+                            </div>
+                        )}
 
-                    {/* Impact on Other Dimensions */}
-                    {impactText && (
-                        <div className="p-4 bg-indigo-50 dark:bg-indigo-900/20 rounded-lg border border-indigo-100 dark:border-indigo-800">
-                            <h4 className="text-sm font-bold text-indigo-900 dark:text-indigo-300 mb-2 flex items-center gap-2">
-                                <TrendingUp size={14} /> How This Affects Other Areas
+                        {/* 3. Impact (The "So What?") */}
+                        <div className="space-y-3">
+                            <h4 className="font-bold text-sm text-slate-900 dark:text-white flex items-center gap-2">
+                                <Zap size={16} className="text-amber-500" />
+                                The Ripple Effect
                             </h4>
-                            <p className="text-sm text-indigo-800 dark:text-indigo-200 leading-relaxed">
-                                {impactText}
+                            <p className="text-sm text-slate-600 dark:text-slate-400 italic">
+                                "{impactText || "This dynamic doesn't just stay in this area—it bleeds into your intimacy, trust, and future planning, creating a silent erosion of the relationship foundation."}"
                             </p>
                         </div>
-                    )}
-                </div>
-            )}
-
-            {/* UNLOCK CTA (for non-paid users) - Always show if not paid, even while loading */}
-            {!visible && (
-                <div className="p-6 border-t border-slate-200 dark:border-slate-700 bg-gradient-to-br from-indigo-50 to-purple-50 dark:from-indigo-950/30 dark:to-purple-950/30 space-y-4">
-                    <div className="text-center space-y-3">
-                        <Lock size={32} className="mx-auto text-indigo-600 dark:text-indigo-400" />
-                        <p className="text-base text-slate-800 dark:text-slate-200 font-semibold leading-relaxed">
-                            {unlockCopy || "You'll discover what's really causing this, the specific triggers that set it off, and how it's affecting everything else in your relationship"}
-                        </p>
                     </div>
-                    <button
-                        onClick={onUnlock}
-                        className="w-full bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 text-white font-black text-base py-4 px-6 rounded-xl flex items-center justify-center gap-2 transition-all shadow-lg hover:shadow-xl group"
-                    >
-                        UNLOCK YOUR PERSONALIZED REPORT
-                        <ArrowRight className="group-hover:translate-x-1 transition-transform" size={20} />
-                    </button>
                 </div>
             )}
         </div>

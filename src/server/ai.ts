@@ -273,6 +273,16 @@ export const generateFullReport: GenerateFullReport<GenerateFullReportArgs, Full
       "chapter1_pulse": {
         "headline": "One punchy sentence summarizing the relationship's current state (e.g. 'You're stuck in a loop, but it's fixable')",
         "summary": "One clinical sentence about overall health (e.g. 'This relationship is showing signs of chronic repair failure')",
+        "health_score": "NUMBER 0-100 (Overall health score based on weighted average of dimensions)",
+        "primary_diagnosis": "A specific label for the relationship's core issue (e.g. 'The Silent Drift', 'The Volatile Cycle', 'The Roommate Trap')",
+        "action_priority": "The #1 dimension that needs immediate attention (e.g. 'Immediate Action Required: Emotional Safety')",
+        "breakup_probability": "Low|Medium|High|Critical",
+        "silent_killer": "The specific interaction pattern causing the decline (e.g. 'Unresolved Resentment' or 'The Silent Treatment')",
+        "timeline": {
+            "year_1": "The Drift: What happens in 12 months if nothing changes (focus on emotional distance)",
+            "year_3": "The Detachment: What happens in 3 years (focus on parallel lives or resentment)",
+            "year_5": "The Outcome: What happens in 5 years (Breakup or complete emotional death)"
+        },
         "short_term_forecast": "What will happen in 6 months if nothing changes (2-3 sentences, specific to their conflict pattern)",
         "long_term_forecast": "What will happen in 5 years if nothing changes (2-3 sentences, paint the picture of slow erosion)",
         "dimensions": {
@@ -531,7 +541,10 @@ export const generateQuickOverview: GenerateFullReport<GenerateQuickOverviewArgs
         "result_badge": "2-4 words (e.g. 'HIGH RISK', 'REPAIRABLE')"
       },
       "pulse": {
-        "summary": "One clinical sentence about overall health"
+        "summary": "One clinical sentence about overall health",
+        "health_score": "NUMBER 0-100",
+        "primary_diagnosis": "2-4 words diagnosis label",
+        "action_priority": "The #1 dimension to fix"
       },
       "forecast": {
         "short_term": "What happens in 6 months if nothing changes (2 sentences max)"

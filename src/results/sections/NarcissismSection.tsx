@@ -136,56 +136,70 @@ export const NarcissismSection: React.FC<NarcissismSectionProps> = ({ analysis, 
                 </div>
 
             ) : (
-                // --- LOCKED / TEASER VIEW ---
-                <div className="relative bg-gradient-to-br from-red-50 to-orange-50 dark:from-red-950/20 dark:to-orange-950/20 p-6 md:p-8 rounded-3xl shadow-lg border-2 border-red-200 dark:border-red-800 overflow-hidden group cursor-pointer hover:shadow-xl transition-all min-h-[400px]" onClick={onUnlock}>
+                // --- LOCKED / TEASER VIEW (Empathetic & Validating) ---
+                <div className="relative bg-white dark:bg-slate-900 p-1 rounded-3xl shadow-sm border border-slate-200 dark:border-slate-800 overflow-hidden group cursor-pointer" onClick={onUnlock}>
 
-                    {/* Blurred Background Content */}
-                    <div className="filter blur-[6px] opacity-40 select-none pointer-events-none space-y-4">
-                        <div className="flex justify-between items-center">
-                            <div>
-                                <div className="h-3 w-28 bg-red-200 dark:bg-red-700 rounded mb-2"></div>
-                                <div className="h-8 w-40 bg-red-300 dark:bg-red-600 rounded"></div>
-                            </div>
-                            <div className="text-right">
-                                <div className="h-3 w-20 bg-red-200 dark:bg-red-700 rounded mb-2 ml-auto"></div>
-                                <div className="h-8 w-16 bg-red-400 dark:bg-red-500 rounded ml-auto"></div>
+                    {/* Background "Teaser" Content - Semi-blurred */}
+                    <div className="p-6 pb-24 md:p-8 md:pb-32 space-y-6 opacity-30 blur-[2px] pointer-events-none select-none grayscale transition-all duration-500 group-hover:scale-[1.01] group-hover:blur-[1px]">
+                        <div className="flex gap-4 items-center mb-6">
+                            <div className="h-16 w-16 bg-red-100 rounded-full"></div>
+                            <div className="space-y-2">
+                                <div className="h-6 w-48 bg-slate-200 rounded"></div>
+                                <div className="h-4 w-32 bg-slate-200 rounded"></div>
                             </div>
                         </div>
-                        <div className="space-y-2">
-                            <div className="h-4 w-full bg-red-100 dark:bg-red-800/30 rounded"></div>
-                            <div className="h-4 w-5/6 bg-red-100 dark:bg-red-800/30 rounded"></div>
-                        </div>
-                        <div className="flex gap-2">
-                            <div className="h-7 w-24 bg-red-200 dark:bg-red-700 rounded-full"></div>
-                            <div className="h-7 w-28 bg-red-200 dark:bg-red-700 rounded-full"></div>
+                        <div className="space-y-4">
+                            <div className="flex items-start gap-3">
+                                <span className="text-xl">🚩</span>
+                                <p className="font-medium text-lg leading-relaxed text-slate-900">
+                                    You often <span className="bg-red-100 px-1">second-guess your own memory</span> of events because they deny...
+                                </p>
+                            </div>
+                            <div className="flex items-start gap-3">
+                                <span className="text-xl">🚩</span>
+                                <p className="font-medium text-lg leading-relaxed text-slate-900">
+                                    You feel anxious before bringing up simple issues because <span className="bg-red-100 px-1">reactions are unpredictable</span>...
+                                </p>
+                            </div>
+                            <div className="flex items-start gap-3">
+                                <span className="text-xl">🚩</span>
+                                <p className="font-medium text-lg leading-relaxed text-slate-900">
+                                    Your "No" is frequently ignored or negotiated until it becomes a <span className="bg-red-100 px-1">reluctant Yes</span>...
+                                </p>
+                            </div>
                         </div>
                     </div>
 
-                    {/* Unlock Overlay */}
-                    <div className="absolute inset-0 z-10 flex flex-col items-center justify-center p-4 text-center">
-                        <div className="bg-white dark:bg-slate-800 p-4 md:p-5 rounded-2xl shadow-2xl border-2 border-red-200 dark:border-red-700 max-w-md w-full space-y-3">
-                            <div className="mx-auto w-12 h-12 bg-red-100 dark:bg-red-900/30 rounded-full flex items-center justify-center text-red-600 dark:text-red-400">
-                                <AlertCircle size={24} strokeWidth={2.5} />
+                    {/* Overlay Content */}
+                    <div className="absolute inset-0 z-10 flex flex-col items-center justify-center p-4 sm:p-6 text-center bg-gradient-to-t from-white via-white/90 to-transparent dark:from-slate-900 dark:via-slate-900/90">
+
+                        <div className="max-w-md w-full space-y-5 animate-in fade-in slide-in-from-bottom-4 duration-700">
+
+                            {/* Validation Badge */}
+                            <div className="inline-flex items-center gap-2 bg-red-50 dark:bg-red-900/30 text-red-700 dark:text-red-300 px-4 py-1.5 rounded-full text-xs font-bold uppercase tracking-wider mx-auto">
+                                <AlertTriangle size={12} /> Signals Detected
                             </div>
-                            <div className="space-y-1.5">
-                                <h3 className="font-black text-xl text-slate-900 dark:text-white">
-                                    Are You Being Gaslit?
+
+                            <div className="space-y-2">
+                                <h3 className="text-2xl sm:text-3xl font-black text-slate-900 dark:text-white leading-tight">
+                                    Is This Manipulation—<br />Or Are You Overreacting?
                                 </h3>
-                                <p className="text-xs text-slate-600 dark:text-slate-400 leading-relaxed">
-                                    We've analyzed your responses for <span className="font-bold text-red-600">Gaslighting</span>, <span className="font-bold text-red-600">Emotional Manipulation</span>, and <span className="font-bold text-red-600">Narcissistic Patterns</span>.
+                                <p className="text-base text-slate-600 dark:text-slate-300 leading-relaxed font-medium">
+                                    "Am I crazy?"<br />
+                                    "Why do I feel so drained?"
                                 </p>
-                                <p className="text-xs text-slate-500 dark:text-slate-400 font-medium pt-1">
-                                    Discover your Toxicity Score, manipulation tactics being used, and what to do next.
+                                <p className="text-sm text-slate-500 dark:text-slate-400 leading-relaxed italic">
+                                    Your answers contain specific patterns that align with the <strong>Cycle of Emotional Control</strong>. You aren't imagining it.
                                 </p>
                             </div>
 
-                            <button className="w-full bg-gradient-to-r from-red-600 to-orange-600 hover:from-red-500 hover:to-orange-500 text-white font-black text-sm py-3 px-4 rounded-xl transition-all shadow-lg hover:shadow-xl flex items-center justify-center gap-2 group">
-                                SEE YOUR TOXICITY ANALYSIS
-                                <ArrowRight size={16} className="group-hover:translate-x-1 transition-transform" />
+                            <button className="w-full bg-slate-900 dark:bg-white hover:bg-slate-800 dark:hover:bg-slate-100 text-white dark:text-slate-900 font-bold text-base py-4 px-6 rounded-full transition-all shadow-xl hover:shadow-2xl hover:-translate-y-0.5 flex items-center justify-center gap-2 group">
+                                GET YOUR CLARITY REPORT - €29
+                                <ArrowRight size={18} className="group-hover:translate-x-1 transition-transform" />
                             </button>
 
-                            <p className="text-xs text-slate-500 dark:text-slate-400 italic">
-                                You're not crazy. You're not too sensitive.
+                            <p className="text-xs text-slate-400 dark:text-slate-500 font-medium">
+                                Less than one therapy session (€150) • Instant Results
                             </p>
                         </div>
                     </div>

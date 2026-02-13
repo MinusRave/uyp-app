@@ -74,7 +74,7 @@ app OpenSaaS {
       // }
     },
     onAuthFailedRedirectTo: "/login",
-    onAuthSucceededRedirectTo: "/",
+    onAuthSucceededRedirectTo: "/auth/login-redirect",
   },
 
 
@@ -97,6 +97,10 @@ app OpenSaaS {
       name: "UnderstandYourPartner",
       email: "noreply@understandyourpartner.com"
     },
+  },
+
+  server: {
+    middlewareConfigFn: import { serverMiddlewareFn } from "@src/server/middleware",
   },
 }
 
@@ -138,6 +142,12 @@ page EmailVerificationPage {
   component: import { EmailVerificationPage } from "@src/auth/email-and-pass/EmailVerificationPage",
 }
 
+route LoginRedirectRoute { path: "/auth/login-redirect", to: LoginRedirectPage }
+page LoginRedirectPage {
+  authRequired: true,
+  component: import LoginRedirectPage from "@src/auth/LoginRedirectPage"
+}
+
 route MagicLoginCallbackRoute { path: "/auth/magic-login-callback", to: MagicLoginCallbackPage }
 page MagicLoginCallbackPage {
   component: import MagicLoginCallbackPage from "@src/auth/MagicLoginCallbackPage"
@@ -164,10 +174,31 @@ page ProcessingPage {
 }
 
 // Placeholder for Teaser (implemented next)
-route TeaserRoute { path: "/results", to: TeaserPage }
-page TeaserPage {
-  component: import TeaserPage from "@src/results/TeaserPage"
+// Teaser Page (Old)
+// route TeaserOldRoute { path: "/results-old", to: TeaserPageOld }
+// page TeaserPageOld {
+//   component: import TeaserPage from "@src/results/TeaserPage"
+// }
+
+// Selling Page
+route SellingPageRoute { path: "/offer", to: SellingPage }
+page SellingPage {
+  component: import SellingPage from "@src/results/SellingPage"
 }
+
+// NEW Teaser Page (Live)
+route TeaserRoute { path: "/results", to: TeaserPageNew }
+page TeaserPageNew {
+  component: import TeaserPageNew from "@src/results/TeaserPageNew"
+}
+
+// Full Paid Report
+route FullReportRoute { path: "/report", to: FullReportPage }
+page FullReportPage {
+  component: import FullReport from "@src/results/FullReport",
+  authRequired: false
+}
+
 
 
 
@@ -399,6 +430,14 @@ query getDownloadFileSignedURL {
 action deleteFile {
   fn: import { deleteFile } from "@src/file-upload/operations",
   entities: [User, File]
+}
+//#endregion
+
+//#region Secure Downloads
+api pdfDownload {
+  fn: import { downloadPdf } from "@src/server/downloads",
+  entities: [User, TestSession],
+  httpRoute: (GET, "/api/downloads/:filename")
 }
 //#endregion
 

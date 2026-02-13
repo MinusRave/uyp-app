@@ -8,6 +8,12 @@ import {
 } from "wasp/server/operations";
 import { sendMagicLink } from "../auth/magicLink";
 
+import crypto from "crypto";
+// @ts-ignore
+import { createUser } from "wasp/server/auth";
+// @ts-ignore
+import argon2 from "argon2";
+
 // --- Queries ---
 
 import { sendCapiEvent } from "../server/analytics/metaCapi";
@@ -23,20 +29,52 @@ export const captureLead = async ({ sessionId, email, eventID }: CaptureLeadArgs
         throw new HttpError(404, "Session not found");
     }
 
-    // 1. Update TestSession with email
+    const normalizedEmail = email.toLowerCase();
+    let user: any = null;
+
+    // 1. Find existing User (Case-Insensitive)
+    user = await context.entities.User.findFirst({
+        where: {
+            email: { equals: normalizedEmail, mode: 'insensitive' }
+        }
+    });
+
+    // 2. Create User if not exists
+    if (!user) {
+        try {
+            // Generate random password (token)
+            const token = crypto.randomBytes(32).toString('hex');
+            const hashedPassword = await argon2.hash(token);
+            const providerData = JSON.stringify({
+                hashedPassword,
+                isEmailVerified: true // Implicitly verified presumably, or false? Let's say true for lead friction reduction if they pay.
+            });
+
+            // createUser(providerId, providerData, userFields)
+            user = await createUser(
+                { providerName: "email", providerUserId: normalizedEmail },
+                providerData,
+                { email: normalizedEmail }
+            );
+            console.log(`[captureLead] Created new user: ${user.id}`);
+        } catch (e: any) {
+            console.error("[captureLead] Failed to create user:", e);
+            // Fallback: Proceed without user linking if creation fails (shouldn't happen)
+        }
+    }
+
+    // 3. Link Session to User & Email
     await context.entities.TestSession.update({
         where: { id: sessionId },
         data: {
-            email,
+            email: normalizedEmail,
+            userId: user ? user.id : undefined, // Link immediately!
             // Set email sequence type for test abandonment if not completed
             emailSequenceType: !session.isCompleted ? "test_abandonment" : undefined,
         }
     });
 
-    // 2. Send Magic Link
-    await sendMagicLink(email, context);
-
-    // 3. Send Meta CAPI Lead Event
+    // 4. Send Meta CAPI Lead Event
     if (eventID) {
         // Run in background / don't await execution to avoid blocking response
         sendCapiEvent({
@@ -44,7 +82,7 @@ export const captureLead = async ({ sessionId, email, eventID }: CaptureLeadArgs
             eventId: eventID,
             eventSourceUrl: context.req?.headers?.referer || 'https://understandyourpartner.com/test',
             userData: {
-                email: email,
+                email: normalizedEmail,
                 clientIp: context.req?.ip,
                 userAgent: context.req?.headers?.['user-agent'],
                 // Try to get fbp/fbc from cookies if available in context
@@ -54,7 +92,7 @@ export const captureLead = async ({ sessionId, email, eventID }: CaptureLeadArgs
         });
     }
 
-    // 4. Persist cookies to TestSession for future use (e.g. Purchase Webhook)
+    // 5. Persist cookies to TestSession for future use (e.g. Purchase Webhook)
     const fbp = context.req?.cookies?.['_fbp'];
     const fbc = context.req?.cookies?.['_fbc'];
     if (fbp || fbc) {
@@ -91,7 +129,10 @@ export const getTestSession: GetTestSession<{ sessionId?: string }, TestSession 
                     { email: context.user.email, userId: null } // Match email if session has no user yet
                 ]
             },
-            orderBy: { createdAt: "desc" },
+            orderBy: [
+                { isPaid: "desc" },   // Prioritize Paid Sessions
+                { createdAt: "desc" } // Then Latest
+            ],
         });
     }
 
@@ -276,6 +317,7 @@ type CompleteTestArgs = {
 import { calculateScore } from "./scoring";
 import { calculateAdvancedMetrics } from "./calculateMetrics";
 import { assessNarcissism } from "../server/narcissism";
+import { generateQuickOverview } from "../server/ai";
 
 export const completeTest: CompleteTest<CompleteTestArgs, void> = async (
     args,
@@ -335,6 +377,11 @@ export const completeTest: CompleteTest<CompleteTestArgs, void> = async (
     // Fire-and-forget: don't await, let it run asynchronously
     Promise.resolve(assessNarcissism({ sessionId }, context)).catch((e) => {
         console.error("Failed to trigger Narcissism Assessment:", e);
+    });
+
+    // Start Quick Overview generation immediately
+    Promise.resolve(generateQuickOverview({ sessionId }, context)).catch((e) => {
+        console.error("Failed to trigger Quick Overview:", e);
     });
 };
 

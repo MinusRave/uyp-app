@@ -148,7 +148,7 @@ export const createCheckoutSession: CreateCheckoutSession<
           currency: "usd",
           product_data: {
             name: "Understand Your Partner - Full Analysis",
-            description: "Complete psychological profile, collision dynamics analysis, and personalized resolution roadmap.",
+            description: "Complete Relationship Diagnosis, 5-Year Forecast, and 5 Targeted Strategic Protocol Guides.",
           },
           unit_amount: Math.round(reportPrice * 100),
         },
@@ -156,7 +156,7 @@ export const createCheckoutSession: CreateCheckoutSession<
       },
     ],
     mode: "payment",
-    success_url: `${config.frontendUrl}/results?success=true&session_id={CHECKOUT_SESSION_ID}`,
+    success_url: `${config.frontendUrl}/report?success=true&session_id=${sessionId}`,
     cancel_url: `${config.frontendUrl}/results?checkout_cancelled=true`,
     customer_email: customerEmail,
     metadata: {
