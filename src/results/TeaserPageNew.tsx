@@ -1076,7 +1076,7 @@ export default function TeaserPageNew() {
                             <div className="flex flex-col items-center gap-6">
                                 <div className="space-y-1 text-center">
                                     <p className="text-sm font-bold uppercase tracking-wider text-muted-foreground">Your Price Today</p>
-                                    <p className="text-6xl font-black text-primary">${import.meta.env.REACT_APP_REPORT_PRICE}</p>
+                                    <p className="text-6xl font-black text-primary">${import.meta.env.REACT_APP_REPORT_PRICE || "29.00"}</p>
                                 </div>
 
                                 <button
