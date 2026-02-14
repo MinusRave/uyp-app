@@ -10,7 +10,7 @@ const __dirname = path.dirname(__filename);
 
 // Configuration
 const GUIDES_DIR = path.join(__dirname, '../.ai');
-const OUTPUT_DIR = path.join(__dirname, '../private/pdfs');
+const OUTPUT_DIR = path.join(__dirname, '../public/secure_downloads_v1');
 const LOGO_PATH = path.join(__dirname, '../src/client/static/logo.png');
 
 // Ensure output directory exists

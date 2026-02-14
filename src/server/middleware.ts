@@ -1,4 +1,10 @@
 import { config } from 'wasp/server';
+import express from 'express';
+import path from 'path';
+import { fileURLToPath } from 'url';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 export const serverMiddlewareFn = (middlewareConfig: any) => {
     middlewareConfig.set('cors', (req: any, res: any, next: any) => {
@@ -23,9 +29,20 @@ export const serverMiddlewareFn = (middlewareConfig: any) => {
 
         if (req.method === 'OPTIONS') {
             res.sendStatus(200);
-        } else {
-            next();
+            return;
         }
+
+        // Public access allowed for /secure_downloads_v1 as per urgent request
+
+        next();
     });
+
+    // Explicitly serve the secure_downloads_v1 folder
+    // This ensures it works even if Wasp's public folder handling is finicky with new folders
+    middlewareConfig.set('secure_downloads', express.static(path.join(__dirname, '../../public/secure_downloads_v1'), {
+        index: false,
+        maxAge: '1d'
+    }));
+
     return middlewareConfig;
 };

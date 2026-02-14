@@ -170,10 +170,9 @@ const GuideCard = ({ title, format, desc, icon, color, filename, sessionId }: an
         if (!filename) return;
         try {
             setDownloading(true);
-            // DIRECT DOWNLOAD LINK (Bypasses CORS preflight)
-            // Construct URL: serverUrl + /api/downloads/filename?sessionId=...
-            const baseUrl = config.apiUrl; // e.g. http://localhost:3001
-            const downloadUrl = `${baseUrl}/api/downloads/${filename}?sessionId=${sessionId || ''}`;
+            // DIRECT PUBLIC DOWNLOAD (Simpler, faster, reliable)
+            // Files are in public/secure_downloads_v1/
+            const downloadUrl = `/secure_downloads_v1/${filename}`;
 
             // Trigger download via new tab/window
             window.open(downloadUrl, '_blank');

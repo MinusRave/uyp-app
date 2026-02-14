@@ -433,13 +433,7 @@ action deleteFile {
 }
 //#endregion
 
-//#region Secure Downloads
-api pdfDownload {
-  fn: import { downloadPdf } from "@src/server/downloads",
-  entities: [User, TestSession],
-  httpRoute: (GET, "/api/downloads/:filename")
-}
-//#endregion
+
 
 //#region Analytics
 query getDailyStats {
@@ -602,3 +596,4 @@ page AdminAiLogsPage {
   authRequired: true,
   component: import AiLogsPage from "@src/admin/dashboards/ai/AiLogsPage"
 }
+

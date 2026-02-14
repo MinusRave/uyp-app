@@ -46,13 +46,12 @@ export const downloadPdf = async (req: any, res: any, context: any) => {
 
     // Robust Path Resolution
     // In Wasp dev, __dirname is inside .wasp/out/server/... 
-    // We need to find the 'app/private/pdfs' folder which might not be copied to build.
-    // We check relative path, then project root relative, then absolute fallback.
+    // We expect 'public/secure_downloads_v1' to be available in project root (dev) or app root (prod).
     const possiblePaths = [
-        path.join(__dirname, '../../private/pdfs'), // Original relative
-        path.join(process.cwd(), 'private/pdfs'),   // Server root relative
-        path.join(process.cwd(), '../private/pdfs'), // One up from server root
-        '/home/minusrave/projects/understandyourpartner/uyp-app/app/private/pdfs' // Absolute Fallback (WSL Specific)
+        path.join(process.cwd(), 'public/secure_downloads_v1'),   // Prod / Dev Root
+        path.join(__dirname, '../../public/secure_downloads_v1'), // Dev Relative Legacy
+        path.join(process.cwd(), '../public/secure_downloads_v1'), // One up
+        '/home/minusrave/projects/understandyourpartner/uyp-app/app/public/secure_downloads_v1' // Absolute Fallback
     ];
 
     let filePath = '';
