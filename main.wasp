@@ -106,9 +106,9 @@ app OpenSaaS {
 
 
 
-route LandingPageRoute { path: "/", to: LandingPage }
-page LandingPage {
-  component: import LandingPage from "@src/landing-page/LandingPage"
+route LandingPageRoute { path: "/", to: HomePage }
+page HomePage {
+  component: import HomePage from "@src/landing-page/HomePage"
 }
 
 route ProblemRoute { path: "/problems/:id", to: ProblemPage }
