@@ -1,10 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { ArrowRight, Check, Menu, X, CheckCircle, MessageCircle, Search, Lightbulb, Activity, TrendingUp, AlertTriangle, ShieldCheck, Star, Quote, ChevronDown, ChevronUp, ListChecks } from 'lucide-react';
+import { ArrowRight, Check, X, CheckCircle, MessageCircle, Search, Lightbulb, Activity, TrendingUp, AlertTriangle, ShieldCheck, Star, Quote, ChevronDown, ChevronUp, ListChecks } from 'lucide-react';
 import { useAuth } from 'wasp/client/auth';
 
 export default function HomePage() {
-    const [isMenuOpen, setIsMenuOpen] = useState(false);
     const [faqOpen, setFaqOpen] = useState<number | null>(null);
 
     // Analytics: Page View
@@ -45,61 +44,12 @@ export default function HomePage() {
         }
     };
 
-    const scrollToSection = (id: string) => {
-        const element = document.getElementById(id);
-        if (element) {
-            element.scrollIntoView({ behavior: 'smooth' });
-            setIsMenuOpen(false);
-        }
-    };
+
 
     return (
         <div className="font-sans text-foreground bg-background min-h-screen">
 
-            {/* 1. STICKY NAVIGATION */}
-            <nav className="sticky top-0 z-50 bg-background/80 backdrop-blur-md border-b border-border">
-                <div className="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
-                    {/* Logo */}
-                    <Link to="/" className="text-xl font-bold tracking-tight text-foreground flex items-center gap-2">
-                        UnderstandYourPartner
-                    </Link>
 
-                    {/* Desktop Menu */}
-                    <div className="hidden md:flex items-center gap-8">
-                        <button onClick={() => scrollToSection('how-it-works')} className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">How It Works</button>
-                        <button onClick={() => scrollToSection('about')} className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">About</button>
-                        <button onClick={() => scrollToSection('contact')} className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">Contact</button>
-                        <Link
-                            to="/test"
-                            onClick={() => trackCTA('nav')}
-                            className="bg-primary hover:bg-primary/90 text-primary-foreground font-bold text-sm py-2.5 px-6 rounded-full shadow-sm transition-all"
-                        >
-                            Take Assessment
-                        </Link>
-                    </div>
-
-                    {/* Mobile Menu Toggle */}
-                    <button className="md:hidden text-foreground" onClick={() => setIsMenuOpen(!isMenuOpen)}>
-                        {isMenuOpen ? <X size={24} /> : <Menu size={24} />}
-                    </button>
-                </div>
-
-                {/* Mobile Menu */}
-                {isMenuOpen && (
-                    <div className="md:hidden bg-background border-b border-border p-4 absolute w-full space-y-4 shadow-xl">
-                        <button onClick={() => scrollToSection('how-it-works')} className="block w-full text-left text-sm font-medium text-foreground py-2">How It Works</button>
-                        <button onClick={() => scrollToSection('about')} className="block w-full text-left text-sm font-medium text-foreground py-2">About</button>
-                        <button onClick={() => scrollToSection('contact')} className="block w-full text-left text-sm font-medium text-foreground py-2">Contact</button>
-                        <Link
-                            to="/test"
-                            onClick={() => trackCTA('nav_mobile')}
-                            className="block w-full text-center bg-primary hover:bg-primary/90 text-primary-foreground font-bold text-sm py-3 rounded-full"
-                        >
-                            Take Assessment
-                        </Link>
-                    </div>
-                )}
-            </nav>
 
             {/* 2. HERO SECTION */}
             <section className="relative pt-20 pb-32 px-6 overflow-hidden">

@@ -1,6 +1,6 @@
 
 import { type TestSession, type User } from "wasp/entities";
-import { type GetTestSessions, type GetSessionDetail, type GetFunnelStats, type GetDemographicStats, type GetEmailStats, type GetAiLogs } from "wasp/server/operations";
+import { type GetTestSessions, type GetSessionDetail, type GetFunnelStats, type GetDemographicStats, type GetEmailStats, type GetAiLogs, type GetSessionAnalytics } from "wasp/server/operations";
 import { HttpError } from "wasp/server";
 
 // --- Types ---
@@ -403,4 +403,111 @@ export const retriggerAiProcessing = async ({ sessionId }: { sessionId: string }
     ]);
 
     return { success: true };
+};
+
+// --- Advanced Analytics ---
+
+type GetSessionAnalyticsArgs = {
+    dateFrom?: string;
+    dateTo?: string;
+};
+
+type DailyAnalytics = {
+    date: string;
+    started: number;
+    leads: number;
+    sales: number;
+    conversionRate: number;
+};
+
+type SessionAnalyticsResult = {
+    summary: {
+        totalStarted: number;
+        totalCompletedNoEmail: number;
+        totalLeads: number; // Email captured
+        totalSales: number;
+        conversionRate: number; // Sales / Leads
+        completionRate: number; // Completed / Started
+    };
+    dailyStats: DailyAnalytics[];
+};
+
+export const getSessionAnalytics: GetSessionAnalytics<GetSessionAnalyticsArgs, SessionAnalyticsResult> = async (args, context) => {
+    if (!context.user?.isAdmin) throw new HttpError(401, "Unauthorized");
+
+    const { dateFrom, dateTo } = args;
+    const where: any = {};
+
+    if (dateFrom || dateTo) {
+        where.createdAt = {};
+        if (dateFrom) where.createdAt.gte = new Date(dateFrom);
+        if (dateTo) where.createdAt.lte = new Date(dateTo);
+    }
+
+    const sessions = await context.entities.TestSession.findMany({
+        where,
+        select: {
+            createdAt: true,
+            isCompleted: true,
+            email: true,
+            isPaid: true,
+            currentQuestionIndex: true,
+            onboardingStep: true
+        },
+        orderBy: { createdAt: 'asc' }
+    });
+
+    let totalStarted = 0;
+    let totalCompletedNoEmail = 0;
+    let totalLeads = 0;
+    let totalSales = 0;
+
+    const dailyMap = new Map<string, { started: number, leads: number, sales: number }>();
+
+    sessions.forEach(s => {
+        // "Started" = answered at least 1 question
+        const isStarted = s.currentQuestionIndex > 0 || (s.onboardingStep || 0) > 0;
+        if (isStarted) totalStarted++;
+
+        // "Lead" = email captured
+        const isLead = !!s.email;
+        if (isLead) totalLeads++;
+
+        // "Completed No Email" = isCompleted true BUT no email (shouldn't happen often if flow is strict, but good to know)
+        // Actually user request: "quante persone hanno completato il test ma non hanno inserito l email"
+        // Usually completion implies email, but let's check
+        if (s.isCompleted && !s.email) totalCompletedNoEmail++;
+
+        // "Sale"
+        if (s.isPaid) totalSales++;
+
+        // Daily Aggr
+        const day = s.createdAt.toISOString().split('T')[0];
+        if (!dailyMap.has(day)) dailyMap.set(day, { started: 0, leads: 0, sales: 0 });
+        const dayStats = dailyMap.get(day)!;
+
+        if (isStarted) dayStats.started++;
+        if (isLead) dayStats.leads++;
+        if (s.isPaid) dayStats.sales++;
+    });
+
+    const dailyStats: DailyAnalytics[] = Array.from(dailyMap.entries()).map(([date, stats]) => ({
+        date,
+        started: stats.started,
+        leads: stats.leads,
+        sales: stats.sales,
+        conversionRate: stats.leads > 0 ? (stats.sales / stats.leads) * 100 : 0
+    })).sort((a, b) => a.date.localeCompare(b.date));
+
+    return {
+        summary: {
+            totalStarted,
+            totalCompletedNoEmail,
+            totalLeads,
+            totalSales,
+            conversionRate: totalLeads > 0 ? (totalSales / totalLeads) * 100 : 0,
+            completionRate: totalStarted > 0 ? (totalLeads / totalStarted) * 100 : 0 // Proxying completion as lead capture for now
+        },
+        dailyStats
+    };
 };

@@ -1,13 +1,15 @@
 
 import { useState } from "react";
 import { type AuthUser } from "wasp/auth";
-import { useQuery, getTestSessions, getConversionFunnelMetrics } from "wasp/client/operations";
+import { useQuery, getTestSessions, getConversionFunnelMetrics, getSessionAnalytics } from "wasp/client/operations";
 import { Link } from "react-router-dom";
 import DefaultLayout from "../../layout/DefaultLayout";
-import { Loader2 } from "lucide-react";
+import { Loader2, Calendar } from "lucide-react";
 import { cn } from "../../../client/utils";
 import { type TestSession } from "wasp/entities";
 import { FunnelMetrics } from "./FunnelMetrics";
+import { StatsOverview } from "./StatsOverview";
+import { TrendChart } from "./TrendChart";
 
 // Define a type that includes the relation, as Wasp/Prisma clients types usually return the raw model
 // but the query is configured to include user.
@@ -35,11 +37,17 @@ const SessionsPage = ({ user }: { user: AuthUser }) => {
     const [statusFilter, setStatusFilter] = useState<'all' | 'completed' | 'paid' | 'abandoned'>('all');
     const [emailFilter, setEmailFilter] = useState("");
 
+    // Global Date Filters
+    const [dateRange, setDateRange] = useState({
+        from: '',
+        to: ''
+    });
+
     // Funnel metrics filters
     const [funnelFilters, setFunnelFilters] = useState({
         trafficSource: 'all' as 'all' | 'meta' | 'direct',
-        dateFrom: '',
-        dateTo: '',
+        // dateFrom: '', // Removing redundant internal date state to use global
+        // dateTo: '',   // Removing redundant internal date state to use global
         deviceType: 'all' as 'all' | 'mobile' | 'desktop' | 'tablet',
         excludeBots: true
     });
@@ -57,10 +65,16 @@ const SessionsPage = ({ user }: { user: AuthUser }) => {
     // Fetch funnel metrics with filters
     const { data: funnelMetrics, isLoading: isLoadingMetrics } = useQuery(getConversionFunnelMetrics, {
         trafficSource: funnelFilters.trafficSource,
-        dateFrom: funnelFilters.dateFrom || undefined,
-        dateTo: funnelFilters.dateTo || undefined,
+        dateFrom: dateRange.from || undefined,
+        dateTo: dateRange.to || undefined,
         deviceType: funnelFilters.deviceType,
         excludeBots: funnelFilters.excludeBots
+    });
+
+    // Fetch Session Analytics (Aggregates & Trends)
+    const { data: analyticsData, isLoading: isLoadingAnalytics } = useQuery(getSessionAnalytics, {
+        dateFrom: dateRange.from || undefined,
+        dateTo: dateRange.to || undefined
     });
 
     // Cast the data to include the user relation
@@ -74,12 +88,57 @@ const SessionsPage = ({ user }: { user: AuthUser }) => {
                     <p className="text-gray-500">Deep dive into user journeys and results.</p>
                 </div>
 
+                {/* Global Date Filter */}
+                <div className="bg-white dark:bg-boxdark p-4 rounded-lg shadow-sm border border-gray-200 dark:border-strokedark flex flex-wrap gap-4 items-center">
+                    <div className="flex items-center gap-2 text-gray-500">
+                        <Calendar size={18} />
+                        <span className="font-bold text-sm">Global Date Range:</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                        <input
+                            type="date"
+                            value={dateRange.from}
+                            onChange={(e) => setDateRange({ ...dateRange, from: e.target.value })}
+                            className="rounded border border-stroke bg-transparent py-1 px-2 text-sm outline-none transition focus:border-primary dark:border-form-strokedark dark:bg-form-input"
+                        />
+                        <span className="text-gray-400">-</span>
+                        <input
+                            type="date"
+                            value={dateRange.to}
+                            onChange={(e) => setDateRange({ ...dateRange, to: e.target.value })}
+                            className="rounded border border-stroke bg-transparent py-1 px-2 text-sm outline-none transition focus:border-primary dark:border-form-strokedark dark:bg-form-input"
+                        />
+                    </div>
+                    <button
+                        onClick={() => setDateRange({ from: '', to: '' })}
+                        className="text-xs text-primary hover:underline ml-auto"
+                    >
+                        Clear Dates
+                    </button>
+                </div>
+
+                {/* New Stats Overview */}
+                {analyticsData && (
+                    <StatsOverview
+                        summary={analyticsData.summary}
+                        isLoading={isLoadingAnalytics}
+                    />
+                )}
+
+                {/* Trend Chart */}
+                {analyticsData && (
+                    <TrendChart
+                        dailyStats={analyticsData.dailyStats}
+                        isLoading={isLoadingAnalytics}
+                    />
+                )}
+
                 {/* Funnel Metrics Filters */}
                 <div className="bg-white dark:bg-boxdark p-4 rounded-lg shadow-sm border border-gray-200 dark:border-strokedark">
                     <h3 className="text-sm font-bold text-gray-700 dark:text-gray-300 mb-3 uppercase tracking-wide">
-                        Funnel Analytics Filters
+                        Detailed Funnel Filters & Analysis
                     </h3>
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-3">
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3">
                         {/* Traffic Source */}
                         <div>
                             <label className="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">
@@ -94,32 +153,6 @@ const SessionsPage = ({ user }: { user: AuthUser }) => {
                                 <option value="meta">Meta Ads Only</option>
                                 <option value="direct">Direct/Organic Only</option>
                             </select>
-                        </div>
-
-                        {/* Date From */}
-                        <div>
-                            <label className="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">
-                                From Date
-                            </label>
-                            <input
-                                type="date"
-                                value={funnelFilters.dateFrom}
-                                onChange={(e) => setFunnelFilters({ ...funnelFilters, dateFrom: e.target.value })}
-                                className="w-full rounded-lg border-[1.5px] border-stroke bg-transparent py-2 px-3 text-sm outline-none transition focus:border-primary dark:border-form-strokedark dark:bg-form-input"
-                            />
-                        </div>
-
-                        {/* Date To */}
-                        <div>
-                            <label className="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">
-                                To Date
-                            </label>
-                            <input
-                                type="date"
-                                value={funnelFilters.dateTo}
-                                onChange={(e) => setFunnelFilters({ ...funnelFilters, dateTo: e.target.value })}
-                                className="w-full rounded-lg border-[1.5px] border-stroke bg-transparent py-2 px-3 text-sm outline-none transition focus:border-primary dark:border-form-strokedark dark:bg-form-input"
-                            />
                         </div>
 
                         {/* Device Type */}
@@ -141,7 +174,7 @@ const SessionsPage = ({ user }: { user: AuthUser }) => {
 
                         {/* Exclude Bots */}
                         <div className="flex items-end">
-                            <label className="flex items-center gap-2 cursor-pointer">
+                            <label className="flex items-center gap-2 cursor-pointer mb-2">
                                 <input
                                     type="checkbox"
                                     checked={funnelFilters.excludeBots}
