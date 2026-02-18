@@ -31,7 +31,8 @@ const guides = [
   { file: 'guide_emotional_affair_warning.md', title: 'Emotional Affair Warning Signs', subtitle: 'Analyzing subtle breaches of trust & recovery steps.', output: 'emotional-affair-warning.pdf' },
   { file: 'guide_mental_load_equalizer.md', title: 'Mental Load Equalizer', subtitle: 'Strategic framework for fair household management.', output: 'mental-load-equalizer.pdf' },
   { file: 'guide_narcissist_detection_manual.md', title: 'Narcissist Detection Manual', subtitle: 'Clinical markers of high-conflict personality types.', output: 'narcissist-detection-manual.pdf' },
-  { file: 'guide_shoud_i_stay_or_should_i_go.md', title: 'Stay or Go Decision Matrix', subtitle: 'Objective assessment for critical relationship choices.', output: 'stay-or-go-matrix.pdf' }
+  { file: 'guide_shoud_i_stay_or_should_i_go.md', title: 'Stay or Go Decision Matrix', subtitle: 'Objective assessment for critical relationship choices.', output: 'stay-or-go-matrix.pdf' },
+  { file: '30_days_reconnection_wb.md', title: 'The 30-Day Reconnection Workbook', subtitle: 'From Diagnosis to Daily Action', output: '30-day-reconnection-workbook.pdf' }
 ];
 
 // Brand-Match CSS for PDF

@@ -63,15 +63,17 @@ import { sendCapiEvent } from "../server/analytics/metaCapi";
 export type CreateCheckoutSessionArgs = {
   sessionId: string;
   eventID?: string;
+  addWorkbook?: boolean; // NEW: Order bump
 };
 
 export const createCheckoutSession: CreateCheckoutSession<
   CreateCheckoutSessionArgs,
   CheckoutSession
-> = async ({ sessionId, eventID }, context) => {
+> = async ({ sessionId, eventID, addWorkbook }, context) => {
   // 1. Fetch Session
   console.log("[createCheckoutSession] SessionId:", sessionId);
   console.log("[createCheckoutSession] User Context:", context.user?.id);
+  console.log("[createCheckoutSession] Add Workbook:", addWorkbook);
 
   const testSession = await context.entities.TestSession.findUnique({
     where: { id: sessionId },
@@ -106,6 +108,11 @@ export const createCheckoutSession: CreateCheckoutSession<
   // This supports the "Skip Email Gate" A/B test case.
 
   // 3. Send Meta CAPI InitiateCheckout Event
+  const reportPrice = parseFloat(process.env.REPORT_PRICE || "29.00");
+  const workbookPrice = 12.00;
+  let totalPrice = reportPrice;
+  if (addWorkbook) totalPrice += workbookPrice;
+
   if (eventID) {
     // Run in background
     sendCapiEvent({
@@ -121,8 +128,8 @@ export const createCheckoutSession: CreateCheckoutSession<
       },
       customData: {
         currency: 'usd',
-        value: parseFloat(process.env.REPORT_PRICE || "29.00"),
-        content_name: 'Full Relationship Report',
+        value: totalPrice,
+        content_name: 'Full Relationship Report', // Stick to main product for name
         content_category: 'Report',
         content_ids: ['report-full'],
         content_type: 'product',
@@ -131,28 +138,43 @@ export const createCheckoutSession: CreateCheckoutSession<
   }
 
   // 4. Log price for verification
-  const reportPrice = parseFloat(process.env.REPORT_PRICE || "29.00");
-  console.log(`[createCheckoutSession] Charging price: $${reportPrice}`);
+  console.log(`[createCheckoutSession] Charging price: $${totalPrice}`);
 
   // 5. Create Stripe Checkout Session
+  const lineItems = [
+    {
+      price_data: {
+        currency: "usd",
+        product_data: {
+          name: "Understand Your Partner - Full Analysis",
+          description: "Complete Relationship Diagnosis, 5-Year Forecast, and 5 Targeted Strategic Protocol Guides.",
+        },
+        unit_amount: Math.round(reportPrice * 100),
+      },
+      quantity: 1,
+    }
+  ];
+
+  if (addWorkbook) {
+    lineItems.push({
+      price_data: {
+        currency: "usd",
+        product_data: {
+          name: "The 30-Day Reconnection Workbook",
+          description: "Daily guided exercises to rebuild connection.",
+        },
+        unit_amount: Math.round(workbookPrice * 100),
+      },
+      quantity: 1,
+    });
+  }
+
   const session = await stripeClient.checkout.sessions.create({
     payment_method_types: ["card"],
     billing_address_collection: 'auto', // Reduces friction
     phone_number_collection: { enabled: false }, // Don't ask for phone
     submit_type: 'pay', // Button says "Pay" not "Subscribe"
-    line_items: [
-      {
-        price_data: {
-          currency: "usd",
-          product_data: {
-            name: "Understand Your Partner - Full Analysis",
-            description: "Complete Relationship Diagnosis, 5-Year Forecast, and 5 Targeted Strategic Protocol Guides.",
-          },
-          unit_amount: Math.round(reportPrice * 100),
-        },
-        quantity: 1,
-      },
-    ],
+    line_items: lineItems,
     mode: "payment",
     success_url: `${config.frontendUrl}/report?success=true&session_id=${sessionId}`,
     cancel_url: `${config.frontendUrl}/results?checkout_cancelled=true`,
@@ -162,6 +184,7 @@ export const createCheckoutSession: CreateCheckoutSession<
       userId: context.user?.id || "", // Empty if anonymous
       type: "report_unlock",
       capiEventId: eventID || "", // Pass it just in case we need it
+      hasOrderBump: addWorkbook ? "true" : "false", // Track if they bought it
     },
   });
 

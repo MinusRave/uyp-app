@@ -55,6 +55,7 @@ export const stripeWebhook = async (
       try {
         const eventId = session.id; // cs_test_...
         const userEmail = testSession?.email || session.customer_details?.email;
+        const amountTotal = session.amount_total ? session.amount_total / 100 : parseFloat(process.env.REPORT_PRICE || "29.00");
 
         // Import dynamically if needed or assume it's available. 
         // Since this is a server file, we can import from metaCapi.
@@ -72,7 +73,7 @@ export const stripeWebhook = async (
           },
           customData: {
             currency: 'usd',
-            value: parseFloat(process.env.REPORT_PRICE || "29.00"),
+            value: amountTotal,
             content_name: 'Full Relationship Report',
             content_type: 'product',
             order_id: session.id
@@ -89,6 +90,10 @@ export const stripeWebhook = async (
         isPaid: true,
         emailSequenceType: null, // Stop sequences
       };
+
+      if (metadata.hasOrderBump === 'true') {
+        dataToUpdate.hasPurchasedOrderBump = true;
+      }
 
       if (!testSession.email && session.customer_details?.email) {
         console.log(`[Webhook] Capturing missing email from Stripe: ${session.customer_details.email}`);

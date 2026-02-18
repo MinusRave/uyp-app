@@ -601,6 +601,19 @@ export default function FullReport() {
                     </div>
 
                     <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+                        {/* ORDER BUMP GUIDE - Only if purchased */}
+                        {(session as any).hasPurchasedOrderBump && (
+                            <GuideCard
+                                title="30-Day Reconnection Workbook"
+                                format="Daily Workbook"
+                                desc="A 4-week guided program to rebuild intimacy, trust, and communication through daily exercises."
+                                icon={<Brain size={24} />}
+                                color={{ bgLight: "bg-yellow-500/20", text: "text-yellow-600", btnBg: "bg-yellow-600", btnText: "text-white" }}
+                                filename="30-day-reconnection-workbook.pdf"
+                                sessionId={session?.id}
+                            />
+                        )}
+
                         {/* Guide 1 */}
                         <GuideCard
                             title="The Mental Load Equalizer"

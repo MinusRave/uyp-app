@@ -45,6 +45,7 @@ model TestSession {
   
   // Payment gate
   isPaid               Boolean  @default(false)
+  hasPurchasedOrderBump Boolean @default(false)
   email                String?  // Lead capture before matching with User
 
   // User Profile Data (Collected before test)

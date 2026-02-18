@@ -236,7 +236,25 @@ export default function TeaserPageNew() {
     const quickOverviewInitiated = useRef(false);
     const fullReportInitiated = useRef(false);
 
+    const [addOrderBump, setAddOrderBump] = useState(false);
     const [isCheckoutLoading, setIsCheckoutLoading] = useState(false);
+    const [showStickyCTA, setShowStickyCTA] = useState(false);
+
+    useEffect(() => {
+        const handleScroll = () => {
+            const offerSection = document.getElementById('offer');
+            if (offerSection) {
+                const rect = offerSection.getBoundingClientRect();
+                // Show sticky CTA if offer is not currently visible (scrolled past or haven't reached)
+                const isOfferVisible = rect.top < window.innerHeight && rect.bottom > 0;
+                setShowStickyCTA(!isOfferVisible && window.scrollY > 800);
+            }
+        };
+        window.addEventListener('scroll', handleScroll);
+        return () => window.removeEventListener('scroll', handleScroll);
+    }, []);
+
+
 
     // Analytics: Page View
     useEffect(() => {
@@ -351,7 +369,7 @@ export default function TeaserPageNew() {
         trackPixelEvent('InitiateCheckout', {
             content_name: 'Full Relationship Report',
             content_category: 'Report',
-            value: 29,
+            value: addOrderBump ? 41 : 29, // Update value based on order bump ($29 + $12)
             currency: 'USD',
             eventID: eventID
         });
@@ -359,7 +377,8 @@ export default function TeaserPageNew() {
         try {
             const checkout = await createCheckoutSession({
                 sessionId: session.id,
-                eventID: eventID
+                eventID: eventID,
+                addWorkbook: addOrderBump // NEW: Pass order bump selection
             });
             if (checkout.sessionUrl) {
                 window.location.href = checkout.sessionUrl;
@@ -372,7 +391,6 @@ export default function TeaserPageNew() {
         }
     };
 
-    if (isSessionLoading) return <div className="min-h-screen flex items-center justify-center bg-background text-foreground"><Activity className="animate-spin" /></div>;
     if (!session) return <div className="min-h-screen flex items-center justify-center bg-background text-foreground">Session not found.</div>;
 
     const badge = quickOverview?.hero?.result_badge || "CALCULATING...";
@@ -1079,147 +1097,198 @@ export default function TeaserPageNew() {
                                     <p className="text-6xl font-black text-primary">${import.meta.env.REACT_APP_REPORT_PRICE || "29.00"}</p>
                                 </div>
 
-                                <button
-                                    onClick={() => handleCheckout('offer_cta')}
-                                    className="w-full md:w-auto bg-primary hover:bg-primary/90 text-primary-foreground text-xl font-bold py-5 px-12 rounded-full shadow-2xl hover:scale-105 transition-all flex items-center justify-center gap-3 animate-pulse-slow"
-                                >
-                                    {isCheckoutLoading ? "Processing..." : "Get Instant Access Now"} <ArrowRight size={24} />
-                                </button>
-                                <p className="text-xs text-muted-foreground">Secure One-Time Payment • Instant PDF Download</p>
-                            </div>
-                        </div>
+                                {/* ORDER BUMP */}
+                                <div className="w-full bg-yellow-50 dark:bg-yellow-900/10 border-2 border-dashed border-yellow-400 p-4 rounded-xl text-left cursor-pointer hover:bg-yellow-100 dark:hover:bg-yellow-900/20 transition-colors mb-8" onClick={() => setAddOrderBump(!addOrderBump)}>
+                                    <div className="flex items-start gap-3">
+                                        <div className={`mt-1 h-5 w-5 rounded border flex items-center justify-center transition-colors ${addOrderBump ? 'bg-primary border-primary text-white' : 'bg-white border-gray-400'}`}>
+                                            {addOrderBump && <Check size={14} strokeWidth={4} />}
+                                        </div>
+                                        <div>
+                                            <p className="font-bold text-foreground text-sm leading-tight">
+                                                YES! Add the <span className="text-primary">30-Day Reconnection Workbook</span> for just $12.
+                                            </p>
+                                            <ul className="text-xs text-muted-foreground mt-2 space-y-1">
+                                                <li className="flex items-center gap-2"><CheckCircle size={10} className="text-primary" /> Daily check-ins (5-10 min/day)</li>
+                                                <li className="flex items-center gap-2"><CheckCircle size={10} className="text-primary" /> Conversation practice templates</li>
+                                                <li className="flex items-center gap-2"><CheckCircle size={10} className="text-primary" /> Progress tracker with visual milestones</li>
+                                            </ul>
+                                            <p className="text-xs font-bold text-primary mt-2 animate-pulse">
+                                                START TODAY. Not "someday."
+                                            </p>
+                                        </div>
+                                    </div>
+                                </div>
 
-                        {/* Risk Reversal */}
-                        <div className="bg-secondary/10 p-6 md:p-8 flex flex-col md:flex-row items-center gap-6 border-t border-border mt-8 rounded-b-3xl">
-                            <div className="shrink-0 p-3 bg-card rounded-full shadow-sm">
-                                <ShieldCheck className="text-primary w-8 h-8" />
-                            </div>
-                            <div className="text-left">
-                                <h3 className="font-bold text-foreground mb-1">The "Lightbulb Moment" Guarantee</h3>
-                                <p className="text-sm text-muted-foreground leading-relaxed">
-                                    Read your personalized analysis. If you don't have at least one profound realization about your relationship that gives you clarity, email us for a full refund. No questions asked.
-                                </p>
-                            </div>
-                        </div>
-                    </div>
-
-                    {/* 6.5 COMPARISON TABLE */}
-                    <section className="max-w-4xl mx-auto py-12 px-2">
-                        <div className="text-center mb-10 space-y-2">
-                            <h2 className="text-3xl font-black text-foreground">Why This Price? (And Why It's Worth 10x More)</h2>
-                            <p className="text-muted-foreground">Most people spend thousands trying to understand their relationship. Here's what you'd pay elsewhere:</p>
-                        </div>
-
-                        <div className="overflow-x-auto rounded-2xl border border-border bg-card shadow-sm">
-                            <table className="w-full text-left border-collapse">
-                                <thead>
-                                    <tr className="bg-muted/50 border-b border-border text-xs uppercase tracking-wider text-muted-foreground">
-                                        <th className="p-4 font-bold">What You're Comparing</th>
-                                        <th className="p-4 font-bold">Cost</th>
-                                        <th className="p-4 font-bold">Time to Results</th>
-                                        <th className="p-4 font-bold">What You Get</th>
-                                    </tr>
-                                </thead>
-                                <tbody className="text-sm divide-y divide-border">
-                                    <tr className="hover:bg-muted/10 transition-colors">
-                                        <td className="p-4 font-bold text-foreground">Couples Therapy</td>
-                                        <td className="p-4 text-muted-foreground">$150/session × 6-10 = <span className="font-bold text-red-500 block">$900-1,500</span></td>
-                                        <td className="p-4 text-muted-foreground">6-12 weeks minimum</td>
-                                        <td className="p-4 text-muted-foreground">Depends on therapist quality. Takes 4-5 sessions just to identify your pattern.</td>
-                                    </tr>
-                                    <tr className="hover:bg-muted/10 transition-colors">
-                                        <td className="p-4 font-bold text-foreground">Self-Help Books</td>
-                                        <td className="p-4 text-muted-foreground">$20 × 5-8 books = <span className="font-bold block">$100-160</span></td>
-                                        <td className="p-4 text-muted-foreground">20-40 hours reading</td>
-                                        <td className="p-4 text-muted-foreground">Generic advice for everyone. Not specific to YOUR relationship pattern.</td>
-                                    </tr>
-                                    <tr className="hover:bg-muted/10 transition-colors">
-                                        <td className="p-4 font-bold text-foreground">Online Course</td>
-                                        <td className="p-4 text-muted-foreground"><span className="font-bold block">$97-297</span></td>
-                                        <td className="p-4 text-muted-foreground">8-12 hours of video</td>
-                                        <td className="p-4 text-muted-foreground">General frameworks. No personalized diagnosis. No action plan.</td>
-                                    </tr>
-                                    <tr className="bg-primary/5 hover:bg-primary/10 transition-colors border-l-4 border-l-primary">
-                                        <td className="p-4 font-black text-primary text-base">This Analysis</td>
-                                        <td className="p-4"><span className="font-black text-2xl text-primary">$29</span></td>
-                                        <td className="p-4 font-bold text-foreground">Instant</td>
-                                        <td className="p-4 font-bold text-foreground">Personalized to YOUR 30 answers. Pattern identified. 5 clinical guides. Exact scripts.</td>
-                                    </tr>
-                                </tbody>
-                            </table>
-                        </div>
-
-                        <p className="text-center text-sm text-muted-foreground italic mt-6">
-                            You'll spend more on a dinner where you both scroll your phones than on understanding what's actually destroying your relationship.
-                        </p>
-                    </section>
-
-                    {/* TESTIMONIAL C: MARTA (Risk Reversal / Emotional Safety) */}
-                    <div className="bg-background py-12 px-6 mb-12 rounded-2xl border border-border shadow-sm">
-                        <div className="max-w-2xl mx-auto text-center">
-                            <p className="text-xl italic font-serif text-muted-foreground mb-6 leading-relaxed">
-                                "I cried a lot. For the first time someone said 'you are not the problem, you are in a pattern'. And this sentence freed me from 5 years of guilt. I don't know if we stay together but at least now I can breathe."
-                            </p>
-                            <div className="font-bold text-foreground">— Marta, 38, Paris</div>
-                        </div>
-                    </div>
-
-                    {/* FAQ */}
-                    <div className="max-w-3xl mx-auto space-y-8 mt-16">
-                        <h3 className="text-2xl font-bold text-center mb-12 text-foreground">Common Questions & Concerns</h3>
-
-                        <div className="space-y-4">
-                            {/* Q1 */}
-                            <div className="space-y-2">
-                                <h4 className="font-bold text-lg text-foreground">"Can't I just figure this out on my own?"</h4>
-                                <p className="text-muted-foreground leading-relaxed text-sm">
-                                    You've been trying. That's why you took the test. The problem isn't intelligence—it's perspective. <strong>You can't read the label from inside the bottle.</strong> This analysis gives you the outside view—the clinical lens that cuts through emotions and shows you the STRUCTURE.
-                                </p>
                             </div>
 
-                            {/* Q2 */}
-                            <div className="space-y-2">
-                                <h4 className="font-bold text-lg text-foreground">"What if my partner refuses to read it?"</h4>
-                                <p className="text-muted-foreground leading-relaxed text-sm">
-                                    <strong>47% of our users never show it to their partner.</strong> They use it to change their OWN behavior—which inevitably forces the dynamic to shift. You don't need their permission to understand the pattern.
-                                </p>
-                            </div>
-
-                            {/* Q3 */}
-                            <div className="space-y-2">
-                                <h4 className="font-bold text-lg text-foreground">"What if it tells me something I don't want to hear?"</h4>
-                                <p className="text-muted-foreground leading-relaxed text-sm">
-                                    Then you NEED to hear it. The worst thing isn't a painful truth—it's wasting 5 more years on a comfortable lie. Look: You already KNOW something is wrong. That's why you took the test. The analysis doesn't create problems—it NAMES them.
-                                </p>
-                            </div>
-
-                            {/* Q4 */}
-                            <div className="space-y-2">
-                                <h4 className="font-bold text-lg text-foreground">"Is this therapy?"</h4>
-                                <p className="text-muted-foreground leading-relaxed text-sm">
-                                    No, this is <strong>triage</strong>. Therapy requires finding a doctor, waiting weeks, and spending thousands. This report gives you the immediate diagnostic clarity you need *right now* to decide your next step. It's self-diagnosis before you see the doctor.
-                                </p>
-                            </div>
-
-                            {/* Q5 */}
-                            <div className="space-y-2">
-                                <h4 className="font-bold text-lg text-foreground">"What if I'm the problem?"</h4>
-                                <p className="text-muted-foreground leading-relaxed text-sm">
-                                    That's actually the most empowering discovery possible. Because you can control YOUR behavior. Most people discover they're BOTH part of the problem—one pattern triggering another. That means you can BOTH fix it.
-                                </p>
-                            </div>
-
-                            {/* Q6 */}
-                            <div className="space-y-2">
-                                <h4 className="font-bold text-lg text-foreground">"Is my data safe?"</h4>
-                                <p className="text-muted-foreground leading-relaxed text-sm">
-                                    100%. We don't sell data. We don't share answers. You can delete your account and all data at any time.
-                                </p>
-                            </div>
+                            <button
+                                onClick={() => handleCheckout('offer_cta')}
+                                className="w-full md:w-auto bg-primary hover:bg-primary/90 text-primary-foreground text-xl font-bold py-5 px-12 rounded-full shadow-2xl hover:scale-105 transition-all flex items-center justify-center gap-3 animate-pulse-slow"
+                            >
+                                {isCheckoutLoading ? "Processing..." : "Get Instant Access Now"} <ArrowRight size={24} />
+                            </button>
+                            <p className="text-xs text-muted-foreground">Secure One-Time Payment • Instant PDF Download</p>
                         </div>
                     </div>
                 </div>
-            </section>
+
+
+
+
+                {/* Guarantee */}
+                <div className="max-w-3xl mx-auto text-center mt-12 mb-20">
+                    <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-green-500/10 text-green-600 border border-green-500/20 text-sm font-bold mb-6">
+                        <ShieldCheck size={16} /> 100% Satisfaction Guarantee
+                    </div>
+                    <h3 className="text-2xl font-bold text-foreground mb-4">Try It Risk-Free</h3>
+                    <p className="text-muted-foreground">
+                        If you don't feel this report provides valuable insights into your relationship dynamics, simply email us within 30 days for a full refund. No questions asked.
+                    </p>
+                </div>
+
+
+
+                {/* Risk Reversal */}
+                <div className="bg-secondary/10 p-6 md:p-8 flex flex-col md:flex-row items-center gap-6 border-t border-border mt-8 rounded-b-3xl">
+                    <div className="shrink-0 p-3 bg-card rounded-full shadow-sm">
+                        <ShieldCheck className="text-primary w-8 h-8" />
+                    </div>
+                    <div className="text-left">
+                        <h3 className="font-bold text-foreground mb-1">The "Lightbulb Moment" Guarantee</h3>
+                        <p className="text-sm text-muted-foreground leading-relaxed">
+                            Read your personalized analysis. If you don't have at least one profound realization about your relationship that gives you clarity, email us for a full refund. No questions asked.
+                        </p>
+                    </div>
+                </div>
+
+
+                {/* Sticky Mobile CTA */}
+                <div className={`fixed bottom-0 left-0 w-full bg-background border-t border-border p-4 md:hidden transform transition-transform duration-300 z-50 ${showStickyCTA ? 'translate-y-0' : 'translate-y-full'}`}>
+                    <button
+                        onClick={handleScrollToOffer}
+                        className="w-full bg-primary text-primary-foreground font-bold py-4 rounded-xl shadow-lg flex items-center justify-center gap-2"
+                    >
+                        Get Your Report <ArrowRight size={20} />
+                    </button>
+                </div>
+
+            </section >
+
+            {/* 6.5 COMPARISON TABLE */}
+            < section className="max-w-4xl mx-auto py-12 px-2" >
+                <div className="text-center mb-10 space-y-2">
+                    <h2 className="text-3xl font-black text-foreground">Why This Price? (And Why It's Worth 10x More)</h2>
+                    <p className="text-muted-foreground">Most people spend thousands trying to understand their relationship. Here's what you'd pay elsewhere:</p>
+                </div>
+
+                <div className="overflow-x-auto rounded-2xl border border-border bg-card shadow-sm">
+                    <table className="w-full text-left border-collapse">
+                        <thead>
+                            <tr className="bg-muted/50 border-b border-border text-xs uppercase tracking-wider text-muted-foreground">
+                                <th className="p-4 font-bold">What You're Comparing</th>
+                                <th className="p-4 font-bold">Cost</th>
+                                <th className="p-4 font-bold">Time to Results</th>
+                                <th className="p-4 font-bold">What You Get</th>
+                            </tr>
+                        </thead>
+                        <tbody className="text-sm divide-y divide-border">
+                            <tr className="hover:bg-muted/10 transition-colors">
+                                <td className="p-4 font-bold text-foreground">Couples Therapy</td>
+                                <td className="p-4 text-muted-foreground">$150/session × 6-10 = <span className="font-bold text-red-500 block">$900-1,500</span></td>
+                                <td className="p-4 text-muted-foreground">6-12 weeks minimum</td>
+                                <td className="p-4 text-muted-foreground">Depends on therapist quality. Takes 4-5 sessions just to identify your pattern.</td>
+                            </tr>
+                            <tr className="hover:bg-muted/10 transition-colors">
+                                <td className="p-4 font-bold text-foreground">Self-Help Books</td>
+                                <td className="p-4 text-muted-foreground">$20 × 5-8 books = <span className="font-bold block">$100-160</span></td>
+                                <td className="p-4 text-muted-foreground">20-40 hours reading</td>
+                                <td className="p-4 text-muted-foreground">Generic advice for everyone. Not specific to YOUR relationship pattern.</td>
+                            </tr>
+                            <tr className="hover:bg-muted/10 transition-colors">
+                                <td className="p-4 font-bold text-foreground">Online Course</td>
+                                <td className="p-4 text-muted-foreground"><span className="font-bold block">$97-297</span></td>
+                                <td className="p-4 text-muted-foreground">8-12 hours of video</td>
+                                <td className="p-4 text-muted-foreground">General frameworks. No personalized diagnosis. No action plan.</td>
+                            </tr>
+                            <tr className="bg-primary/5 hover:bg-primary/10 transition-colors border-l-4 border-l-primary">
+                                <td className="p-4 font-black text-primary text-base">This Analysis</td>
+                                <td className="p-4"><span className="font-black text-2xl text-primary">$29</span></td>
+                                <td className="p-4 font-bold text-foreground">Instant</td>
+                                <td className="p-4 font-bold text-foreground">Personalized to YOUR 30 answers. Pattern identified. 5 clinical guides. Exact scripts.</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <p className="text-center text-sm text-muted-foreground italic mt-6">
+                    You'll spend more on a dinner where you both scroll your phones than on understanding what's actually destroying your relationship.
+                </p>
+            </section >
+
+            {/* TESTIMONIAL C: MARTA (Risk Reversal / Emotional Safety) */}
+            < div className="bg-background py-12 px-6 mb-12 rounded-2xl border border-border shadow-sm" >
+                <div className="max-w-2xl mx-auto text-center">
+                    <p className="text-xl italic font-serif text-muted-foreground mb-6 leading-relaxed">
+                        "I cried a lot. For the first time someone said 'you are not the problem, you are in a pattern'. And this sentence freed me from 5 years of guilt. I don't know if we stay together but at least now I can breathe."
+                    </p>
+                    <div className="font-bold text-foreground">— Marta, 38, Paris</div>
+                </div>
+            </div >
+
+            {/* FAQ */}
+            < div className="max-w-3xl mx-auto space-y-8 mt-16" >
+                <h3 className="text-2xl font-bold text-center mb-12 text-foreground">Common Questions & Concerns</h3>
+
+                <div className="space-y-4">
+                    {/* Q1 */}
+                    <div className="space-y-2">
+                        <h4 className="font-bold text-lg text-foreground">"Can't I just figure this out on my own?"</h4>
+                        <p className="text-muted-foreground leading-relaxed text-sm">
+                            You've been trying. That's why you took the test. The problem isn't intelligence—it's perspective. <strong>You can't read the label from inside the bottle.</strong> This analysis gives you the outside view—the clinical lens that cuts through emotions and shows you the STRUCTURE.
+                        </p>
+                    </div>
+
+                    {/* Q2 */}
+                    <div className="space-y-2">
+                        <h4 className="font-bold text-lg text-foreground">"What if my partner refuses to read it?"</h4>
+                        <p className="text-muted-foreground leading-relaxed text-sm">
+                            <strong>47% of our users never show it to their partner.</strong> They use it to change their OWN behavior—which inevitably forces the dynamic to shift. You don't need their permission to understand the pattern.
+                        </p>
+                    </div>
+
+                    {/* Q3 */}
+                    <div className="space-y-2">
+                        <h4 className="font-bold text-lg text-foreground">"What if it tells me something I don't want to hear?"</h4>
+                        <p className="text-muted-foreground leading-relaxed text-sm">
+                            Then you NEED to hear it. The worst thing isn't a painful truth—it's wasting 5 more years on a comfortable lie. Look: You already KNOW something is wrong. That's why you took the test. The analysis doesn't create problems—it NAMES them.
+                        </p>
+                    </div>
+
+                    {/* Q4 */}
+                    <div className="space-y-2">
+                        <h4 className="font-bold text-lg text-foreground">"Is this therapy?"</h4>
+                        <p className="text-muted-foreground leading-relaxed text-sm">
+                            No, this is <strong>triage</strong>. Therapy requires finding a doctor, waiting weeks, and spending thousands. This report gives you the immediate diagnostic clarity you need *right now* to decide your next step. It's self-diagnosis before you see the doctor.
+                        </p>
+                    </div>
+
+                    {/* Q5 */}
+                    <div className="space-y-2">
+                        <h4 className="font-bold text-lg text-foreground">"What if I'm the problem?"</h4>
+                        <p className="text-muted-foreground leading-relaxed text-sm">
+                            That's actually the most empowering discovery possible. Because you can control YOUR behavior. Most people discover they're BOTH part of the problem—one pattern triggering another. That means you can BOTH fix it.
+                        </p>
+                    </div>
+
+                    {/* Q6 */}
+                    <div className="space-y-2">
+                        <h4 className="font-bold text-lg text-foreground">"Is my data safe?"</h4>
+                        <p className="text-muted-foreground leading-relaxed text-sm">
+                            100%. We don't sell data. We don't share answers. You can delete your account and all data at any time.
+                        </p>
+                    </div>
+                </div>
+            </div>
 
             {/* Footer */}
             <footer className="bg-slate-900 text-slate-500 py-12 text-center text-sm border-t border-slate-800">
@@ -1240,6 +1309,6 @@ export default function TeaserPageNew() {
 
             <ExitIntentPopup onCTAClick={() => handleCheckout('exit_intent')} />
 
-        </div>
+        </div >
     );
 }
