@@ -10,6 +10,7 @@ type PixelEventName =
     | 'Purchase'
     | 'CompleteRegistration'
     | 'Contact'
+    | 'SubmitApplication'
     | 'CustomEvent';
 
 interface PixelEventData {

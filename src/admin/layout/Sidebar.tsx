@@ -9,7 +9,10 @@ import {
   X,
   PieChart,
   BarChart,
-  List
+  List,
+  SidebarClose,
+  SidebarOpen,
+  Sliders
 } from "lucide-react";
 import React, { useEffect, useRef, useState } from "react";
 import { NavLink, useLocation } from "react-router-dom";
@@ -73,11 +76,12 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
     <aside
       ref={sidebar}
       className={cn(
-        "z-9999 w-72.5 bg-muted absolute left-0 top-0 flex h-screen flex-col overflow-y-hidden border-r duration-300 ease-linear lg:static lg:translate-x-0",
+        "z-9999 absolute left-0 top-0 flex h-screen flex-col overflow-y-hidden bg-white duration-300 ease-linear dark:bg-boxdark lg:static lg:translate-x-0 border-r border-gray-200 dark:border-strokedark",
         {
           "translate-x-0": sidebarOpen,
           "-translate-x-full": !sidebarOpen,
         },
+        sidebarExpanded ? "w-72.5" : "w-20 hidden lg:flex"
       )}
     >
       {/* <!-- SIDEBAR HEADER --> */}
@@ -103,7 +107,7 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
         <nav className="mt-5 px-4 py-4 lg:mt-9 lg:px-6">
           {/* <!-- Menu Group --> */}
           <div>
-            <h3 className="text-muted-foreground mb-4 ml-4 text-sm font-semibold">
+            <h3 className={cn("text-muted-foreground mb-4 ml-4 text-sm font-semibold", !sidebarExpanded && "lg:hidden")}>
               MENU
             </h3>
 
@@ -122,7 +126,7 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
                 }
               >
                 <LayoutDashboard />
-                Dashboard
+                <span className={cn(!sidebarExpanded && "lg:hidden")}>Dashboard</span>
               </NavLink>
 
               {/* <!-- Menu Item Dashboard --> */}
@@ -142,7 +146,7 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
                   }
                 >
                   <Sheet />
-                  Users
+                  <span className={cn(!sidebarExpanded && "lg:hidden")}>Users</span>
                 </NavLink>
               </li>
               {/* <!-- Menu Item Users --> */}
@@ -161,7 +165,7 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
                   }
                 >
                   <List />
-                  Sessions
+                  <span className={cn(!sidebarExpanded && "lg:hidden")}>Sessions</span>
                 </NavLink>
               </li>
               {/* <!-- Menu Item Sessions --> */}
@@ -190,8 +194,10 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
                         }}
                       >
                         <PieChart />
-                        Analytics
-                        {open ? <ChevronUp /> : <ChevronDown />}
+                        <span className={cn(!sidebarExpanded && "lg:hidden")}>Analytics</span>
+                        <div className={cn(!sidebarExpanded && "lg:hidden")}>
+                          {open ? <ChevronUp /> : <ChevronDown />}
+                        </div>
                       </NavLink>
                       {/* <!-- Dropdown Menu Start --> */}
                       <div
@@ -200,6 +206,7 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
                         })}
                       >
                         <ul className="mb-5.5 mt-4 flex flex-col gap-2.5 pl-6">
+                          {/* Analytics sub-items would be hidden if sidebar is collapsed, but the group itself is hidden or handled above */}
                           <li>
                             <NavLink
                               to="/admin/analytics/funnel"
@@ -251,6 +258,26 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
               </SidebarLinkGroup>
               {/* <!-- Menu Item Analytics Group --> */}
 
+              {/* <!-- Menu Item System Config --> */}
+              <li>
+                <NavLink
+                  to="/admin/config"
+                  end
+                  className={({ isActive }) =>
+                    cn(
+                      "text-muted-foreground hover:bg-accent hover:text-accent-foreground group relative flex items-center gap-2.5 rounded-sm px-4 py-2 font-medium duration-300 ease-in-out",
+                      {
+                        "bg-accent text-accent-foreground": isActive,
+                      },
+                    )
+                  }
+                >
+                  <Sliders />
+                  <span className={cn(!sidebarExpanded && "lg:hidden")}>System Config</span>
+                </NavLink>
+              </li>
+              {/* <!-- Menu Item System Config --> */}
+
               {/* <!-- Menu Item Settings --> */}
               <li>
                 <NavLink
@@ -266,7 +293,7 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
                   }
                 >
                   <Settings />
-                  Settings
+                  <span className={cn(!sidebarExpanded && "lg:hidden")}>Settings</span>
                 </NavLink>
               </li>
               {/* <!-- Menu Item Settings --> */}
@@ -275,7 +302,7 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
 
           {/* <!-- Others Group --> */}
           <div>
-            <h3 className="text-muted-foreground mb-4 ml-4 text-sm font-semibold">
+            <h3 className={cn("text-muted-foreground mb-4 ml-4 text-sm font-semibold", !sidebarExpanded && "lg:hidden")}>
               Extra Components
             </h3>
 
@@ -295,7 +322,7 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
                   }
                 >
                   <Calendar />
-                  Calendar
+                  <span className={cn(!sidebarExpanded && "lg:hidden")}>Calendar</span>
                 </NavLink>
               </li>
               {/* <!-- Menu Item Calendar --> */}
@@ -324,8 +351,10 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
                         }}
                       >
                         <LayoutTemplate />
-                        UI Elements
-                        {open ? <ChevronUp /> : <ChevronDown />}
+                        <span className={cn(!sidebarExpanded && "lg:hidden")}>UI Elements</span>
+                        <div className={cn(!sidebarExpanded && "lg:hidden")}>
+                          {open ? <ChevronUp /> : <ChevronDown />}
+                        </div>
                       </NavLink>
                       {/* <!-- Dropdown Menu Start --> */}
                       <div
@@ -360,6 +389,16 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
           </div>
         </nav>
         {/* <!-- Sidebar Menu --> */}
+      </div>
+
+      {/* Sidebar Expander Button */}
+      <div className="hidden lg:flex justify-end mt-auto p-4">
+        <button
+          onClick={() => setSidebarExpanded(!sidebarExpanded)}
+          className="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-meta-4 transition-colors text-gray-500"
+        >
+          {sidebarExpanded ? <SidebarClose size={20} /> : <SidebarOpen size={20} />}
+        </button>
       </div>
     </aside>
   );

@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { startTest, submitAnswer, completeTest, getTestSession, useQuery, captureLead, updateConflictDescription, updateWizardProgress, updateSessionActivity, generateQuickOverview, assessNarcissism } from "wasp/client/operations";
+import { startTest, submitAnswer, completeTest, getTestSession, useQuery, captureLead, updateConflictDescription, updateWizardProgress, updateSessionActivity, generateQuickOverview, assessNarcissism, getSystemConfig } from "wasp/client/operations";
 import { routes } from "wasp/client/router";
 import { Loader2, Mail, MessageSquare, ChevronLeft, BadgeCheck, AlertTriangle, Activity, ShieldCheck, Lock as LockIcon } from "lucide-react";
 import { cn } from "../client/utils";
@@ -27,6 +27,12 @@ export default function TestPage() {
     const { data: existingSession, isLoading: isSessionLoading } = useQuery(getTestSession, {
         sessionId: localSessionId || undefined
     });
+
+    // 3. Query for System Config
+    const { data: systemConfig } = useQuery(getSystemConfig);
+    const enableSoftGate = systemConfig?.enableSoftGate ?? false;
+    // Hard Gate is ENABLED if Soft Gate is DISABLED.
+    const isHardGateEnabled = !enableSoftGate;
 
     const [sessionId, setSessionId] = useState<string | null>(null);
     const [currentQIndex, setCurrentQIndex] = useState(0);
@@ -88,11 +94,6 @@ export default function TestPage() {
     // Guard against double-advance
     const isAdvancing = React.useRef(false);
 
-    // A/B Test Switch for Email Gate
-    // If true, user must provide email to see results.
-    // If false, user goes straight to results (and provides email at checkout).
-    const ENABLE_EMAIL_GATE = import.meta.env.REACT_APP_ENABLE_EMAIL_GATE !== 'false'; // Default to true
-
     useEffect(() => {
         const handleSessionCheck = async () => {
             if (isSessionLoading) return;
@@ -106,13 +107,18 @@ export default function TestPage() {
                     const hasEmail = !!existingSession.email;
                     const isPaid = !!existingSession.isPaid;
 
-                    if (isPaid || hasEmail || !ENABLE_EMAIL_GATE) {
+                    // Logic Update: If Hard Gate is ENABLED, we force email.
+                    // If Hard Gate is DISABLED (Soft Gate ON), we allow through if completed.
+                    const canProceed = isPaid || hasEmail || !isHardGateEnabled;
+
+                    if (canProceed) {
                         navigate(routes.ProcessingRoute.build());
                         return;
                     }
                     // Otherwise: Stay here to show Email Gate
                 }
                 setSessionId(existingSession.id);
+
 
                 // If we have a session, assume we might be resuming
                 // Check if wizard is done (we can infer this from profile data being present, e.g., gender)
@@ -296,20 +302,23 @@ export default function TestPage() {
                 await new Promise(resolve => setTimeout(resolve, minTime - elapsedTime));
             }
 
-            if (ENABLE_EMAIL_GATE) {
+            // Track Test Completion (Pixel)
+            trackPixelEvent('SubmitApplication', { status: 'completed' });
+
+            if (isHardGateEnabled) {
                 setShowEmailGate(true);
             } else {
-                // If gate disabled, go straight to processing -> results
-                navigate(routes.ProcessingRoute.build());
+                // If gate disabled (Soft Gate Mode), go straight to results (we already waited)
+                navigate(routes.TeaserRoute.build());
             }
 
         } catch (err) {
             console.error("Analysis failed:", err);
             // Fallback: Show email gate anyway if enabled
-            if (ENABLE_EMAIL_GATE) {
+            if (isHardGateEnabled) {
                 setShowEmailGate(true);
             } else {
-                navigate(routes.ProcessingRoute.build());
+                navigate(routes.TeaserRoute.build());
             }
         } finally {
             setIsAnalyzing(false);

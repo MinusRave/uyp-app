@@ -174,17 +174,10 @@ page ProcessingPage {
 }
 
 // Placeholder for Teaser (implemented next)
-// Teaser Page (Old)
-// route TeaserOldRoute { path: "/results-old", to: TeaserPageOld }
-// page TeaserPageOld {
-//   component: import TeaserPage from "@src/results/TeaserPage"
-// }
+
 
 // Selling Page
-route SellingPageRoute { path: "/offer", to: SellingPage }
-page SellingPage {
-  component: import SellingPage from "@src/results/SellingPage"
-}
+
 
 // NEW Teaser Page (Live)
 route TeaserRoute { path: "/results", to: TeaserPageNew }
@@ -339,11 +332,7 @@ action deleteUserAccount {
 //#endregion
 
 //#region Payment
-// Pricing Page hidden as per request
-// route PricingPageRoute { path: "/pricing", to: PricingPage }
-// page PricingPage {
-//   component: import PricingPage from "@src/payment/PricingPage"
-// }
+
 
 route CheckoutResultRoute { path: "/checkout", to: CheckoutResultPage }
 page CheckoutResultPage {
@@ -536,6 +525,12 @@ page AdminDemographicsPage {
   component: import AdminDemographicsPage from "@src/admin/dashboards/analytics/DemographicsPage"
 }
 
+route AdminConfigRoute { path: "/admin/config", to: AdminConfigPage }
+page AdminConfigPage {
+  authRequired: true,
+  component: import AdminConfigPage from "@src/admin/AdminConfigPage"
+}
+
 //#endregion
 
 //#region Contact Form Messages
@@ -601,4 +596,19 @@ page AdminAiLogsPage {
 query getSessionAnalytics {
   fn: import { getSessionAnalytics } from "@src/admin/operations",
   entities: [TestSession]
+}
+
+action deleteSession {
+  fn: import { deleteSession } from "@src/admin/operations",
+  entities: [TestSession]
+}
+
+query getSystemConfig {
+  fn: import { getSystemConfig } from "@src/server/configOperations",
+  entities: [SystemConfig, User]
+}
+
+action updateSystemConfig {
+  fn: import { updateSystemConfig } from "@src/server/configOperations",
+  entities: [SystemConfig, User]
 }

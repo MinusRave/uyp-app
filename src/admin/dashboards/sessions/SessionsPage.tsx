@@ -1,10 +1,10 @@
 
 import { useState } from "react";
 import { type AuthUser } from "wasp/auth";
-import { useQuery, getTestSessions, getConversionFunnelMetrics, getSessionAnalytics } from "wasp/client/operations";
+import { useQuery, getTestSessions, getConversionFunnelMetrics, getSessionAnalytics, deleteSession } from "wasp/client/operations";
 import { Link } from "react-router-dom";
 import DefaultLayout from "../../layout/DefaultLayout";
-import { Loader2, Calendar } from "lucide-react";
+import { Loader2, Calendar, Trash2 } from "lucide-react";
 import { cn } from "../../../client/utils";
 import { type TestSession } from "wasp/entities";
 import { FunnelMetrics } from "./FunnelMetrics";
@@ -410,12 +410,36 @@ const SessionsPage = ({ user }: { user: AuthUser }) => {
 
                                         {/* ACTION */}
                                         <td className="py-4 px-4">
-                                            <Link
-                                                to={`/admin/sessions/${session.id}`}
-                                                className="text-primary hover:text-primary/80 font-medium text-sm border border-primary/20 px-3 py-1.5 rounded-lg hover:bg-primary/5 transition-colors"
-                                            >
-                                                View
-                                            </Link>
+                                            <div className="flex items-center gap-2">
+                                                <Link
+                                                    to={`/admin/sessions/${session.id}`}
+                                                    className="text-primary hover:text-primary/80 font-medium text-sm border border-primary/20 px-3 py-1.5 rounded-lg hover:bg-primary/5 transition-colors"
+                                                >
+                                                    View
+                                                </Link>
+                                                <button
+                                                    onClick={async () => {
+                                                        if (window.confirm("Are you sure you want to delete this session? This action cannot be undone.")) {
+                                                            try {
+                                                                await deleteSession({ sessionId: session.id });
+                                                                // Invalidate queries to refresh list
+                                                                // Wasp generic useQuery doesn't expose invalidate directly easily without queryClient, 
+                                                                // but simple page refresh or refetch logic works. 
+                                                                // Ideally we use queryClient.invalidateQueries() but let's do a simple reload for now or rely on cache expiry if set.
+                                                                // Actually, standard way is:
+                                                                window.location.reload();
+                                                            } catch (err) {
+                                                                alert("Failed to delete session");
+                                                                console.error(err);
+                                                            }
+                                                        }
+                                                    }}
+                                                    className="text-red-500 hover:text-red-700 p-1.5 rounded-lg hover:bg-red-50 transition-colors"
+                                                    title="Delete Session"
+                                                >
+                                                    <Trash2 size={18} />
+                                                </button>
+                                            </div>
                                         </td>
                                     </tr>
                                 ))}

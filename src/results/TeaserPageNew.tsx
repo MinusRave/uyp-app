@@ -1,11 +1,12 @@
 import React, { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { ArrowRight, Lock, CheckCircle, AlertTriangle, TrendingUp, Shield, Heart, BadgeCheck, Compass, Zap, X, Activity, ChevronDown, Check, Eye, Microscope, ListChecks, ShieldAlert, Clock, MessageCircle, Brain, Quote, Star, Play, TrendingDown, Battery, Thermometer, FileWarning, BookOpen, Users, FileText, ShieldCheck, Info, ChevronUp } from "lucide-react";
-import { useQuery, generateQuickOverview, generateFullReport, createCheckoutSession, getTestSession } from "wasp/client/operations";
+import { useQuery, generateQuickOverview, generateFullReport, createCheckoutSession, getTestSession, getSystemConfig, captureLead } from "wasp/client/operations";
 import { useAuth } from "wasp/client/auth";
 import Confetti from "react-confetti";
 import { trackPixelEvent } from '../analytics/pixel';
 import ExitIntentPopup from './ExitIntentPopup';
+import EmailCaptureModal from "./components/EmailCaptureModal";
 
 // --- TYPES ---
 type QuickOverviewData = {
@@ -240,6 +241,14 @@ export default function TeaserPageNew() {
     const [isCheckoutLoading, setIsCheckoutLoading] = useState(false);
     const [showStickyCTA, setShowStickyCTA] = useState(false);
 
+    // Soft Gate State & Config
+    const { data: systemConfig } = useQuery(getSystemConfig);
+    const enableSoftGate = systemConfig?.enableSoftGate ?? false;
+
+    const [showEmailModal, setShowEmailModal] = useState(false);
+    const [pendingAction, setPendingAction] = useState<(() => void) | null>(null);
+    const [isEmailSubmitting, setIsEmailSubmitting] = useState(false);
+
     useEffect(() => {
         const handleScroll = () => {
             const offerSection = document.getElementById('offer');
@@ -352,15 +361,20 @@ export default function TeaserPageNew() {
         trackCTA(location);
         if (!session) return;
 
-        // Enforce Auth before Payment - REMOVED to allow guest checkout
-        // Backend 'createCheckoutSession' handles unauthenticated users if session has email.
-        /*
-        if (!user) {
-            navigate('/signup');
+        // SOFT GATE CHECK
+        // If soft gate enabled AND we don't have email -> Open Modal
+        if (enableSoftGate && !session.email) {
+            setPendingAction(() => () => proceedToCheckout(location));
+            setShowEmailModal(true);
             return;
         }
-        */
 
+        // Otherwise proceed
+        await proceedToCheckout(location);
+    };
+
+    const proceedToCheckout = async (location: string) => {
+        if (!session) return;
         setIsCheckoutLoading(true);
 
         const { generateEventId } = await import("../analytics/eventId");
@@ -369,7 +383,7 @@ export default function TeaserPageNew() {
         trackPixelEvent('InitiateCheckout', {
             content_name: 'Full Relationship Report',
             content_category: 'Report',
-            value: addOrderBump ? 41 : 29, // Update value based on order bump ($29 + $12)
+            value: addOrderBump ? 41 : 29,
             currency: 'USD',
             eventID: eventID
         });
@@ -378,7 +392,7 @@ export default function TeaserPageNew() {
             const checkout = await createCheckoutSession({
                 sessionId: session.id,
                 eventID: eventID,
-                addWorkbook: addOrderBump // NEW: Pass order bump selection
+                addWorkbook: addOrderBump
             });
             if (checkout.sessionUrl) {
                 window.location.href = checkout.sessionUrl;
@@ -388,6 +402,33 @@ export default function TeaserPageNew() {
             alert("Checkout failed. Please try again.");
         } finally {
             setIsCheckoutLoading(false);
+        }
+    };
+
+    const handleEmailSubmit = async (email: string) => {
+        if (!session) return;
+        setIsEmailSubmitting(true);
+        try {
+            // Capture lead
+            await captureLead({
+                sessionId: session.id,
+                email,
+                eventID: 'soft-gate-' + Date.now()
+            });
+
+            // Close modal
+            setShowEmailModal(false);
+
+            // Execute pending action (checkout)
+            if (pendingAction) {
+                pendingAction();
+                setPendingAction(null);
+            }
+        } catch (e) {
+            console.error(e);
+            alert("Error saving email. Please try again.");
+        } finally {
+            setIsEmailSubmitting(false);
         }
     };
 
@@ -1125,7 +1166,7 @@ export default function TeaserPageNew() {
                                 onClick={() => handleCheckout('offer_cta')}
                                 className="w-full md:w-auto bg-primary hover:bg-primary/90 text-primary-foreground text-xl font-bold py-5 px-12 rounded-full shadow-2xl hover:scale-105 transition-all flex items-center justify-center gap-3 animate-pulse-slow"
                             >
-                                {isCheckoutLoading ? "Processing..." : "Get Instant Access Now"} <ArrowRight size={24} />
+                                {isCheckoutLoading ? "Processing..." : `Get Instant Access Now - $${addOrderBump ? 41 : 29}`} <ArrowRight size={24} />
                             </button>
                             <p className="text-xs text-muted-foreground">Secure One-Time Payment • Instant PDF Download</p>
                         </div>
@@ -1308,6 +1349,13 @@ export default function TeaserPageNew() {
             </footer>
 
             <ExitIntentPopup onCTAClick={() => handleCheckout('exit_intent')} />
+
+            <EmailCaptureModal
+                isOpen={showEmailModal}
+                onClose={() => setShowEmailModal(false)}
+                onSubmit={handleEmailSubmit}
+                isSubmitting={isEmailSubmitting}
+            />
 
         </div >
     );

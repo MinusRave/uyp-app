@@ -243,3 +243,9 @@ model MagicLinkToken {
   createdAt DateTime @default(now())
   used      Boolean  @default(false)
 }
+
+model SystemConfig {
+  id             String  @id @default(uuid())
+  enableSoftGate     Boolean @default(false)
+  enableCookieBanner Boolean @default(true)
+}

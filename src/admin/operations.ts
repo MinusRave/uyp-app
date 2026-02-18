@@ -563,3 +563,21 @@ export const getSessionAnalytics: GetSessionAnalytics<GetSessionAnalyticsArgs, S
         dailyStats
     };
 };
+
+export const deleteSession = async ({ sessionId }: { sessionId: string }, context: any) => {
+    if (!context.user?.isAdmin) {
+        throw new HttpError(401, "Unauthorized");
+    }
+
+    // Optional: Check if session exists first, but delete throws if not found usually or returns count
+    // Prisma delete expects `where`.
+    try {
+        await context.entities.TestSession.delete({
+            where: { id: sessionId }
+        });
+        return { success: true };
+    } catch (error) {
+        console.error("Failed to delete session:", error);
+        throw new HttpError(500, "Failed to delete session");
+    }
+};
