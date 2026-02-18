@@ -10,6 +10,9 @@ type GetTestSessionsArgs = {
     take?: number;
     statusFilter?: 'all' | 'completed' | 'paid' | 'abandoned';
     emailFilter?: string;
+    sourceFilter?: 'all' | 'meta' | 'google' | 'email' | 'direct';
+    progressFilter?: 'all' | 'no_start' | 'in_progress' | 'completed';
+    leadFilter?: 'all' | 'lead' | 'anonymous';
 };
 
 type GetTestSessionsResult = {
@@ -54,7 +57,7 @@ export const getTestSessions: GetTestSessions<GetTestSessionsArgs, GetTestSessio
         throw new HttpError(401, "Unauthorized");
     }
 
-    const { skip = 0, take = 10, statusFilter = 'all', emailFilter } = args;
+    const { skip = 0, take = 10, statusFilter = 'all', emailFilter, sourceFilter, progressFilter, leadFilter } = args;
 
     const where: any = {};
 
@@ -62,6 +65,7 @@ export const getTestSessions: GetTestSessions<GetTestSessionsArgs, GetTestSessio
         where.email = { contains: emailFilter, mode: 'insensitive' };
     }
 
+    // Status Filter (Existing)
     if (statusFilter === 'completed') {
         where.isCompleted = true;
     } else if (statusFilter === 'paid') {
@@ -69,6 +73,54 @@ export const getTestSessions: GetTestSessions<GetTestSessionsArgs, GetTestSessio
     } else if (statusFilter === 'abandoned') {
         where.isCompleted = false;
         where.email = { not: null }; // Has email but not completed
+    }
+
+    // Lead Filter
+    if (leadFilter === 'lead') {
+        where.email = { not: null };
+    } else if (leadFilter === 'anonymous') {
+        where.email = null;
+    }
+
+    // Progress Filter
+    if (progressFilter === 'no_start') {
+        // Less than 2 questions answered
+        where.currentQuestionIndex = { lt: 2 };
+        // And not completed
+        where.isCompleted = false;
+    } else if (progressFilter === 'in_progress') {
+        where.currentQuestionIndex = { gte: 2 };
+        where.isCompleted = false;
+    } else if (progressFilter === 'completed') {
+        where.isCompleted = true;
+    }
+
+    // Source Filter
+    if (sourceFilter === 'meta') {
+        where.OR = [
+            { utm_source: { contains: 'fb', mode: 'insensitive' } },
+            { utm_source: { contains: 'ig', mode: 'insensitive' } },
+            { utm_source: { contains: 'facebook', mode: 'insensitive' } },
+            { utm_source: { contains: 'instagram', mode: 'insensitive' } },
+            { referrer: { contains: 'facebook', mode: 'insensitive' } },
+            { referrer: { contains: 'instagram', mode: 'insensitive' } }
+        ];
+    } else if (sourceFilter === 'email') {
+        // Source is email (UTM) or Reactivated (Email Clicked)
+        where.OR = [
+            { utm_source: { contains: 'email', mode: 'insensitive' } },
+            { utm_medium: { contains: 'email', mode: 'insensitive' } }
+        ];
+        // Note: We can't easily filter by JSON array content (emailSentHistory) in standard Prisma relational queries without raw query 
+        // or using Postgres JSONB filter efficiently. For now, rely on UTM/Source capture.
+    } else if (sourceFilter === 'google') {
+        where.OR = [
+            { utm_source: { contains: 'google', mode: 'insensitive' } },
+            { referrer: { contains: 'google', mode: 'insensitive' } }
+        ];
+    } else if (sourceFilter === 'direct') {
+        where.utm_source = null;
+        where.referrer = null;
     }
 
     const [sessions, totalCount] = await Promise.all([

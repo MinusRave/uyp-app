@@ -6,6 +6,11 @@ import { wrapHtml } from "../emailLayout";
 // Trigger: 5 min after completion
 // Goal: Validation. "We see the pattern you can't see."
 // ==========================================
+// Helper to add UTMs
+const addUtm = (url: string, stage: number) => {
+  return `${url}?utm_source=email&utm_medium=retention&utm_campaign=mirror&utm_content=mirror_${stage}`;
+};
+
 // ==========================================
 // EMAIL 1: THE COLD TRUTH (Immediate)
 // Trigger: 5 min after completion
@@ -13,6 +18,7 @@ import { wrapHtml } from "../emailLayout";
 // ==========================================
 export function getMirror1_ColdTruth(vars: PersonalizationVars) {
   const subject = `Analysis Result: ${vars.quick_overview_headline}`;
+  const link = addUtm(`${vars.app_url}/results`, 1);
 
   const text = `
 You just finished the assessment. That wasn't easy.
@@ -24,7 +30,7 @@ You told us: "${vars.pulse_summary}"
 
 Right now, you are too close to the problem to see the pattern. We are the mirror.
 
-See The Pattern: ${vars.app_url}/results
+See The Pattern: ${link}
 
 – The UYP Team
 
@@ -53,7 +59,7 @@ Unsubscribe: ${vars.unsubscribe_url}
       <p>Right now, you are too close to the problem to see the pattern. We are the mirror.</p>
       
       <p style="text-align: center; margin: 40px 0;">
-        <a href="${vars.app_url}/results" class="button">
+        <a href="${link}" class="button">
           See The Pattern →
         </a>
       </p>
@@ -75,6 +81,7 @@ Unsubscribe: ${vars.unsubscribe_url}
 // ==========================================
 export function getMirror2_VitalSign(vars: PersonalizationVars) {
   const subject = `It’s not "communication issues" (It’s this score)`;
+  const link = addUtm(`${vars.app_url}/results`, 2);
 
   const text = `
 "We have communication issues."
@@ -89,7 +96,7 @@ The good news? High-efficiency repair is a skill, not a personality trait. Coupl
 
 We listed them in Chapter 2 of your report.
 
-Read Chapter 2: The Communication Loop: ${vars.app_url}/results
+Read Chapter 2: The Communication Loop: ${link}
 
 – The UYP Team
 
@@ -114,7 +121,7 @@ Unsubscribe: ${vars.unsubscribe_url}
       <p>We listed them in Chapter 2 of your report.</p>
       
       <p style="text-align: center; margin: 40px 0;">
-        <a href="${vars.app_url}/results" class="button">
+        <a href="${link}" class="button">
           Read Chapter 2: The Communication Loop →
         </a>
       </p>
@@ -136,6 +143,7 @@ Unsubscribe: ${vars.unsubscribe_url}
 // ==========================================
 export function getMirror3_Forecast(vars: PersonalizationVars) {
   const subject = `A 5-year forecast for your relationship`;
+  const link = addUtm(`${vars.app_url}/results`, 3);
 
   const text = `
 In relationships, "drifting apart" isn't an accident. It's a mathematical trajectory.
@@ -149,7 +157,7 @@ If you change nothing today, here is the AI model's prediction for your relation
 It's hard to read. But it's harder to live through.
 The turn-by-turn roadmap to change this trajectory is waiting for you.
 
-Change The Trajectory: ${vars.app_url}/results
+Change The Trajectory: ${link}
 
 – The UYP Team
 
@@ -171,7 +179,7 @@ Unsubscribe: ${vars.unsubscribe_url}
       <p>The turn-by-turn roadmap to change this trajectory is waiting for you.</p>
       
       <p style="text-align: center; margin: 40px 0;">
-        <a href="${vars.app_url}/results" class="button">
+        <a href="${link}" class="button">
           Change The Trajectory →
         </a>
       </p>
@@ -193,6 +201,7 @@ Unsubscribe: ${vars.unsubscribe_url}
 // ==========================================
 export function getMirror4_Manager(vars: PersonalizationVars) {
   const subject = `Why you feel more like a manager than a partner`;
+  const link = addUtm(`${vars.app_url}/results`, 4);
 
   const text = `
 You act like a Manager because you're afraid if you stop, everything will collapse.
@@ -206,7 +215,7 @@ This imbalance is the #1 killer of intimacy (your Erotic Potential is ${vars.met
 
 Chapter 5 isn't advice. It's a resignation letter for your role as "The Manager".
 
-Quit The Manager Role: ${vars.app_url}/results
+Quit The Manager Role: ${link}
 
 – The UYP Team
 
@@ -229,7 +238,7 @@ Unsubscribe: ${vars.unsubscribe_url}
       <p>Chapter 5 isn't advice. It's a resignation letter for your role as "The Manager".</p>
       
       <p style="text-align: center; margin: 40px 0;">
-        <a href="${vars.app_url}/results" class="button">
+        <a href="${link}" class="button">
           Quit The Manager Role →
         </a>
       </p>
@@ -251,6 +260,7 @@ Unsubscribe: ${vars.unsubscribe_url}
 // ==========================================
 export function getMirror5_Hope(vars: PersonalizationVars) {
   const subject = `You are actually compatible (Data proof)`;
+  const link = addUtm(`${vars.app_url}/results`, 5);
 
   const text = `
 I want to show you one number that should give you hope.
@@ -263,7 +273,7 @@ Many couples break up because they are incompatible. You are at risk of breaking
 
 Don't throw away a high-compatibility match because of a fixable mechanical error.
 
-Calibrate The Relationship: ${vars.app_url}/results
+Calibrate The Relationship: ${link}
 
 – The UYP Team
 
@@ -284,7 +294,7 @@ Unsubscribe: ${vars.unsubscribe_url}
       <p>Don't throw away a high-compatibility match because of a fixable mechanical error.</p>
       
       <p style="text-align: center; margin: 40px 0;">
-        <a href="${vars.app_url}/results" class="button">
+        <a href="${link}" class="button">
           Calibrate The Relationship →
         </a>
       </p>
@@ -306,6 +316,7 @@ Unsubscribe: ${vars.unsubscribe_url}
 // ==========================================
 export function getMirror6_Loop(vars: PersonalizationVars) {
   const subject = `It’s a loop, not a flaw`;
+  const link = addUtm(`${vars.app_url}/results`, 6);
 
   const text = `
 You've probably tried talking. You've probably tried "trying harder."
@@ -321,7 +332,7 @@ Reaction C (The Shutdown)
 Your report doesn't judge you. It maps the loop.
 Once you see the map, you can stop walking in the circle.
 
-See The Map: ${vars.app_url}/results
+See The Map: ${link}
 
 – The UYP Team
 
@@ -337,7 +348,7 @@ Unsubscribe: ${vars.unsubscribe_url}
       <p>Once you see the map, you can stop walking in the circle.</p>
       
       <p style="text-align: center; margin: 40px 0;">
-        <a href="${vars.app_url}/results" class="button">
+        <a href="${link}" class="button">
           See The Map →
         </a>
       </p>
@@ -359,6 +370,7 @@ Unsubscribe: ${vars.unsubscribe_url}
 // ==========================================
 export function getMirror7_Archive(vars: PersonalizationVars) {
   const subject = `Protecting your data (Deletion Warning)`;
+  const link = addUtm(`${vars.app_url}/results`, 7);
 
   const text = `
 We handle sensitive psychological profiles, and we take privacy seriously.
@@ -370,7 +382,7 @@ If you don't unlock it, the data will be lost. You will have to retake the test 
 
 This is the owner's manual for your relationship. Don't let it be deleted.
 
-Secure My Report: ${vars.app_url}/results
+Secure My Report: ${link}
 
 – The UYP Team
 
@@ -390,7 +402,7 @@ Unsubscribe: ${vars.unsubscribe_url}
       <p>This is the owner's manual for your relationship. Don't let it be deleted.</p>
       
       <p style="text-align: center; margin: 40px 0;">
-        <a href="${vars.app_url}/results" class="button">
+        <a href="${link}" class="button">
           Secure My Report →
         </a>
       </p>

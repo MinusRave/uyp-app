@@ -1,9 +1,10 @@
 import React, { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { startTest, submitAnswer, completeTest, getTestSession, useQuery, captureLead, updateConflictDescription, updateWizardProgress, updateSessionActivity } from "wasp/client/operations";
+import { startTest, submitAnswer, completeTest, getTestSession, useQuery, captureLead, updateConflictDescription, updateWizardProgress, updateSessionActivity, generateQuickOverview, assessNarcissism } from "wasp/client/operations";
 import { routes } from "wasp/client/router";
-import { Loader2, Mail, MessageSquare, ChevronLeft } from "lucide-react";
+import { Loader2, Mail, MessageSquare, ChevronLeft, BadgeCheck, AlertTriangle, Activity, ShieldCheck, Lock as LockIcon } from "lucide-react";
 import { cn } from "../client/utils";
+import { ProcessingOverlay } from "./ProcessingOverlay";
 import { trackPixelEvent } from "../analytics/pixel";
 import { generateEventId } from "../analytics/eventId";
 import { getDeviceInfo } from "../client/utils/deviceDetection";
@@ -39,6 +40,10 @@ export default function TestPage() {
     // NEW: Conflict Gate
     const [conflictText, setConflictText] = useState("");
     const [showConflictGate, setShowConflictGate] = useState(false);
+
+    // NEW: Lead Magnet Optimization
+    const [isAnalyzing, setIsAnalyzing] = useState(false);
+    const [analysisData, setAnalysisData] = useState<{ quickOverview?: any, narcissism?: any } | null>(null);
 
     // Session tracking - DISABLED due to excessive database writes
     // TODO: Optimize this to batch updates or reduce frequency
@@ -83,6 +88,11 @@ export default function TestPage() {
     // Guard against double-advance
     const isAdvancing = React.useRef(false);
 
+    // A/B Test Switch for Email Gate
+    // If true, user must provide email to see results.
+    // If false, user goes straight to results (and provides email at checkout).
+    const ENABLE_EMAIL_GATE = import.meta.env.REACT_APP_ENABLE_EMAIL_GATE !== 'false'; // Default to true
+
     useEffect(() => {
         const handleSessionCheck = async () => {
             if (isSessionLoading) return;
@@ -90,8 +100,17 @@ export default function TestPage() {
             if (existingSession) {
                 // If session exists
                 if (existingSession.isCompleted) {
-                    navigate(routes.ProcessingRoute.build());
-                    return;
+                    // Lead Magnet Optimization:
+                    // Only redirect if we have everything we need (Email provided OR Gate Disabled)
+                    // Or if they already paid.
+                    const hasEmail = !!existingSession.email;
+                    const isPaid = !!existingSession.isPaid;
+
+                    if (isPaid || hasEmail || !ENABLE_EMAIL_GATE) {
+                        navigate(routes.ProcessingRoute.build());
+                        return;
+                    }
+                    // Otherwise: Stay here to show Email Gate
                 }
                 setSessionId(existingSession.id);
 
@@ -105,6 +124,13 @@ export default function TestPage() {
                     const savedIndex = existingSession.currentQuestionIndex || 0;
                     if (savedIndex >= QUESTIONS.length) {
                         setShowEmailGate(true);
+                        // Hydrate analysis data if available
+                        if (existingSession.quickOverview || existingSession.narcissismAnalysis) {
+                            setAnalysisData({
+                                quickOverview: existingSession.quickOverview,
+                                narcissism: existingSession.narcissismAnalysis
+                            });
+                        }
                     } else {
                         setCurrentQIndex(savedIndex);
                     }
@@ -215,8 +241,8 @@ export default function TestPage() {
                 setCurrentQIndex(prev => prev + 1);
                 setSelectedAnswer(null);
             } else {
-                // Finished Questions -> Go STRAIGHT to Email Gate (Conflict Gate Removed)
-                setShowEmailGate(true);
+                // Finished Questions -> Trigger Analysis IMMEDIATELY
+                await triggerAnalysis();
             }
 
         } catch (e) {
@@ -228,6 +254,70 @@ export default function TestPage() {
         }
     };
 
+    const triggerAnalysis = async () => {
+        setIsAnalyzing(true);
+        setShowConflictGate(false); // Ensure this is hidden
+        // Ensure email gate is hidden until analysis is done
+        setShowEmailGate(false);
+
+        try {
+            // NEW: Lead Magnet Optimization - Trigger Analysis on Quiz Completion
+            const startTime = Date.now();
+
+            if (!sessionId) {
+                console.error("No sessionId available for analysis");
+                setShowEmailGate(true); // Fallback
+                return;
+            }
+
+            // Lead Magnet Optimization:
+            // 1. Mark test as complete and Calculate Metrics FIRST
+            // This ensures 'advancedMetrics' are popualared in the DB so the AI has data to work with.
+            await completeTest({ sessionId });
+
+            // 2. Run parallel AI requests
+            const [quickOverviewRes, narcissismRes] = await Promise.allSettled([
+                generateQuickOverview({ sessionId }),
+                assessNarcissism({ sessionId })
+            ]);
+
+            const quickOverview = quickOverviewRes.status === 'fulfilled' ? quickOverviewRes.value : null;
+            const narcissism = narcissismRes.status === 'fulfilled' ? narcissismRes.value?.json : null;
+
+            setAnalysisData({
+                quickOverview: quickOverview?.json,
+                narcissism: narcissism
+            });
+
+            // Ensure minimum display time for the "Analyzing..." effect (e.g. 4 seconds)
+            const elapsedTime = Date.now() - startTime;
+            const minTime = 4000;
+            if (elapsedTime < minTime) {
+                await new Promise(resolve => setTimeout(resolve, minTime - elapsedTime));
+            }
+
+            if (ENABLE_EMAIL_GATE) {
+                setShowEmailGate(true);
+            } else {
+                // If gate disabled, go straight to processing -> results
+                navigate(routes.ProcessingRoute.build());
+            }
+
+        } catch (err) {
+            console.error("Analysis failed:", err);
+            // Fallback: Show email gate anyway if enabled
+            if (ENABLE_EMAIL_GATE) {
+                setShowEmailGate(true);
+            } else {
+                navigate(routes.ProcessingRoute.build());
+            }
+        } finally {
+            setIsAnalyzing(false);
+        }
+    };
+
+    // Removed handleConflictSubmit as it's no longer used
+    /*
     const handleConflictSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         if (!sessionId) return;
@@ -239,21 +329,48 @@ export default function TestPage() {
         }
 
         setIsSubmitting(true);
+        setIsAnalyzing(true); // Show Overlay
+
         try {
             await updateConflictDescription({ sessionId, description: conflictText });
+
+            // RUN ANALYSIS NOW (Lead Magnet Optimization)
+            const startTime = Date.now();
+
+            // Run parallel requests
+            const [quickOverviewRes, narcissismRes] = await Promise.allSettled([
+                generateQuickOverview({ sessionId }),
+                assessNarcissism({ sessionId })
+            ]);
+
+            const quickOverview = quickOverviewRes.status === 'fulfilled' ? quickOverviewRes.value : null;
+            const narcissism = narcissismRes.status === 'fulfilled' ? narcissismRes.value?.json : null;
+
+            setAnalysisData({
+                quickOverview: quickOverview?.json,
+                narcissism: narcissism
+            });
+
+            // Ensure minimum display time for the "Analyzing..." effect (e.g. 4 seconds)
+            const elapsedTime = Date.now() - startTime;
+            const minTime = 4000;
+            if (elapsedTime < minTime) {
+                await new Promise(resolve => setTimeout(resolve, minTime - elapsedTime));
+            }
+
             setShowConflictGate(false);
             setShowEmailGate(true);
         } catch (err) {
             console.error(err);
-            if (err instanceof Error) {
-                alert("Error saving: " + err.message);
-            } else {
-                alert("Error saving. Please try again or skip.");
-            }
+            // Even if analysis fails, we still want to move to email gate (just without juicy data)
+            setShowConflictGate(false);
+            setShowEmailGate(true);
         } finally {
             setIsSubmitting(false);
+            setIsAnalyzing(false);
         }
     };
+    */
 
     const handleEmailSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -265,13 +382,15 @@ export default function TestPage() {
 
         try {
             await captureLead({ sessionId, email, eventID });
+            // completeTest was already called in triggerAnalysis
+            // await completeTest({ sessionId });
+
             // Add Client Pixel Event (was missing)
             trackPixelEvent('Lead', { eventID });
 
             // Small delay to ensure Pixel event has time to fire before navigation
             await new Promise(resolve => setTimeout(resolve, 300));
 
-            await completeTest({ sessionId });
             navigate(routes.ProcessingRoute.build());
         } catch (err) {
             console.error(err);
@@ -289,70 +408,17 @@ export default function TestPage() {
         );
     }
 
+    // Global Processing Overlay (for when analysis is triggered after quiz)
+    if (isAnalyzing) {
+        return <ProcessingOverlay isVisible={isAnalyzing} />;
+    }
+
     // PROFILE FORM UI (Now QuizWizard)
     if (showProfileForm) {
         return <QuizWizard onSubmit={handleProfileSubmit} isSubmitting={isSubmitting} sessionId={sessionId} />;
     }
 
-    // CONFLICT GATE UI (New)
-    if (showConflictGate && sessionId) {
-        return (
-            <div className="min-h-[100dvh] bg-background flex items-center justify-center p-6 animate-fade-in">
-                <div className="max-w-md w-full bg-card p-8 rounded-2xl shadow-xl border border-border">
-                    <div className="w-16 h-16 bg-purple-100 dark:bg-purple-900/30 rounded-full flex items-center justify-center mx-auto mb-6 text-purple-600">
-                        <MessageSquare size={32} />
-                    </div>
-                    <h2 className="text-2xl font-bold mb-2 text-center">One Last Thing...</h2>
-                    <p className="text-muted-foreground mb-6 text-center text-sm">
-                        To generate your <strong>"Conflict Autopsy"</strong>, briefly describe the last argument or moment of tension you had.
-                    </p>
-
-                    {/* Privacy Notice */}
-                    <div className="bg-blue-50 dark:bg-blue-900/20 p-4 rounded-lg mb-4 text-sm">
-                        <div className="flex items-start gap-2">
-                            <MessageSquare className="text-blue-600 dark:text-blue-400 shrink-0 mt-0.5" size={16} />
-                            <div className="text-blue-900 dark:text-blue-100">
-                                <strong>Privacy Note:</strong> Your conflict description is used ONLY to personalize
-                                your AI analysis. It's encrypted, never shared, and you can delete it anytime from
-                                your account settings.
-                            </div>
-                        </div>
-                    </div>
-
-                    <form onSubmit={handleConflictSubmit} className="space-y-4">
-                        <textarea
-                            required
-                            placeholder="e.g., 'We were arguing about cleaning. I felt ignored when he walked away...'"
-                            className="w-full p-4 rounded-xl border border-input bg-background min-h-[150px] focus:ring-2 ring-primary/20 outline-none resize-none"
-                            value={conflictText}
-                            onChange={(e) => setConflictText(e.target.value)}
-                        />
-                        <div className="text-xs text-muted-foreground text-right">
-                            {conflictText.length < 50 ?
-                                <span className="text-red-400">Too short ({conflictText.length}/50 chars)</span> :
-                                <span className="text-green-500">Good length!</span>
-                            }
-                        </div>
-
-                        <button
-                            type="submit"
-                            disabled={isSubmitting}
-                            className="w-full py-4 rounded-full bg-primary text-primary-foreground font-bold text-lg hover:opacity-90 transition-opacity disabled:opacity-50"
-                        >
-                            {isSubmitting ? "Saving..." : "Analyze This Conflict →"}
-                        </button>
-                        <button
-                            type="button"
-                            onClick={() => { setShowConflictGate(false); setShowEmailGate(true); }}
-                            className="w-full text-sm text-muted-foreground hover:text-foreground py-2"
-                        >
-                            Skip this step (I just want the standard report)
-                        </button>
-                    </form>
-                </div>
-            </div>
-        );
-    }
+    // CONFLICT GATE UI (Removed per user request)
 
     // EMAIL GATE UI
     if (showEmailGate || (!currentQuestion && !isLoading && sessionId)) {
@@ -363,15 +429,85 @@ export default function TestPage() {
                         <Mail size={32} />
                     </div>
 
-                    <h2 className="text-2xl md:text-3xl font-bold mb-4 md:mb-6 text-center">Generating Your Relationship Profile</h2>
+                    <h2 className="text-2xl md:text-3xl font-bold mb-4 md:mb-6 text-center">
+                        {analysisData?.quickOverview ? "Your Relationship Profile is Ready" : "Generating Your Relationship Profile"}
+                    </h2>
 
 
-                    <div className="bg-muted/30 rounded-xl p-4 md:p-5 mb-6 text-left space-y-3">
-                        <p className="text-sm font-semibold text-foreground">Your personalized analysis will include:</p>
-                        <p className="text-sm text-muted-foreground leading-relaxed">
-                            A comprehensive psychological assessment of your relationship dynamics, based on validated frameworks used by couples therapists. This isn't generic advice—it's a clinical-grade analysis of your specific patterns, blind spots, and next steps.
-                        </p>
-                    </div>
+                    {analysisData?.quickOverview ? (
+                        <div className="animate-fade-in space-y-6">
+                            {/* Analysis Complete Badge */}
+                            <div className="flex items-center justify-center gap-2 text-green-600 bg-green-50 dark:bg-green-900/20 py-2 px-4 rounded-full w-fit mx-auto mb-4 border border-green-200">
+                                <BadgeCheck size={18} className="fill-green-100 dark:fill-green-900" />
+                                <span className="font-bold text-sm tracking-wide uppercase">Analysis Complete</span>
+                            </div>
+
+                            {/* Primary Result Card */}
+                            <div className="bg-card border-2 border-primary/20 rounded-2xl p-6 shadow-lg transform transition-all hover:scale-[1.01] relative overflow-hidden">
+                                <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-primary via-purple-500 to-indigo-500"></div>
+
+                                <div className="text-center mb-6">
+                                    {/* Headline */}
+                                    <h3 className="text-lg font-bold text-foreground mb-2 leading-tight">
+                                        "{analysisData.quickOverview.hero.headline}"
+                                    </h3>
+
+                                    {/* Primary Diagnosis */}
+                                    <div className="text-3xl md:text-4xl font-black text-foreground leading-tight bg-clip-text text-transparent bg-gradient-to-r from-primary to-purple-600 mb-4">
+                                        {analysisData.quickOverview.pulse.primary_diagnosis}
+                                    </div>
+
+                                    {/* Result Badge */}
+                                    <div className="inline-block px-3 py-1 rounded-full bg-primary/10 text-primary font-bold text-xs uppercase tracking-wider border border-primary/20">
+                                        {analysisData.quickOverview.hero.result_badge}
+                                    </div>
+                                </div>
+
+                                {/* Risk Level & Red Flags Grid */}
+                                <div className="grid grid-cols-2 gap-4 mb-6">
+                                    {analysisData.narcissism?.partner_analysis?.risk_level && (
+                                        <div className={cn("p-3 rounded-xl border text-center flex flex-col items-center justify-center",
+                                            (analysisData.narcissism.partner_analysis.risk_level === "High" || analysisData.narcissism.partner_analysis.risk_level === "Severe")
+                                                ? "bg-red-50 border-red-200 text-red-700"
+                                                : "bg-blue-50 border-blue-200 text-blue-700"
+                                        )}>
+                                            <div className="text-[10px] font-bold uppercase opacity-75 mb-1">Toxicity Risk</div>
+                                            <div className="font-black text-lg flex items-center justify-center gap-1">
+                                                {analysisData.narcissism.partner_analysis.risk_level === "High" || analysisData.narcissism.partner_analysis.risk_level === "Severe" ? <AlertTriangle size={16} /> : <Activity size={16} />}
+                                                {analysisData.narcissism.partner_analysis.risk_level}
+                                            </div>
+                                        </div>
+                                    )}
+                                    <div className="p-3 rounded-xl border bg-orange-50 border-orange-200 text-orange-800 text-center flex flex-col items-center justify-center">
+                                        <div className="text-[10px] font-bold uppercase opacity-75 mb-1">Red Flags Detected</div>
+                                        <div className="font-black text-lg flex items-center gap-1">
+                                            <AlertTriangle size={16} />
+                                            {analysisData.narcissism?.relationship_health?.red_flags?.length || 0} Critical
+                                        </div>
+                                    </div>
+                                </div>
+
+                                {/* Value Prop Teaser */}
+                                <div className="bg-muted/50 rounded-xl p-4 text-sm text-muted-foreground leading-relaxed border border-border/50">
+                                    <p className="font-medium text-foreground mb-1">Your Full Report is Ready.</p>
+                                    <p>
+                                        We've mapped out exactly how this pattern started, why it's escalating, and the <strong>specific roadmap</strong> to break free before it's too late.
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    ) : (
+                        <div className="bg-muted/30 rounded-xl p-6 mb-8 text-center space-y-4 border border-border">
+                            <h3 className="text-xl font-bold">Your Profile is Ready</h3>
+                            <p className="text-muted-foreground leading-relaxed">
+                                We've analyzed your answers against 5 key relationship dimensions. Your results include a detailed breakdown of your conflict style, hidden emotional needs, and a personalized roadmap to connection.
+                            </p>
+                            <div className="flex justify-center gap-4 text-sm font-medium text-muted-foreground">
+                                <span className="flex items-center gap-1"><BadgeCheck size={16} className="text-green-500" /> Confidential</span>
+                                <span className="flex items-center gap-1"><Activity size={16} className="text-primary" /> Clinical-Grade</span>
+                            </div>
+                        </div>
+                    )}
 
                     <form onSubmit={handleEmailSubmit} className="space-y-4">
                         <div>
@@ -388,21 +524,23 @@ export default function TestPage() {
                             />
                         </div>
 
-                        <button
-                            type="submit"
-                            disabled={isSubmitting}
-                            className="w-full py-4 rounded-full bg-primary text-primary-foreground font-bold text-base md:text-lg hover:opacity-90 transition-opacity disabled:opacity-50 shadow-lg"
-                        >
-                            {isSubmitting ? (
-                                <span className="flex items-center justify-center gap-2">
-                                    <Loader2 className="animate-spin" size={20} />
-                                    Generating Report...
+                        <div className="relative">
+                            <button
+                                type="submit"
+                                disabled={isSubmitting}
+                                className="w-full py-4 rounded-xl bg-primary text-primary-foreground font-bold text-lg hover:shadow-lg hover:bg-primary/90 transition-all flex items-center justify-center gap-2 group overflow-hidden relative"
+                            >
+                                <span className="relative z-10 flex items-center gap-2">
+                                    {isSubmitting ? <Loader2 className="animate-spin" /> : <LockIcon size={20} />}
+                                    {isSubmitting ? "Unlocking..." : "Unlock Full Report Now"}
                                 </span>
-                            ) : (
-                                "View My Report →"
-                            )}
-                        </button>
-
+                                <div className="absolute inset-0 bg-white/20 translate-y-full group-hover:translate-y-0 transition-transform duration-300"></div>
+                            </button>
+                            <p className="text-xs text-center text-muted-foreground mt-3 flex items-center justify-center gap-1.5 opacity-80">
+                                <ShieldCheck size={12} className="text-green-600" />
+                                100% Secure. We respect your privacy & zero spam.
+                            </p>
+                        </div>
                         <div className="bg-blue-50 dark:bg-blue-950/20 rounded-lg p-3 text-left space-y-1.5">
                             <div className="flex items-center gap-2 text-xs text-blue-900 dark:text-blue-100">
                                 <span className="text-blue-600 dark:text-blue-400">✓</span>

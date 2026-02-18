@@ -52,6 +52,11 @@ const SessionsPage = ({ user }: { user: AuthUser }) => {
         excludeBots: true
     });
 
+    // Session Table Filters
+    const [sourceFilter, setSourceFilter] = useState<'all' | 'meta' | 'google' | 'email' | 'direct'>('all');
+    const [progressFilter, setProgressFilter] = useState<'all' | 'no_start' | 'in_progress' | 'completed'>('all');
+    const [leadFilter, setLeadFilter] = useState<'all' | 'lead' | 'anonymous'>('all');
+
     const take = 10;
     const skip = (page - 1) * take;
 
@@ -60,6 +65,9 @@ const SessionsPage = ({ user }: { user: AuthUser }) => {
         take,
         statusFilter,
         emailFilter: emailFilter || undefined,
+        sourceFilter,
+        progressFilter,
+        leadFilter
     });
 
     // Fetch funnel metrics with filters
@@ -199,26 +207,65 @@ const SessionsPage = ({ user }: { user: AuthUser }) => {
                     <FunnelMetrics metrics={funnelMetrics} filters={funnelFilters} />
                 ) : null}
 
-                {/* Filters */}
-                <div className="flex flex-col md:flex-row gap-4 bg-white dark:bg-boxdark p-4 rounded-lg shadow-sm border border-gray-200 dark:border-strokedark">
+                {/* Filters Row */}
+                <div className="flex flex-col xl:flex-row gap-4 bg-white dark:bg-boxdark p-4 rounded-lg shadow-sm border border-gray-200 dark:border-strokedark">
                     <input
                         type="text"
                         placeholder="Search by email..."
                         value={emailFilter}
                         onChange={(e) => setEmailFilter(e.target.value)}
-                        className="w-full md:w-64 rounded-lg border-[1.5px] border-stroke bg-transparent py-3 px-5 font-medium outline-none transition focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:border-form-strokedark dark:bg-form-input dark:focus:border-primary"
+                        className="w-full xl:w-64 rounded-lg border-[1.5px] border-stroke bg-transparent py-2 px-3 pl-4 font-medium outline-none transition focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:border-form-strokedark dark:bg-form-input dark:focus:border-primary text-sm"
                     />
 
-                    <select
-                        value={statusFilter}
-                        onChange={(e) => setStatusFilter(e.target.value as any)}
-                        className="w-full md:w-48 rounded-lg border-[1.5px] border-stroke bg-transparent py-3 px-5 font-medium outline-none transition focus:border-primary active:border-primary dark:border-form-strokedark dark:bg-form-input dark:focus:border-primary"
-                    >
-                        <option value="all">All Statuses</option>
-                        <option value="completed">Completed</option>
-                        <option value="paid">Paid</option>
-                        <option value="abandoned">Abandoned (with Email)</option>
-                    </select>
+                    <div className="flex flex-wrap gap-2 w-full">
+                        {/* Status Filter */}
+                        <select
+                            value={statusFilter}
+                            onChange={(e) => setStatusFilter(e.target.value as any)}
+                            className="rounded-lg border-[1.5px] border-stroke bg-transparent py-2 px-3 font-medium outline-none transition focus:border-primary active:border-primary dark:border-form-strokedark dark:bg-form-input dark:focus:border-primary text-sm min-w-[130px]"
+                        >
+                            <option value="all">Status: All</option>
+                            <option value="completed">Completed</option>
+                            <option value="paid">Paid</option>
+                            <option value="abandoned">Abandoned</option>
+                        </select>
+
+                        {/* Source Filter */}
+                        <select
+                            value={sourceFilter}
+                            onChange={(e) => setSourceFilter(e.target.value as any)}
+                            className="rounded-lg border-[1.5px] border-stroke bg-transparent py-2 px-3 font-medium outline-none transition focus:border-primary active:border-primary dark:border-form-strokedark dark:bg-form-input dark:focus:border-primary text-sm min-w-[130px]"
+                        >
+                            <option value="all">Source: All</option>
+                            <option value="meta">Meta / IG</option>
+                            <option value="google">Google</option>
+                            <option value="email">Email Campaign</option>
+                            <option value="direct">Direct</option>
+                        </select>
+
+                        {/* Lead Filter */}
+                        <select
+                            value={leadFilter}
+                            onChange={(e) => setLeadFilter(e.target.value as any)}
+                            className="rounded-lg border-[1.5px] border-stroke bg-transparent py-2 px-3 font-medium outline-none transition focus:border-primary active:border-primaryダーク:border-form-strokedark dark:bg-form-input dark:focus:border-primary text-sm min-w-[130px]"
+                        >
+                            <option value="all">Leads: All</option>
+                            <option value="lead">Has Email</option>
+                            <option value="anonymous">Anonymous</option>
+                        </select>
+
+                        {/* Progress Filter */}
+                        <select
+                            value={progressFilter}
+                            onChange={(e) => setProgressFilter(e.target.value as any)}
+                            className="rounded-lg border-[1.5px] border-stroke bg-transparent py-2 px-3 font-medium outline-none transition focus:border-primary active:border-primary dark:border-form-strokedark dark:bg-form-input dark:focus:border-primary text-sm min-w-[130px]"
+                        >
+                            <option value="all">Progress: All</option>
+                            <option value="no_start">No Start</option>
+                            <option value="in_progress">In Progress</option>
+                            <option value="completed">Completed</option>
+                        </select>
+                    </div>
                 </div>
 
                 {/* Table */}
@@ -256,17 +303,33 @@ const SessionsPage = ({ user }: { user: AuthUser }) => {
                                             <p className="text-xs text-gray-500">{new Date(session.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</p>
                                         </td>
 
-                                        {/* USER / SOURCE */}
+                                        {/* USER / SOURCE / ENGAGEMENT */}
                                         <td className="py-4 px-4">
                                             <p className="font-bold text-black dark:text-white text-sm truncate max-w-[180px]" title={session.email || session.user?.email || "Anonymous"}>
                                                 {session.email || session.user?.email || "Anonymous"}
                                             </p>
-                                            <div className="flex items-center gap-2 mt-1">
-                                                {session.fbclid ? (
-                                                    <span className="text-[10px] bg-blue-100 text-blue-700 px-2 py-0.5 rounded-full font-bold">META AD</span>
+                                            <div className="flex flex-wrap items-center gap-2 mt-1">
+                                                {/* Source Badge */}
+                                                {(session.utm_source === 'email' || session.utm_medium === 'email') ? (
+                                                    <span className="text-[10px] bg-purple-100 text-purple-700 px-2 py-0.5 rounded-full font-bold border border-purple-200">EMAIL LEADS</span>
+                                                ) : session.fbclid || (session.utm_source && session.utm_source.includes('fb')) || (session.utm_source && session.utm_source.includes('ig')) ? (
+                                                    <span className="text-[10px] bg-blue-100 text-blue-700 px-2 py-0.5 rounded-full font-bold border border-blue-200">META AD</span>
+                                                ) : session.utm_source ? (
+                                                    <span className="text-[10px] bg-yellow-100 text-yellow-700 px-2 py-0.5 rounded-full font-bold border border-yellow-200 uppercase">{session.utm_source}</span>
                                                 ) : (
-                                                    <span className="text-[10px] bg-gray-100 text-gray-600 px-2 py-0.5 rounded-full">DIRECT</span>
+                                                    <span className="text-[10px] bg-gray-100 text-gray-600 px-2 py-0.5 rounded-full border border-gray-200">DIRECT</span>
                                                 )}
+
+                                                {/* Email Engagement Badge */}
+                                                {(() => {
+                                                    const history = (session.emailSentHistory as any[]) || [];
+                                                    const hasClicked = history.some(h => h.clicked);
+                                                    const hasOpened = history.some(h => h.opened);
+                                                    if (hasClicked) return <span className="text-[10px] bg-green-100 text-green-700 px-2 py-0.5 rounded-full font-bold border border-green-200">CLICKED LINK</span>;
+                                                    if (hasOpened) return <span className="text-[10px] bg-indigo-100 text-indigo-700 px-2 py-0.5 rounded-full font-bold border border-indigo-200">OPENED EMAIL</span>;
+                                                    return null;
+                                                })()}
+
                                                 {session.user?.username && <span className="text-xs text-gray-400">@{session.user.username}</span>}
                                             </div>
                                         </td>
@@ -438,15 +501,30 @@ const EmailHistoryBadge = ({ session }: { session: any }) => {
         <div className="flex flex-col gap-1 items-start">
             <span className="text-[10px] uppercase font-bold text-gray-600">{getSequenceName(session.emailSequenceType)}</span>
             <div className="flex flex-wrap gap-1">
-                {history.map((h, i) => (
-                    <span
-                        key={i}
-                        className="inline-flex items-center justify-center w-5 h-5 rounded-full bg-blue-100 text-blue-700 text-[10px] font-bold border border-blue-200"
-                        title={`Sent: ${new Date(h.sentAt).toLocaleString()}`}
-                    >
-                        {h.stage}
-                    </span>
-                ))}
+                {history.map((h, i) => {
+                    let bgClass = "bg-gray-100 text-gray-500 border-gray-200";
+                    let title = `Sent: ${new Date(h.sentAt).toLocaleString()}`;
+                    let label = h.stage;
+
+                    if (h.clicked) {
+                        bgClass = "bg-green-100 text-green-700 border-green-200 font-bold ring-1 ring-green-300";
+                        title += `\nClicked: ${new Date(h.clickedAt).toLocaleString()}`;
+                        label = "✓"; // Checkmark for clicked
+                    } else if (h.opened) {
+                        bgClass = "bg-blue-100 text-blue-700 border-blue-200 font-bold";
+                        title += `\nOpened: ${new Date(h.openedAt).toLocaleString()}`;
+                    }
+
+                    return (
+                        <span
+                            key={i}
+                            className={`inline-flex items-center justify-center w-5 h-5 rounded-full text-[10px] border cursor-help ${bgClass}`}
+                            title={title}
+                        >
+                            {h.stage}
+                        </span>
+                    );
+                })}
             </div>
         </div>
     );

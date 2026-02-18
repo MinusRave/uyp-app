@@ -102,10 +102,8 @@ export const createCheckoutSession: CreateCheckoutSession<
   const customerEmail = context.user?.email || testSession.email;
   console.log("[createCheckoutSession] Determined Email:", customerEmail);
 
-  if (!customerEmail) {
-    console.warn("[createCheckoutSession] Missing email for session:", sessionId);
-    throw new HttpError(401, "Email required. Please log in or provide email at end of test.");
-  }
+  // NOTE: If customerEmail is missing, we allow it (Stripe will ask for it)
+  // This supports the "Skip Email Gate" A/B test case.
 
   // 3. Send Meta CAPI InitiateCheckout Event
   if (eventID) {
@@ -115,7 +113,7 @@ export const createCheckoutSession: CreateCheckoutSession<
       eventId: eventID,
       eventSourceUrl: (context as any).req?.headers?.referer || 'https://understandyourpartner.com/results',
       userData: {
-        email: customerEmail,
+        email: customerEmail || undefined, // Allow undefined
         clientIp: (context as any).req?.ip,
         userAgent: (context as any).req?.headers?.['user-agent'],
         fbp: (context as any).req?.cookies?.['_fbp'],
@@ -158,7 +156,7 @@ export const createCheckoutSession: CreateCheckoutSession<
     mode: "payment",
     success_url: `${config.frontendUrl}/report?success=true&session_id=${sessionId}`,
     cancel_url: `${config.frontendUrl}/results?checkout_cancelled=true`,
-    customer_email: customerEmail,
+    customer_email: customerEmail || undefined, // Allow undefined to let Stripe ask
     metadata: {
       testSessionId: sessionId,
       userId: context.user?.id || "", // Empty if anonymous

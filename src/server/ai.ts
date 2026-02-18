@@ -508,9 +508,17 @@ export const generateQuickOverview: GenerateFullReport<GenerateQuickOverviewArgs
     });
     if (!session) throw new Error('Session not found');
 
-    // CACHE HIT
+    // CACHE HIT - Check if valid
     if (session.quickOverview && Object.keys(session.quickOverview as object).length > 0) {
-        return { json: session.quickOverview };
+        const existing = session.quickOverview as any;
+        // If the previous generation failed due to insufficient data (e.g. metrics weren't ready), force regenerate
+        const isInsufficient = existing.hero?.result_badge?.includes("INSUFFICIENT DATA") ||
+            existing.pulse?.primary_diagnosis?.includes("Insufficient Data");
+
+        if (!isInsufficient) {
+            return { json: session.quickOverview };
+        }
+        console.log("Regenerating Quick Overview due to insufficient data in previous run.");
     }
 
     const metrics = (session.advancedMetrics as Record<string, any>) || {};

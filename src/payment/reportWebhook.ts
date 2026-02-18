@@ -83,13 +83,21 @@ export const stripeWebhook = async (
       }
 
       // Update session to mark as paid and stop retention emails
+      // Update session to mark as paid and stop retention emails
+      // AND Capture email if we didn't have it (from Stripe)
+      const dataToUpdate: any = {
+        isPaid: true,
+        emailSequenceType: null, // Stop sequences
+      };
+
+      if (!testSession.email && session.customer_details?.email) {
+        console.log(`[Webhook] Capturing missing email from Stripe: ${session.customer_details.email}`);
+        dataToUpdate.email = session.customer_details.email;
+      }
+
       await context.entities.TestSession.update({
         where: { id: metadata.testSessionId },
-        data: {
-          isPaid: true,
-          // Clear email sequence to stop retention emails
-          emailSequenceType: null,
-        }
+        data: dataToUpdate
       });
 
       // Send payment confirmation email
