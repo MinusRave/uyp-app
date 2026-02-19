@@ -96,6 +96,7 @@ export const createCheckoutSession: CreateCheckoutSession<
         data: { userId: context.user.id }
       });
     } else if (testSession.userId !== context.user.id) {
+      console.error(`[createCheckoutSession] 403 Mismatch! TestSession UserId: ${testSession.userId} vs Context UserId: ${context.user.id}`);
       throw new HttpError(403, "Invalid session ownership.");
     }
   }
@@ -169,26 +170,33 @@ export const createCheckoutSession: CreateCheckoutSession<
     });
   }
 
-  const session = await stripeClient.checkout.sessions.create({
-    payment_method_types: ["card"],
-    billing_address_collection: 'auto', // Reduces friction
-    phone_number_collection: { enabled: false }, // Don't ask for phone
-    submit_type: 'pay', // Button says "Pay" not "Subscribe"
-    line_items: lineItems,
-    mode: "payment",
-    success_url: `${config.frontendUrl}/report?success=true&session_id=${sessionId}`,
-    cancel_url: `${config.frontendUrl}/results?checkout_cancelled=true`,
-    customer_email: customerEmail || undefined, // Allow undefined to let Stripe ask
-    metadata: {
-      testSessionId: sessionId,
-      userId: context.user?.id || "", // Empty if anonymous
-      type: "report_unlock",
-      capiEventId: eventID || "", // Pass it just in case we need it
-      hasOrderBump: addWorkbook ? "true" : "false", // Track if they bought it
-    },
-  });
+  let session;
+  try {
+    session = await stripeClient.checkout.sessions.create({
+      payment_method_types: ["card"],
+      billing_address_collection: 'auto', // Reduces friction
+      phone_number_collection: { enabled: false }, // Don't ask for phone
+      submit_type: 'pay', // Button says "Pay" not "Subscribe"
+      line_items: lineItems,
+      mode: "payment",
+      success_url: `${config.frontendUrl}/report?success=true&session_id=${sessionId}`,
+      cancel_url: `${config.frontendUrl}/results?checkout_cancelled=true`,
+      // customer_email: customerEmail || undefined, // COMMENTED OUT: Makes email editable. Stripe will ask for it.
+      metadata: {
+        testSessionId: sessionId,
+        userId: context.user?.id || "", // Empty if anonymous
+        type: "report_unlock",
+        capiEventId: eventID || "", // Pass it just in case we need it
+        hasOrderBump: addWorkbook ? "true" : "false", // Track if they bought it
+      },
+    });
+  } catch (error) {
+    console.error("Stripe Checkout Creation Failed:", error);
+    const message = error instanceof Error ? error.message : String(error);
+    throw new HttpError(500, `Stripe Error: ${message}`);
+  }
 
-  if (!session.url) {
+  if (!session || !session.url) {
     throw new HttpError(500, "Failed to create checkout session");
   }
 
