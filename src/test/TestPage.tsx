@@ -474,15 +474,11 @@ export default function TestPage() {
 
                                 {/* Risk Level & Red Flags Grid */}
                                 <div className="grid grid-cols-2 gap-4 mb-6">
-                                    {analysisData.narcissism?.partner_analysis?.risk_level && (
-                                        <div className={cn("p-3 rounded-xl border text-center flex flex-col items-center justify-center",
-                                            (analysisData.narcissism.partner_analysis.risk_level === "High" || analysisData.narcissism.partner_analysis.risk_level === "Severe")
-                                                ? "bg-red-50 border-red-200 text-red-700"
-                                                : "bg-blue-50 border-blue-200 text-blue-700"
-                                        )}>
+                                    {(analysisData.narcissism?.partner_analysis?.risk_level === "High" || analysisData.narcissism?.partner_analysis?.risk_level === "Severe") && (
+                                        <div className={cn("p-3 rounded-xl border text-center flex flex-col items-center justify-center bg-red-50 border-red-200 text-red-700")}>
                                             <div className="text-[10px] font-bold uppercase opacity-75 mb-1">Toxicity Risk</div>
                                             <div className="font-black text-lg flex items-center justify-center gap-1">
-                                                {analysisData.narcissism.partner_analysis.risk_level === "High" || analysisData.narcissism.partner_analysis.risk_level === "Severe" ? <AlertTriangle size={16} /> : <Activity size={16} />}
+                                                <AlertTriangle size={16} />
                                                 {analysisData.narcissism.partner_analysis.risk_level}
                                             </div>
                                         </div>
@@ -541,7 +537,7 @@ export default function TestPage() {
                             >
                                 <span className="relative z-10 flex items-center gap-2">
                                     {isSubmitting ? <Loader2 className="animate-spin" /> : <LockIcon size={20} />}
-                                    {isSubmitting ? "Unlocking..." : "Unlock Full Report Now"}
+                                    {isSubmitting ? "Unlocking..." : "Get Your Report Now"}
                                 </span>
                                 <div className="absolute inset-0 bg-white/20 translate-y-full group-hover:translate-y-0 transition-transform duration-300"></div>
                             </button>
@@ -671,16 +667,21 @@ function QuizWizard({ onSubmit, isSubmitting, sessionId }: { onSubmit: (data: an
         livingTogether: false,
         hasChildren: false,
 
+        fightFrequency: "",
+        partnerConflictStyle: "",
+        repairFrequency: "",
         partnerHurtfulBehavior: "",
-        biggestFear: "" // NEW
+        biggestFear: ""
     });
+
+    const totalSteps = 7;
 
     const updateData = (key: string, value: any) => {
         setFormData(prev => ({ ...prev, [key]: value }));
     };
 
     const nextStep = async (currentStepData?: any) => {
-        setStep(prev => prev + 1);
+        setStep(prev => Math.min(prev + 1, totalSteps));
 
         // Save progress to DB if we have a session
         if (sessionId) {
@@ -690,13 +691,11 @@ function QuizWizard({ onSubmit, isSubmitting, sessionId }: { onSubmit: (data: an
                 const payload = { ...formData, ...currentStepData, sessionId, onboardingStep: step };
                 await updateWizardProgress(payload);
 
-                // Track Pixel Event for Step Completion
-                const stepNames = ["Status", "History", "Conflict"];
                 import("../analytics/pixel").then(({ trackPixelEvent }) => {
                     trackPixelEvent("CustomEvent", {
                         content_name: "WizardStep",
                         step_number: step,
-                        step_name: stepNames[step - 1]
+                        step_name: `Step_${step}`
                     });
                 });
 
@@ -706,14 +705,14 @@ function QuizWizard({ onSubmit, isSubmitting, sessionId }: { onSubmit: (data: an
         }
     };
 
-    const prevStep = () => setStep(prev => prev - 1);
+    const prevStep = () => setStep(prev => Math.max(prev - 1, 1));
 
     const handleFinalSubmit = async () => {
         // Track final step
         import("../analytics/pixel").then(({ trackPixelEvent }) => {
             trackPixelEvent("CustomEvent", {
                 content_name: "WizardStep",
-                step_number: 5,
+                step_number: totalSteps,
                 step_name: "BiggestFear"
             });
         });
@@ -724,11 +723,12 @@ function QuizWizard({ onSubmit, isSubmitting, sessionId }: { onSubmit: (data: an
     return (
         <div className="min-h-screen bg-background flex flex-col items-center justify-center p-4 animate-fade-in">
             <div className="w-full max-w-lg">
-                {/* Progress Bar (Subtle) */}
-                <div className="mb-8 flex justify-center gap-2">
-                    {[1, 2, 3, 4, 5].map(s => (
-                        <div key={s} className={cn("h-1.5 w-12 rounded-full transition-all duration-500", step >= s ? "bg-primary" : "bg-muted")} />
-                    ))}
+                {/* Progress Bar (Liquid) */}
+                <div className="mb-8 h-1.5 w-full bg-muted rounded-full overflow-hidden">
+                    <div
+                        className="h-full bg-primary transition-all duration-500 ease-out"
+                        style={{ width: `${(step / totalSteps) * 100}%` }}
+                    />
                 </div>
 
                 {step === 1 && (
@@ -742,17 +742,16 @@ function QuizWizard({ onSubmit, isSubmitting, sessionId }: { onSubmit: (data: an
                 )}
 
                 {step === 2 && (
-                    <Step2_History
+                    <Step2_Context
                         data={formData}
                         updateData={updateData}
                         onNext={() => nextStep()}
                         onBack={prevStep}
-                    // Only auto-advance if specific conditions met inside if complex, but simple enough to have a "Next" button here as it has multiple fields
                     />
                 )}
 
                 {step === 3 && (
-                    <Step3_Conflict
+                    <Step3_Frequency
                         data={formData}
                         updateData={updateData}
                         onNext={() => nextStep()}
@@ -761,16 +760,34 @@ function QuizWizard({ onSubmit, isSubmitting, sessionId }: { onSubmit: (data: an
                 )}
 
                 {step === 4 && (
-                    <Step4_Demographics
+                    <Step4_Style
                         data={formData}
                         updateData={updateData}
-                        onNext={() => nextStep()} // Now goes to Step 5
+                        onNext={() => nextStep()}
                         onBack={prevStep}
                     />
                 )}
 
                 {step === 5 && (
-                    <Step5_Fear
+                    <Step5_Repair
+                        data={formData}
+                        updateData={updateData}
+                        onNext={() => nextStep()}
+                        onBack={prevStep}
+                    />
+                )}
+
+                {step === 6 && (
+                    <Step6_Demographics
+                        data={formData}
+                        updateData={updateData}
+                        onNext={() => nextStep()}
+                        onBack={prevStep}
+                    />
+                )}
+
+                {step === 7 && (
+                    <Step7_Fear
                         data={formData}
                         updateData={updateData}
                         onSubmit={handleFinalSubmit}
@@ -784,6 +801,12 @@ function QuizWizard({ onSubmit, isSubmitting, sessionId }: { onSubmit: (data: an
 }
 
 // -- Step Components --
+
+const CheckIcon = ({ className }: { className?: string }) => (
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}>
+        <polyline points="20 6 9 17 4 12" />
+    </svg>
+);
 
 function Step1_Status({ value, onChange }: { value: string, onChange: (val: string) => void }) {
     const options = [
@@ -820,53 +843,73 @@ function Step1_Status({ value, onChange }: { value: string, onChange: (val: stri
     );
 }
 
-function Step2_History({ data, updateData, onNext, onBack }: { data: any, updateData: any, onNext: () => void, onBack: () => void }) {
+function Step2_Context({ data, updateData, onNext, onBack }: { data: any, updateData: any, onNext: () => void, onBack: () => void }) {
     return (
         <div className="space-y-6 animate-slide-up">
             <div className="text-center">
                 <h2 className="text-2xl font-bold mb-1">A few quick details</h2>
-                <p className="text-muted-foreground">To benchmark your results against similar couples.</p>
+                <p className="text-muted-foreground">To set the context for your analysis.</p>
             </div>
 
-            <div className="space-y-4 bg-card p-6 rounded-2xl border border-border shadow-sm">
+            <div className="space-y-5 bg-card p-6 rounded-2xl border border-border shadow-sm">
                 <div className="space-y-3">
-                    <label className="text-sm font-medium block">How long have you been together?</label>
+                    <label className="text-sm font-bold uppercase text-muted-foreground tracking-wider">Time Together</label>
                     <div className="grid grid-cols-2 gap-2">
-                        {['0-6mo', '6mo-2yr', '2-5yr', '5-10yr', '10+yr'].map(val => (
+                        {[
+                            { id: '0-6mo', label: '< 6 Mo' },
+                            { id: '6mo-2yr', label: '6 Mo-2 Yr' },
+                            { id: '2-5yr', label: '2-5 Yrs' },
+                            { id: '5-10yr', label: '5-10 Yrs' },
+                            { id: '10+yr', label: '10+ Yrs' },
+                        ].map(opt => (
                             <button
-                                key={val}
-                                onClick={() => updateData('relationshipDuration', val)}
+                                key={opt.id}
+                                onClick={() => updateData('relationshipDuration', opt.id)}
                                 className={cn(
-                                    "p-3 rounded-lg border text-sm transition-all",
-                                    data.relationshipDuration === val ? "border-primary bg-primary/10 text-primary font-bold" : "border-border hover:border-primary/50"
+                                    "p-3 rounded-xl border text-sm font-bold transition-all",
+                                    data.relationshipDuration === opt.id
+                                        ? "bg-primary text-primary-foreground border-primary shadow-md transform scale-[1.02]"
+                                        : "border-border hover:border-primary/50 hover:bg-muted/50"
                                 )}
                             >
-                                {val === '0-6mo' ? '< 6 Months' : val === '6mo-2yr' ? '6 Months - 2 Years' : val === '10+yr' ? '10+ Years' : val + ' Years'}
+                                {opt.label}
                             </button>
                         ))}
                     </div>
                 </div>
 
-                <div className="space-y-3 pt-2">
-                    <label className="flex items-center gap-3 p-3 rounded-lg border border-border hover:bg-muted/50 cursor-pointer transition-colors">
-                        <input
-                            type="checkbox"
-                            checked={data.livingTogether}
-                            onChange={(e) => updateData('livingTogether', e.target.checked)}
-                            className="w-5 h-5 rounded border-gray-300 text-primary focus:ring-primary"
-                        />
-                        <span className="font-medium">We live together</span>
-                    </label>
+                <div className="h-px bg-border/50"></div>
 
-                    <label className="flex items-center gap-3 p-3 rounded-lg border border-border hover:bg-muted/50 cursor-pointer transition-colors">
-                        <input
-                            type="checkbox"
-                            checked={data.hasChildren}
-                            onChange={(e) => updateData('hasChildren', e.target.checked)}
-                            className="w-5 h-5 rounded border-gray-300 text-primary focus:ring-primary"
-                        />
-                        <span className="font-medium">We have children</span>
-                    </label>
+                <div className="grid grid-cols-2 gap-3">
+                    <button
+                        onClick={() => updateData('livingTogether', !data.livingTogether)}
+                        className={cn(
+                            "p-4 rounded-xl border text-left transition-all flex items-center gap-3",
+                            data.livingTogether ? "border-primary bg-primary/5 ring-1 ring-primary" : "border-border hover:bg-muted/50"
+                        )}
+                    >
+                        <span className="text-2xl">🏠</span>
+                        <div className="leading-tight">
+                            <div className="font-bold text-sm">Living</div>
+                            <div className="text-xs text-muted-foreground">Together</div>
+                        </div>
+                        {data.livingTogether && <CheckIcon className="w-4 h-4 ml-auto text-primary" />}
+                    </button>
+
+                    <button
+                        onClick={() => updateData('hasChildren', !data.hasChildren)}
+                        className={cn(
+                            "p-4 rounded-xl border text-left transition-all flex items-center gap-3",
+                            data.hasChildren ? "border-primary bg-primary/5 ring-1 ring-primary" : "border-border hover:bg-muted/50"
+                        )}
+                    >
+                        <span className="text-2xl">👶</span>
+                        <div className="leading-tight">
+                            <div className="font-bold text-sm">Have</div>
+                            <div className="text-xs text-muted-foreground">Children</div>
+                        </div>
+                        {data.hasChildren && <CheckIcon className="w-4 h-4 ml-auto text-primary" />}
+                    </button>
                 </div>
             </div>
 
@@ -875,7 +918,7 @@ function Step2_History({ data, updateData, onNext, onBack }: { data: any, update
                 <button
                     onClick={onNext}
                     disabled={!data.relationshipDuration}
-                    className="flex-1 py-3 rounded-full bg-primary text-primary-foreground font-bold hover:opacity-90 disabled:opacity-50 transition-opacity"
+                    className="flex-1 py-3 rounded-full bg-primary text-primary-foreground font-bold hover:opacity-90 disabled:opacity-50 transition-opacity shadow-lg"
                 >
                     Continue
                 </button>
@@ -884,145 +927,198 @@ function Step2_History({ data, updateData, onNext, onBack }: { data: any, update
     );
 }
 
-function Step3_Conflict({ data, updateData, onNext, onBack }: { data: any, updateData: any, onNext: () => void, onBack: () => void }) {
+function Step3_Frequency({ data, updateData, onNext, onBack }: { data: any, updateData: any, onNext: () => void, onBack: () => void }) {
+    const options = [
+        { id: "daily", label: "Daily" },
+        { id: "weekly", label: "Weekly" },
+        { id: "monthly", label: "Monthly" },
+        { id: "rarely", label: "Rarely" },
+    ];
+
     return (
         <div className="space-y-6 animate-slide-up">
-            <div className="text-center">
-                <h2 className="text-2xl font-bold mb-1">Conflict Dynamics</h2>
-                <p className="text-muted-foreground">Understanding how you fight is key.</p>
+            <div className="text-center space-y-2">
+                <h2 className="text-2xl font-bold">How often do you fight?</h2>
+                <p className="text-muted-foreground">Be honest, we don't judge.</p>
             </div>
-
-            <div className="space-y-4 bg-card p-6 rounded-2xl border border-border shadow-sm">
-                <div className="space-y-2">
-                    <label className="text-sm font-medium">How often do you have conflicts?</label>
-                    <select
-                        value={data.fightFrequency}
-                        onChange={(e) => updateData('fightFrequency', e.target.value)}
-                        className="w-full p-3 rounded-lg border bg-background"
+            <div className="grid gap-3">
+                {options.map((opt) => (
+                    <button
+                        key={opt.id}
+                        onClick={() => {
+                            updateData('fightFrequency', opt.id);
+                            onNext();
+                        }}
+                        className={cn(
+                            "w-full text-left p-5 rounded-xl border-2 transition-all hover:border-primary hover:bg-primary/5 active:scale-[0.98]",
+                            data.fightFrequency === opt.id ? "border-primary bg-primary/5 ring-1 ring-primary" : "border-border"
+                        )}
                     >
-                        <option value="">Select...</option>
-                        <option value="daily">Daily</option>
-                        <option value="weekly">Weekly</option>
-                        <option value="monthly">Monthly</option>
-                        <option value="rarely">Rarely</option>
-                    </select>
-                </div>
-
-                <div className="space-y-2">
-                    <label className="text-sm font-medium">When you fight, your partner typically:</label>
-                    <select
-                        value={data.partnerConflictStyle}
-                        onChange={(e) => updateData('partnerConflictStyle', e.target.value)}
-                        className="w-full p-3 rounded-lg border bg-background"
-                    >
-                        <option value="">Select...</option>
-                        <option value="withdraws">Withdraws / Goes silent</option>
-                        <option value="escalates">Escalates / Gets intense</option>
-                        <option value="deflects">Deflects / Blames you</option>
-                        <option value="engages">Tries to resolve it calmly</option>
-                    </select>
-                </div>
-
-                <div className="space-y-2">
-                    <label className="text-sm font-medium">Do you successfully repair afterwards?</label>
-                    <select
-                        value={data.repairFrequency}
-                        onChange={(e) => updateData('repairFrequency', e.target.value)}
-                        className="w-full p-3 rounded-lg border bg-background"
-                    >
-                        <option value="">Select...</option>
-                        <option value="always">Always - We make up quickly</option>
-                        <option value="sometimes">Sometimes - It takes time</option>
-                        <option value="rarely">Rarely - We brush it under the rug</option>
-                        <option value="never">Never - Resentment builds up</option>
-                    </select>
-                </div>
+                        <div className="font-bold text-lg">{opt.label}</div>
+                    </button>
+                ))}
             </div>
-
-            <div className="flex gap-3">
-                <button onClick={onBack} className="px-6 py-3 rounded-full font-medium text-muted-foreground hover:bg-muted">Back</button>
-                <button
-                    onClick={onNext}
-                    disabled={!data.fightFrequency || !data.partnerConflictStyle || !data.repairFrequency}
-                    className="flex-1 py-3 rounded-full bg-primary text-primary-foreground font-bold hover:opacity-90 disabled:opacity-50 transition-opacity"
-                >
-                    Continue
-                </button>
-            </div>
+            <button onClick={onBack} className="w-full py-3 text-muted-foreground hover:text-foreground text-sm font-medium">Back</button>
         </div>
     );
 }
 
-function Step4_Demographics({ data, updateData, onNext, onBack }: { data: any, updateData: any, onNext: () => void, onBack: () => void }) {
+function Step4_Style({ data, updateData, onNext, onBack }: { data: any, updateData: any, onNext: () => void, onBack: () => void }) {
+    const options = [
+        { id: "withdraws", label: "Withdraws / Goes silent", icon: "😶" },
+        { id: "escalates", label: "Escalates / Gets intense", icon: "🔥" },
+        { id: "deflects", label: "Deflects / Blames you", icon: "🛡️" },
+        { id: "engages", label: "Tries to resolve it calmly", icon: "🤝" },
+    ];
+
+    return (
+        <div className="space-y-6 animate-slide-up">
+            <div className="text-center space-y-2">
+                <h2 className="text-2xl font-bold">When you fight, your partner typically...</h2>
+            </div>
+            <div className="grid gap-3">
+                {options.map((opt) => (
+                    <button
+                        key={opt.id}
+                        onClick={() => {
+                            updateData('partnerConflictStyle', opt.id);
+                            onNext();
+                        }}
+                        className={cn(
+                            "w-full text-left p-5 rounded-xl border-2 transition-all hover:border-primary hover:bg-primary/5 active:scale-[0.98]",
+                            data.partnerConflictStyle === opt.id ? "border-primary bg-primary/5 ring-1 ring-primary" : "border-border"
+                        )}
+                    >
+                        <div className="flex items-center gap-4">
+                            <span className="text-2xl">{opt.icon}</span>
+                            <div className="font-bold text-lg">{opt.label}</div>
+                        </div>
+                    </button>
+                ))}
+            </div>
+            <button onClick={onBack} className="w-full py-3 text-muted-foreground hover:text-foreground text-sm font-medium">Back</button>
+        </div>
+    );
+}
+
+function Step5_Repair({ data, updateData, onNext, onBack }: { data: any, updateData: any, onNext: () => void, onBack: () => void }) {
+    const options = [
+        { id: "always", label: "Always", desc: "We make up quickly" },
+        { id: "sometimes", label: "Sometimes", desc: "It takes time" },
+        { id: "rarely", label: "Rarely", desc: "We brush it under the rug" },
+        { id: "never", label: "Never", desc: "Resentment builds up" },
+    ];
+
+    return (
+        <div className="space-y-6 animate-slide-up">
+            <div className="text-center space-y-2">
+                <h2 className="text-2xl font-bold">Do you repair afterwards?</h2>
+                <p className="text-muted-foreground">Can you reconnect after a conflict?</p>
+            </div>
+            <div className="grid gap-3">
+                {options.map((opt) => (
+                    <button
+                        key={opt.id}
+                        onClick={() => {
+                            updateData('repairFrequency', opt.id);
+                            onNext();
+                        }}
+                        className={cn(
+                            "w-full text-left p-5 rounded-xl border-2 transition-all hover:border-primary hover:bg-primary/5 active:scale-[0.98]",
+                            data.repairFrequency === opt.id ? "border-primary bg-primary/5 ring-1 ring-primary" : "border-border"
+                        )}
+                    >
+                        <div>
+                            <div className="font-bold text-lg">{opt.label}</div>
+                            <div className="text-muted-foreground text-sm">{opt.desc}</div>
+                        </div>
+                    </button>
+                ))}
+            </div>
+            <button onClick={onBack} className="w-full py-3 text-muted-foreground hover:text-foreground text-sm font-medium">Back</button>
+        </div>
+    );
+}
+
+function Step6_Demographics({ data, updateData, onNext, onBack }: { data: any, updateData: any, onNext: () => void, onBack: () => void }) {
     const isValid = data.userGender && data.partnerGender && data.userAgeRange && data.partnerAgeRange;
+    const ageRanges = [
+        { id: "<25", label: "< 25" },
+        { id: "25-34", label: "25-34" },
+        { id: "35-44", label: "35-44" },
+        { id: "45+", label: "45+" }
+    ];
 
     return (
         <div className="space-y-6 animate-slide-up">
             <div className="text-center">
-                <h2 className="text-2xl font-bold mb-1">Last Step</h2>
-                <p className="text-muted-foreground">Demographics for statistical accuracy.</p>
+                <h2 className="text-2xl font-bold mb-1">Final Details</h2>
+                <p className="text-muted-foreground">For accurate caching & benchmarks.</p>
             </div>
 
-            <div className="bg-card p-6 rounded-2xl border border-border shadow-sm space-y-4">
-                <div className="grid grid-cols-2 gap-4">
-                    <div className="space-y-2">
-                        <label className="text-sm font-medium">Your Gender</label>
-                        <div className="flex flex-col gap-2">
+            <div className="bg-card p-5 rounded-2xl border border-border shadow-sm space-y-6">
+                {/* User Row */}
+                <div className="space-y-3">
+                    <div className="flex items-center gap-2 mb-1">
+                        <span className="text-xs font-bold uppercase text-muted-foreground bg-muted px-2 py-1 rounded">You</span>
+                    </div>
+                    <div className="grid grid-cols-2 gap-3">
+                        {/* Gender */}
+                        <div className="flex bg-muted/30 p-1 rounded-lg">
                             {['Male', 'Female'].map(g => (
                                 <button
                                     key={g}
                                     onClick={() => updateData('userGender', g)}
-                                    className={cn("p-2 rounded border text-sm", data.userGender === g ? "bg-primary text-primary-foreground border-primary" : "border-border")}
+                                    className={cn("flex-1 py-2 rounded-md text-sm font-bold transition-all",
+                                        data.userGender === g ? "bg-white shadow-sm text-primary" : "text-muted-foreground hover:text-foreground"
+                                    )}
                                 >
-                                    {g}
+                                    {g === 'Male' ? 'Man' : 'Woman'}
                                 </button>
                             ))}
-                            {/* Other option could be added but keeping simple for speed */}
                         </div>
+                        {/* Age */}
+                        <select
+                            value={data.userAgeRange}
+                            onChange={(e) => updateData('userAgeRange', e.target.value)}
+                            className="w-full p-2 rounded-lg border bg-background text-sm font-medium"
+                        >
+                            <option value="">Age...</option>
+                            {ageRanges.map(r => <option key={r.id} value={r.id}>{r.label}</option>)}
+                        </select>
                     </div>
-                    <div className="space-y-2">
-                        <label className="text-sm font-medium">Partner's Gender</label>
-                        <div className="flex flex-col gap-2">
+                </div>
+
+                <div className="h-px bg-border/50"></div>
+
+                {/* Partner Row */}
+                <div className="space-y-3">
+                    <div className="flex items-center gap-2 mb-1">
+                        <span className="text-xs font-bold uppercase text-muted-foreground bg-muted px-2 py-1 rounded">Partner</span>
+                    </div>
+                    <div className="grid grid-cols-2 gap-3">
+                        {/* Gender */}
+                        <div className="flex bg-muted/30 p-1 rounded-lg">
                             {['Male', 'Female'].map(g => (
                                 <button
                                     key={g}
                                     onClick={() => updateData('partnerGender', g)}
-                                    className={cn("p-2 rounded border text-sm", data.partnerGender === g ? "bg-primary text-primary-foreground border-primary" : "border-border")}
+                                    className={cn("flex-1 py-2 rounded-md text-sm font-bold transition-all",
+                                        data.partnerGender === g ? "bg-white shadow-sm text-primary" : "text-muted-foreground hover:text-foreground"
+                                    )}
                                 >
-                                    {g}
+                                    {g === 'Male' ? 'Man' : 'Woman'}
                                 </button>
                             ))}
                         </div>
-                    </div>
-                </div>
-
-                <div className="grid grid-cols-2 gap-4">
-                    <div className="space-y-2">
-                        <label className="text-sm font-medium">Your Age</label>
-                        <select
-                            value={data.userAgeRange}
-                            onChange={(e) => updateData('userAgeRange', e.target.value)}
-                            className="w-full p-2 rounded border bg-background"
-                        >
-                            <option value="">Select...</option>
-                            <option value="<25">Under 25</option>
-                            <option value="25-34">25-34</option>
-                            <option value="35-44">35-44</option>
-                            <option value="45+">45+</option>
-                        </select>
-                    </div>
-                    <div className="space-y-2">
-                        <label className="text-sm font-medium">Partner's Age</label>
+                        {/* Age */}
                         <select
                             value={data.partnerAgeRange}
                             onChange={(e) => updateData('partnerAgeRange', e.target.value)}
-                            className="w-full p-2 rounded border bg-background"
+                            className="w-full p-2 rounded-lg border bg-background text-sm font-medium"
                         >
-                            <option value="">Select...</option>
-                            <option value="<25">Under 25</option>
-                            <option value="25-34">25-34</option>
-                            <option value="35-44">35-44</option>
-                            <option value="45+">45+</option>
+                            <option value="">Age...</option>
+                            {ageRanges.map(r => <option key={r.id} value={r.id}>{r.label}</option>)}
                         </select>
                     </div>
                 </div>
@@ -1033,7 +1129,7 @@ function Step4_Demographics({ data, updateData, onNext, onBack }: { data: any, u
                 <button
                     onClick={onNext}
                     disabled={!isValid}
-                    className="flex-1 py-3 rounded-full bg-primary text-primary-foreground font-bold hover:opacity-90 disabled:opacity-50 transition-opacity"
+                    className="flex-1 py-3 rounded-full bg-primary text-primary-foreground font-bold hover:opacity-90 disabled:opacity-50 transition-opacity shadow-lg"
                 >
                     Continue
                 </button>
@@ -1042,7 +1138,7 @@ function Step4_Demographics({ data, updateData, onNext, onBack }: { data: any, u
     );
 }
 
-function Step5_Fear({ data, updateData, onSubmit, onBack, isSubmitting }: { data: any, updateData: any, onSubmit: () => void, onBack: () => void, isSubmitting: boolean }) {
+function Step7_Fear({ data, updateData, onSubmit, onBack, isSubmitting }: { data: any, updateData: any, onSubmit: () => void, onBack: () => void, isSubmitting: boolean }) {
     const options = [
         "That I'm not happy",
         "That I don't trust them",
@@ -1057,6 +1153,7 @@ function Step5_Fear({ data, updateData, onSubmit, onBack, isSubmitting }: { data
     const handleSelect = (val: string) => {
         setIsOther(false);
         updateData('biggestFear', val);
+        onSubmit(); // Auto-submit on selection
     };
 
     const handleOther = () => {
@@ -1085,6 +1182,7 @@ function Step5_Fear({ data, updateData, onSubmit, onBack, isSubmitting }: { data
                     <button
                         key={opt}
                         onClick={() => handleSelect(opt)}
+                        disabled={isSubmitting}
                         className={cn(
                             "w-full text-left p-4 rounded-xl border-2 transition-all",
                             data.biggestFear === opt && !isOther
@@ -1109,27 +1207,31 @@ function Step5_Fear({ data, updateData, onSubmit, onBack, isSubmitting }: { data
                 </button>
 
                 {isOther && (
-                    <textarea
-                        autoFocus
-                        placeholder="Type here..."
-                        className="w-full p-4 rounded-xl border border-input bg-background min-h-[100px] resize-none animate-in fade-in zoom-in-95 duration-200"
-                        value={customFear}
-                        onChange={handleCustomChange}
-                    />
+                    <div className="space-y-4 animate-in fade-in zoom-in-95 duration-200">
+                        <textarea
+                            autoFocus
+                            placeholder="Type here..."
+                            className="w-full p-4 rounded-xl border border-input bg-background min-h-[100px] resize-none"
+                            value={customFear}
+                            onChange={handleCustomChange}
+                        />
+                        <button
+                            onClick={onSubmit}
+                            disabled={!isValid || isSubmitting}
+                            className="w-full py-4 rounded-full bg-primary text-primary-foreground font-bold hover:opacity-90 disabled:opacity-50 transition-opacity shadow-lg"
+                        >
+                            {isSubmitting ? <Loader2 className="animate-spin inline mr-2" /> : null}
+                            {isSubmitting ? "Starting Test..." : "Start Assessment"}
+                        </button>
+                    </div>
                 )}
             </div>
 
-            <div className="flex gap-3 pt-4">
-                <button onClick={onBack} className="px-6 py-3 rounded-full font-medium text-muted-foreground hover:bg-muted">Back</button>
-                <button
-                    onClick={onSubmit}
-                    disabled={!isValid || isSubmitting}
-                    className="flex-1 py-3 rounded-full bg-primary text-primary-foreground font-bold hover:opacity-90 disabled:opacity-50 transition-opacity"
-                >
-                    {isSubmitting ? <Loader2 className="animate-spin inline mr-2" /> : null}
-                    {isSubmitting ? "Starting Test..." : "Start Assessment"}
-                </button>
-            </div>
+            {!isOther && (
+                <div className="flex gap-3 pt-4">
+                    <button onClick={onBack} className="w-full py-3 text-muted-foreground hover:text-foreground text-sm font-medium">Back</button>
+                </div>
+            )}
         </div>
     );
 }

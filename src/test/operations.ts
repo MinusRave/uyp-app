@@ -316,8 +316,7 @@ type CompleteTestArgs = {
 
 import { calculateScore } from "./scoring";
 import { calculateAdvancedMetrics } from "./calculateMetrics";
-import { assessNarcissism } from "../server/narcissism";
-import { generateQuickOverview } from "../server/ai";
+
 
 export const completeTest: CompleteTest<CompleteTestArgs, void> = async (
     args,
@@ -373,16 +372,7 @@ export const completeTest: CompleteTest<CompleteTestArgs, void> = async (
         },
     });
 
-    // TRIGGER AI ANALYSIS IN BACKGROUND (non-blocking)
-    // Fire-and-forget: don't await, let it run asynchronously
-    Promise.resolve(assessNarcissism({ sessionId }, context)).catch((e) => {
-        console.error("Failed to trigger Narcissism Assessment:", e);
-    });
 
-    // Start Quick Overview generation immediately
-    Promise.resolve(generateQuickOverview({ sessionId }, context)).catch((e) => {
-        console.error("Failed to trigger Quick Overview:", e);
-    });
 };
 
 type ClaimSessionArgs = { sessionId: string };
