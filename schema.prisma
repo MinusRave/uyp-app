@@ -40,6 +40,7 @@ model TestSession {
   userId               String?
 
   // Progress tracking
+  testType             String   @default("standard") // "standard" | "toxic-men"
   currentQuestionIndex Int      @default(0)
   isCompleted          Boolean  @default(false)
   

@@ -188,11 +188,13 @@ export const startTest: StartTest<UserProfile & DeviceInfo & {
     utm_content?: string;
     utm_term?: string;
     referrer?: string;
+    testType?: string; // NEW
 } | void, TestSession> = async (args, context) => {
     // Create a new test session with profile data
     const session = await context.entities.TestSession.create({
         data: {
             userId: context.user ? context.user.id : undefined,
+            testType: args?.testType || "standard", // Default to standard
             currentQuestionIndex: 0,
             answers: {},
             // Profile data (optional at start)

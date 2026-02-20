@@ -109,8 +109,18 @@ export const createCheckoutSession: CreateCheckoutSession<
   // This supports the "Skip Email Gate" A/B test case.
 
   // 3. Send Meta CAPI InitiateCheckout Event
-  const reportPrice = parseFloat(process.env.REPORT_PRICE || "29.00");
-  const workbookPrice = 12.00;
+  // DETECT PRODUCT TYPE
+  let reportPrice = parseFloat(process.env.REPORT_PRICE || "29.00");
+  let workbookPrice = 12.00;
+  let productName = "Understand Your Partner - Full Analysis";
+
+  // CHECK IF TOXIC TEST
+  if (testSession.testType === 'toxic-men') {
+    reportPrice = 47.00;
+    workbookPrice = 9.00; // Special offer
+    productName = "Toxic Relationship Analysis (Men)";
+  }
+
   let totalPrice = reportPrice;
   if (addWorkbook) totalPrice += workbookPrice;
 
@@ -130,16 +140,16 @@ export const createCheckoutSession: CreateCheckoutSession<
       customData: {
         currency: 'usd',
         value: totalPrice,
-        content_name: 'Full Relationship Report', // Stick to main product for name
+        content_name: productName,
         content_category: 'Report',
-        content_ids: ['report-full'],
+        content_ids: [testSession.testType === 'toxic-men' ? 'report-toxic-men' : 'report-full'],
         content_type: 'product',
       }
     });
   }
 
   // 4. Log price for verification
-  console.log(`[createCheckoutSession] Charging price: $${totalPrice}`);
+  console.log(`[createCheckoutSession] Charging price: $${totalPrice} for ${productName}`);
 
   // 5. Create Stripe Checkout Session
   const lineItems = [
@@ -147,8 +157,10 @@ export const createCheckoutSession: CreateCheckoutSession<
       price_data: {
         currency: "usd",
         product_data: {
-          name: "Understand Your Partner - Full Analysis",
-          description: "Complete Relationship Diagnosis, 5-Year Forecast, and 5 Targeted Strategic Protocol Guides.",
+          name: productName,
+          description: testSession.testType === 'toxic-men'
+            ? "Complete Toxic Dynamic Analysis, Vulnerability Map, and Strategic Action Plan."
+            : "Complete Relationship Diagnosis, 5-Year Forecast, and 5 Targeted Strategic Protocol Guides.",
         },
         unit_amount: Math.round(reportPrice * 100),
       },
@@ -161,8 +173,8 @@ export const createCheckoutSession: CreateCheckoutSession<
       price_data: {
         currency: "usd",
         product_data: {
-          name: "The 30-Day Reconnection Workbook",
-          description: "Daily guided exercises to rebuild connection.",
+          name: testSession.testType === 'toxic-men' ? "Emergency Scripts Pack (+20 Scenarios)" : "The 30-Day Reconnection Workbook",
+          description: testSession.testType === 'toxic-men' ? "Exact words to use during conflicts or threats." : "Daily guided exercises to rebuild connection.",
         },
         unit_amount: Math.round(workbookPrice * 100),
       },
@@ -179,8 +191,12 @@ export const createCheckoutSession: CreateCheckoutSession<
       submit_type: 'pay', // Button says "Pay" not "Subscribe"
       line_items: lineItems,
       mode: "payment",
-      success_url: `${config.frontendUrl}/report?success=true&session_id=${sessionId}`,
-      cancel_url: `${config.frontendUrl}/results?checkout_cancelled=true`,
+      success_url: testSession.testType === 'toxic-men'
+        ? `${config.frontendUrl}/toxic-results?success=true&sessionId=${sessionId}`
+        : `${config.frontendUrl}/report?success=true&session_id=${sessionId}`,
+      cancel_url: testSession.testType === 'toxic-men'
+        ? `${config.frontendUrl}/toxic-offer?sessionId=${sessionId}&checkout_cancelled=true`
+        : `${config.frontendUrl}/results?checkout_cancelled=true`,
       // customer_email: customerEmail || undefined, // COMMENTED OUT: Makes email editable. Stripe will ask for it.
       metadata: {
         testSessionId: sessionId,

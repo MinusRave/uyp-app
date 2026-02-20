@@ -175,6 +175,41 @@ page ProcessingPage {
 
 // Placeholder for Teaser (implemented next)
 
+route ToxicTestRoute { path: "/toxic-relationship-test-for-men", to: ToxicTestPage }
+page ToxicTestPage {
+  component: import ToxicTestPage from "@src/test/ToxicTestPage"
+}
+
+route ToxicEmailGateRoute { path: "/toxic-analysis", to: ToxicEmailGatePage }
+page ToxicEmailGatePage {
+  component: import ToxicEmailGate from "@src/test/ToxicEmailGate"
+}
+
+route ToxicSalesRoute { path: "/toxic-offer", to: ToxicSalesPage }
+page ToxicSalesPage {
+  component: import ToxicSalesPage from "@src/sales/ToxicSalesPage"
+}
+
+route ToxicResultRoute { path: "/toxic-results", to: ToxicResultPage }
+page ToxicResultPage {
+  component: import ToxicResultPage from "@src/results/ToxicResultPage"
+}
+
+action submitToxicTest {
+  fn: import { submitToxicTest } from "@src/test/toxicOperations",
+  entities: [TestSession]
+}
+
+action captureToxicLead {
+  fn: import { captureToxicLead } from "@src/test/toxicOperations",
+  entities: [TestSession]
+}
+
+action finalizeToxicReport {
+  fn: import { finalizeToxicReport } from "@src/test/toxicOperations",
+  entities: [TestSession, AiLog]
+}
+
 
 // Selling Page
 
