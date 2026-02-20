@@ -1,11 +1,11 @@
 ﻿import React, { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
-import { ArrowRight, Lock, CheckCircle, AlertTriangle, TrendingUp, Shield, Heart, BadgeCheck, Compass, Zap, X, Activity, ChevronDown, Check, Eye, Microscope, ListChecks, ShieldAlert, Clock, MessageCircle, Brain, Quote, Star, Play, TrendingDown, Battery, Thermometer, FileWarning, BookOpen, Users, FileText, ShieldCheck, Info, ChevronUp } from "lucide-react";
+import { ArrowRight, Lock, CheckCircle, AlertTriangle, TrendingUp, Shield, Heart, BadgeCheck, Compass, Zap, X, Activity, ChevronDown, Check, Eye, Microscope, ListChecks, ShieldAlert, Clock, MessageCircle, Brain, Quote, Star, Play, TrendingDown, Battery, Thermometer, FileWarning, BookOpen, Users, FileText, ShieldCheck, Info, ChevronUp, Link, Repeat, Ghost } from "lucide-react";
 import { useQuery, generateQuickOverview, generateFullReport, createCheckoutSession, getTestSession, getSystemConfig, captureLead } from "wasp/client/operations";
 import { useAuth } from "wasp/client/auth";
 import Confetti from "react-confetti";
 import { trackPixelEvent } from '../analytics/pixel';
-import ExitIntentPopup from './ExitIntentPopup';
+
 import EmailCaptureModal from "./components/EmailCaptureModal";
 
 // --- TYPES ---
@@ -102,20 +102,20 @@ const HeroSection = ({
                 <h1 className="text-4xl md:text-6xl font-black tracking-tight text-foreground mb-4">
                     {isHighRisk ? (
                         <>
-                            We found a specific <span className="text-primary underline decoration-wavy">toxicity pattern</span>.
+                            Your relationship is displaying clear signs of <span className="text-primary underline decoration-wavy">toxic interaction</span>.
                         </>
                     ) : isHighConflict ? (
                         <>
-                            We detected the <span className="text-primary">"High-Conflict"</span> pattern.
+                            You aren't just fighting. You're trapped in the <span className="text-primary">High-Conflict</span> loop.
                             <div className="text-lg md:text-xl font-medium text-muted-foreground mt-4 leading-relaxed">
-                                You aren't just fighting. You're stuck in a loop. And it's escalating.
+                                Your answers confirm it: the arguments are escalating, the resentment is building, and the cycle isn't breaking itself.
                             </div>
                         </>
                     ) : (
                         <>
-                            We detected the <span className="text-primary">"Silent Drift"</span> pattern.
+                            You aren't fighting. You're fading into the <span className="text-primary">Silent Drift</span>.
                             <div className="text-lg md:text-xl font-medium text-muted-foreground mt-4 leading-relaxed">
-                                You aren't fighting. You're fading. This is statistically the hardest pattern to reverse.
+                                Based on your data, the emotional distance between you is widening. This is statistically the hardest pattern to reverse once the apathy sets in.
                             </div>
                         </>
                     )}
@@ -195,22 +195,22 @@ const HeroSection = ({
 
                     {/* Lock Overlay */}
                     <div className="absolute inset-0 z-10 flex flex-col items-center justify-center bg-background/40 backdrop-blur-[1px]">
-                        <div className="bg-background/95 border border-border/50 shadow-2xl p-6 rounded-2xl text-center max-w-sm mx-4 transform hover:scale-105 transition-all duration-300 cursor-pointer" onClick={() => onUnlock('hero_lock')}>
+                        <div className="bg-background/95 border border-red-500/20 shadow-2xl p-6 rounded-2xl text-center max-w-sm mx-4 transform hover:scale-105 transition-all duration-300 cursor-pointer" onClick={() => onUnlock('hero_lock')}>
                             <Lock className="mx-auto text-primary mb-3 h-8 w-8" />
-                            <h3 className="font-bold text-lg text-foreground mb-1">Unlock Your Forecast</h3>
-                            <p className="text-xs text-muted-foreground mb-4">
-                                See your 6-month trajectory and get the cure.
+                            <h3 className="font-bold text-lg text-foreground mb-1 uppercase tracking-wide text-red-500">Warning: Forecast Locked</h3>
+                            <p className="text-xs text-muted-foreground mb-4 font-medium leading-relaxed">
+                                Our algorithm has predicted where this trajectory leads in 6 months. Unlock your <strong>Clinical Report</strong> to view your risk forecast and the exact protocols to begin de-escalation today.
                             </p>
-                            <button className="bg-primary hover:bg-primary/90 text-primary-foreground text-sm font-bold py-2 px-6 rounded-full w-full">
-                                Reveal Strategy &rarr;
+                            <button className="bg-primary hover:bg-primary/90 text-primary-foreground text-sm font-bold py-3 px-6 rounded-full w-full shadow-lg">
+                                Unlock My Analysis Now &rarr;
                             </button>
                         </div>
                     </div>
                 </div>
 
                 {/* Sub-text below card */}
-                <p className="text-sm text-muted-foreground max-w-lg mx-auto pt-4">
-                    <span className="text-foreground font-bold">Analysis Complete.</span> We have identified the root cause. The forecast and action plan are ready for your review.
+                <p className="text-sm text-muted-foreground max-w-lg mx-auto pt-4 leading-relaxed">
+                    <span className="text-foreground font-bold">This is a turning point.</span> The data proves your relationship dynamics aren't just random. They are deeply predictable, which means they are solvable.
                 </p>
 
             </div>
@@ -228,48 +228,48 @@ const MirrorSection = ({ narcissismAnalysis, badge }: { narcissismAnalysis?: any
     // 1. Fallback / Low Risk Symptoms (Silent Drift)
     const genericSymptoms = [
         {
-            title: "The Roommate Trap",
-            desc: "Use mostly logistical communication. 'Did you pay the bill?' 'Who is picking up the kids?' You manage a life together, but you don't share one."
+            title: "The Logistical Truce",
+            desc: "Your communications are entirely about groceries, schedules, and kids. You run a household together flawlessly, but the thought of having a deep, vulnerable conversation feels exhausting."
         },
         {
             title: "The Intimacy Void",
-            desc: "It's not just about sex. It's about feeling lonely even when you're sitting on the same couch. The distance feels physical."
+            desc: "It's not just a physical disconnect. It's the profound loneliness of sitting right next to them on the couch and feeling like you're oceans apart."
         },
         {
-            title: "Peace at a Price",
-            desc: "You avoid conflict to keep the peace, but the silence is actually resentment building up layer by layer."
+            title: "The Eggshell Silence",
+            desc: "You've learned exactly what topics not to bring up. You bite your tongue to keep the peace, but that unsaid resentment is quietly killing your attraction to them."
         },
         {
             title: "The Boredom Guilt",
-            desc: "You feel bored, then guilty for being bored because 'nothing is wrong'. But lack of conflict is not the same as connection."
+            desc: "You catch yourself feeling suffocated or bored, and then immediately feel guilty because 'nothing is actually wrong.' But a lack of conflict is not the same as connection."
         }
     ];
 
     // 2. Use Dynamic Data if Available (High Risk Priority)
     let displaySymptoms = genericSymptoms;
     let sectionTitle = "We Detect the 'Silent Drift'";
-    let sectionDesc = "Your answers reveal a pattern of gradual disconnection. You aren't fighting—you're fading.";
+    let sectionDesc = "Your answers reveal a pattern of gradual emotional starvation. You aren't fighting—you're fading.";
 
     // High Conflict Override (If not toxic but volatile)
     if (isHighConflict && !isHighRisk) {
         sectionTitle = "We Detected a Cyclic Conflict Pattern";
-        sectionDesc = "You aren't drifting apart quietly—you are caught in a loop of friction. The conflict has become your main form of connection.";
+        sectionDesc = "You aren't drifting apart quietly—you are caught in a loop. The conflict has become your main form of connection.";
         displaySymptoms = [
             {
-                title: "The Circular Argument",
-                desc: "You have the same fight over and over. Different topic, same exhausted outcome."
+                title: "The Scripted Fight",
+                desc: "You already know how the fight will go before it starts. The topic changes, but the dance is the same: one pursues, the other withdraws. Nothing ever gets resolved."
             },
             {
-                title: "The Scoreboard",
-                desc: "Past mistakes are weaponized. You both keep a mental tally, making forgiveness impossible."
+                title: "The Vault of Past Sins",
+                desc: "During an argument, things from 6 months ago are weaponized. Neither of you feels truly forgiven, so you both stay armed, defensive, and ready for war."
             },
             {
-                title: "The Shutdown",
-                desc: "One partner attacks/criticizes, the other defends/withdraws. It's a perfect storm of anxiety and avoidance."
+                title: "The Exhaustion Loop",
+                desc: "You argue over something tiny, it escalates out of control, you both withdraw to lick your wounds, and then you sweep it under the rug until the next time."
             },
             {
-                title: "The Eggshell Walk",
-                desc: "You monitor your words carefully to avoid triggering an explosion, but it happens anyway."
+                title: "The Competitor Trap",
+                desc: "Instead of being teammates attacking a problem, you've become competitors. Every disagreement turns into a zero-sum game of who is 'right' and who is 'wrong'."
             }
         ];
     }
@@ -299,54 +299,58 @@ const MirrorSection = ({ narcissismAnalysis, badge }: { narcissismAnalysis?: any
     }
 
     return (
-        <section className="py-20 px-6 bg-muted/30">
-            <div className="max-w-3xl mx-auto">
-                <div className="text-center mb-12 space-y-4">
-                    <h2 className="text-3xl md:text-4xl font-bold text-foreground">
+        <section className="py-24 px-6 bg-muted/30 border-y border-border/50">
+            <div className="max-w-4xl mx-auto">
+                <div className="text-center mb-16 space-y-4">
+                    <span className="inline-block px-3 py-1 bg-primary/10 text-primary rounded-full text-xs font-bold uppercase tracking-widest shadow-sm">
+                        Clinical Observation
+                    </span>
+                    <h2 className="text-3xl md:text-5xl font-black text-foreground tracking-tight">
                         {sectionTitle}
                     </h2>
-                    <p className="text-lg text-muted-foreground">
+                    <p className="text-xl text-muted-foreground font-medium max-w-2xl mx-auto">
                         {sectionDesc}
                     </p>
                 </div>
 
-                <div className="space-y-6">
+                <div className="grid md:grid-cols-2 gap-6">
                     {displaySymptoms.map((symptom, idx) => (
-                        <div key={idx} className="flex gap-5 bg-card p-6 rounded-xl shadow-sm border border-border transition-all hover:shadow-md hover:border-primary/30">
-                            <div className="shrink-0 pt-1">
+                        <div key={idx} className="bg-card p-8 rounded-2xl shadow-sm border border-border/60 relative overflow-hidden group hover:border-primary/40 hover:shadow-md transition-all duration-300">
+                            <div className="absolute top-0 left-0 w-1.5 h-full bg-primary/20 group-hover:bg-primary transition-colors duration-300"></div>
+                            <h3 className="font-bold text-xl text-foreground mb-3 flex items-center gap-2">
                                 {narcissismAnalysis?.risk_level === "High" || narcissismAnalysis?.risk_level === "Severe" ?
-                                    <AlertTriangle className="text-red-500" size={24} /> :
-                                    <CheckCircle className="text-primary" size={24} />
+                                    <AlertTriangle className="text-red-500 shrink-0" size={20} /> :
+                                    <Activity className="text-primary shrink-0" size={20} />
                                 }
-                            </div>
-                            <div>
-                                <h3 className="font-bold text-lg text-foreground mb-2">"{symptom.title}"</h3>
-                                <p className="text-muted-foreground leading-relaxed italic">
-                                    {symptom.desc}
-                                </p>
-                            </div>
+                                {symptom.title}
+                            </h3>
+                            <p className="text-muted-foreground leading-relaxed text-[15px]">
+                                {symptom.desc}
+                            </p>
                         </div>
                     ))}
                 </div>
 
                 {/* TOXICITY ASSESSMENT CALLOUT */}
                 {(narcissismAnalysis?.risk_level === "High" || narcissismAnalysis?.risk_level === "Severe") && (
-                    <div className="mt-12 bg-red-50 dark:bg-red-950/20 border-l-4 border-red-500 p-6 rounded-r-xl">
-                        <h4 className="flex items-center gap-2 text-red-700 dark:text-red-400 font-bold text-lg mb-2">
-                            <ShieldAlert size={20} /> Use Caution
+                    <div className="mt-12 bg-red-50 dark:bg-red-950/20 border border-red-200 dark:border-red-900/50 p-6 md:p-8 rounded-2xl shadow-sm text-center">
+                        <h4 className="flex items-center justify-center gap-2 text-red-700 dark:text-red-400 font-black text-xl mb-3">
+                            <ShieldAlert size={24} /> Use Caution
                         </h4>
-                        <p className="text-foreground font-medium">
+                        <p className="text-foreground text-lg leading-relaxed max-w-2xl mx-auto font-medium">
                             Your <strong>Toxicity Score is {narcissismAnalysis?.relationship_health?.toxicity_score}/100</strong>.
-                            This level typically indicates a cycle that cannot be fixed by "trying harder" alone.
+                            This level indicates a cycle that cannot be fixed by "trying harder" alone.
                             The full report includes a safety plan and specific "Grey Rock" communication scripts.
                         </p>
                     </div>
                 )}
 
+                {/* NORMAL/CONFLICT Assessment Callout */}
                 {!(narcissismAnalysis?.risk_level === "High" || narcissismAnalysis?.risk_level === "Severe") && (
-                    <div className="mt-12 bg-primary/5 border-l-4 border-primary p-6 rounded-r-xl">
-                        <p className="text-foreground font-medium text-lg">
-                            <strong>You're not imagining it.</strong> Your relationship HAS a pattern. And that pattern has a name, a structure, and a predicted trajectory. The problem isn't that you're brokenâ€”it's that you're stuck in a system you can't see.
+                    <div className="mt-12 bg-primary/5 border border-primary/20 p-8 rounded-2xl shadow-sm text-center max-w-2xl mx-auto">
+                        <p className="text-foreground font-medium text-lg leading-relaxed">
+                            <strong className="text-primary text-xl block mb-2">You're not imagining it.</strong>
+                            Your relationship HAS a pattern. And that pattern has a name, a structure, and a predicted trajectory. The problem isn't that you're broken—it's that you're stuck in a system you can't see.
                         </p>
                     </div>
                 )}
@@ -523,7 +527,7 @@ export default function TeaserPageNew() {
         trackPixelEvent('InitiateCheckout', {
             content_name: 'Full Relationship Report',
             content_category: 'Report',
-            value: addOrderBump ? 41 : 29,
+            value: addOrderBump ? 59 : 47,
             currency: 'USD',
             eventID: eventID
         });
@@ -623,80 +627,101 @@ export default function TeaserPageNew() {
             }
 
             {/* 3. COST OF INACTION (The Forecast) */}
+            {/* 2.7 CLINICAL WARNING (High Impact Full Width Band) */}
+            <section className={`py-16 px-6 relative overflow-hidden border-y border-border/50 ${((session?.narcissismAnalysis as any)?.risk_level === "High" || (session?.narcissismAnalysis as any)?.risk_level === "Severe") ? "bg-red-50 dark:bg-red-950/20" : "bg-orange-50 dark:bg-orange-950/20"}`}>
+                <div className="max-w-4xl mx-auto relative z-10 text-center space-y-8">
+                    {
+                        (session?.narcissismAnalysis as any)?.risk_level === "High" || (session?.narcissismAnalysis as any)?.risk_level === "Severe" ? (
+                            <>
+                                <div className="inline-flex items-center gap-2 px-4 py-1.5 bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-400 rounded-full font-bold uppercase tracking-widest text-sm border border-red-200 dark:border-red-800">
+                                    <AlertTriangle size={18} />
+                                    Accelerated Decay Detected
+                                </div>
+                                <h2 className="text-4xl md:text-5xl font-black text-red-950 dark:text-red-50 leading-tight">
+                                    This Isn't Just a Drift.<br /><span className="text-red-600 dark:text-red-500">It's a Structural Collapse.</span>
+                                </h2>
+                                <p className="text-xl text-red-800/80 dark:text-red-200/80 max-w-2xl mx-auto leading-relaxed">
+                                    Based on <strong>{(session?.narcissismAnalysis as any)?.relationship_health?.red_flags?.length} clinical red flags</strong>, your relationship is deteriorating 3x faster than average. Without immediate intervention, the cycle will escalate.
+                                </p>
+                            </>
+                        ) : (
+                            <>
+                                <div className="inline-flex items-center gap-2 px-4 py-1.5 bg-orange-100 dark:bg-orange-900/30 text-orange-700 dark:text-orange-400 rounded-full font-bold uppercase tracking-widest text-sm border border-orange-200 dark:border-orange-800">
+                                    <TrendingDown size={18} />
+                                    Risk of "Grey Divorce"
+                                </div>
+                                <h2 className="text-4xl md:text-5xl font-black text-orange-950 dark:text-orange-50 leading-tight">
+                                    Patterns Do Not Fix Themselves.<br /><span className="text-orange-600 dark:text-orange-500">They Compound.</span>
+                                </h2>
+                                <p className="text-xl text-orange-800/80 dark:text-orange-200/80 max-w-2xl mx-auto leading-relaxed">
+                                    Couples with this profile report ~40% less intimacy year-over-year. You are currently on track for a "convenience marriage" that quietly ends when the kids leave.
+                                </p>
+                            </>
+                        )
+                    }
+                </div>
+            </section>
+
             {/* 3. COST OF INACTION (The Forecast) */}
-            <section className="py-20 px-6 bg-card border-y border-border/50">
-                <div className="max-w-4xl mx-auto text-center space-y-12">
-                    <div className="space-y-4">
-                        <h2 className="text-3xl md:text-4xl font-bold">Where This Leads in 5 Years</h2>
-                        {
-                            (session?.narcissismAnalysis as any)?.risk_level === "High" || (session?.narcissismAnalysis as any)?.risk_level === "Severe" ? (
-                                <>
-                                    <div className="bg-red-50 dark:bg-red-950/20 border border-red-200 dark:border-red-900 mx-auto max-w-2xl p-4 rounded-lg animate-pulse-slow">
-                                        <p className="text-red-700 dark:text-red-400 font-bold flex items-center justify-center gap-2">
-                                            <AlertTriangle size={18} />
-                                            Warning: Accelerated Decay Detected
-                                        </p>
-                                        <p className="text-xs text-red-600/80 dark:text-red-400/80 mt-1">
-                                            Based on {(session?.narcissismAnalysis as any)?.relationship_health?.red_flags?.length} red flags, your relationship is deteriorating 3x faster than average.
-                                        </p>
-                                    </div>
-                                    <p className="text-lg text-muted-foreground max-w-2xl mx-auto text-red-600/90 font-medium">
-                                        This isn't a drift. It's a structural collapse. Without intervention, here are the 3 clinical trajectories for this specific toxicity profile:
-                                    </p>
-                                </>
-                            ) : (
-                                <>
-                                    <div className="bg-orange-50 dark:bg-orange-950/20 border border-orange-200 dark:border-orange-900 mx-auto max-w-2xl p-4 rounded-lg">
-                                        <p className="text-orange-700 dark:text-orange-400 font-bold flex items-center justify-center gap-2">
-                                            <TrendingDown size={18} />
-                                            Warning: Risk of "Grey Divorce"
-                                        </p>
-                                        <p className="text-xs text-orange-600/80 dark:text-orange-400/80 mt-1">
-                                            Couples with this profile report ~40% less intimacy year-over-year. You are on track for a "convenience marriage" that ends when the kids leave.
-                                        </p>
-                                    </div>
-                                    <p className="text-lg text-muted-foreground max-w-2xl mx-auto mt-4">
-                                        Patterns don't fix themselves. They compound. Without intervention, here are the 3 clinical trajectories for your relationship:
-                                    </p>
-                                </>
-                            )
-                        }
+            <section className="py-24 px-6 bg-card border-b border-border/50">
+                <div className="max-w-5xl mx-auto space-y-16">
+                    <div className="text-center space-y-4">
+                        <span className="inline-block px-3 py-1 bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-300 rounded-full text-xs font-bold uppercase tracking-widest shadow-sm">
+                            Clinical Trajectory
+                        </span>
+                        <h2 className="text-3xl md:text-5xl font-black text-foreground tracking-tight">Where This Leads in 5 Years</h2>
+                        <p className="text-xl text-muted-foreground font-medium max-w-2xl mx-auto mt-6 leading-relaxed">
+                            Without intervention, here are the 3 statistical trajectories for your specific relationship profile based on current data:
+                        </p>
                     </div>
 
-                    <div className="grid md:grid-cols-3 gap-8">
+                    <div className="grid md:grid-cols-3 gap-6">
                         {/* Path 1: Dynamic based on Risk */}
                         {(session?.narcissismAnalysis as any)?.risk_level === "High" || (session?.narcissismAnalysis as any)?.risk_level === "Severe" ? (
-                            <div className="p-6 rounded-2xl bg-red-50 dark:bg-red-950/10 border-2 border-red-100 dark:border-red-900/30 hover:border-red-300 transition-all shadow-sm">
-                                <div className="h-12 w-12 bg-red-100 dark:bg-red-900/40 rounded-full flex items-center justify-center mx-auto mb-4 text-2xl">🔗</div>
-                                <h3 className="font-bold text-xl mb-3 text-red-800 dark:text-red-400">The Trauma Bond</h3>
-                                <p className="text-sm text-red-700/80 dark:text-red-300/80 leading-relaxed font-medium">
+                            <div className="p-8 rounded-2xl bg-red-50 dark:bg-red-950/20 border border-red-200 dark:border-red-900/50 relative overflow-hidden group hover:shadow-lg transition-all duration-300">
+                                <div className="absolute top-0 left-0 w-full h-1 bg-red-500"></div>
+                                <div className="h-12 w-12 bg-red-100 dark:bg-red-900/60 rounded-xl flex items-center justify-center mb-6 text-red-600 dark:text-red-400">
+                                    <Link size={24} />
+                                </div>
+                                <h3 className="font-bold text-2xl mb-3 text-foreground">The Trauma Bond</h3>
+                                <p className="text-[15px] text-muted-foreground leading-relaxed font-medium">
                                     You leave and return, over and over. Each cycle erodes more of your self-worth until you feel unable to function without them. It becomes an addiction, not a relationship.
                                 </p>
                             </div>
                         ) : (
-                            <div className="p-6 rounded-2xl bg-secondary/20 border border-border hover:border-primary/50 transition-all">
-                                <div className="h-12 w-12 bg-secondary rounded-full flex items-center justify-center mx-auto mb-4 text-2xl">🧟</div>
-                                <h3 className="font-bold text-xl mb-3">The Zombie Marriage</h3>
-                                <p className="text-sm text-muted-foreground leading-relaxed">
+                            <div className="p-8 rounded-2xl bg-secondary/10 border border-border/60 relative overflow-hidden group hover:border-primary/40 hover:shadow-md transition-all duration-300">
+                                <div className="absolute top-0 left-0 w-full h-1 bg-primary/30 group-hover:bg-primary transition-colors duration-300"></div>
+                                <div className="h-12 w-12 bg-secondary/50 rounded-xl flex items-center justify-center mb-6 text-foreground">
+                                    <Repeat size={24} />
+                                </div>
+                                <h3 className="font-bold text-2xl mb-3 text-foreground">The Roommate Trap</h3>
+                                <p className="text-[15px] text-muted-foreground leading-relaxed">
                                     It's safe, but it's dead. You stay together for convenience or the kids, but the passion is gone forever. You become excellent co-managers of a household, but strangers in bed.
                                 </p>
                             </div>
                         )}
 
                         {/* Path 2 */}
-                        <div className="p-6 rounded-2xl bg-secondary/20 border border-border hover:border-orange-300 transition-all">
-                            <div className="h-12 w-12 bg-orange-100 dark:bg-orange-900/30 rounded-full flex items-center justify-center mx-auto mb-4 text-2xl">💥</div>
-                            <h3 className="font-bold text-xl mb-3">The Explosion</h3>
-                            <p className="text-sm text-muted-foreground leading-relaxed">
+                        <div className="p-8 rounded-2xl bg-secondary/10 border border-border/60 relative overflow-hidden group hover:border-orange-400 hover:shadow-md transition-all duration-300">
+                            <div className="absolute top-0 left-0 w-full h-1 bg-orange-400/30 group-hover:bg-orange-400 transition-colors duration-300"></div>
+                            <div className="h-12 w-12 bg-orange-100 dark:bg-orange-950/40 rounded-xl flex items-center justify-center mb-6 text-orange-600 dark:text-orange-400">
+                                <Zap size={24} />
+                            </div>
+                            <h3 className="font-bold text-2xl mb-3 text-foreground">The Explosion</h3>
+                            <p className="text-[15px] text-muted-foreground leading-relaxed">
                                 The quiet resentment finally boils over. A small fight turns into "I want a divorce." It's messy, expensive, and leaves you wondering why you didn't act sooner.
                             </p>
                         </div>
+
                         {/* Path 3 */}
-                        <div className="p-6 rounded-2xl bg-secondary/20 border border-border hover:border-gray-300 transition-all">
-                            <div className="h-12 w-12 bg-gray-200 dark:bg-gray-700/50 rounded-full flex items-center justify-center mx-auto mb-4 text-2xl">👻</div>
-                            <h3 className="font-bold text-xl mb-3">The Fade</h3>
-                            <p className="text-sm text-muted-foreground leading-relaxed">
-                                You lose yourself. You stop fighting because you've stopped caring. You become a shadow of who you used to be, sacrificing your happiness to keep the peace.
+                        <div className="p-8 rounded-2xl bg-secondary/10 border border-border/60 relative overflow-hidden group hover:border-gray-500 hover:shadow-md transition-all duration-300">
+                            <div className="absolute top-0 left-0 w-full h-1 bg-gray-400/30 group-hover:bg-gray-500 transition-colors duration-300"></div>
+                            <div className="h-12 w-12 bg-gray-100 dark:bg-gray-800 rounded-xl flex items-center justify-center mb-6 text-gray-600 dark:text-gray-400">
+                                <Ghost size={24} />
+                            </div>
+                            <h3 className="font-bold text-2xl mb-3 text-foreground">The Fade</h3>
+                            <p className="text-[15px] text-muted-foreground leading-relaxed">
+                                You lose yourself. You stop fighting because you've stopped caring. You become a shadow of who you used to be, slowly sacrificing your happiness to just keep the peace.
                             </p>
                         </div>
                     </div>
@@ -722,7 +747,7 @@ export default function TeaserPageNew() {
 
                     <div className="grid md:grid-cols-2 gap-12 items-center">
                         {/* Visual Representation of Report (Abstract) */}
-                        <div className="relative aspect-[3/4] bg-primary/90 rounded-2xl shadow-2xl p-6 md:p-8 transform md:rotate-[-2deg] border border-primary/50 overflow-hidden group hover:rotate-0 transition-all duration-500">
+                        <div className="relative aspect-square md:aspect-[3/4] max-w-sm mx-auto w-full bg-primary/90 rounded-2xl shadow-2xl p-6 md:p-8 transform md:rotate-[-2deg] border border-primary/50 overflow-hidden group hover:rotate-0 transition-all duration-500">
                             {/* Fake Content Layer */}
                             <div className="absolute top-0 right-0 p-4 opacity-20">
                                 <Activity size={120} className="text-white" />
@@ -735,10 +760,10 @@ export default function TeaserPageNew() {
                                     <div className="h-2 w-32 bg-white/40 rounded mb-2"></div>
                                     <h3 className="text-3xl font-black leading-none">Confidential<br />Report</h3>
                                 </div>
-                                <div className="space-y-3 pt-8 opacity-80">
-                                    <div className="flex gap-3 items-center"><div className="w-6 h-6 rounded-full border border-white/50 flex items-center justify-center text-xs">1</div><div className="h-2 w-full bg-gradient-to-r from-white/40 to-transparent rounded"></div></div>
-                                    <div className="flex gap-3 items-center"><div className="w-6 h-6 rounded-full border border-white/50 flex items-center justify-center text-xs">2</div><div className="h-2 w-3/4 bg-gradient-to-r from-white/40 to-transparent rounded"></div></div>
-                                    <div className="flex gap-3 items-center"><div className="w-6 h-6 rounded-full border border-white/50 flex items-center justify-center text-xs">3</div><div className="h-2 w-5/6 bg-gradient-to-r from-white/40 to-transparent rounded"></div></div>
+                                <div className="space-y-3 pt-4 md:pt-8 opacity-80">
+                                    <div className="flex gap-3 items-center"><div className="w-6 h-6 shrink-0 rounded-full border border-white/50 flex items-center justify-center text-xs">1</div><div className="h-2 w-full bg-gradient-to-r from-white/40 to-transparent rounded"></div></div>
+                                    <div className="flex gap-3 items-center"><div className="w-6 h-6 shrink-0 rounded-full border border-white/50 flex items-center justify-center text-xs">2</div><div className="h-2 w-3/4 bg-gradient-to-r from-white/40 to-transparent rounded"></div></div>
+                                    <div className="flex gap-3 items-center"><div className="w-6 h-6 shrink-0 rounded-full border border-white/50 flex items-center justify-center text-xs">3</div><div className="h-2 w-5/6 bg-gradient-to-r from-white/40 to-transparent rounded"></div></div>
                                 </div>
                             </div>
                         </div>
@@ -787,12 +812,25 @@ export default function TeaserPageNew() {
                             {/* Component 4 */}
                             <div className="flex gap-5">
                                 <div className="shrink-0 h-10 w-10 bg-emerald-100 dark:bg-emerald-900/50 text-emerald-600 dark:text-emerald-400 rounded-lg flex items-center justify-center">
-                                    <Zap size={20} />
+                                    <MessageCircle size={20} />
                                 </div>
                                 <div>
-                                    <h4 className="text-xl font-bold mb-2">4. Your Action Plan</h4>
+                                    <h4 className="text-xl font-bold mb-2">4. Word-For-Word Custom Scripts</h4>
                                     <p className="text-muted-foreground text-sm leading-relaxed">
-                                        Custom scripts to break <strong>your</strong> specific conflict loop. Plus a 30-day "Connection Calendar" tailored to your lowest score.
+                                        Stop guessing what to say. We give you <strong>exact phrases</strong> mathematically designed for your partner's specific psychological profile to instantly de-escalate fights and bypass their defenses.
+                                    </p>
+                                </div>
+                            </div>
+
+                            {/* Component 5 (Biomarkers) */}
+                            <div className="flex gap-5">
+                                <div className="shrink-0 h-10 w-10 bg-blue-100 dark:bg-blue-900/50 text-blue-600 dark:text-blue-400 rounded-lg flex items-center justify-center">
+                                    <Activity size={20} />
+                                </div>
+                                <div>
+                                    <h4 className="text-xl font-bold mb-2">5. The 12-Point Clinical Biomarker Dashboard</h4>
+                                    <p className="text-muted-foreground text-sm leading-relaxed">
+                                        Unlock your exact clinical scores across 12 hidden drivers of relationship decay, including: <em>The Erotic Death Spiral</em>, <em>CEO vs Intern Imbalance</em>, and <em>The Silent Divorce Risk</em>.
                                     </p>
                                 </div>
                             </div>
@@ -805,10 +843,10 @@ export default function TeaserPageNew() {
             <section className="py-24 px-6 bg-muted/30 relative overflow-hidden">
                 <div className="max-w-6xl mx-auto relative z-10">
                     <div className="text-center mb-16 space-y-4">
-                        <span className="text-primary font-bold tracking-widest uppercase text-xs">Clinical Protocol</span>
-                        <h2 className="text-3xl md:text-5xl font-black text-foreground">Targeted Strategic Tools</h2>
+                        <span className="text-primary font-bold tracking-widest uppercase text-xs">Included For Free Today</span>
+                        <h2 className="text-3xl md:text-5xl font-black text-foreground">The Emergency Intervention Toolkit</h2>
                         <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
-                            Specific interventions selected to address the <strong>{badge}</strong> pattern identified in your analysis.
+                            Therapists normally charge $200+/hr to teach these frameworks. You get the exact clinical PDF protocols included securely in your dashboard today.
                         </p>
                     </div>
 
@@ -861,7 +899,7 @@ export default function TeaserPageNew() {
                                 {/* Footer / Value */}
                                 <div className="p-4 bg-muted/50 border-t border-border flex justify-between items-center">
                                     <span className="text-[10px] font-bold text-muted-foreground uppercase">Relevance: High</span>
-                                    <span className="text-xs font-mono text-muted-foreground">Value: $29.00</span>
+                                    <span className="text-xs font-mono text-muted-foreground">Value: $47.00</span>
                                 </div>
                             </div>
                             {/* Stacked Paper Effect underneath */}
@@ -978,7 +1016,7 @@ export default function TeaserPageNew() {
 
                                 <div className="p-4 bg-muted/50 border-t border-border flex justify-between items-center">
                                     <span className="text-[10px] font-bold text-muted-foreground uppercase">Relevance: Essential</span>
-                                    <span className="text-xs font-mono text-muted-foreground">Value: $29.00</span>
+                                    <span className="text-xs font-mono text-muted-foreground">Value: $47.00</span>
                                 </div>
                             </div>
                             <div className="absolute top-2 left-2 w-full h-full bg-card border border-border rounded-r-xl shadow-sm -z-10"></div>
@@ -1028,7 +1066,7 @@ export default function TeaserPageNew() {
 
                                 <div className="p-4 bg-muted/50 border-t border-border flex justify-between items-center">
                                     <span className="text-[10px] font-bold text-muted-foreground uppercase">Relevance: Preventative</span>
-                                    <span className="text-xs font-mono text-muted-foreground">Value: $29.00</span>
+                                    <span className="text-xs font-mono text-muted-foreground">Value: $47.00</span>
                                 </div>
                             </div>
                             <div className="absolute top-2 left-2 w-full h-full bg-card border border-border rounded-r-xl shadow-sm -z-10"></div>
@@ -1186,6 +1224,37 @@ export default function TeaserPageNew() {
                 </div>
             </section>
 
+            {/* 6.2 A NOTE FROM THE AUTHORS */}
+            <section className="bg-background py-24 px-6 border-b border-border/50">
+                <div className="max-w-2xl mx-auto space-y-8">
+                    <div className="text-center mb-12">
+                        <h3 className="text-xs font-bold text-muted-foreground uppercase tracking-widest">A Note From The Creators</h3>
+                    </div>
+
+                    <div className="space-y-6 text-xl md:text-2xl text-foreground font-medium leading-relaxed opacity-90">
+                        <p>Maybe you feel like you're managing your partner instead of being with them.</p>
+                        <p>Maybe you're questioning if it's toxic... or just complicated.</p>
+                        <p>Or maybe nothing is "wrong" — and that's what scares you most.</p>
+                    </div>
+
+                    <div className="h-px w-24 bg-primary/20 mx-auto my-12 hidden md:block"></div>
+                    <div className="h-px w-16 bg-primary/20 my-8 md:hidden"></div>
+
+                    <div className="space-y-6 text-lg text-muted-foreground leading-relaxed">
+                        <p>We built this analysis for that in-between space.</p>
+                        <p>The place where love exists — but something isn't working.</p>
+                        <p>This isn't about blaming you. And it's not about labeling your partner.</p>
+                        <p className="text-foreground font-bold">It's about giving you solid ground under your feet.</p>
+                    </div>
+
+                    <div className="bg-primary/5 p-8 rounded-2xl mt-12 border border-primary/20 text-center">
+                        <p className="text-xl md:text-2xl font-serif italic text-primary font-medium leading-relaxed">
+                            "Whatever is happening in your relationship, you deserve to see it clearly — before you decide what comes next."
+                        </p>
+                    </div>
+                </div>
+            </section>
+
             {/* 6.5. OFFER SECTION & GUARANTEE (VALUE STACK) */}
             <section id="offer" className="py-24 px-6 bg-muted/20">
                 <div className="max-w-4xl mx-auto">
@@ -1202,107 +1271,56 @@ export default function TeaserPageNew() {
                                 </p>
                             </div>
 
-                            {/* The Value Stack Table */}
-                            <div className="max-w-md mx-auto bg-background/50 rounded-xl border border-border overflow-hidden mb-10">
-                                <div className="p-4 border-b border-border flex justify-between items-center text-sm font-bold text-muted-foreground">
-                                    <span>ITEM</span>
-                                    <span>VALUE</span>
-                                </div>
-                                <div className="divide-y divide-border/50">
-                                    {/* Core Product */}
-                                    <div className="p-4 flex justify-between items-start bg-primary/5 border-l-4 border-primary">
-                                        <div>
-                                            <span className="font-bold text-foreground block">Full Relationship Analysis</span>
-                                            <ul className="text-xs text-muted-foreground mt-1 space-y-1 list-disc pl-4">
-                                                <li>5 Core Dimensions Analysis</li>
-                                                <li>Advanced Dynamic Metrics (Communication, Power)</li>
-                                                <li>Multivariate Compatibility Check</li>
-                                                <li>Customized Action Plan</li>
-                                            </ul>
-                                        </div>
-                                        <div className="text-right">
-                                            <span className="block text-xs text-red-400 line-through decoration-red-400">$99.00</span>
-                                            <span className="block font-bold text-foreground text-sm">$29.00</span>
-                                        </div>
-                                    </div>
-
-                                    {/* Bonuses */}
-                                    <div className="p-4 flex justify-between items-center bg-red-50 dark:bg-red-900/10 border-l-4 border-red-400">
-                                        <div className="flex flex-col">
-                                            <span className="text-sm font-bold text-red-600 dark:text-red-400">CRITICAL BONUS: Toxic & Narcissistic Screen</span>
-                                            <span className="text-[10px] text-red-500/80">Safety Assessment Included</span>
-                                        </div>
-                                        <div className="text-right">
-                                            <span className="block text-xs text-red-400 line-through decoration-red-400">$49.00</span>
-                                            <span className="block font-bold text-red-600 text-sm">FREE</span>
-                                        </div>
-                                    </div>
-
-                                    <div className="p-4 flex justify-between items-center bg-background/30">
-                                        <span className="font-medium text-foreground">5-Year Trajectory Forecast</span>
-                                        <span className="font-bold text-green-600 text-sm">Included</span>
-                                    </div>
-
-                                    <div className="p-4 flex justify-between items-center">
-                                        <span className="text-sm text-foreground">Bonus: Mental Load Equalizer Guide</span>
-                                        <div className="text-right">
-                                            <span className="block text-xs text-red-400 line-through decoration-red-400">$29.00</span>
-                                            <span className="block font-bold text-green-600 text-sm">FREE</span>
-                                        </div>
-                                    </div>
-                                    <div className="p-4 flex justify-between items-center">
-                                        <span className="text-sm text-foreground">Bonus: Dead Bedroom Revival Guide</span>
-                                        <div className="text-right">
-                                            <span className="block text-xs text-red-400 line-through decoration-red-400">$39.00</span>
-                                            <span className="block font-bold text-green-600 text-sm">FREE</span>
-                                        </div>
-                                    </div>
-
-                                    <div className="p-4 flex justify-between items-center">
-                                        <span className="text-sm text-foreground">Bonus: Emotional Affair Warning Signs</span>
-                                        <div className="text-right">
-                                            <span className="block text-xs text-red-400 line-through decoration-red-400">$29.00</span>
-                                            <span className="block font-bold text-green-600 text-sm">FREE</span>
-                                        </div>
-                                    </div>
-                                    <div className="p-4 flex justify-between items-center">
-                                        <span className="text-sm text-foreground">Bonus: "Should I Stay or Go" Matrix</span>
-                                        <div className="text-right">
-                                            <span className="block text-xs text-red-400 line-through decoration-red-400">$49.00</span>
-                                            <span className="block font-bold text-green-600 text-sm">FREE</span>
-                                        </div>
-                                    </div>
-                                    <div className="p-4 flex justify-between items-center bg-muted/20 border-t-2 border-dashed border-border">
-                                        <span className="font-bold text-foreground">TOTAL REAL VALUE</span>
-                                        <span className="font-bold text-foreground">$323.00</span>
-                                    </div>
+                            {/* Streamlined Value Stack */}
+                            <div className="max-w-md mx-auto bg-primary/5 rounded-2xl border border-primary/20 p-6 md:p-8 mb-10 text-left">
+                                <h3 className="font-bold text-foreground mb-6 text-center text-lg">What You're Getting Securely Today:</h3>
+                                <ul className="space-y-4 text-sm md:text-base text-muted-foreground mb-6">
+                                    <li className="flex items-start gap-3">
+                                        <CheckCircle className="text-primary shrink-0 mt-0.5" size={20} />
+                                        <span className="font-bold text-foreground leading-tight">The Complete 8-Chapter Relationship MRI Report</span>
+                                    </li>
+                                    <li className="flex items-start gap-3">
+                                        <CheckCircle className="text-primary shrink-0 mt-0.5" size={20} />
+                                        <span className="leading-tight text-foreground font-medium">Your 6-Month & 5-Year Clinical Trajectory Forecast</span>
+                                    </li>
+                                    <li className="flex items-start gap-3">
+                                        <CheckCircle className="text-primary shrink-0 mt-0.5" size={20} />
+                                        <span className="leading-tight">The Emergency Intervention Toolkit (5 PDF Protocols)</span>
+                                    </li>
+                                </ul>
+                                <div className="pt-4 border-t border-primary/20 flex justify-between items-center">
+                                    <span className="font-bold uppercase tracking-wider text-muted-foreground text-sm">Total Real Value:</span>
+                                    <span className="text-lg font-bold text-muted-foreground line-through decoration-red-400 opacity-70">$323.00</span>
                                 </div>
                             </div>
 
                             <div className="flex flex-col items-center gap-6">
                                 <div className="space-y-1 text-center">
+                                    <p className="text-sm font-bold text-red-500/90 dark:text-red-400 mb-2">"Every month you wait, the pattern becomes harder to reverse."</p>
                                     <p className="text-sm font-bold uppercase tracking-wider text-muted-foreground">Your Price Today</p>
-                                    <p className="text-6xl font-black text-primary">${import.meta.env.REACT_APP_REPORT_PRICE || "29.00"}</p>
+                                    <p className="text-6xl font-black text-primary">${import.meta.env.REACT_APP_REPORT_PRICE || "47.00"}</p>
                                 </div>
 
                                 {/* ORDER BUMP */}
                                 <div className="w-full bg-yellow-50 dark:bg-yellow-900/10 border-2 border-dashed border-yellow-400 p-4 rounded-xl text-left cursor-pointer hover:bg-yellow-100 dark:hover:bg-yellow-900/20 transition-colors mb-8" onClick={() => setAddOrderBump(!addOrderBump)}>
                                     <div className="flex items-start gap-3">
-                                        <div className={`mt-1 h-5 w-5 rounded border flex items-center justify-center transition-colors ${addOrderBump ? 'bg-primary border-primary text-white' : 'bg-white border-gray-400'}`}>
+                                        <div className={`mt-1 h-5 w-5 shrink-0 rounded border flex items-center justify-center transition-colors ${addOrderBump ? 'bg-primary border-primary text-white' : 'bg-white border-gray-400'}`}>
                                             {addOrderBump && <Check size={14} strokeWidth={4} />}
                                         </div>
                                         <div>
-                                            <p className="font-bold text-foreground text-sm leading-tight">
+                                            <p className="font-bold text-foreground text-sm leading-tight mb-2">
                                                 YES! Add the <span className="text-primary">30-Day Reconnection Workbook</span> for just $12.
                                             </p>
-                                            <ul className="text-xs text-muted-foreground mt-2 space-y-1">
-                                                <li className="flex items-center gap-2"><CheckCircle size={10} className="text-primary" /> Daily check-ins (5-10 min/day)</li>
-                                                <li className="flex items-center gap-2"><CheckCircle size={10} className="text-primary" /> Conversation practice templates</li>
-                                                <li className="flex items-center gap-2"><CheckCircle size={10} className="text-primary" /> Progress tracker with visual milestones</li>
-                                            </ul>
-                                            <p className="text-xs font-bold text-primary mt-2 animate-pulse">
-                                                START TODAY. Not "someday."
+                                            <p className="text-xs text-muted-foreground leading-relaxed mb-2 font-medium">
+                                                The report tells you <em>what's wrong.</em> This daily workbook forces you to actually <em>fix it</em>.
                                             </p>
+                                            <ul className="text-xs text-muted-foreground space-y-1">
+                                                <li className="flex items-start gap-2"><CheckCircle size={12} className="text-primary mt-0.5 shrink-0" /> <span className="leading-tight">Accountability: Just 5 minutes a day</span></li>
+                                                <li className="flex items-start gap-2"><CheckCircle size={12} className="text-primary mt-0.5 shrink-0" /> <span className="leading-tight">Conversation practice templates</span></li>
+                                            </ul>
+                                            <div className="mt-3 inline-block bg-yellow-100 dark:bg-yellow-900/50 text-yellow-800 dark:text-yellow-400 text-[10px] font-bold uppercase tracking-wider px-2 py-1 rounded">
+                                                Highly Recommended
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
@@ -1313,7 +1331,7 @@ export default function TeaserPageNew() {
                                 onClick={() => handleCheckout('offer_cta')}
                                 className="w-full md:w-auto bg-primary hover:bg-primary/90 text-primary-foreground text-xl font-bold py-5 px-12 rounded-full shadow-2xl hover:scale-105 transition-all flex items-center justify-center gap-3 animate-pulse-slow"
                             >
-                                {isCheckoutLoading ? "Processing..." : `Get Instant Access Now - $${addOrderBump ? 41 : 29}`} <ArrowRight size={24} />
+                                {isCheckoutLoading ? "Processing..." : `Get Instant Access Now - $${addOrderBump ? 59 : 47}`} <ArrowRight size={24} />
                             </button>
                             <p className="text-xs text-muted-foreground">Secure One-Time Payment • Instant PDF Download</p>
                         </div>
@@ -1400,7 +1418,7 @@ export default function TeaserPageNew() {
                             </tr>
                             <tr className="bg-primary/5 hover:bg-primary/10 transition-colors border-l-4 border-l-primary">
                                 <td className="p-4 font-black text-primary text-base">This Analysis</td>
-                                <td className="p-4"><span className="font-black text-2xl text-primary">$29</span></td>
+                                <td className="p-4"><span className="font-black text-2xl text-primary">$47</span></td>
                                 <td className="p-4 font-bold text-foreground">Instant</td>
                                 <td className="p-4 font-bold text-foreground">Personalized to YOUR 30 answers. Pattern identified. 5 clinical guides. Exact scripts.</td>
                             </tr>
@@ -1498,7 +1516,7 @@ export default function TeaserPageNew() {
                 </div>
             </footer>
 
-            <ExitIntentPopup onCTAClick={() => handleCheckout('exit_intent')} />
+
 
             <EmailCaptureModal
                 isOpen={showEmailModal}

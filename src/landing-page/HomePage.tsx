@@ -74,15 +74,6 @@ export default function HomePage() {
                         >
                             Take the Free Assessment <ArrowRight size={20} />
                         </Link>
-
-                        <Link
-                            to="/toxic-relationship-test-for-men"
-                            className="mt-6 flex items-center justify-center gap-3 bg-red-600 hover:bg-red-700 text-white font-bold text-lg py-4 px-10 rounded-full shadow-lg hover:shadow-2xl transition-all hover:scale-[1.03] border-4 border-red-500/50 hover:border-red-400 group relative overflow-hidden"
-                        >
-                            <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-1000" />
-                            <AlertTriangle size={24} className="text-white group-hover:animate-pulse" />
-                            <span>Take the "Toxic Relationship" Test</span>
-                        </Link>
                     </div>
 
                     <div className="flex flex-col md:flex-row items-center justify-center gap-4 md:gap-8 text-sm font-medium text-muted-foreground pt-4">
