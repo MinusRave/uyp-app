@@ -38,7 +38,7 @@ export default function PrivacyPolicyPage() {
                         <li>Your generated report</li>
                     </ul>
                     <p>
-                        You can also request immediate deletion by contacting us at privacy@understandyourpartner.com.
+                        You can also request immediate deletion by contacting us at admin@understandyourpartner.com.
                     </p>
 
                     <h2>4. Data Sharing</h2>
@@ -87,7 +87,7 @@ export default function PrivacyPolicyPage() {
 
                     <h2>10. Contact Us</h2>
                     <p>
-                        Questions about privacy? Email us at <strong>privacy@understandyourpartner.com</strong>
+                        Questions about privacy? Email us at <strong>admin@understandyourpartner.com</strong>
                     </p>
                 </div>
             </div>

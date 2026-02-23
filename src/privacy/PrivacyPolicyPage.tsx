@@ -135,7 +135,7 @@ export default function PrivacyPolicyPage() {
                             Questions about this privacy policy or how we handle your data?
                         </p>
                         <p className="text-muted-foreground mt-2">
-                            Email: <a href="mailto:privacy@understandyourpartner.com" className="text-primary hover:underline">privacy@understandyourpartner.com</a>
+                            Email: <a href="mailto:admin@understandyourpartner.com" className="text-primary hover:underline">admin@understandyourpartner.com</a>
                         </p>
                     </section>
                 </div>

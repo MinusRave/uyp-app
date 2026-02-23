@@ -19,6 +19,7 @@ import {
     X
 } from "lucide-react";
 import { cn } from "../client/utils";
+import { FaCcVisa, FaCcMastercard, FaCcPaypal, FaApplePay, FaGooglePay } from "react-icons/fa";
 
 export default function ToxicSalesPage() {
     const [searchParams] = useSearchParams();
@@ -500,6 +501,14 @@ export default function ToxicSalesPage() {
                             {isCheckingOut ? "Processing..." : "Get My Analysis & Guides"}
                             <ArrowRight size={24} />
                         </button>
+
+                        <div className="flex items-center justify-center gap-4 mt-4 mb-2 text-slate-400">
+                            <FaCcVisa className="h-6 w-auto opacity-60 grayscale hover:grayscale-0 transition-all" />
+                            <FaCcMastercard className="h-6 w-auto opacity-60 grayscale hover:grayscale-0 transition-all" />
+                            <FaCcPaypal className="h-6 w-auto opacity-60 grayscale hover:grayscale-0 transition-all" />
+                            <FaApplePay className="h-6 w-auto opacity-60 grayscale hover:grayscale-0 transition-all" />
+                            <FaGooglePay className="h-6 w-auto opacity-60 grayscale hover:grayscale-0 transition-all" />
+                        </div>
 
                         <div className="text-center">
                             <p className="text-[10px] text-slate-400 uppercase tracking-wider">

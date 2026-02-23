@@ -64,7 +64,7 @@ function getInvoiceCreationConfig(
 ): Stripe.Checkout.SessionCreateParams["invoice_creation"] {
   return mode === "payment"
     ? {
-        enabled: true,
-      }
+      enabled: true,
+    }
     : undefined;
 }

@@ -5,6 +5,7 @@ import { useQuery, generateQuickOverview, generateFullReport, createCheckoutSess
 import { useAuth } from "wasp/client/auth";
 import Confetti from "react-confetti";
 import { trackPixelEvent } from '../analytics/pixel';
+import { FaCcVisa, FaCcMastercard, FaCcPaypal, FaApplePay, FaGooglePay } from "react-icons/fa";
 
 import EmailCaptureModal from "./components/EmailCaptureModal";
 
@@ -1333,7 +1334,14 @@ export default function TeaserPageNew() {
                             >
                                 {isCheckoutLoading ? "Processing..." : `Get Instant Access Now - $${addOrderBump ? 59 : 47}`} <ArrowRight size={24} />
                             </button>
-                            <p className="text-xs text-muted-foreground">Secure One-Time Payment • Instant PDF Download</p>
+                            <div className="flex items-center justify-center gap-4 mt-6 text-slate-400">
+                                <FaCcVisa className="h-7 w-auto opacity-70 hover:opacity-100 transition-opacity" />
+                                <FaCcMastercard className="h-7 w-auto opacity-70 hover:opacity-100 transition-opacity" />
+                                <FaCcPaypal className="h-7 w-auto opacity-70 hover:opacity-100 transition-opacity" />
+                                <FaApplePay className="h-7 w-auto opacity-70 hover:opacity-100 transition-opacity" />
+                                <FaGooglePay className="h-7 w-auto opacity-70 hover:opacity-100 transition-opacity" />
+                            </div>
+                            <p className="text-xs text-muted-foreground mt-4">Secure One-Time Payment • Instant PDF Download</p>
                         </div>
                     </div>
                 </div>
@@ -1372,10 +1380,17 @@ export default function TeaserPageNew() {
                 <div className={`fixed bottom-0 left-0 w-full bg-background border-t border-border p-4 md:hidden transform transition-transform duration-300 z-50 ${showStickyCTA ? 'translate-y-0' : 'translate-y-full'}`}>
                     <button
                         onClick={handleScrollToOffer}
-                        className="w-full bg-primary text-primary-foreground font-bold py-4 rounded-xl shadow-lg flex items-center justify-center gap-2"
+                        className="w-full bg-primary text-primary-foreground font-bold py-4 rounded-xl shadow-lg flex items-center justify-center gap-2 mb-3"
                     >
                         Get Your Report <ArrowRight size={20} />
                     </button>
+                    <div className="flex items-center justify-center gap-3 text-slate-400">
+                        <FaCcVisa className="h-6 w-auto opacity-80" />
+                        <FaCcMastercard className="h-6 w-auto opacity-80" />
+                        <FaCcPaypal className="h-6 w-auto opacity-80" />
+                        <FaApplePay className="h-6 w-auto opacity-80" />
+                        <FaGooglePay className="h-6 w-auto opacity-80" />
+                    </div>
                 </div>
 
             </section >

@@ -452,7 +452,7 @@ export default function HomePage() {
                         <ul className="space-y-2">
                             <li><Link to="/privacy-policy" className="hover:text-white transition-colors">Privacy Policy</Link></li>
                             <li><Link to="/terms-of-service" className="hover:text-white transition-colors">Terms of Service</Link></li>
-                            <li><a href="mailto:support@understandyourpartner.com" className="hover:text-white transition-colors">Contact Support</a></li>
+                            <li><a href="mailto:admin@understandyourpartner.com" className="hover:text-white transition-colors">Contact Support</a></li>
                         </ul>
                     </div>
                     <div>
