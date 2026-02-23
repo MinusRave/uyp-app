@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { ArrowRight, Lock, CheckCircle, AlertTriangle, TrendingUp, Shield, Heart, BadgeCheck, Compass, Zap, X, Activity, ChevronDown, Check, Eye, Microscope, ListChecks, ShieldAlert, Clock, MessageCircle, Brain, Quote, Star, Play, TrendingDown, Battery, Thermometer, FileWarning, BookOpen, Users, FileText, ShieldCheck, Info, ChevronUp, Link, Repeat, Ghost } from "lucide-react";
 import { useQuery, generateQuickOverview, generateFullReport, createCheckoutSession, getTestSession, getSystemConfig, captureLead } from "wasp/client/operations";
 import { useAuth } from "wasp/client/auth";
-import Confetti from "react-confetti";
+
 import { trackPixelEvent } from '../analytics/pixel';
 import { FaCcVisa, FaCcMastercard, FaCcPaypal, FaApplePay, FaGooglePay } from "react-icons/fa";
 
@@ -42,13 +42,15 @@ const HeroSection = ({
     onUnlock,
     quickOverview,
     narcissismAnalysis,
-    advancedMetrics
+    advancedMetrics,
+    session
 }: {
     badge: string,
     onUnlock: (location: string) => void,
     quickOverview?: QuickOverviewData | null,
     narcissismAnalysis?: any,
-    advancedMetrics?: any
+    advancedMetrics?: any,
+    session?: any
 }) => {
     // Determine Risk Level & Sustainability
     const isHighRisk = narcissismAnalysis?.risk_level === "High" || narcissismAnalysis?.risk_level === "Severe";
@@ -136,14 +138,14 @@ const HeroSection = ({
                                 </div>
                             </div>
                         ) : (
-                            <div className="bg-emerald-50 dark:bg-emerald-950/20 border-2 border-emerald-100 dark:border-emerald-900/30 p-4 rounded-xl shadow-sm">
-                                <p className="text-xs font-bold text-emerald-600/70 uppercase tracking-wider mb-1">Toxicity Score</p>
-                                <div className="text-3xl font-black text-emerald-600">
-                                    {narcissismAnalysis?.relationship_health?.toxicity_score || "Low"}
-                                    <span className="text-lg text-emerald-400 font-bold">/100</span>
+                            <div className="bg-yellow-50 dark:bg-yellow-950/20 border-2 border-yellow-100 dark:border-yellow-900/30 p-4 rounded-xl shadow-sm">
+                                <p className="text-xs font-bold text-yellow-700/70 dark:text-yellow-600/70 uppercase tracking-wider mb-1">Toxicity Score</p>
+                                <div className="text-3xl font-black text-yellow-600">
+                                    {narcissismAnalysis?.relationship_health?.toxicity_score || "Moderate"}
+                                    <span className="text-lg text-yellow-500 font-bold">/100</span>
                                 </div>
-                                <div className="flex items-center justify-center gap-1 text-xs font-bold text-emerald-500 mt-1">
-                                    <ShieldCheck size={12} fill="currentColor" /> Within Range
+                                <div className="flex items-center justify-center gap-1 text-xs font-bold text-yellow-600 mt-1">
+                                    <AlertTriangle size={12} fill="currentColor" className="text-yellow-500" /> Elevated Risk
                                 </div>
                             </div>
                         )}
@@ -160,14 +162,80 @@ const HeroSection = ({
                     </div>
                 )}
 
-                {/* Diagnosis Card (UNLOCKED) */}
-                <div className="bg-card border-2 border-primary/20 p-8 rounded-2xl shadow-lg max-w-2xl mx-auto mb-8 relative overflow-hidden">
-                    <div className="absolute top-0 inset-x-0 h-1 bg-gradient-to-r from-transparent via-primary/50 to-transparent"></div>
-                    <p className="text-xs font-bold text-muted-foreground uppercase tracking-wider mb-2">Core Diagnosis</p>
-                    <h2 className="text-3xl font-black text-primary mb-4">"{diagnosis}"</h2>
-                    <p className="text-lg text-muted-foreground leading-relaxed">
-                        {patternDescription}
+                {/* Personalized Generation Anchor */}
+                <div className="max-w-xl mx-auto mb-8 bg-green-50 dark:bg-green-900/10 border border-green-200 dark:border-green-900/30 p-4 rounded-xl flex items-center gap-3">
+                    <div className="shrink-0 relative">
+                        <div className="absolute inset-0 bg-green-400 rounded-full animate-ping opacity-20"></div>
+                        <div className="relative h-3 w-3 bg-green-500 rounded-full"></div>
+                    </div>
+                    <p className="text-sm font-medium text-green-800 dark:text-green-300">
+                        <strong className="font-bold">Your report is already generated.</strong> 847 words written specifically about your relationship dynamics.
                     </p>
+                </div>
+
+                {/* Dimensions Scores (Show Numbers, Block Meaning) */}
+                {(session?.advancedMetrics as any)?.dimensions && (
+                    <div className="grid grid-cols-2 md:grid-cols-4 gap-4 max-w-4xl mx-auto mb-8">
+                        {['communication', 'security', 'erotic', 'balance'].map((dimKey, idx) => {
+                            const score = (session?.advancedMetrics as any)?.dimensions?.[dimKey]?.score || 0;
+                            const dimNames: Record<string, string> = { communication: "Communication", security: "Trust & Safety", erotic: "Intimacy", balance: "Fairness" };
+                            return (
+                                <div key={idx} className="bg-card border border-border/50 p-4 rounded-xl text-center shadow-sm relative overflow-hidden group">
+                                    <h4 className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground mb-1">{dimNames[dimKey]}</h4>
+                                    <div className={`text-3xl font-black mb-2 ${score < 40 ? 'text-red-500' : score < 70 ? 'text-orange-500' : 'text-emerald-500'}`}>
+                                        {score}<span className="text-sm opacity-50">/100</span>
+                                    </div>
+                                    <div className="bg-muted p-2 rounded flex items-center justify-center gap-1">
+                                        <Lock size={10} className="text-muted-foreground" />
+                                        <span className="text-[9px] font-bold uppercase tracking-wider text-muted-foreground">Meaning Locked</span>
+                                    </div>
+                                </div>
+                            );
+                        })}
+                    </div>
+                )}
+
+                {/* Diagnosis Card (PARTIAL REVEAL / BLURRED) */}
+                <div className="bg-card border-2 border-primary/20 p-8 rounded-2xl shadow-lg max-w-2xl mx-auto mb-8 relative overflow-hidden group cursor-pointer" onClick={() => onUnlock('diagnosis_lock')}>
+                    <div className="absolute top-0 inset-x-0 h-1 bg-gradient-to-r from-transparent via-primary/50 to-transparent"></div>
+                    <p className="text-xs font-bold text-muted-foreground uppercase tracking-wider mb-2">Your Pattern</p>
+                    <h2 className="text-3xl font-black text-primary mb-6">"{diagnosis}"</h2>
+
+                    {/* Blurred Body */}
+                    <div className="relative">
+                        <div className="filter blur-md opacity-40 select-none">
+                            <p className="text-lg text-muted-foreground leading-relaxed">
+                                This relationship dynamic is characterized by a cyclical pursuit and withdrawal interaction pattern. It usually forms when one partner feels unheard or unappreciated, while the other feels constantly pressured or criticized, leading to a predictable sequence of conflict that rarely resolves the underlying core issues...
+                            </p>
+                        </div>
+                        {/* Lock Overlay */}
+                        <div className="absolute inset-0 flex flex-col items-center justify-center bg-background/20 backdrop-blur-[1px]">
+                            <div className="bg-background/95 border border-primary/20 shadow-lg px-6 py-4 rounded-xl text-center transform group-hover:scale-105 transition-transform">
+                                <Lock className="mx-auto text-primary mb-2 h-6 w-6" />
+                                <p className="text-sm font-bold text-foreground">Why this pattern forms and the exact cycle you're stuck in — unlocked in your report</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                {/* THE BLURRED TRIGGERS */}
+                <div className="max-w-2xl mx-auto mb-16 mt-8">
+                    <div className="text-center mb-6">
+                        <h3 className="text-xl font-bold text-foreground">We identified 3 specific conflict triggers in your relationship.</h3>
+                    </div>
+                    <div className="space-y-3 bg-secondary/10 border border-border/50 p-6 rounded-2xl relative">
+                        {/* Redacted lines */}
+                        {[1, 2, 3].map((num) => (
+                            <div key={num} className="flex items-center gap-4">
+                                <div className="shrink-0 h-6 w-6 rounded-full bg-primary/20 text-primary flex items-center justify-center text-xs font-bold">{num}</div>
+                                <div className="h-6 bg-foreground/90 rounded-sm w-full animate-pulse-slow max-w-sm" style={{ width: `${Math.random() * 40 + 50}%` }}></div>
+                            </div>
+                        ))}
+                        {/* Overlay CTA */}
+                        <div className="mt-6 pt-4 border-t border-border/50 flex items-center gap-2 justify-center text-primary font-bold text-sm">
+                            <Lock size={14} /> Your exact de-escalation scripts for each — Chapter 8
+                        </div>
+                    </div>
                 </div>
 
                 {/* Locked Forecast Section */}
@@ -583,7 +651,7 @@ export default function TeaserPageNew() {
 
     return (
         <div className="min-h-screen bg-background font-sans text-foreground selection:bg-primary selection:text-primary-foreground">
-            {session.isPaid && <Confetti recycle={false} numberOfPieces={500} />}
+
 
             <HeroSection
                 badge={badge}
@@ -591,6 +659,7 @@ export default function TeaserPageNew() {
                 quickOverview={quickOverview}
                 narcissismAnalysis={session?.narcissismAnalysis}
                 advancedMetrics={session?.advancedMetrics}
+                session={session}
             />
 
             <MirrorSection narcissismAnalysis={session?.narcissismAnalysis} badge={quickOverview?.hero?.result_badge} />
@@ -1273,33 +1342,86 @@ export default function TeaserPageNew() {
                             </div>
 
                             {/* Streamlined Value Stack */}
-                            <div className="max-w-md mx-auto bg-primary/5 rounded-2xl border border-primary/20 p-6 md:p-8 mb-10 text-left">
-                                <h3 className="font-bold text-foreground mb-6 text-center text-lg">What You're Getting Securely Today:</h3>
-                                <ul className="space-y-4 text-sm md:text-base text-muted-foreground mb-6">
-                                    <li className="flex items-start gap-3">
-                                        <CheckCircle className="text-primary shrink-0 mt-0.5" size={20} />
-                                        <span className="font-bold text-foreground leading-tight">The Complete 8-Chapter Relationship MRI Report</span>
+                            <div className="max-w-xl mx-auto bg-card rounded-2xl border border-border shadow-sm p-6 md:p-8 mb-10 text-left">
+                                <h3 className="font-black text-foreground mb-6 text-center text-xl uppercase tracking-wider">What You're Getting Securely Today</h3>
+                                <ul className="space-y-5 text-sm md:text-base text-foreground mb-8">
+                                    <li className="flex items-start gap-4">
+                                        <CheckCircle className="text-primary shrink-0 mt-1" size={24} />
+                                        <div className="flex-1">
+                                            <div className="flex justify-between items-start">
+                                                <span className="font-bold text-lg leading-tight">The Full Relationship Analysis</span>
+                                                <div className="text-right">
+                                                    <span className="text-sm line-through text-red-500 opacity-80 mr-2">$99.00</span>
+                                                    <span className="font-bold text-lg">${import.meta.env.REACT_APP_REPORT_PRICE || "47.00"}</span>
+                                                </div>
+                                            </div>
+                                            <p className="text-sm text-muted-foreground mt-1">Includes: Core Diagnosis, 5 Dimension Scores & Communication Breakdown</p>
+                                        </div>
                                     </li>
-                                    <li className="flex items-start gap-3">
-                                        <CheckCircle className="text-primary shrink-0 mt-0.5" size={20} />
-                                        <span className="leading-tight text-foreground font-medium">Your 6-Month & 5-Year Clinical Trajectory Forecast</span>
+
+                                    <li className="flex items-start gap-4 pt-5 border-t border-border/50">
+                                        <CheckCircle className="text-green-500 shrink-0 mt-1" size={24} />
+                                        <div className="flex-1">
+                                            <div className="flex justify-between items-start">
+                                                <span className="font-bold text-lg leading-tight">5-Year Trajectory Forecast</span>
+                                                <div className="text-right">
+                                                    <span className="text-sm line-through text-red-500 opacity-80 mr-2">$49.00</span>
+                                                    <span className="font-bold text-green-600">Included</span>
+                                                </div>
+                                            </div>
+                                        </div>
                                     </li>
-                                    <li className="flex items-start gap-3">
-                                        <CheckCircle className="text-primary shrink-0 mt-0.5" size={20} />
-                                        <span className="leading-tight">The Emergency Intervention Toolkit (5 PDF Protocols)</span>
+
+                                    <li className="flex items-start gap-4 pt-5 border-t border-border/50 bg-red-50/50 dark:bg-red-950/10 -mx-4 px-4 py-4 rounded-lg border border-red-100/50 dark:border-red-900/30">
+                                        <ShieldAlert className="text-red-500 shrink-0 mt-1" size={24} />
+                                        <div className="flex-1">
+                                            <div className="flex justify-between items-start">
+                                                <span className="font-bold text-lg leading-tight text-red-700 dark:text-red-400">CRITICAL: Toxic & Narcissistic Screen</span>
+                                                <div className="text-right">
+                                                    <span className="text-sm line-through text-red-500 opacity-80 mr-2">$49.00</span>
+                                                    <span className="font-bold text-red-600 dark:text-red-500 uppercase">Free</span>
+                                                </div>
+                                            </div>
+                                            <p className="text-sm text-red-600/80 dark:text-red-400/80 mt-1">Includes: The Danger Score & Gaslighting Counter-Scripts</p>
+                                        </div>
+                                    </li>
+
+                                    <li className="flex items-start gap-4 pt-5 border-t border-border/50">
+                                        <CheckCircle className="text-green-500 shrink-0 mt-1" size={24} />
+                                        <div className="flex-1">
+                                            <div className="flex justify-between items-start">
+                                                <span className="font-bold text-lg leading-tight">The Emergency Intervention Toolkit</span>
+                                                <div className="text-right">
+                                                    <span className="text-sm line-through text-red-500 opacity-80 mr-2">$126.00</span>
+                                                    <span className="font-bold text-green-600">Included</span>
+                                                </div>
+                                            </div>
+                                            <p className="text-sm text-muted-foreground mt-1">Includes: 5 Premium Clinical PDF Guides</p>
+                                        </div>
                                     </li>
                                 </ul>
-                                <div className="pt-4 border-t border-primary/20 flex justify-between items-center">
-                                    <span className="font-bold uppercase tracking-wider text-muted-foreground text-sm">Total Real Value:</span>
-                                    <span className="text-lg font-bold text-muted-foreground line-through decoration-red-400 opacity-70">$323.00</span>
+                                <div className="pt-6 border-t border-border flex justify-between items-center bg-secondary/10 -mx-6 md:-mx-8 -mb-6 md:-mb-8 px-6 md:px-8 py-5 rounded-b-2xl">
+                                    <span className="font-black uppercase tracking-wider text-foreground text-lg">Total Real Value</span>
+                                    <span className="text-2xl font-black text-foreground line-through decoration-red-500 opacity-70">$323.00</span>
                                 </div>
                             </div>
 
                             <div className="flex flex-col items-center gap-6">
-                                <div className="space-y-1 text-center">
-                                    <p className="text-sm font-bold text-red-500/90 dark:text-red-400 mb-2">"Every month you wait, the pattern becomes harder to reverse."</p>
-                                    <p className="text-sm font-bold uppercase tracking-wider text-muted-foreground">Your Price Today</p>
-                                    <p className="text-6xl font-black text-primary">${import.meta.env.REACT_APP_REPORT_PRICE || "47.00"}</p>
+                                <div className="space-y-4 text-center max-w-lg mx-auto">
+                                    <p className="text-base font-medium text-foreground">
+                                        You already know something is wrong. <span className="text-primary font-bold">That's why you took the test.</span>
+                                    </p>
+                                    <p className="text-base font-medium text-foreground pb-2">
+                                        The pattern identified in your analysis doesn't wait. <span className="text-red-500 font-bold dark:text-red-400">Every day without clarity, the pattern gets stronger.</span>
+                                    </p>
+
+                                    <div className="pt-2 border-t border-border mt-4">
+                                        <div className="bg-green-50 dark:bg-green-900/10 border border-green-200 dark:border-green-900/30 p-2 text-center rounded text-sm font-medium text-green-800 dark:text-green-300 mb-4">
+                                            <strong>Your report is already generated.</strong> 847 words written specifically about your relationship dynamics.
+                                        </div>
+                                        <p className="text-sm font-bold uppercase tracking-wider text-muted-foreground">Your Price Today</p>
+                                        <p className="text-6xl font-black text-primary">${import.meta.env.REACT_APP_REPORT_PRICE || "47.00"}</p>
+                                    </div>
                                 </div>
 
                                 {/* ORDER BUMP */}

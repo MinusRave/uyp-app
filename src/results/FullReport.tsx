@@ -6,7 +6,7 @@ import { useAuth } from "wasp/client/auth";
 import { api } from "wasp/client/api";
 import { config } from "wasp/client";
 import GaugeChart from "../components/GaugeChart";
-import Confetti from "react-confetti";
+
 import { NarcissismSection } from "./sections/NarcissismSection";
 import { FutureForecastSection } from "./sections/FutureForecastSection";
 import { PulseSection } from "./sections/PulseSection";
@@ -333,7 +333,7 @@ export default function FullReport() {
 
     return (
         <div className="min-h-screen bg-background font-sans pb-24 text-foreground selection:bg-primary selection:text-primary-foreground">
-            <Confetti recycle={false} numberOfPieces={500} />
+
 
             {/* 1. HERO SECTION (Updated to match TeaserPageNew) */}
             <header className="bg-background pt-12 pb-20 px-6 relative overflow-hidden text-center border-b border-border/40">
