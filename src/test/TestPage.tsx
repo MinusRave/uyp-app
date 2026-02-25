@@ -112,7 +112,7 @@ export default function TestPage() {
                     const canProceed = isPaid || hasEmail || !isHardGateEnabled;
 
                     if (canProceed) {
-                        navigate(routes.ProcessingRoute.build());
+                        navigate(routes.TeaserRoute.build());
                         return;
                     }
                     // Otherwise: Stay here to show Email Gate
@@ -400,7 +400,7 @@ export default function TestPage() {
             // Small delay to ensure Pixel event has time to fire before navigation
             await new Promise(resolve => setTimeout(resolve, 300));
 
-            navigate(routes.ProcessingRoute.build());
+            navigate(routes.TeaserRoute.build());
         } catch (err) {
             console.error(err);
             alert("Errore. Riprova");

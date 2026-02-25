@@ -1,7 +1,7 @@
 ﻿import React, { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { ArrowRight, Lock, CheckCircle, AlertTriangle, TrendingUp, Shield, Heart, BadgeCheck, Compass, Zap, X, Activity, ChevronDown, Check, Eye, Microscope, ListChecks, ShieldAlert, Clock, MessageCircle, Brain, Quote, Star, Play, TrendingDown, Battery, Thermometer, FileWarning, BookOpen, Users, FileText, ShieldCheck, Info, ChevronUp, Link, Repeat, Ghost } from "lucide-react";
-import { useQuery, generateQuickOverview, generateFullReport, createCheckoutSession, getTestSession, getSystemConfig, captureLead } from "wasp/client/operations";
+import { useQuery, generateQuickOverview, generateFullReportV2, createCheckoutSession, getTestSession, getSystemConfig, captureLead } from "wasp/client/operations";
 import { useAuth } from "wasp/client/auth";
 
 import { trackPixelEvent } from '../analytics/pixel';
@@ -545,14 +545,21 @@ export default function TeaserPageNew() {
         // Full Report
         if (session.fullReport && Object.keys(session.fullReport as object).length > 0) {
             setFullReport(session.fullReport as any);
+        }
+        
+        // Trigger the Full Report V2 generation in the background if it doesn't exist
+        if (!session.fullReportV2 && !fullReportInitiated.current) {
             fullReportInitiated.current = true;
-        } else if (!fullReportInitiated.current && !loadingFull) {
+            console.log("Triggering Full Report V2 generation in background...");
+            generateFullReportV2({ sessionId: session.id })
+                .then(() => console.log("Full Report V2 generated successfully"))
+                .catch(err => {
+                    console.error("Failed to generate Full Report V2:", err);
+                    fullReportInitiated.current = false;
+                });
+        } else if (session.fullReportV2) {
+            console.log("Full Report V2 already exists in session.");
             fullReportInitiated.current = true;
-            setLoadingFull(true);
-            generateFullReport({ sessionId: session.id })
-                .then((res: any) => setFullReport(res.json))
-                .catch((err: any) => { console.error(err); fullReportInitiated.current = false; })
-                .finally(() => setLoadingFull(false));
         }
     }, [session?.id, session?.quickOverview, refetch]);
 

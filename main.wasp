@@ -299,6 +299,11 @@ action generateFullReport {
   entities: [TestSession, AiLog]
 }
 
+action generateFullReportV2 {
+  fn: import { generateFullReportV2 } from "@src/server/ai",
+  entities: [TestSession, AiLog]
+}
+
 action generateQuickOverview {
   fn: import { generateQuickOverview } from "@src/server/ai",
   entities: [TestSession, AiLog]

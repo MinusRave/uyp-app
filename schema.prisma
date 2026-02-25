@@ -75,6 +75,7 @@ model TestSession {
   // NEW: Cached AI Results (Prevent duplicate calls)
   quickOverview        Json?
   fullReport           Json?
+  fullReportV2         Json? // NEW: Multi-stage parallel generation cache
   narcissismAnalysis   Json? // NEW: Input for "Narcissism Assessment"
 
   // Meta CAPI Cookies tracking

@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { ArrowRight, Lock, CheckCircle, AlertTriangle, TrendingUp, Shield, Heart, BadgeCheck, Compass, Zap, X, Activity, ChevronDown, Check, Eye, Microscope, ListChecks, ShieldAlert, Clock, MessageCircle, Brain, Quote, Star, Play, TrendingDown, Battery, Thermometer, FileWarning, Download, FileText, Loader2 } from "lucide-react";
-import { useQuery, generateQuickOverview, generateFullReport, getTestSession } from "wasp/client/operations";
+import { useQuery, generateQuickOverview, generateFullReportV2, getTestSession } from "wasp/client/operations";
 import { useAuth } from "wasp/client/auth";
 import { api } from "wasp/client/api";
 import { config } from "wasp/client";
@@ -29,13 +29,43 @@ type QuickOverviewData = {
 
 type FullReportData = {
     chapter1_pulse: any;
+    multivariate_signature?: {
+        pattern_name: string;
+        dimensions_combined: string[];
+        scores_summary: string;
+        core_insight: string;
+        hidden_mechanism: string;
+        unique_vulnerability: string;
+        aha_sentence: string;
+    };
     chapter2_communication: any;
     chapter3_security: any;
     chapter4_erotic: any;
     chapter5_balance: any;
     chapter6_compass: any;
-    chapter7_synthesis: any;
-    chapter8_roadmap: any;
+    chapter7_synthesis: {
+        multivariate_deep_dive?: string;
+        connection_1: string;
+        connection_2: string;
+        connection_3?: string;
+    };
+    chapter8_roadmap: {
+        stop_doing: string[];
+        scripts: Array<{
+            situation: string;
+            phrase: string;
+            tone: string;
+            why_it_works: string;
+            expected_response: string;
+            if_it_fails: string;
+        }>;
+        calendar: {
+            week1: { focus: string; daily_action: string; what_to_notice: string; success_metric: string; };
+            week2: { focus: string; daily_action: string; what_to_notice: string; success_metric: string; };
+            week3: { focus: string; daily_action: string; what_to_notice: string; success_metric: string; };
+            week4: { focus: string; daily_action: string; what_to_notice: string; success_metric: string; };
+        };
+    };
 };
 
 // --- COMPONENTS ---
@@ -84,7 +114,7 @@ const BiomarkerStrip = ({ label, score, description, icon, color = "red" }: any)
 };
 
 const DimensionCard = ({
-    title, description, icon, status, teaser, metricInsight, blurredText, onUnlock, visible, metricName, metricScore, isGoodMetric = true, deepDive, specificItems, specificItemsLabel, impactText, unlockCopy, isSymptom
+    title, description, icon, status, teaser, metricInsight, blurredText, onUnlock, visible, metricName, metricScore, isGoodMetric = true, deepDive, specificItems, specificItemsLabel, impactText, unlockCopy, isSymptom, multivariateConnection
 }: any) => {
 
     const isCritical = status?.toUpperCase().includes("RISK") || status?.toUpperCase().includes("CRITICAL") || isSymptom;
@@ -154,6 +184,18 @@ const DimensionCard = ({
                         </h4>
                         <p className="text-sm text-slate-600 dark:text-slate-400 italic border-l-2 border-indigo-200 dark:border-indigo-900 pl-3">
                             "{impactText}"
+                        </p>
+                    </div>
+                )}
+
+                {/* 4. Multivariate Connection */}
+                {multivariateConnection && (
+                    <div>
+                        <h4 className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-2 flex items-center gap-2">
+                            <Brain size={12} /> Systemic Connection
+                        </h4>
+                        <p className="text-sm text-slate-700 dark:text-slate-300 font-medium bg-indigo-50 dark:bg-indigo-900/20 border border-indigo-100 dark:border-indigo-800/50 p-4 rounded-xl shadow-sm">
+                            {multivariateConnection}
                         </p>
                     </div>
                 )}
@@ -289,13 +331,17 @@ export default function FullReport() {
         }
 
         // Full Report
-        if (session.fullReport && Object.keys(session.fullReport as object).length > 0) {
+        if (session.fullReportV2 && Object.keys(session.fullReportV2 as object).length > 0) {
+            setFullReport(session.fullReportV2 as any);
+            fullReportInitiated.current = true;
+        } else if (session.fullReport && Object.keys(session.fullReport as object).length > 0) {
+            // BACKWARD COMPATIBILITY: Fallback to old report if V2 is not generated yet
             setFullReport(session.fullReport as any);
             fullReportInitiated.current = true;
         } else if (!fullReportInitiated.current && !loadingFull) {
             fullReportInitiated.current = true;
             setLoadingFull(true);
-            generateFullReport({ sessionId: session.id })
+            generateFullReportV2({ sessionId: session.id })
                 .then((res: any) => setFullReport(res.json))
                 .catch((err: any) => { console.error(err); fullReportInitiated.current = false; })
                 .finally(() => setLoadingFull(false));
@@ -385,6 +431,51 @@ export default function FullReport() {
                     onUnlock={() => { }}
                 />
 
+                {/* 4.5 MULTIVARIATE SIGNATURE */}
+                {fullReport?.multivariate_signature && (
+                    <section className="bg-gradient-to-br from-indigo-900 via-indigo-950 to-slate-950 rounded-3xl p-1 shadow-2xl overflow-hidden mt-12 text-indigo-50 border border-indigo-500/20">
+                        <div className="bg-black/20 backdrop-blur-sm p-8 md:p-12 text-center space-y-8 relative">
+                            <div className="space-y-4">
+                                <span className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-indigo-500/20 text-indigo-300 border border-indigo-500/30 text-[10px] font-bold uppercase tracking-widest">
+                                    <Brain size={12} /> The Core Dynamic
+                                </span>
+                                <h2 className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-200 to-cyan-200 text-3xl md:text-5xl font-black">
+                                    "{fullReport.multivariate_signature.pattern_name}"
+                                </h2>
+                                <p className="text-indigo-200/80 text-lg italic max-w-2xl mx-auto">
+                                    "{fullReport.multivariate_signature.aha_sentence}"
+                                </p>
+                            </div>
+
+                            <div className="grid md:grid-cols-2 gap-6 text-left max-w-4xl mx-auto mt-8">
+                                <div className="bg-white/5 rounded-2xl p-6 border border-white/10">
+                                    <h3 className="text-indigo-300 font-bold mb-3 text-sm uppercase tracking-wider flex items-center gap-2">
+                                        <Eye size={16} /> The Hidden Mechanism
+                                    </h3>
+                                    <p className="text-indigo-100/90 leading-relaxed text-sm">
+                                        {fullReport.multivariate_signature.hidden_mechanism}
+                                    </p>
+                                </div>
+                                <div className="bg-white/5 rounded-2xl p-6 border border-white/10">
+                                    <h3 className="text-indigo-300 font-bold mb-3 text-sm uppercase tracking-wider flex items-center gap-2">
+                                        <ShieldAlert size={16} /> Unique Vulnerability
+                                    </h3>
+                                    <p className="text-indigo-100/90 leading-relaxed text-sm">
+                                        {fullReport.multivariate_signature.unique_vulnerability}
+                                    </p>
+                                </div>
+                            </div>
+
+                            <div className="bg-indigo-950/50 rounded-xl p-6 max-w-4xl mx-auto mt-6 border border-indigo-500/20 text-left">
+                                <p className="text-indigo-200 font-medium leading-relaxed">
+                                    <span className="font-bold text-white mr-2">Clinical Insight:</span>
+                                    {fullReport.multivariate_signature.core_insight}
+                                </p>
+                            </div>
+                        </div>
+                    </section>
+                )}
+
                 {/* 5. DIMENSION BREAKDOWN (DEEP DIVE) */}
                 <div className="space-y-8">
                     <div className="text-center py-6 space-y-2">
@@ -412,6 +503,7 @@ export default function FullReport() {
                             specificItemsLabel="Specific Triggers Identified"
                             impactText={fullReport?.chapter2_communication?.impact_on_other_dimensions}
                             isSymptom={(metrics.repair_efficiency || 40) < 60}
+                            multivariateConnection={fullReport?.chapter2_communication?.multivariate_connection}
                         />
 
                         {/* B. Emotional Safety */}
@@ -431,6 +523,7 @@ export default function FullReport() {
                             specificItemsLabel="Hypervigilance Triggers"
                             impactText={fullReport?.chapter3_security?.impact_on_daily_life}
                             isSymptom={(metrics.betrayal_vulnerability || 65) > 40}
+                            multivariateConnection={fullReport?.chapter3_security?.multivariate_connection}
                         />
 
                         {/* C. Sex & Intimacy */}
@@ -450,6 +543,7 @@ export default function FullReport() {
                             specificItemsLabel="Desire Blockers"
                             impactText={fullReport?.chapter4_erotic?.polarity_analysis}
                             isSymptom={(metrics.erotic_death_spiral || 68) > 40}
+                            multivariateConnection={fullReport?.chapter4_erotic?.multivariate_connection}
                         />
 
                         {/* D. Power & Fairness */}
@@ -469,6 +563,7 @@ export default function FullReport() {
                             specificItemsLabel="Mental Load Dynamics"
                             impactText={fullReport?.chapter5_balance?.impact_on_attraction}
                             isSymptom={(metrics.ceo_vs_intern || 58) > 40}
+                            multivariateConnection={fullReport?.chapter5_balance?.multivariate_connection}
                         />
 
                         {/* E. Shared Future */}
@@ -485,8 +580,9 @@ export default function FullReport() {
                             deepDive={fullReport?.chapter6_compass?.deep_dive}
                             specificItems={[fullReport?.chapter6_compass?.vision_compatibility, fullReport?.chapter6_compass?.dream_erosion, fullReport?.chapter6_compass?.trajectory_warning].filter(Boolean)}
                             specificItemsLabel="Future Alignment Factors"
-                            impactText={fullReport?.chapter6_compass?.impact_on_longevity}
+                            impactText={fullReport?.chapter6_compass?.trajectory_warning}
                             isSymptom={(metrics.compatibility_quotient || 90) < 60}
+                            multivariateConnection={fullReport?.chapter6_compass?.multivariate_connection}
                         />
                     </div>
                 </div>
@@ -531,6 +627,17 @@ export default function FullReport() {
                             </p>
                         </div>
 
+                        {fullReport?.chapter7_synthesis?.multivariate_deep_dive && (
+                            <div className="max-w-3xl mx-auto bg-primary/5 border border-primary/20 rounded-2xl p-6 text-left shadow-sm">
+                                <h3 className="text-primary font-bold mb-3 flex items-center gap-2">
+                                    <Brain size={20} /> The Overarching Dynamic
+                                </h3>
+                                <p className="text-foreground/90 leading-relaxed font-medium">
+                                    {fullReport.chapter7_synthesis.multivariate_deep_dive}
+                                </p>
+                            </div>
+                        )}
+
                         <div className="space-y-4 text-left max-w-3xl mx-auto">
                             <div className="flex gap-4 p-6 bg-secondary/20 rounded-xl border border-border/50">
                                 <div className="bg-primary/20 p-3 rounded h-fit shrink-0"><Zap size={20} className="text-primary" /></div>
@@ -540,6 +647,12 @@ export default function FullReport() {
                                 <div className="bg-primary/20 p-3 rounded h-fit shrink-0"><Zap size={20} className="text-primary" /></div>
                                 <p className="text-foreground text-sm md:text-base leading-relaxed font-medium">{fullReport?.chapter7_synthesis?.connection_2 || "Analyzing systemic connection..."}</p>
                             </div>
+                            {fullReport?.chapter7_synthesis?.connection_3 && (
+                                <div className="flex gap-4 p-6 bg-secondary/20 rounded-xl border border-border/50">
+                                    <div className="bg-primary/20 p-3 rounded h-fit shrink-0"><Zap size={20} className="text-primary" /></div>
+                                    <p className="text-foreground text-sm md:text-base leading-relaxed font-medium">{fullReport.chapter7_synthesis.connection_3}</p>
+                                </div>
+                            )}
                         </div>
                     </div>
                 </section>
@@ -573,19 +686,109 @@ export default function FullReport() {
                             </div>
 
                             {/* Scripts */}
-                            <div className="bg-white/5 rounded-2xl p-6 md:p-8 border border-white/10 hover:bg-white/10 transition-colors">
+                            <div className="bg-white/5 rounded-2xl p-6 md:p-8 border border-white/10 hover:bg-white/10 transition-colors md:col-span-2">
                                 <h3 className="text-emerald-200 font-bold mb-6 flex items-center gap-2 text-xl">
                                     <MessageCircle size={24} className="text-green-400" /> Say This Instead
                                 </h3>
-                                <div className="space-y-4 text-emerald-100/90">
-                                    {fullReport?.chapter8_roadmap?.scripts?.map((script: string, idx: number) => (
-                                        <div key={idx} className="bg-black/20 p-4 rounded-xl border-l-4 border-emerald-400 italic text-sm md:text-base leading-relaxed">
-                                            "{script}"
-                                        </div>
-                                    ))}
-                                </div>
+
+                                {fullReport?.chapter8_roadmap?.scripts && typeof fullReport.chapter8_roadmap.scripts[0] === 'string' ? (
+                                    <div className="space-y-4 text-emerald-100/90">
+                                        {(fullReport.chapter8_roadmap.scripts as unknown as string[]).map((scriptText: string, idx: number) => (
+                                            <div key={idx} className="bg-black/20 p-4 rounded-xl border-l-4 border-emerald-400 italic text-sm md:text-base leading-relaxed">
+                                                "{scriptText}"
+                                            </div>
+                                        ))}
+                                    </div>
+                                ) : (
+                                    <div className="grid gap-6">
+                                        {fullReport?.chapter8_roadmap?.scripts?.map((script, idx: number) => (
+                                            <div key={idx} className="bg-black/20 p-6 rounded-xl border border-emerald-900/50 shadow-inner">
+                                                <div className="mb-4">
+                                                    <span className="text-xs font-bold uppercase tracking-wider text-emerald-500 mb-1 block">Context</span>
+                                                    <p className="text-emerald-100 font-medium">{script.situation}</p>
+                                                </div>
+                                                <div className="bg-emerald-900/30 p-4 rounded-lg border-l-4 border-emerald-400 mb-4">
+                                                    <span className="text-[10px] font-bold uppercase tracking-widest text-emerald-400/80 mb-2 block flex items-center gap-2">
+                                                        <Quote size={10} /> The Script
+                                                    </span>
+                                                    <p className="text-lg md:text-xl font-medium text-white italic leading-relaxed">
+                                                        "{script.phrase}"
+                                                    </p>
+                                                </div>
+                                                <div className="grid md:grid-cols-2 gap-4 text-sm mt-4">
+                                                    <div>
+                                                        <span className="text-[10px] uppercase text-emerald-500 font-bold block mb-1">Tone to Use</span>
+                                                        <span className="bg-emerald-950/50 text-emerald-300 px-2 py-1 rounded inline-block border border-emerald-800/50">{script.tone}</span>
+                                                    </div>
+                                                    <div>
+                                                        <span className="text-[10px] uppercase text-emerald-500 font-bold block mb-1">Why it works</span>
+                                                        <p className="text-emerald-200/80">{script.why_it_works}</p>
+                                                    </div>
+                                                    <div>
+                                                        <span className="text-[10px] uppercase text-emerald-500 font-bold block mb-1">Expected Response</span>
+                                                        <p className="text-emerald-200/80">{script.expected_response}</p>
+                                                    </div>
+                                                    <div>
+                                                        <span className="text-[10px] uppercase text-emerald-500 font-bold block mb-1">If it fails</span>
+                                                        <p className="text-emerald-200/80 border border-red-500/20 bg-red-500/10 rounded p-2 text-red-200">{script.if_it_fails}</p>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        ))}
+                                    </div>
+                                )}
                             </div>
                         </div>
+
+                        {/* Calendar */}
+                        <div className="bg-white/5 rounded-2xl p-6 md:p-8 border border-white/10 mt-8 hover:bg-white/10 transition-colors">
+                            <h3 className="text-emerald-200 font-bold mb-6 flex items-center gap-2 text-xl">
+                                <Clock size={24} className="text-emerald-400" /> 30-Day Recovery Calendar
+                            </h3>
+
+                            {typeof fullReport?.chapter8_roadmap?.calendar === 'string' ? (
+                                <div className="bg-black/20 p-6 rounded-xl border border-emerald-900/50 shadow-inner">
+                                    <p className="text-emerald-100/90 leading-relaxed font-medium whitespace-pre-wrap">
+                                        {fullReport.chapter8_roadmap.calendar}
+                                    </p>
+                                </div>
+                            ) : (
+                                <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                                    {['week1', 'week2', 'week3', 'week4'].map((weekKey, idx) => {
+                                        const weekData = fullReport?.chapter8_roadmap?.calendar?.[weekKey as keyof typeof fullReport.chapter8_roadmap.calendar];
+                                        if (!weekData) return null;
+                                        return (
+                                            <div key={idx} className="bg-black/20 p-5 rounded-xl border border-emerald-900/50 shadow-inner flex flex-col h-full">
+                                                <div className="flex items-center gap-2 mb-3 pb-3 border-b border-emerald-900/50">
+                                                    <span className="bg-emerald-500 text-slate-950 font-black text-xs px-2 py-0.5 rounded-sm uppercase tracking-widest">
+                                                        Week {idx + 1}
+                                                    </span>
+                                                </div>
+                                                <div className="space-y-4 flex-grow text-sm">
+                                                    <div>
+                                                        <span className="block text-[10px] uppercase text-emerald-500 font-bold mb-1">Weekly Focus</span>
+                                                        <p className="text-emerald-100 font-medium">{weekData.focus}</p>
+                                                    </div>
+                                                    <div>
+                                                        <span className="block text-[10px] uppercase text-emerald-500 font-bold mb-1">Daily Action</span>
+                                                        <p className="text-emerald-200/80">{weekData.daily_action}</p>
+                                                    </div>
+                                                    <div>
+                                                        <span className="block text-[10px] uppercase text-emerald-500 font-bold mb-1">What to Track</span>
+                                                        <p className="text-emerald-200/80">{weekData.what_to_notice}</p>
+                                                    </div>
+                                                </div>
+                                                <div className="mt-4 pt-4 border-t border-emerald-900/50">
+                                                    <span className="block text-[10px] uppercase text-emerald-500 font-bold mb-1 flex items-center gap-1"><BadgeCheck size={12} /> Success Metric</span>
+                                                    <p className="text-emerald-300 font-medium text-sm">{weekData.success_metric}</p>
+                                                </div>
+                                            </div>
+                                        );
+                                    })}
+                                </div>
+                            )}
+                        </div>
+
                     </div>
                 </section>
 
