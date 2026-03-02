@@ -197,7 +197,7 @@ export const createCheckoutSession: CreateCheckoutSession<
       cancel_url: testSession.testType === 'toxic-men'
         ? `${config.frontendUrl}/toxic-offer?sessionId=${sessionId}&checkout_cancelled=true`
         : `${config.frontendUrl}/results?checkout_cancelled=true`,
-      // customer_email: customerEmail || undefined, // COMMENTED OUT: Makes email editable. Stripe will ask for it.
+      customer_email: customerEmail || undefined,
       metadata: {
         testSessionId: sessionId,
         userId: context.user?.id || "", // Empty if anonymous
