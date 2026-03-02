@@ -13,6 +13,7 @@ type GetTestSessionsArgs = {
     sourceFilter?: 'all' | 'meta' | 'google' | 'email' | 'direct';
     progressFilter?: 'all' | 'no_start' | 'in_progress' | 'completed';
     leadFilter?: 'all' | 'lead' | 'anonymous';
+    hideEmpty?: boolean;
 };
 
 type GetTestSessionsResult = {
@@ -57,7 +58,7 @@ export const getTestSessions: GetTestSessions<GetTestSessionsArgs, GetTestSessio
         throw new HttpError(401, "Unauthorized");
     }
 
-    const { skip = 0, take = 10, statusFilter = 'all', emailFilter, sourceFilter, progressFilter, leadFilter } = args;
+    const { skip = 0, take = 10, statusFilter = 'all', emailFilter, sourceFilter, progressFilter, leadFilter, hideEmpty } = args;
 
     const where: any = {};
 
@@ -121,6 +122,17 @@ export const getTestSessions: GetTestSessions<GetTestSessionsArgs, GetTestSessio
     } else if (sourceFilter === 'direct') {
         where.utm_source = null;
         where.referrer = null;
+    }
+
+    if (hideEmpty) {
+        where.AND = [
+            {
+                OR: [
+                    { onboardingStep: { gt: 0 } },
+                    { currentQuestionIndex: { gt: 0 } }
+                ]
+            }
+        ];
     }
 
     const [sessions, totalCount] = await Promise.all([

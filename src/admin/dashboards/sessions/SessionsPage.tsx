@@ -56,8 +56,9 @@ const SessionsPage = ({ user }: { user: AuthUser }) => {
     const [sourceFilter, setSourceFilter] = useState<'all' | 'meta' | 'google' | 'email' | 'direct'>('all');
     const [progressFilter, setProgressFilter] = useState<'all' | 'no_start' | 'in_progress' | 'completed'>('all');
     const [leadFilter, setLeadFilter] = useState<'all' | 'lead' | 'anonymous'>('all');
+    const [hideEmpty, setHideEmpty] = useState(false);
 
-    const take = 10;
+    const take = 50;
     const skip = (page - 1) * take;
 
     const { data, isLoading } = useQuery(getTestSessions, {
@@ -67,7 +68,8 @@ const SessionsPage = ({ user }: { user: AuthUser }) => {
         emailFilter: emailFilter || undefined,
         sourceFilter,
         progressFilter,
-        leadFilter
+        leadFilter,
+        hideEmpty
     });
 
     // Fetch funnel metrics with filters
@@ -265,13 +267,26 @@ const SessionsPage = ({ user }: { user: AuthUser }) => {
                             <option value="in_progress">In Progress</option>
                             <option value="completed">Completed</option>
                         </select>
+
+                        {/* Hide 0 Answers Toggle */}
+                        <label className="flex items-center gap-2 cursor-pointer ml-2">
+                            <input
+                                type="checkbox"
+                                checked={hideEmpty}
+                                onChange={(e) => setHideEmpty(e.target.checked)}
+                                className="w-4 h-4 rounded border-gray-300 text-primary focus:ring-primary"
+                            />
+                            <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                                Hide 0 Answers
+                            </span>
+                        </label>
                     </div>
                 </div>
 
                 {/* Table */}
                 <div className="rounded-sm border border-stroke bg-white px-5 pt-6 pb-2.5 shadow-default dark:border-strokedark dark:bg-boxdark sm:px-7.5 xl:pb-1">
-                    <div className="max-w-full overflow-x-auto">
-                        <table className="w-full table-auto">
+                    <div className="w-full overflow-x-auto relative">
+                        <table className="w-full table-auto min-w-[1200px] text-left">
                             <thead>
                                 <tr className="bg-gray-2 text-left dark:bg-meta-4 text-sm uppercase font-bold text-muted-foreground">
                                     <th className="py-4 px-4 min-w-[120px]">Date</th>
