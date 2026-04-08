@@ -2,7 +2,7 @@
 import { type AuthUser } from "wasp/auth";
 import { useQuery, getSessionDetail, retriggerAiProcessing } from "wasp/client/operations";
 import { Link } from "wasp/client/router";
-import { useParams } from "react-router-dom";
+import { useParams } from "react-router";
 import { useState } from "react";
 import DefaultLayout from "../../layout/DefaultLayout";
 import { Loader2, ArrowLeft, CheckCircle, XCircle, DollarSign, Mail, RefreshCw } from "lucide-react";

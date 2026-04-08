@@ -9,7 +9,7 @@ export function ensureArgsSchemaOrThrowHttpError<Schema extends z.ZodType>(
   if (!parseResult.success) {
     console.error(parseResult.error);
     throw new HttpError(400, "Operation arguments validation failed", {
-      errors: parseResult.error.errors,
+      errors: parseResult.error.issues,
     });
   } else {
     return parseResult.data;

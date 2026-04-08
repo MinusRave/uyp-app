@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router";
 import { ArrowRight, Lock, CheckCircle, AlertTriangle, TrendingUp, Shield, Heart, BadgeCheck, Compass, Zap, X, Activity, ChevronDown, Check, Eye, Microscope, ListChecks, ShieldAlert, Clock, MessageCircle, Brain, Quote, Star, Play, TrendingDown, Battery, Thermometer, FileWarning, Download, FileText, Loader2 } from "lucide-react";
 import { useQuery, generateQuickOverview, generateFullReportV2, getTestSession } from "wasp/client/operations";
 import { useAuth } from "wasp/client/auth";
@@ -230,7 +230,7 @@ const GuideCard = ({ title, format, desc, icon, color, filename, sessionId }: an
     return (
         <div className="group relative">
             {/* 3D Document Effect */}
-            <div className="relative bg-card border border-border aspect-[3/4] rounded-r-xl shadow-md transition-all duration-300 group-hover:-translate-y-2 group-hover:shadow-xl overflow-hidden flex flex-col h-full bg-white dark:bg-slate-900">
+            <div className="relative bg-card border border-border aspect-3/4 rounded-r-xl shadow-md transition-all duration-300 group-hover:-translate-y-2 group-hover:shadow-xl overflow-hidden flex flex-col h-full bg-white dark:bg-slate-900">
                 {/* Spine/Binding */}
                 <div className={`absolute left-0 top-0 bottom-0 w-3 border-r border-slate-200 dark:border-slate-700 ${color.bgLight}`}></div>
 
@@ -245,11 +245,11 @@ const GuideCard = ({ title, format, desc, icon, color, filename, sessionId }: an
                             <span className="text-xs font-bold text-slate-900 dark:text-white">{format}</span>
                         </div>
                     </div>
-                    <h3 className="text-xl font-bold leading-tight text-slate-900 dark:text-white min-h-[3rem]">{title}</h3>
+                    <h3 className="text-xl font-bold leading-tight text-slate-900 dark:text-white min-h-12">{title}</h3>
                 </div>
 
                 {/* Body */}
-                <div className="p-6 flex-grow bg-slate-50 dark:bg-slate-800/20">
+                <div className="p-6 grow bg-slate-50 dark:bg-slate-800/20">
                     <p className="text-sm text-slate-500 dark:text-slate-400 leading-relaxed mb-4">
                         {desc}
                     </p>
@@ -384,7 +384,7 @@ export default function FullReport() {
             {/* 1. HERO SECTION (Updated to match TeaserPageNew) */}
             <header className="bg-background pt-12 pb-20 px-6 relative overflow-hidden text-center border-b border-border/40">
                 {/* Dynamic Background based on Risk */}
-                <div className={`absolute top-0 left-0 w-full h-full bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] ${(session.narcissismAnalysis as any)?.score > 40 ? 'from-orange-500/20 via-background to-background' : 'from-primary/10 via-background to-background'} -z-20`} />
+                <div className={`absolute top-0 left-0 w-full h-full bg-[radial-gradient(ellipse_at_top,var(--tw-gradient-stops))] ${(session.narcissismAnalysis as any)?.score > 40 ? 'from-orange-500/20 via-background to-background' : 'from-primary/10 via-background to-background'} -z-20`} />
 
                 <div className="max-w-4xl mx-auto space-y-6 relative z-10 animate-fade-in">
                     <div className="flex justify-center mb-6">
@@ -433,13 +433,13 @@ export default function FullReport() {
 
                 {/* 4.5 MULTIVARIATE SIGNATURE */}
                 {fullReport?.multivariate_signature && (
-                    <section className="bg-gradient-to-br from-indigo-900 via-indigo-950 to-slate-950 rounded-3xl p-1 shadow-2xl overflow-hidden mt-12 text-indigo-50 border border-indigo-500/20">
+                    <section className="bg-linear-to-br from-indigo-900 via-indigo-950 to-slate-950 rounded-3xl p-1 shadow-2xl overflow-hidden mt-12 text-indigo-50 border border-indigo-500/20">
                         <div className="bg-black/20 backdrop-blur-sm p-8 md:p-12 text-center space-y-8 relative">
                             <div className="space-y-4">
                                 <span className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-indigo-500/20 text-indigo-300 border border-indigo-500/30 text-[10px] font-bold uppercase tracking-widest">
                                     <Brain size={12} /> The Core Dynamic
                                 </span>
-                                <h2 className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-200 to-cyan-200 text-3xl md:text-5xl font-black">
+                                <h2 className="text-transparent bg-clip-text bg-linear-to-r from-indigo-200 to-cyan-200 text-3xl md:text-5xl font-black">
                                     "{fullReport.multivariate_signature.pattern_name}"
                                 </h2>
                                 <p className="text-indigo-200/80 text-lg italic max-w-2xl mx-auto">
@@ -658,10 +658,10 @@ export default function FullReport() {
                 </section>
 
                 {/* 7. ACTION PLAN (Chapter 8) */}
-                <section className="bg-gradient-to-br from-emerald-900 via-emerald-950 to-slate-950 rounded-3xl p-1 shadow-2xl overflow-hidden mt-12 text-emerald-50">
+                <section className="bg-linear-to-br from-emerald-900 via-emerald-950 to-slate-950 rounded-3xl p-1 shadow-2xl overflow-hidden mt-12 text-emerald-50">
                     <div className="bg-black/20 backdrop-blur-sm p-8 md:p-12 text-center space-y-10 relative">
                         <div className="space-y-4">
-                            <h2 className="text-transparent bg-clip-text bg-gradient-to-r from-emerald-200 to-cyan-200 text-3xl md:text-4xl font-black">
+                            <h2 className="text-transparent bg-clip-text bg-linear-to-r from-emerald-200 to-cyan-200 text-3xl md:text-4xl font-black">
                                 Your Recovery Roadmap
                             </h2>
                             <p className="text-emerald-100/80 text-lg">
@@ -764,7 +764,7 @@ export default function FullReport() {
                                                         Week {idx + 1}
                                                     </span>
                                                 </div>
-                                                <div className="space-y-4 flex-grow text-sm">
+                                                <div className="space-y-4 grow text-sm">
                                                     <div>
                                                         <span className="block text-[10px] uppercase text-emerald-500 font-bold mb-1">Weekly Focus</span>
                                                         <p className="text-emerald-100 font-medium">{weekData.focus}</p>

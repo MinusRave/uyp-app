@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useQuery, useAction, getSystemConfig, updateSystemConfig } from "wasp/client/operations";
 import { Loader2, Settings, ToggleLeft, ToggleRight, Save } from "lucide-react";
-import { Link } from "react-router-dom";
+import { Link } from "react-router";
 
 export default function AdminConfigPage() {
     const { data: config, isLoading, refetch } = useQuery(getSystemConfig);

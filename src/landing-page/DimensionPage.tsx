@@ -1,5 +1,5 @@
 import React, { useEffect } from "react";
-import { useParams, Link, useNavigate } from "react-router-dom";
+import { useParams, Link, useNavigate } from "react-router";
 import { routes } from "wasp/client/router";
 import { ArrowRight, Activity, Brain, CheckCircle2, AlertCircle } from "lucide-react";
 import { PILLAR_CONTENT } from "./content";

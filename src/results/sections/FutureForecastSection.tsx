@@ -103,7 +103,7 @@ export const FutureForecastSection: React.FC<FutureForecastSectionProps> = ({ an
                             </p>
                         ) : (
                             <div className="relative cursor-pointer group" onClick={onUnlock}>
-                                <p className="text-slate-500 blur-[4px] select-none">
+                                <p className="text-slate-500 blur-xs select-none">
                                     This is where parallel lives begin. You stop fighting because you stop caring. The resentment solidifies into indifference.
                                 </p>
                                 <div className="absolute inset-0 flex items-center justify-start">

@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router";
 import { startTest, submitAnswer, completeTest, getTestSession, useQuery, captureLead, updateConflictDescription, updateWizardProgress, updateSessionActivity, generateQuickOverview, assessNarcissism, getSystemConfig } from "wasp/client/operations";
 import { routes } from "wasp/client/router";
 import { Loader2, Mail, MessageSquare, ChevronLeft, BadgeCheck, AlertTriangle, Activity, ShieldCheck, Lock as LockIcon } from "lucide-react";
@@ -411,7 +411,7 @@ export default function TestPage() {
 
     if (isLoading) {
         return (
-            <div className="flex h-[100dvh] w-full items-center justify-center bg-background">
+            <div className="flex h-dvh w-full items-center justify-center bg-background">
                 <Loader2 className="animate-spin text-primary" size={48} />
             </div>
         );
@@ -432,7 +432,7 @@ export default function TestPage() {
     // EMAIL GATE UI
     if (showEmailGate || (!currentQuestion && !isLoading && sessionId)) {
         return (
-            <div className="min-h-[100dvh] bg-background flex flex-col items-center justify-start pt-8 md:pt-12 p-4 md:p-6 animate-fade-in overflow-y-auto">
+            <div className="min-h-dvh bg-background flex flex-col items-center justify-start pt-8 md:pt-12 p-4 md:p-6 animate-fade-in overflow-y-auto">
                 <div className="max-w-lg w-full bg-card p-6 md:p-8 rounded-2xl shadow-xl border border-border">
                     <div className="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-6 text-primary">
                         <Mail size={32} />
@@ -453,7 +453,7 @@ export default function TestPage() {
 
                             {/* Primary Result Card */}
                             <div className="bg-card border-2 border-primary/20 rounded-2xl p-6 shadow-lg transform transition-all hover:scale-[1.01] relative overflow-hidden">
-                                <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-primary via-purple-500 to-indigo-500"></div>
+                                <div className="absolute top-0 left-0 w-full h-1 bg-linear-to-r from-primary via-purple-500 to-indigo-500"></div>
 
                                 <div className="text-center mb-6">
                                     {/* Headline */}
@@ -462,7 +462,7 @@ export default function TestPage() {
                                     </h3>
 
                                     {/* Primary Diagnosis */}
-                                    <div className="text-3xl md:text-4xl font-black text-foreground leading-tight bg-clip-text text-transparent bg-gradient-to-r from-primary to-purple-600 mb-4">
+                                    <div className="text-3xl md:text-4xl font-black text-foreground leading-tight bg-clip-text text-transparent bg-linear-to-r from-primary to-purple-600 mb-4">
                                         {analysisData.quickOverview.pulse.primary_diagnosis}
                                     </div>
 
@@ -576,7 +576,7 @@ export default function TestPage() {
     if (!currentQuestion) return null;
 
     return (
-        <div className="min-h-[100dvh] bg-background text-foreground flex flex-col justify-between">
+        <div className="min-h-dvh bg-background text-foreground flex flex-col justify-between">
             <header className="sticky top-0 z-50 bg-background/80 backdrop-blur-md border-b border-border">
                 <div className="max-w-3xl mx-auto px-4 md:px-6 h-14 md:h-16 flex items-center justify-between">
                     <div className="flex items-center gap-2">

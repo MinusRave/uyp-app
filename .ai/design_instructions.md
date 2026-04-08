@@ -68,7 +68,7 @@ Use these exact specific HSL values in your `global.css` (or tailwind config equ
 -   **Header**: Simple, sticky or distinct, carrying the logo and main nav.
 -   **Hero**: Text-heavy but clearly typographed. Centered or split. Warm background.
 -   **Content**: Single column for reading (reports/articles), max-width constrained for readability (e.g., `prose` or `max-w-3xl`).
--   **Gradients**: Use valid gradients like `bg-gradient-to-r from-[hsl(var(--secondary-muted))] to-[hsl(var(--secondary))]` for accent text ("Nomad" gradient).
+-   **Gradients**: Use valid gradients like `bg-linear-to-r from-[hsl(var(--secondary-muted))] to-[hsl(var(--secondary))]` for accent text ("Nomad" gradient).
 
 ## 6. Do's and Don'ts
 -   **DO**: Use the "Soft Purple" for primary calls to action (Sign up, Start Test).

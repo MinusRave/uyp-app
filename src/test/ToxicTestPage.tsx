@@ -1,6 +1,6 @@
 
 import React, { useEffect, useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router";
 import { useQuery, useAction } from "wasp/client/operations";
 import {
     startTest,
@@ -166,7 +166,7 @@ export default function ToxicTestPage() {
                 </div>
                 <div className="h-1 w-full bg-slate-900">
                     <div
-                        className="h-full bg-gradient-to-r from-red-600 to-orange-600 transition-all duration-300 ease-out"
+                        className="h-full bg-linear-to-r from-red-600 to-orange-600 transition-all duration-300 ease-out"
                         style={{ width: `${progressPercentage}%` }}
                     />
                 </div>

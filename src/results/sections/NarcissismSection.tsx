@@ -171,7 +171,7 @@ export const NarcissismSection: React.FC<NarcissismSectionProps> = ({ analysis, 
                     </div>
 
                     {/* Overlay Content */}
-                    <div className="absolute inset-0 z-10 flex flex-col items-center justify-center p-4 sm:p-6 text-center bg-gradient-to-t from-white via-white/90 to-transparent dark:from-slate-900 dark:via-slate-900/90">
+                    <div className="absolute inset-0 z-10 flex flex-col items-center justify-center p-4 sm:p-6 text-center bg-linear-to-t from-white via-white/90 to-transparent dark:from-slate-900 dark:via-slate-900/90">
 
                         <div className="max-w-md w-full space-y-5 animate-in fade-in slide-in-from-bottom-4 duration-700">
 

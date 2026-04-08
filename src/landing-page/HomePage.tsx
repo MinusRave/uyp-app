@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link } from 'react-router';
 import { ArrowRight, Check, X, CheckCircle, MessageCircle, Search, Lightbulb, Activity, TrendingUp, AlertTriangle, ShieldCheck, Star, Quote, ChevronDown, ChevronUp, ListChecks } from 'lucide-react';
 import { useAuth } from 'wasp/client/auth';
 
@@ -54,7 +54,7 @@ export default function HomePage() {
             {/* 2. HERO SECTION */}
             <section className="relative pt-20 pb-32 px-6 overflow-hidden">
                 {/* Abstract Background (Matching TeaserPageNew) */}
-                <div className="absolute top-0 left-0 w-full h-full bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-primary/10 via-background to-background -z-20" />
+                <div className="absolute top-0 left-0 w-full h-full bg-[radial-gradient(ellipse_at_top,var(--tw-gradient-stops))] from-primary/10 via-background to-background -z-20" />
 
                 <div className="max-w-4xl mx-auto text-center space-y-8 z-10 relative">
                     <h1 className="text-4xl md:text-6xl font-black tracking-tight leading-tight mb-6">
@@ -411,7 +411,7 @@ export default function HomePage() {
             </section>
 
             {/* 9. FINAL CTA */}
-            <section className="py-24 px-6 bg-gradient-to-b from-background to-muted/30 border-t border-border">
+            <section className="py-24 px-6 bg-linear-to-b from-background to-muted/30 border-t border-border">
                 <div className="max-w-4xl mx-auto text-center space-y-8">
                     <h2 className="text-4xl md:text-5xl font-black text-foreground">Stop Guessing. Start Knowing.</h2>
                     <div className="text-xl text-muted-foreground max-w-2xl mx-auto space-y-2">

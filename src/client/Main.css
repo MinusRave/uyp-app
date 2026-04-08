@@ -1,7 +1,11 @@
 @import url('https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400;1,700&display=swap');
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import 'tailwindcss';
+@import 'tw-animate-css';
+
+@config "../../tailwind.config.js";
+
+@plugin "@tailwindcss/forms";
+@plugin "@tailwindcss/typography";
 
 @layer utilities {
 
@@ -18,11 +22,11 @@
   }
 
   .chat-height {
-    @apply h-[calc(100vh_-_8.125rem)] lg:h-[calc(100vh_-_5.625rem)];
+    @apply h-[calc(100vh-8.125rem)] lg:h-[calc(100vh-5.625rem)];
   }
 
   .inbox-height {
-    @apply h-[calc(100vh_-_8.125rem)] lg:h-[calc(100vh_-_5.625rem)];
+    @apply h-[calc(100vh-8.125rem)] lg:h-[calc(100vh-5.625rem)];
   }
 
   /* Text gradient utilities */
@@ -87,19 +91,19 @@
 }
 
 .apexcharts-legend-text {
-  @apply !text-muted-foreground;
+  @apply text-muted-foreground!;
 }
 
 .apexcharts-text {
-  @apply !fill-muted-foreground;
+  @apply fill-muted-foreground!;
 }
 
 .apexcharts-xcrosshairs {
-  @apply !fill-border;
+  @apply fill-border!;
 }
 
 .apexcharts-gridline {
-  @apply !stroke-border;
+  @apply stroke-border!;
 }
 
 .apexcharts-series.apexcharts-pie-series path {
@@ -107,7 +111,7 @@
 }
 
 .apexcharts-legend-series {
-  @apply !inline-flex gap-1.5;
+  @apply inline-flex! gap-1.5;
 }
 
 .apexcharts-tooltip.apexcharts-theme-light {

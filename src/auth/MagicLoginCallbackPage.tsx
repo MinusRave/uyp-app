@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Link, useSearchParams, useNavigate } from "react-router-dom";
+import { Link, useSearchParams, useNavigate } from "react-router";
 import { login } from "wasp/client/auth";
 import { claimSession } from "wasp/client/operations"; // Import claimSession
 

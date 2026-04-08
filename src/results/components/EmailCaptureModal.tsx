@@ -20,7 +20,7 @@ export default function EmailCaptureModal({ isOpen, onClose, onSubmit, isSubmitt
     if (!isOpen) return null;
 
     return (
-        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-background/80 backdrop-blur-sm animate-in fade-in duration-300">
+        <div className="fixed inset-0 z-100 flex items-center justify-center p-4 bg-background/80 backdrop-blur-sm animate-in fade-in duration-300">
             <div className="bg-card w-full max-w-lg rounded-2xl shadow-2xl border-2 border-primary/20 p-6 md:p-8 relative animate-in zoom-in-95 duration-300">
                 <button
                     onClick={onClose}

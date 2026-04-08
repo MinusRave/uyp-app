@@ -48,7 +48,7 @@ const HeroSection = ({
     return (
         <header className="bg-background text-foreground pt-8 pb-16 px-6 relative overflow-hidden border-b border-border/40">
             {/* Background Gradient */}
-            <div className={`absolute inset-0 bg-gradient-to-b ${bgGradient} -z-10`} />
+            <div className={`absolute inset-0 bg-linear-to-b ${bgGradient} -z-10`} />
 
             <div className="max-w-4xl mx-auto text-center space-y-6">
 
@@ -73,7 +73,7 @@ const HeroSection = ({
 
                 {/* Diagnosis Card (UNLOCKED) */}
                 <div className="bg-card border-2 border-primary/20 p-8 rounded-2xl shadow-lg max-w-2xl mx-auto mb-8 relative overflow-hidden">
-                    <div className="absolute top-0 inset-x-0 h-1 bg-gradient-to-r from-transparent via-primary/50 to-transparent"></div>
+                    <div className="absolute top-0 inset-x-0 h-1 bg-linear-to-r from-transparent via-primary/50 to-transparent"></div>
                     <p className="text-xs font-bold text-muted-foreground uppercase tracking-wider mb-2">Core Diagnosis</p>
                     <h2 className="text-3xl font-black text-primary mb-4">"{diagnosis}"</h2>
                     <p className="text-lg text-muted-foreground leading-relaxed">

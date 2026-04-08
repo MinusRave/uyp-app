@@ -1,7 +1,7 @@
 import React, { useEffect } from 'react';
 import { useAuth } from 'wasp/client/auth';
 import { useQuery, getTestSession } from 'wasp/client/operations';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router';
 import { Activity } from 'lucide-react';
 
 export default function LoginRedirectPage() {

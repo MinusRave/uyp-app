@@ -2,7 +2,7 @@
 import { useState } from "react";
 import { type AuthUser } from "wasp/auth";
 import { useQuery, getTestSessions, getConversionFunnelMetrics, getSessionAnalytics, deleteSession } from "wasp/client/operations";
-import { Link } from "react-router-dom";
+import { Link } from "react-router";
 import DefaultLayout from "../../layout/DefaultLayout";
 import { Loader2, Calendar, Trash2 } from "lucide-react";
 import { cn } from "../../../client/utils";

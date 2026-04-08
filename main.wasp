@@ -1,13 +1,13 @@
 app OpenSaaS {
   wasp: {
-    version: "^0.20.0"
+    version: "^0.22.0"
   },
 
   title: "UnderstandYourPartner - Scientific Relationship Insights",
 
   head: [
     "<link rel='icon' href='/favicon.ico' />",
-    "<meta charset='utf-8' />",
+    "<meta charSet='utf-8' />",
     "<meta name='description' content='Stop guessing. Get an objective, dimensional analysis of your relationship dynamics in 10 minutes.' />",
     "<meta name='author' content='UnderstandYourPartner' />",
     "<meta name='keywords' content='relationship test, couple psychology, conflict resolution, love languages, dimensional analysis' />",
@@ -29,11 +29,8 @@ app OpenSaaS {
     "<script defer data-domain='<your-site-id>' src='https://plausible.io/js/script.js'></script>",  // for production
     "<script defer data-domain='<your-site-id>' src='https://plausible.io/js/script.local.js'></script>",  // for development
     
-    // Meta Pixel Loader
-    "<script>!function(f,b,e,v,n,t,s){if(f.fbq)return;n=f.fbq=function(){n.callMethod?n.callMethod.apply(n,arguments):n.queue.push(arguments)};if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';n.queue=[];t=b.createElement(e);t.async=!0;t.src=v;s=b.getElementsByTagName(e)[0];s.parentNode.insertBefore(t,s)}(window, document,'script','https://connect.facebook.net/en_US/fbevents.js');</script>",
-  
-"<script async src='https://www.googletagmanager.com/gtag/js?id=G-FZJY27JW0'></script>",
-"<script>  window.dataLayer = window.dataLayer || [];  function gtag(){dataLayer.push(arguments);}  gtag('js', new Date()); gtag('config', 'G-FZJY27JW0G');</script>"
+    // Meta Pixel Loader (external file to avoid JSX brace issues)
+    "<script src='/fb-pixel.js'></script>"
 
   
   ],

@@ -18,7 +18,7 @@ const CheckoutErrorModal: React.FC<CheckoutErrorModalProps> = ({
     onEmailFallback
 }) => {
     return (
-        <div className="fixed inset-0 bg-black/70 backdrop-blur-sm z-[100] flex items-center justify-center p-4 animate-fade-in">
+        <div className="fixed inset-0 bg-black/70 backdrop-blur-sm z-100 flex items-center justify-center p-4 animate-fade-in">
             <div className="bg-background rounded-2xl p-0 max-w-[450px] w-full relative shadow-2xl border-0 overflow-hidden">
                 {/* Header */}
                 <div className="bg-yellow-500 text-white p-4 text-center relative">

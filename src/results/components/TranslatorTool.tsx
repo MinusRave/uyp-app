@@ -71,7 +71,7 @@ export function TranslatorTool({ myLens, partnerLens, sessionId }: TranslatorToo
                         <Sparkles size={16} /> How it works - Example
                     </h4>
 
-                    <div className="grid md:grid-cols-[1fr,auto,1fr] gap-6 items-center">
+                    <div className="grid md:grid-cols-[1fr_auto_1fr] gap-6 items-center">
                         {/* Bad Example */}
                         <div className="bg-white dark:bg-black/20 p-6 rounded-xl border border-red-100 dark:border-red-900/30 shadow-sm relative">
                             <div className="absolute top-0 right-0 -mt-2 -mr-2 bg-red-100 text-red-600 text-xs font-bold px-2 py-1 rounded-full border border-red-200 uppercase">

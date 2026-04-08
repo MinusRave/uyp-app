@@ -60,7 +60,7 @@ export const RelationshipPhaseChart: React.FC<RelationshipPhaseChartProps> = ({ 
             {/* Current Phase Description */}
             <div className="text-center mt-12 bg-secondary/10 p-4 rounded-xl border border-secondary/20 animate-fade-in-up">
                 <p className="text-xs uppercase tracking-wide text-muted-foreground mb-1">Current Status</p>
-                <h4 className="text-xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-primary to-purple-600">
+                <h4 className="text-xl font-bold bg-clip-text text-transparent bg-linear-to-r from-primary to-purple-600">
                     {phases[currentIndex]}
                 </h4>
             </div>

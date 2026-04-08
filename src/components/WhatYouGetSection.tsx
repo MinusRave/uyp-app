@@ -63,7 +63,7 @@ export default function WhatYouGetSection() {
             </div>
 
             {/* 5 Dimension Deep Dives */}
-            <div className="bg-gradient-to-br from-primary/5 to-primary/10 border border-primary/20 rounded-3xl p-8">
+            <div className="bg-linear-to-br from-primary/5 to-primary/10 border border-primary/20 rounded-3xl p-8">
                 <div className="flex items-center gap-3 mb-6">
                     <Target className="text-primary" size={28} />
                     <h4 className="font-bold text-2xl">5 Dimension Deep Dives</h4>

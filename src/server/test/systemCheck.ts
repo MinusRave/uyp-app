@@ -2,8 +2,6 @@ import { type SystemCheck } from "wasp/server/api";
 import { type TestSession } from "wasp/entities";
 import { stripeWebhook } from "../../payment/reportWebhook";
 import { sendgridWebhook } from "../webhooks/sendgrid";
-import Stripe from "stripe";
-
 // Helper to mock Express Request/Response
 class MockResponse {
     statusCode: number = 200;
@@ -53,10 +51,6 @@ export const systemCheck: SystemCheck = async (req, res, context) => {
 
         // 2. Simulate Stripe Webhook (Payment)
         log("2. Simulating Stripe Payment...");
-        const stripe = new Stripe(process.env.STRIPE_KEY || "sk_test_dummy", { apiVersion: "2024-06-20" as any }); // Using strict version or default? Package.json says 18.1.0? 
-        // Actually we don't need the client here, just the webhook signature generator.
-        // The Stripe library version in package.json is 18.1.0.
-
         const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET;
         if (!webhookSecret) {
             log("❌ SKIPPING Stripe Test: STRIPE_WEBHOOK_SECRET not set.");
@@ -80,10 +74,13 @@ export const systemCheck: SystemCheck = async (req, res, context) => {
 
             const payloadString = JSON.stringify(payload);
             // Generate valid signature
-            const header = stripe.webhooks.generateTestHeaderString({
-                payload: payloadString,
-                secret: webhookSecret,
-            });
+            const timestamp = Math.floor(Date.now() / 1000);
+            const crypto = require('crypto');
+            const signature = crypto
+                .createHmac('sha256', webhookSecret)
+                .update(`${timestamp}.${payloadString}`)
+                .digest('hex');
+            const header = `t=${timestamp},v1=${signature}`;
 
             const mockReq = {
                 headers: { "stripe-signature": header },

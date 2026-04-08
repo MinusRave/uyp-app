@@ -23,7 +23,7 @@ export default function SocialProofSection() {
     ];
 
     return (
-        <section className="py-24 bg-gradient-to-b from-background to-secondary/10">
+        <section className="py-24 bg-linear-to-b from-background to-secondary/10">
             <div className="mx-auto max-w-7xl px-6 lg:px-8">
                 {/* Header */}
                 <div className="mx-auto max-w-2xl text-center mb-16">

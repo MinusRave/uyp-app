@@ -92,7 +92,7 @@ export function IntimacyAnalysisSection({ answers }: IntimacyAnalysisSectionProp
 
 
     return (
-        <section className="bg-gradient-to-br from-rose-50 via-pink-50 to-orange-50 dark:from-rose-950/20 dark:to-orange-950/20 rounded-3xl p-8 md:p-12 border border-rose-100 dark:border-rose-900/30">
+        <section className="bg-linear-to-br from-rose-50 via-pink-50 to-orange-50 dark:from-rose-950/20 dark:to-orange-950/20 rounded-3xl p-8 md:p-12 border border-rose-100 dark:border-rose-900/30">
             <div className="flex items-center gap-2 mb-8 justify-center">
                 <Flame className="text-rose-500 fill-rose-500" size={24} />
                 <h2 className="text-sm font-bold uppercase tracking-wider text-rose-600 dark:text-rose-400">Deep Dive: Intimacy Analysis</h2>

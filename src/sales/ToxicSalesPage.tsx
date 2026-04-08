@@ -1,6 +1,6 @@
 
 import React, { useState } from "react";
-import { useSearchParams } from "react-router-dom";
+import { useSearchParams } from "react-router";
 import { useQuery } from "wasp/client/operations";
 import { getTestSession } from "wasp/client/operations";
 import { createCheckoutSession } from "wasp/client/operations";
@@ -68,7 +68,7 @@ export default function ToxicSalesPage() {
 
             {/* SECTION 1: HERO (Personalized Results) */}
             <section className="bg-slate-950 text-white py-16 px-4 relative overflow-hidden">
-                <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-red-600 to-orange-500"></div>
+                <div className="absolute top-0 left-0 w-full h-1 bg-linear-to-r from-red-600 to-orange-500"></div>
 
                 <div className="max-w-3xl mx-auto text-center space-y-8 relative z-10">
                     <h1 className="text-4xl md:text-6xl font-black tracking-tight leading-tight">
@@ -271,7 +271,7 @@ export default function ToxicSalesPage() {
                     </div>
 
                     {/* Bonus Guides */}
-                    <div className="mt-16 bg-gradient-to-br from-red-600 to-red-800 rounded-3xl p-8 md:p-12 text-white shadow-2xl">
+                    <div className="mt-16 bg-linear-to-br from-red-600 to-red-800 rounded-3xl p-8 md:p-12 text-white shadow-2xl">
                         <div className="flex flex-col md:flex-row gap-8 items-center">
                             <div className="flex-1 space-y-6">
                                 <h3 className="text-2xl font-bold border-b border-red-400 pb-4">PLUS 5 TACTICAL GUIDES:</h3>

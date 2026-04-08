@@ -138,7 +138,7 @@ function CompatibilityRow({ item }: { item: any }) {
     return (
         <div className="bg-background p-4 rounded-xl border border-border/50 hover:border-border transition-colors">
             <div className="flex items-start gap-4">
-                <div className="mt-1 flex-shrink-0">
+                <div className="mt-1 shrink-0">
                     {getStatusIcon(item.status)}
                 </div>
                 <div className="space-y-1 w-full">

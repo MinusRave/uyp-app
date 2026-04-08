@@ -1,6 +1,6 @@
 
 import React, { useEffect, useState } from "react";
-import { useSearchParams } from "react-router-dom";
+import { useSearchParams } from "react-router";
 import { useQuery } from "wasp/client/operations";
 import { getTestSession, finalizeToxicReport } from "wasp/client/operations";
 import { Loader2, Download, Lock, CheckCircle, FileText, AlertTriangle } from "lucide-react";
@@ -78,7 +78,7 @@ export default function ToxicResultPage() {
                 <div className="max-w-md w-full bg-slate-900 border border-slate-800 rounded-3xl p-10 text-center shadow-2xl relative overflow-hidden">
 
                     {/* Pulsing Accent */}
-                    <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-red-600 to-orange-500 animate-pulse" />
+                    <div className="absolute top-0 left-0 w-full h-1 bg-linear-to-r from-red-600 to-orange-500 animate-pulse" />
 
                     <div className="w-20 h-20 bg-slate-800 rounded-full flex items-center justify-center mx-auto mb-8 relative">
                         <Loader2 className="animate-spin text-red-500" size={40} />

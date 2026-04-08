@@ -111,7 +111,7 @@ export function FunnelMetrics({ metrics, filters }: FunnelMetricsProps) {
     return (
         <div className="space-y-6">
             {/* Overall Conversion */}
-            <div className="bg-gradient-to-br from-primary/10 to-purple-500/10 rounded-xl p-6 border-2 border-primary/20">
+            <div className="bg-linear-to-br from-primary/10 to-purple-500/10 rounded-xl p-6 border-2 border-primary/20">
                 <div className="flex items-center justify-between">
                     <div>
                         <h3 className="text-sm font-bold text-gray-600 dark:text-gray-400 uppercase tracking-wide mb-1">

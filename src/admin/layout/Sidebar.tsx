@@ -15,7 +15,7 @@ import {
   Sliders
 } from "lucide-react";
 import React, { useEffect, useRef, useState } from "react";
-import { NavLink, useLocation } from "react-router-dom";
+import { NavLink, useLocation } from "react-router";
 import Logo from "../../client/static/logo.png";
 import { cn } from "../../client/utils";
 import SidebarLinkGroup from "./SidebarLinkGroup";
@@ -214,7 +214,7 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
                               className={({ isActive }) =>
                                 cn(
                                   "text-muted-foreground hover:text-accent group relative flex items-center gap-2.5 rounded-md px-4 font-medium duration-300 ease-in-out",
-                                  { "!text-accent": isActive },
+                                  { "text-accent!": isActive },
                                 )
                               }
                             >
@@ -228,7 +228,7 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
                               className={({ isActive }) =>
                                 cn(
                                   "text-muted-foreground hover:text-accent group relative flex items-center gap-2.5 rounded-md px-4 font-medium duration-300 ease-in-out",
-                                  { "!text-accent": isActive },
+                                  { "text-accent!": isActive },
                                 )
                               }
                             >
@@ -242,7 +242,7 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
                               className={({ isActive }) =>
                                 cn(
                                   "text-muted-foreground hover:text-accent group relative flex items-center gap-2.5 rounded-md px-4 font-medium duration-300 ease-in-out",
-                                  { "!text-accent": isActive },
+                                  { "text-accent!": isActive },
                                 )
                               }
                             >
@@ -370,7 +370,7 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
                               className={({ isActive }) =>
                                 cn(
                                   "text-muted-foreground hover:text-accent group relative flex items-center gap-2.5 rounded-md px-4 font-medium duration-300 ease-in-out",
-                                  { "!text-accent": isActive },
+                                  { "text-accent!": isActive },
                                 )
                               }
                             >

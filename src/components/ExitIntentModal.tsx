@@ -23,7 +23,7 @@ const ExitIntentModal: React.FC<ExitIntentModalProps> = ({ show, onClose, onSave
     };
 
     return (
-        <div className="fixed inset-0 bg-black/70 backdrop-blur-sm z-[100] flex items-center justify-center p-4 animate-fade-in">
+        <div className="fixed inset-0 bg-black/70 backdrop-blur-sm z-100 flex items-center justify-center p-4 animate-fade-in">
             <div className="bg-background rounded-2xl p-0 max-w-[500px] w-full relative shadow-2xl border-0 overflow-hidden">
                 {/* Header */}
 

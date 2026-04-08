@@ -11,7 +11,7 @@ const Header = (props: {
 }) => {
   return (
     <header className="bg-background border-border sticky top-0 z-10 flex w-full border-b shadow-sm">
-      <div className="flex flex-grow items-center justify-between px-8 py-5 sm:justify-end sm:gap-5">
+      <div className="flex grow items-center justify-between px-8 py-5 sm:justify-end sm:gap-5">
         <div className="flex items-center gap-2 sm:gap-4 lg:hidden">
           {/* <!-- Hamburger Toggle BTN --> */}
 
@@ -29,7 +29,7 @@ const Header = (props: {
                   className={cn(
                     "bg-foreground relative left-0 top-0 my-1 block h-0.5 w-0 rounded-sm delay-0 duration-200 ease-in-out",
                     {
-                      "!w-full delay-300": !props.sidebarOpen,
+                      "w-full! delay-300": !props.sidebarOpen,
                     },
                   )}
                 ></span>
@@ -37,7 +37,7 @@ const Header = (props: {
                   className={cn(
                     "bg-foreground relative left-0 top-0 my-1 block h-0.5 w-0 rounded-sm delay-150 duration-200 ease-in-out",
                     {
-                      "delay-400 !w-full": !props.sidebarOpen,
+                      "delay-400 w-full!": !props.sidebarOpen,
                     },
                   )}
                 ></span>
@@ -45,7 +45,7 @@ const Header = (props: {
                   className={cn(
                     "bg-foreground relative left-0 top-0 my-1 block h-0.5 w-0 rounded-sm delay-200 duration-200 ease-in-out",
                     {
-                      "!w-full delay-500": !props.sidebarOpen,
+                      "w-full! delay-500": !props.sidebarOpen,
                     },
                   )}
                 ></span>
@@ -55,7 +55,7 @@ const Header = (props: {
                   className={cn(
                     "bg-foreground absolute left-2.5 top-0 block h-full w-0.5 rounded-sm delay-300 duration-200 ease-in-out",
                     {
-                      "!h-0 !delay-0": !props.sidebarOpen,
+                      "h-0! delay-0!": !props.sidebarOpen,
                     },
                   )}
                 ></span>
@@ -63,7 +63,7 @@ const Header = (props: {
                   className={cn(
                     "delay-400 bg-foreground absolute left-0 top-2.5 block h-0.5 w-full rounded-sm duration-200 ease-in-out",
                     {
-                      "!h-0 !delay-200": !props.sidebarOpen,
+                      "h-0! delay-200!": !props.sidebarOpen,
                     },
                   )}
                 ></span>

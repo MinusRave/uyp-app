@@ -1,5 +1,5 @@
 ﻿import React, { useState, useEffect, useRef } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router";
 import { ArrowRight, Lock, CheckCircle, AlertTriangle, TrendingUp, Shield, Heart, BadgeCheck, Compass, Zap, X, Activity, ChevronDown, Check, Eye, Microscope, ListChecks, ShieldAlert, Clock, MessageCircle, Brain, Quote, Star, Play, TrendingDown, Battery, Thermometer, FileWarning, BookOpen, Users, FileText, ShieldCheck, Info, ChevronUp, Link, Repeat, Ghost } from "lucide-react";
 import { useQuery, generateQuickOverview, generateFullReportV2, createCheckoutSession, getTestSession, getSystemConfig, captureLead } from "wasp/client/operations";
 import { useAuth } from "wasp/client/auth";
@@ -91,7 +91,7 @@ const HeroSection = ({
     return (
         <header className="bg-background text-foreground pt-8 pb-16 px-6 relative overflow-hidden border-b border-border/40">
             {/* Background Gradient */}
-            <div className={`absolute inset-0 bg-gradient-to-b ${bgGradient} -z-10`} />
+            <div className={`absolute inset-0 bg-linear-to-b ${bgGradient} -z-10`} />
 
             <div className="max-w-4xl mx-auto text-center space-y-6">
 
@@ -197,7 +197,7 @@ const HeroSection = ({
 
                 {/* Diagnosis Card (PARTIAL REVEAL / BLURRED) */}
                 <div className="bg-card border-2 border-primary/20 p-8 rounded-2xl shadow-lg max-w-2xl mx-auto mb-8 relative overflow-hidden group cursor-pointer" onClick={() => onUnlock('diagnosis_lock')}>
-                    <div className="absolute top-0 inset-x-0 h-1 bg-gradient-to-r from-transparent via-primary/50 to-transparent"></div>
+                    <div className="absolute top-0 inset-x-0 h-1 bg-linear-to-r from-transparent via-primary/50 to-transparent"></div>
                     <p className="text-xs font-bold text-muted-foreground uppercase tracking-wider mb-2">Your Pattern</p>
                     <h2 className="text-3xl font-black text-primary mb-6">"{diagnosis}"</h2>
 
@@ -824,7 +824,7 @@ export default function TeaserPageNew() {
 
                     <div className="grid md:grid-cols-2 gap-12 items-center">
                         {/* Visual Representation of Report (Abstract) */}
-                        <div className="relative aspect-square md:aspect-[3/4] max-w-sm mx-auto w-full bg-primary/90 rounded-2xl shadow-2xl p-6 md:p-8 transform md:rotate-[-2deg] border border-primary/50 overflow-hidden group hover:rotate-0 transition-all duration-500">
+                        <div className="relative aspect-square md:aspect-3/4 max-w-sm mx-auto w-full bg-primary/90 rounded-2xl shadow-2xl p-6 md:p-8 transform md:-rotate-2 border border-primary/50 overflow-hidden group hover:rotate-0 transition-all duration-500">
                             {/* Fake Content Layer */}
                             <div className="absolute top-0 right-0 p-4 opacity-20">
                                 <Activity size={120} className="text-white" />
@@ -838,9 +838,9 @@ export default function TeaserPageNew() {
                                     <h3 className="text-3xl font-black leading-none">Confidential<br />Report</h3>
                                 </div>
                                 <div className="space-y-3 pt-4 md:pt-8 opacity-80">
-                                    <div className="flex gap-3 items-center"><div className="w-6 h-6 shrink-0 rounded-full border border-white/50 flex items-center justify-center text-xs">1</div><div className="h-2 w-full bg-gradient-to-r from-white/40 to-transparent rounded"></div></div>
-                                    <div className="flex gap-3 items-center"><div className="w-6 h-6 shrink-0 rounded-full border border-white/50 flex items-center justify-center text-xs">2</div><div className="h-2 w-3/4 bg-gradient-to-r from-white/40 to-transparent rounded"></div></div>
-                                    <div className="flex gap-3 items-center"><div className="w-6 h-6 shrink-0 rounded-full border border-white/50 flex items-center justify-center text-xs">3</div><div className="h-2 w-5/6 bg-gradient-to-r from-white/40 to-transparent rounded"></div></div>
+                                    <div className="flex gap-3 items-center"><div className="w-6 h-6 shrink-0 rounded-full border border-white/50 flex items-center justify-center text-xs">1</div><div className="h-2 w-full bg-linear-to-r from-white/40 to-transparent rounded"></div></div>
+                                    <div className="flex gap-3 items-center"><div className="w-6 h-6 shrink-0 rounded-full border border-white/50 flex items-center justify-center text-xs">2</div><div className="h-2 w-3/4 bg-linear-to-r from-white/40 to-transparent rounded"></div></div>
+                                    <div className="flex gap-3 items-center"><div className="w-6 h-6 shrink-0 rounded-full border border-white/50 flex items-center justify-center text-xs">3</div><div className="h-2 w-5/6 bg-linear-to-r from-white/40 to-transparent rounded"></div></div>
                                 </div>
                             </div>
                         </div>
@@ -950,7 +950,7 @@ export default function TeaserPageNew() {
                                 </div>
 
                                 {/* Body */}
-                                <div className="p-6 flex-grow bg-card/50 space-y-4">
+                                <div className="p-6 grow bg-card/50 space-y-4">
                                     <div className="space-y-1">
                                         <p className="text-xs font-bold uppercase text-muted-foreground tracking-wider">What you get:</p>
                                         <p className="text-sm text-foreground leading-relaxed">
@@ -1003,7 +1003,7 @@ export default function TeaserPageNew() {
                                     <h3 className="text-xl font-bold leading-tight text-foreground">Dead Bedroom Revival</h3>
                                 </div>
 
-                                <div className="p-6 flex-grow bg-card/50 space-y-4">
+                                <div className="p-6 grow bg-card/50 space-y-4">
                                     <div className="space-y-1">
                                         <p className="text-xs font-bold uppercase text-muted-foreground tracking-wider">What you get:</p>
                                         <p className="text-sm text-foreground leading-relaxed">
@@ -1053,7 +1053,7 @@ export default function TeaserPageNew() {
                                     <h3 className="text-xl font-bold leading-tight text-foreground">Narcissist Detection</h3>
                                 </div>
 
-                                <div className="p-6 flex-grow bg-card/50 space-y-4">
+                                <div className="p-6 grow bg-card/50 space-y-4">
                                     <div className="space-y-1">
                                         <p className="text-xs font-bold uppercase text-muted-foreground tracking-wider">What you get:</p>
                                         <p className="text-sm text-foreground leading-relaxed">
@@ -1118,7 +1118,7 @@ export default function TeaserPageNew() {
                                     <h3 className="text-xl font-bold leading-tight text-foreground">The Emotional Affair Warning System</h3>
                                 </div>
 
-                                <div className="p-6 flex-grow bg-card/50 space-y-4">
+                                <div className="p-6 grow bg-card/50 space-y-4">
                                     <div className="space-y-1">
                                         <p className="text-xs font-bold uppercase text-muted-foreground tracking-wider">What you get:</p>
                                         <p className="text-sm text-foreground leading-relaxed">
@@ -1337,7 +1337,7 @@ export default function TeaserPageNew() {
                 <div className="max-w-4xl mx-auto">
                     {/* Pricing Card */}
                     <div className="bg-card rounded-3xl shadow-2xl border-2 border-primary overflow-hidden mb-16 relative">
-                        <div className="absolute top-0 inset-x-0 h-2 bg-gradient-to-r from-primary to-purple-500"></div>
+                        <div className="absolute top-0 inset-x-0 h-2 bg-linear-to-r from-primary to-purple-500"></div>
                         <div className="p-8 md:p-12">
                             <div className="text-center mb-10">
                                 <h2 className="text-3xl md:text-5xl font-black text-foreground mb-4">

@@ -27,7 +27,7 @@ export function ProcessingOverlay({ isVisible }: { isVisible: boolean }) {
     if (!isVisible) return null;
 
     return (
-        <div className="fixed inset-0 z-[100] flex flex-col items-center justify-center bg-background/95 backdrop-blur-md p-6 text-center animate-in fade-in duration-300">
+        <div className="fixed inset-0 z-100 flex flex-col items-center justify-center bg-background/95 backdrop-blur-md p-6 text-center animate-in fade-in duration-300">
             <div className="relative mb-8">
                 {/* Ping animation effect */}
                 <div className="absolute inset-0 animate-ping rounded-full bg-primary/20"></div>

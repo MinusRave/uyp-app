@@ -1,6 +1,6 @@
 
 import React, { useState, useEffect } from "react";
-import { useNavigate, useSearchParams } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router";
 import { captureToxicLead } from "wasp/client/operations";
 import { Lock, ArrowRight, ShieldCheck, AlertTriangle } from "lucide-react";
 import { cn } from "../client/utils";
@@ -50,7 +50,7 @@ export default function ToxicEmailGate() {
             <div className="max-w-md w-full bg-slate-900 border border-slate-800 rounded-3xl p-8 shadow-2xl relative overflow-hidden">
 
                 {/* Top Accent */}
-                <div className="absolute top-0 left-0 w-full h-1.5 bg-gradient-to-r from-red-600 to-orange-600" />
+                <div className="absolute top-0 left-0 w-full h-1.5 bg-linear-to-r from-red-600 to-orange-600" />
 
                 {/* Header */}
                 <div className="text-center space-y-4 mb-8">

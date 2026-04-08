@@ -26,7 +26,7 @@ export async function ensureStripeCustomer(
 interface CreateStripeCheckoutSessionParams {
   priceId: Stripe.Price["id"];
   customerId: Stripe.Customer["id"];
-  mode: Stripe.Checkout.Session.Mode;
+  mode: Stripe.Checkout.Session["mode"];
 }
 
 export function createStripeCheckoutSession({
@@ -60,8 +60,8 @@ export function createStripeCheckoutSession({
  * However, enabling invoices for subscriptions will throw an error.
  */
 function getInvoiceCreationConfig(
-  mode: Stripe.Checkout.Session.Mode,
-): Stripe.Checkout.SessionCreateParams["invoice_creation"] {
+  mode: Stripe.Checkout.Session["mode"],
+): { enabled: boolean } | undefined {
   return mode === "payment"
     ? {
       enabled: true,

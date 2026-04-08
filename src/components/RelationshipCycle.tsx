@@ -112,7 +112,7 @@ export const RelationshipCycle: React.FC<RelationshipCycleProps> = ({ myLens, pa
 
             {/* STEP 5: THE WAY OUT (SOLUTION) */}
             <div className="relative group">
-                <div className="absolute -inset-1 bg-gradient-to-r from-green-400 to-emerald-600 rounded-2xl blur opacity-25 group-hover:opacity-40 transition duration-1000"></div>
+                <div className="absolute -inset-1 bg-linear-to-r from-green-400 to-emerald-600 rounded-2xl blur opacity-25 group-hover:opacity-40 transition duration-1000"></div>
                 <div className="relative bg-background rounded-xl border border-green-200 dark:border-green-900/30 p-8 shadow-xl">
                     <div className="flex flex-col md:flex-row items-center gap-6">
                         <div className="bg-green-100 text-green-600 p-4 rounded-full shrink-0">

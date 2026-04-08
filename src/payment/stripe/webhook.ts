@@ -91,7 +91,7 @@ function constructStripeEvent(request: express.Request): Stripe.Event {
 
   return stripeClient.webhooks.constructEvent(
     request.body,
-    stripeSignature,
+    stripeSignature as string,
     stripeWebhookSecret,
   );
 }
@@ -143,12 +143,12 @@ function getInvoicePriceId(invoice: Stripe.Invoice): Stripe.Price["id"] {
     throw new Error("There should be exactly one line item in Stripe invoice");
   }
 
-  const priceId = invoiceLineItems[0].pricing?.price_details?.price;
-  if (!priceId) {
+  const price = invoiceLineItems[0].pricing?.price_details?.price;
+  if (!price) {
     throw new Error("Unable to extract price id from items");
   }
 
-  return priceId;
+  return typeof price === "string" ? price : price.id;
 }
 
 async function handleCustomerSubscriptionUpdated(

@@ -3,7 +3,7 @@ import { X, CheckCircle2, AlertTriangle, ArrowRight, Activity, TrendingDown } fr
 
 export default function CostOfInactionSection() {
     return (
-        <section className="bg-gradient-to-br from-red-50/50 to-orange-50/50 dark:from-red-950/20 dark:to-orange-950/20 border border-red-100 dark:border-red-900/30 rounded-3xl p-6 md:p-10 relative overflow-hidden">
+        <section className="bg-linear-to-br from-red-50/50 to-orange-50/50 dark:from-red-950/20 dark:to-orange-950/20 border border-red-100 dark:border-red-900/30 rounded-3xl p-6 md:p-10 relative overflow-hidden">
             {/* Background elements */}
             <div className="absolute top-0 right-0 p-12 opacity-[0.03]">
                 <TrendingDown size={200} />
@@ -32,7 +32,7 @@ export default function CostOfInactionSection() {
                         </div>
                     </div>
 
-                    <div className="space-y-5 mb-8 flex-grow">
+                    <div className="space-y-5 mb-8 grow">
                         <div className="flex gap-4">
                             <span className="font-bold text-red-300 text-lg">01</span>
                             <div>
@@ -78,7 +78,7 @@ export default function CostOfInactionSection() {
                         </div>
                     </div>
 
-                    <div className="space-y-5 mb-8 flex-grow">
+                    <div className="space-y-5 mb-8 grow">
                         <div className="flex gap-4">
                             <span className="font-bold text-green-300 text-lg">01</span>
                             <div>

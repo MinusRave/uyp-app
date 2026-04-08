@@ -1,12 +1,12 @@
 import { ArrowRight, CheckCircle2 } from "lucide-react";
-import { Link } from "react-router-dom";
+import { Link } from "react-router";
 
 export default function ClosingCTASection() {
     return (
         <section className="relative py-24 overflow-hidden">
             {/* Gradient Background */}
-            <div className="absolute inset-0 bg-gradient-to-br from-primary/10 via-purple-500/10 to-blue-500/10"></div>
-            <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,_var(--tw-gradient-stops))] from-primary/20 via-transparent to-transparent"></div>
+            <div className="absolute inset-0 bg-linear-to-br from-primary/10 via-purple-500/10 to-blue-500/10"></div>
+            <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,var(--tw-gradient-stops))] from-primary/20 via-transparent to-transparent"></div>
 
             <div className="relative mx-auto max-w-4xl px-6 lg:px-8 text-center">
                 {/* Main Content */}

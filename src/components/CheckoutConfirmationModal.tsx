@@ -109,11 +109,11 @@ const CheckoutConfirmationModal: React.FC<CheckoutConfirmationModalProps> = ({
     const orderedBenefits = getOrderedBenefits(lowestDimension, isCrisis);
 
     return (
-        <div className="fixed inset-0 bg-black/70 backdrop-blur-sm z-[100] flex items-center justify-center p-4 animate-fade-in overflow-y-auto">
+        <div className="fixed inset-0 bg-black/70 backdrop-blur-sm z-100 flex items-center justify-center p-4 animate-fade-in overflow-y-auto">
             <div className="bg-background rounded-2xl p-0 max-w-[540px] w-full my-8 relative shadow-2xl border border-border">
 
                 {/* Header - PERSONALIZED */}
-                <div className="bg-gradient-to-r from-primary/10 to-primary/5 p-6 text-center relative border-b border-border/50">
+                <div className="bg-linear-to-r from-primary/10 to-primary/5 p-6 text-center relative border-b border-border/50">
                     <button
                         onClick={onClose}
                         disabled={isRedirecting}

@@ -79,7 +79,7 @@ export const stripePaymentProcessor: PaymentProcessor = {
 
 function paymentPlanEffectToStripeCheckoutSessionMode({
   kind,
-}: PaymentPlanEffect): Stripe.Checkout.Session.Mode {
+}: PaymentPlanEffect): Stripe.Checkout.Session["mode"] {
   switch (kind) {
     case "subscription":
       return "subscription";
