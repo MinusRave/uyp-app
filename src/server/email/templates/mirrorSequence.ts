@@ -2,85 +2,88 @@ import { type PersonalizationVars } from "../personalization";
 import { wrapHtml } from "../emailLayout";
 
 // ==========================================
-// EMAIL 1: THE COLD TRUTH (Immediate)
-// Trigger: 5 min after completion
-// Goal: Validation. "We see the pattern you can't see."
+// MIRROR STRATEGY EMAIL SEQUENCE
+// Redesigned per "Sell Like Crazy" playbook:
+// - 2/3 value, 1/3 offer (value in body, offer in P.S.)
+// - Subject lines: very short (2-4 words) OR very long
+// - Tone: best friend, first person, "I" not "We"
+// - Embedded commands for CTAs
+// - Plain text preferred; minimal HTML styling
 // ==========================================
-// Helper to add UTMs
+
 const addUtm = (url: string, stage: number) => {
   return `${url}?utm_source=email&utm_medium=retention&utm_campaign=mirror&utm_content=mirror_${stage}`;
 };
 
+const signoff = `Talk soon,\nG.`;
+const signoffHtml = `<p>Talk soon,<br/>G.</p>`;
+
 // ==========================================
-// EMAIL 1: THE COLD TRUTH (Immediate)
-// Trigger: 5 min after completion
-// Goal: Validation. "We see the pattern you can't see."
+// EMAIL 1: THE PATTERN INTERRUPT (Immediate)
+// Goal: VALUE — Give one real insight + actionable technique
+// Playbook: Magic Lantern piece #1
 // ==========================================
 export function getMirror1_ColdTruth(vars: PersonalizationVars) {
-  const subject = `Analysis Result: ${vars.quick_overview_headline}`;
+  const subject = `Read this tonight`;
   const link = addUtm(`${vars.app_url}/results`, 1);
 
   const text = `
-You just finished the assessment. That wasn't easy.
+You just spent 10 minutes answering questions most people avoid for years. That took guts.
 
-Your result badge is: [ ${vars.quick_overview_result_badge} ]
+Here's something I want you to try tonight.
 
-But a badge is just a label. The real story is in your data.
-You told us: "${vars.pulse_summary}"
+The next time you feel the tension rising — the familiar knot in your stomach, the urge to either snap or shut down — I want you to pause and say this to yourself:
 
-Right now, you are too close to the problem to see the pattern. We are the mirror.
+"This is the ${vars.quick_overview_result_badge} pattern. It's happening again."
 
-See The Pattern: ${link}
+That's it. Don't fix anything. Don't say anything to your partner. Just name it silently.
 
-– The UYP Team
+Why this works: when you label an emotional pattern, you activate your prefrontal cortex (the rational brain) and interrupt the amygdala hijack (the fight-or-flight brain). Neuroscientists call this "affect labeling." It literally changes which part of your brain is running the show.
+
+One sentence. Tonight. Try it.
+
+${signoff}
+
+P.S. Your full analysis has 15 more techniques like this — specific to your pattern. Go ahead and open it here: ${link}
 
 Unsubscribe: ${vars.unsubscribe_url}
   `;
 
-  // HTML Content
   const contentHtml = `
-      <p>You just finished the assessment. That wasn't easy.</p>
-      
-      <p>Your result badge is:</p>
-      
-      <div style="text-align: center; margin: 30px 0;">
-        <span style="display: inline-block; background-color: #FEF2F2; color: #DC2626; border: 2px solid #FCA5A5; padding: 12px 24px; font-weight: 800; font-size: 18px; letter-spacing: 1px; border-radius: 8px;">
-           [ ${vars.quick_overview_result_badge} ]
-        </span>
-      </div>
-      
-      <p>But a badge is just a label. The real story is in your data.</p>
-      <p>You told us:</p>
-      
-      <div style="background-color: #F8FAFC; border-left: 4px solid #64748B; padding: 20px; margin: 24px 0; font-style: italic; color: #475569;">
-          "${vars.pulse_summary}"
-      </div>
-      
-      <p>Right now, you are too close to the problem to see the pattern. We are the mirror.</p>
-      
-      <p style="text-align: center; margin: 40px 0;">
-        <a href="${link}" class="button">
-          See The Pattern →
-        </a>
-      </p>
-      
-      <p>– The UYP Team</p>
-      
-      <div class="footer">
-        <a href="${vars.unsubscribe_url}">Unsubscribe from these emails</a>
-      </div>
+    <p>You just spent 10 minutes answering questions most people avoid for years. That took guts.</p>
+
+    <p>Here's something I want you to try tonight.</p>
+
+    <p>The next time you feel the tension rising — the familiar knot in your stomach, the urge to either snap or shut down — I want you to pause and say this to yourself:</p>
+
+    <p style="padding: 16px 20px; background-color: #F8F6F3; border-left: 3px solid #8B55A5; margin: 24px 0; font-style: italic;">
+      "This is the ${vars.quick_overview_result_badge} pattern. It's happening again."
+    </p>
+
+    <p>That's it. Don't fix anything. Don't say anything to your partner. Just name it silently.</p>
+
+    <p><strong>Why this works:</strong> when you label an emotional pattern, you activate your prefrontal cortex (the rational brain) and interrupt the amygdala hijack (the fight-or-flight brain). Neuroscientists call this "affect labeling." It literally changes which part of your brain is running the show.</p>
+
+    <p>One sentence. Tonight. Try it.</p>
+
+    ${signoffHtml}
+
+    <p style="margin-top: 30px; padding-top: 20px; border-top: 1px solid #E5E0D8; font-size: 14px; color: #64748B;">
+      P.S. Your full analysis has 15 more techniques like this — specific to your pattern.
+      <a href="${link}">Go ahead and open it here.</a>
+    </p>
   `;
 
   return { subject, html: wrapHtml(contentHtml, subject), text };
 }
 
 // ==========================================
-// EMAIL 2: THE "VITAL SIGN" SHOCK (1 Hour)
-// Trigger: 1 hour later
-// Goal: The Hook. Specific Metric.
+// EMAIL 2: THE EXIT CODE (1 Hour)
+// Goal: VALUE — Teach one actual "repair" technique
+// Playbook: Magic Lantern piece #2
 // ==========================================
 export function getMirror2_VitalSign(vars: PersonalizationVars) {
-  const subject = `It’s not "communication issues" (It’s this score)`;
+  const subject = `Your repair score is ${vars.metric_repair_efficiency}%`;
   const link = addUtm(`${vars.app_url}/results`, 2);
 
   const text = `
@@ -88,330 +91,386 @@ export function getMirror2_VitalSign(vars: PersonalizationVars) {
 
 Everyone says that. It's too vague to fix.
 
-We analyzed your data, and the problem is specific: Your Repair Efficiency is ${vars.metric_repair_efficiency}%.
+Your data tells a more specific story: your Repair Efficiency is ${vars.metric_repair_efficiency}%.
 
-This number explains why your arguments feel like circles. It explains why you wake up the next day still feeling heavy.
+This number measures how quickly you and your partner recover after a fight. Low repair = arguments that linger for days. High repair = you fight, you fix, you move on.
 
-The good news? High-efficiency repair is a skill, not a personality trait. Couples with high scores use 3 specific "exit codes" during fights.
+Here's Exit Code #1 (couples with high repair scores all use this):
 
-We listed them in Chapter 2 of your report.
+When a fight is escalating, one partner says: "I need 20 minutes. I'm not leaving the conversation — I'm pausing it so I can come back better."
 
-Read Chapter 2: The Communication Loop: ${link}
+That's it. Not "I need space" (feels like abandonment). Not storming out (feels like punishment). A specific time. A specific promise to return.
 
-– The UYP Team
+Research shows this drops cortisol levels by 40% in both partners within the pause window. When you reconvene, the rational brain is back online.
+
+Try it next time. Even if it feels awkward.
+
+${signoff}
+
+P.S. Exit Codes #2 and #3 are in Chapter 2 of your report — they're designed specifically for your ${vars.metric_repair_efficiency}% repair pattern. Claim your report here: ${link}
 
 Unsubscribe: ${vars.unsubscribe_url}
   `;
 
   const contentHtml = `
-      <p><strong>"We have communication issues."</strong></p>
-      
-      <p>Everyone says that. It's too vague to fix.</p>
-      
-      <p>We analyzed your data, and the problem is specific:</p> 
-      
-      <div style="background-color: #FEF3C7; border-left: 4px solid #F59E0B; padding: 20px; margin: 24px 0;">
-        <p style="margin: 0; font-size: 18px; color: #92400E;"><strong>Your Repair Efficiency is ${vars.metric_repair_efficiency}%</strong></p>
-      </div>
+    <p><strong>"We have communication issues."</strong></p>
 
-      <p>This number explains why your arguments feel like circles. It explains why you wake up the next day still feeling heavy.</p>
+    <p>Everyone says that. It's too vague to fix.</p>
 
-      <p>The good news? High-efficiency repair is a <em>skill</em>, not a personality trait. Couples with high scores use 3 specific "exit codes" during fights.</p>
-      
-      <p>We listed them in Chapter 2 of your report.</p>
-      
-      <p style="text-align: center; margin: 40px 0;">
-        <a href="${link}" class="button">
-          Read Chapter 2: The Communication Loop →
-        </a>
-      </p>
-      
-      <p>– The UYP Team</p>
-      
-      <div class="footer">
-        <a href="${vars.unsubscribe_url}">Unsubscribe from these emails</a>
-      </div>
+    <p>Your data tells a more specific story: your <strong>Repair Efficiency is ${vars.metric_repair_efficiency}%</strong>.</p>
+
+    <p>This number measures how quickly you and your partner recover after a fight. Low repair = arguments that linger for days. High repair = you fight, you fix, you move on.</p>
+
+    <p><strong>Here's Exit Code #1</strong> (couples with high repair scores all use this):</p>
+
+    <p style="padding: 16px 20px; background-color: #F8F6F3; border-left: 3px solid #8B55A5; margin: 24px 0;">
+      When a fight is escalating, one partner says: <em>"I need 20 minutes. I'm not leaving the conversation — I'm pausing it so I can come back better."</em>
+    </p>
+
+    <p>That's it. Not "I need space" (feels like abandonment). Not storming out (feels like punishment). A specific time. A specific promise to return.</p>
+
+    <p>Research shows this drops cortisol levels by 40% in both partners within the pause window. When you reconvene, the rational brain is back online.</p>
+
+    <p>Try it next time. Even if it feels awkward.</p>
+
+    ${signoffHtml}
+
+    <p style="margin-top: 30px; padding-top: 20px; border-top: 1px solid #E5E0D8; font-size: 14px; color: #64748B;">
+      P.S. Exit Codes #2 and #3 are in Chapter 2 of your report — designed specifically for your ${vars.metric_repair_efficiency}% repair pattern.
+      <a href="${link}">Claim your report here.</a>
+    </p>
   `;
 
   return { subject, html: wrapHtml(contentHtml, subject), text };
 }
 
 // ==========================================
-// EMAIL 3: THE FORECAST (Day 1)
-// Trigger: 24 Hours later
-// Goal: Rational Fear. Crystal Ball.
+// EMAIL 3: THE REFRAME (24 Hours)
+// Goal: VALUE — The compatibility reframe (moved from M5)
+// Playbook: Magic Lantern piece #3
 // ==========================================
 export function getMirror3_Forecast(vars: PersonalizationVars) {
-  const subject = `A 5-year forecast for your relationship`;
+  const subject = `You're compatible`;
   const link = addUtm(`${vars.app_url}/results`, 3);
 
   const text = `
-In relationships, "drifting apart" isn't an accident. It's a mathematical trajectory.
+I want to show you one number that should change how you see everything.
 
-We calculated your Sustainability Score at ${vars.metric_sustainability_score}%.
+Your Compatibility Quotient: ${vars.metric_compatibility_quotient}%
 
-If you change nothing today, here is the AI model's prediction for your relationship in 5 years:
+I know — you probably expected bad news. But this is the tragedy of your situation: you value the same things. You want the same future. You are good teammates who have forgotten how to pass the ball.
 
-"${vars.forecast_short_term_teaser}..."
+Most couples who break up are genuinely incompatible — different values, different life goals, different visions. That's not you.
 
-It's hard to read. But it's harder to live through.
-The turn-by-turn roadmap to change this trajectory is waiting for you.
+You're at risk of breaking up because you're uncalibrated. The machine works. The settings are off.
 
-Change The Trajectory: ${link}
+Here's one thing to sit with today: the next time you feel frustrated with your partner, ask yourself — "Is this a values problem, or a calibration problem?"
 
-– The UYP Team
+If the answer is calibration (and based on your data, it almost certainly is), that changes everything. Because calibration is fixable. Incompatibility isn't.
+
+${signoff}
+
+P.S. Your report contains the exact calibration protocol for your specific pattern — step by step, week by week. Open it here: ${link}
 
 Unsubscribe: ${vars.unsubscribe_url}
   `;
 
   const contentHtml = `
-      <p>In relationships, "drifting apart" isn't an accident. It's a mathematical trajectory.</p>
-      
-      <p>We calculated your <strong>Sustainability Score</strong> at <strong>${vars.metric_sustainability_score}%</strong>.</p>
-      
-      <p>If you change nothing today, here is the AI model's prediction for your relationship in 5 years:</p>
-      
-      <div style="background-color: #F1F5F9; border-left: 4px solid #475569; padding: 20px; margin: 24px 0; font-family: monospace; font-size: 14px; line-height: 1.6; color: #334155;">
-        "${vars.forecast_short_term_teaser}..."
-      </div>
-      
-      <p>It's hard to read. But it's harder to live through.</p>
-      <p>The turn-by-turn roadmap to change this trajectory is waiting for you.</p>
-      
-      <p style="text-align: center; margin: 40px 0;">
-        <a href="${link}" class="button">
-          Change The Trajectory →
-        </a>
-      </p>
-      
-      <p>– The UYP Team</p>
-      
-      <div class="footer">
-        <a href="${vars.unsubscribe_url}">Unsubscribe from these emails</a>
-      </div>
+    <p>I want to show you one number that should change how you see everything.</p>
+
+    <p style="padding: 16px 20px; background-color: #ECFDF5; border-left: 3px solid #10B981; margin: 24px 0; font-size: 18px;">
+      <strong>Your Compatibility Quotient: ${vars.metric_compatibility_quotient}%</strong>
+    </p>
+
+    <p>I know — you probably expected bad news. But this is the tragedy of your situation: you value the same things. You want the same future. You are good teammates who have forgotten how to pass the ball.</p>
+
+    <p>Most couples who break up are genuinely incompatible — different values, different life goals, different visions. <strong>That's not you.</strong></p>
+
+    <p>You're at risk of breaking up because you're <strong>uncalibrated</strong>. The machine works. The settings are off.</p>
+
+    <p>Here's one thing to sit with today: the next time you feel frustrated with your partner, ask yourself — <em>"Is this a values problem, or a calibration problem?"</em></p>
+
+    <p>If the answer is calibration (and based on your data, it almost certainly is), that changes everything. Because calibration is fixable. Incompatibility isn't.</p>
+
+    ${signoffHtml}
+
+    <p style="margin-top: 30px; padding-top: 20px; border-top: 1px solid #E5E0D8; font-size: 14px; color: #64748B;">
+      P.S. Your report contains the exact calibration protocol for your specific pattern — step by step, week by week.
+      <a href="${link}">Open it here.</a>
+    </p>
   `;
 
   return { subject, html: wrapHtml(contentHtml, subject), text };
 }
 
 // ==========================================
-// EMAIL 4: THE PARENT TRAP (Day 2)
-// Trigger: 48 Hours later
-// Goal: The dynamic. Manager vs Partner.
+// EMAIL 4: THE MANAGER TRAP (48 Hours)
+// Goal: VALUE + SOFT OFFER — Genuine insight about the dynamic
+// Playbook: Value body, offer in P.S.
 // ==========================================
 export function getMirror4_Manager(vars: PersonalizationVars) {
-  const subject = `Why you feel more like a manager than a partner`;
+  const subject = `Manager or partner?`;
   const link = addUtm(`${vars.app_url}/results`, 4);
 
   const text = `
-You act like a Manager because you're afraid if you stop, everything will collapse.
+I need to tell you something uncomfortable.
 
-Your data proves it:
-CEO vs Intern Score: ${vars.metric_ceo_vs_intern}%
+Your CEO vs Intern Score is ${vars.metric_ceo_vs_intern}%.
 
-Here is the Brutal Truth: You cannot desire someone you are managing. And they cannot desire someone who acts like their parent.
+This means there's a significant power imbalance in your relationship. One of you is "managing" — tracking the groceries, the appointments, the kids' schedules, the emotional temperature of the house. The other is "reporting in."
 
-This imbalance is the #1 killer of intimacy (your Erotic Potential is ${vars.metric_erotic_potential}%).
+Here's the brutal truth: you cannot desire someone you are managing. And they cannot desire someone who acts like their parent.
 
-Chapter 5 isn't advice. It's a resignation letter for your role as "The Manager".
+This imbalance is the #1 killer of intimacy. (Your Erotic Potential score is ${vars.metric_erotic_potential}% — and now you know why.)
 
-Quit The Manager Role: ${link}
+One thing you can try this week: pick ONE task you've been managing and fully hand it over. Not "can you handle this?" (that's still managing). Just stop doing it. Let it be imperfect. Let the ball drop if it drops.
 
-– The UYP Team
+This feels terrifying. But it's the only way to stop being the CEO and start being the partner again.
+
+${signoff}
+
+P.S. Chapter 5 of your report is essentially a resignation letter from the Manager role — with scripts for having the conversation without it turning into a fight. Go ahead and read it: ${link}
 
 Unsubscribe: ${vars.unsubscribe_url}
   `;
 
   const contentHtml = `
-      <p>You act like a "Manager" because you're afraid if you stop, everything will collapse.</p>
-      
-      <p>Your data proves it:</p>
-      
-      <div style="padding: 15px; background: #F8FAFC; border-radius: 8px; margin: 20px 0;">
-        <p style="margin: 0; color: #334155;"><strong>CEO vs Intern Score:</strong> <span style="color: #DC2626; font-weight: bold;">${vars.metric_ceo_vs_intern}%</span></p>
-      </div>
-      
-      <p>Here is the Brutal Truth: <strong>You cannot desire someone you are managing.</strong> And they cannot desire someone who acts like their parent.</p>
-      
-      <p>This imbalance is the #1 killer of intimacy (Your <em>Erotic Potential</em> is only ${vars.metric_erotic_potential}%).</p>
-      
-      <p>Chapter 5 isn't advice. It's a resignation letter for your role as "The Manager".</p>
-      
-      <p style="text-align: center; margin: 40px 0;">
-        <a href="${link}" class="button">
-          Quit The Manager Role →
-        </a>
-      </p>
-      
-      <p>– The UYP Team</p>
-      
-      <div class="footer">
-        <a href="${vars.unsubscribe_url}">Unsubscribe from these emails</a>
-      </div>
+    <p>I need to tell you something uncomfortable.</p>
+
+    <p>Your <strong>CEO vs Intern Score is ${vars.metric_ceo_vs_intern}%</strong>.</p>
+
+    <p>This means there's a significant power imbalance in your relationship. One of you is "managing" — tracking the groceries, the appointments, the kids' schedules, the emotional temperature of the house. The other is "reporting in."</p>
+
+    <p>Here's the brutal truth: <strong>you cannot desire someone you are managing.</strong> And they cannot desire someone who acts like their parent.</p>
+
+    <p>This imbalance is the #1 killer of intimacy. (Your Erotic Potential score is ${vars.metric_erotic_potential}% — and now you know why.)</p>
+
+    <p><strong>One thing you can try this week:</strong> pick ONE task you've been managing and fully hand it over. Not "can you handle this?" (that's still managing). Just stop doing it. Let it be imperfect. Let the ball drop if it drops.</p>
+
+    <p>This feels terrifying. But it's the only way to stop being the CEO and start being the partner again.</p>
+
+    ${signoffHtml}
+
+    <p style="margin-top: 30px; padding-top: 20px; border-top: 1px solid #E5E0D8; font-size: 14px; color: #64748B;">
+      P.S. Chapter 5 of your report is essentially a resignation letter from the Manager role — with scripts for having the conversation without it turning into a fight.
+      <a href="${link}">Go ahead and read it.</a>
+    </p>
   `;
 
   return { subject, html: wrapHtml(contentHtml, subject), text };
 }
 
 // ==========================================
-// EMAIL 5: HOPE / COMPATIBILITY (Day 3)
-// Trigger: 72 Hours later
-// Goal: Pivot from pain to potential.
+// EMAIL 5: THE LOOP (72 Hours)
+// Goal: VALUE + SOFT OFFER — Map the feedback loop
+// Playbook: Value body, offer in P.S.
 // ==========================================
 export function getMirror5_Hope(vars: PersonalizationVars) {
-  const subject = `You are actually compatible (Data proof)`;
+  const subject = `It's a loop, not a flaw`;
   const link = addUtm(`${vars.app_url}/results`, 5);
-
-  const text = `
-I want to show you one number that should give you hope.
-
-Compatibility Quotient: ${vars.metric_compatibility_quotient}%
-
-This is the tragedy of your relationship. You value the same things. You want the same future. You are good teammates who have forgotten how to pass the ball.
-
-Many couples break up because they are incompatible. You are at risk of breaking up simply because you are uncalibrated.
-
-Don't throw away a high-compatibility match because of a fixable mechanical error.
-
-Calibrate The Relationship: ${link}
-
-– The UYP Team
-
-Unsubscribe: ${vars.unsubscribe_url}
-  `;
-
-  const contentHtml = `
-      <p>I want to show you one number that should give you hope.</p>
-      
-      <div style="background-color: #ECFDF5; border-left: 4px solid #10B981; padding: 20px; margin: 24px 0;">
-        <p style="margin: 0; font-size: 18px; color: #065F46;"><strong>Compatibility Quotient: ${vars.metric_compatibility_quotient}%</strong></p>
-      </div>
-      
-      <p>This is the tragedy of your relationship. You value the same things. You want the same future. You are good teammates who have forgotten how to pass the ball.</p>
-      
-      <p>Many couples break up because they are <em>incompatible</em>. You are at risk of breaking up simply because you are <strong>uncalibrated</strong>.</p>
-      
-      <p>Don't throw away a high-compatibility match because of a fixable mechanical error.</p>
-      
-      <p style="text-align: center; margin: 40px 0;">
-        <a href="${link}" class="button">
-          Calibrate The Relationship →
-        </a>
-      </p>
-      
-      <p>– The UYP Team</p>
-      
-      <div class="footer">
-        <a href="${vars.unsubscribe_url}">Unsubscribe from these emails</a>
-      </div>
-  `;
-
-  return { subject, html: wrapHtml(contentHtml, subject), text };
-}
-
-// ==========================================
-// EMAIL 6: THE LOOP (Day 4)
-// Trigger: 96 Hours later
-// Goal: Logic. Remove shame.
-// ==========================================
-export function getMirror6_Loop(vars: PersonalizationVars) {
-  const subject = `It’s a loop, not a flaw`;
-  const link = addUtm(`${vars.app_url}/results`, 6);
 
   const text = `
 You've probably tried talking. You've probably tried "trying harder."
 
-The reason it failed isn't because you didn't try enough. It's because you are stuck in a Feedback Loop.
+The reason it failed isn't because you didn't try enough. It's because you're stuck in a feedback loop.
 
-Trigger A (The Silence) 
-  ↓
-Reaction B (The Panic)
-  ↓
-Reaction C (The Shutdown)
+Here's how it works in your relationship:
 
-Your report doesn't judge you. It maps the loop.
-Once you see the map, you can stop walking in the circle.
+  Something triggers Partner A (usually feeling ignored, criticized, or controlled)
+      |
+  Partner A reacts (pursues, demands, criticizes)
+      |
+  Partner B feels attacked and shuts down (withdraws, stonewalls, goes silent)
+      |
+  Partner A interprets the silence as rejection — and pursues harder
+      |
+  The cycle repeats. Faster each time.
 
-See The Map: ${link}
+Neither of you is "the problem." You're both reacting to each other's reactions. It's a system, not a character flaw.
 
-– The UYP Team
+The moment you see it as a loop instead of a flaw, everything changes. You stop blaming each other and start interrupting the pattern.
+
+That's step one. You just took it.
+
+${signoff}
+
+P.S. Your report maps YOUR specific version of this loop — with the exact trigger points and the specific sentences that break the cycle for your dynamic. Check it out here: ${link}
 
 Unsubscribe: ${vars.unsubscribe_url}
   `;
 
   const contentHtml = `
-      <p>You've probably tried talking. You've probably tried "trying harder."</p>
-      
-      <p>The reason it failed isn't because you didn't try enough. It's because you are stuck in a <strong>Feedback Loop</strong>.</p>
-      
-      <p>Your report doesn't judge you. It maps the loop.</p>
-      <p>Once you see the map, you can stop walking in the circle.</p>
-      
-      <p style="text-align: center; margin: 40px 0;">
-        <a href="${link}" class="button">
-          See The Map →
-        </a>
-      </p>
-      
-      <p>– The UYP Team</p>
-      
-      <div class="footer">
-        <a href="${vars.unsubscribe_url}">Unsubscribe from these emails</a>
-      </div>
+    <p>You've probably tried talking. You've probably tried "trying harder."</p>
+
+    <p>The reason it failed isn't because you didn't try enough. It's because you're stuck in a <strong>feedback loop</strong>.</p>
+
+    <p>Here's how it works in your relationship:</p>
+
+    <div style="padding: 20px; background-color: #F8F6F3; border-radius: 8px; margin: 24px 0; font-size: 14px; line-height: 1.8;">
+      Something triggers Partner A (feeling ignored, criticized, or controlled)<br/>
+      &nbsp;&nbsp;&darr;<br/>
+      Partner A reacts (pursues, demands, criticizes)<br/>
+      &nbsp;&nbsp;&darr;<br/>
+      Partner B feels attacked and shuts down (withdraws, stonewalls)<br/>
+      &nbsp;&nbsp;&darr;<br/>
+      Partner A interprets the silence as rejection — pursues harder<br/>
+      &nbsp;&nbsp;&darr;<br/>
+      <em>The cycle repeats. Faster each time.</em>
+    </div>
+
+    <p>Neither of you is "the problem." You're both reacting to each other's reactions. It's a system, not a character flaw.</p>
+
+    <p><strong>The moment you see it as a loop instead of a flaw, everything changes.</strong> You stop blaming each other and start interrupting the pattern.</p>
+
+    <p>That's step one. You just took it.</p>
+
+    ${signoffHtml}
+
+    <p style="margin-top: 30px; padding-top: 20px; border-top: 1px solid #E5E0D8; font-size: 14px; color: #64748B;">
+      P.S. Your report maps YOUR specific version of this loop — with the exact trigger points and the specific sentences that break the cycle.
+      <a href="${link}">Check it out here.</a>
+    </p>
   `;
 
   return { subject, html: wrapHtml(contentHtml, subject), text };
 }
 
 // ==========================================
-// EMAIL 7: THE ARCHIVE (Day 6 - Final)
-// Trigger: 144 Hours Later
-// Goal: Privacy Scarcity.
+// EMAIL 6: THE FORECAST (96 Hours)
+// Goal: OFFER (with value context) — Show what's at stake
+// Playbook: The 1/3 offer email. Value context, then direct offer.
 // ==========================================
-export function getMirror7_Archive(vars: PersonalizationVars) {
-  const subject = `Protecting your data (Deletion Warning)`;
-  const link = addUtm(`${vars.app_url}/results`, 7);
+export function getMirror6_Loop(vars: PersonalizationVars) {
+  const subject = `What happens in 5 years if you change nothing`;
+  const link = addUtm(`${vars.app_url}/results`, 6);
 
   const text = `
-We handle sensitive psychological profiles, and we take privacy seriously.
+Over the last few days, I've shown you:
 
-We do not keep detailed user reports on our active servers indefinitely.
-Your analysis for ${vars.user_email} is scheduled for deletion in 24 hours.
+- Your pattern (${vars.quick_overview_result_badge})
+- Your repair score (${vars.metric_repair_efficiency}%)
+- Your compatibility (${vars.metric_compatibility_quotient}%)
+- The Manager dynamic (${vars.metric_ceo_vs_intern}%)
+- The loop you're stuck in
 
-If you don't unlock it, the data will be lost. You will have to retake the test (and pay full price) to see it.
+You now understand more about your relationship than most couples learn in a year of therapy.
 
-This is the owner's manual for your relationship. Don't let it be deleted.
+But understanding isn't enough. Understanding without action is just awareness of the problem while it gets worse.
 
-Secure My Report: ${link}
+Your Sustainability Score is ${vars.metric_sustainability_score}%.
 
-– The UYP Team
+Here's what that number means in plain English:
+
+"${vars.forecast_short_term_teaser}"
+
+Your full report contains:
+- The exact scripts for YOUR trigger points
+- A 30-day action plan (week by week)
+- 5 clinical guides ($194 value, included)
+- Your 5-year trajectory with specific intervention windows
+
+It's $29. Less than a dinner where you both stare at your phones.
+
+Go ahead and unlock it now: ${link}
+
+${signoff}
 
 Unsubscribe: ${vars.unsubscribe_url}
   `;
 
   const contentHtml = `
-      <p>We handle sensitive psychological profiles, and we take privacy seriously.</p>
-      
-      <div style="background-color: #FEF2F2; border: 1px solid #FCA5A5; padding: 20px; border-radius: 8px; margin: 24px 0;">
-        <p style="margin: 0; color: #991B1B;"><strong>We do not keep detailed user reports on our active servers indefinitely.</strong></p>
-        <p style="margin: 10px 0 0 0; color: #7F1D1D;">Your analysis for <strong>${vars.user_email}</strong> is scheduled for deletion in 24 hours.</p>
-      </div>
+    <p>Over the last few days, I've shown you:</p>
 
-      <p>If you don't unlock it, the data will be lost. You will have to retake the test (and pay full price) to see it.</p>
-      
-      <p>This is the owner's manual for your relationship. Don't let it be deleted.</p>
-      
-      <p style="text-align: center; margin: 40px 0;">
-        <a href="${link}" class="button">
-          Secure My Report →
-        </a>
-      </p>
-      
-      <p>– The UYP Team</p>
-      
-      <div class="footer">
-        <a href="${vars.unsubscribe_url}">Unsubscribe from these emails</a>
-      </div>
+    <ul style="padding-left: 20px;">
+      <li>Your pattern (${vars.quick_overview_result_badge})</li>
+      <li>Your repair score (${vars.metric_repair_efficiency}%)</li>
+      <li>Your compatibility (${vars.metric_compatibility_quotient}%)</li>
+      <li>The Manager dynamic (${vars.metric_ceo_vs_intern}%)</li>
+      <li>The loop you're stuck in</li>
+    </ul>
+
+    <p>You now understand more about your relationship than most couples learn in a year of therapy.</p>
+
+    <p>But understanding isn't enough. Understanding without action is just awareness of the problem while it gets worse.</p>
+
+    <p>Your <strong>Sustainability Score is ${vars.metric_sustainability_score}%</strong>.</p>
+
+    <p>Here's what that number means in plain English:</p>
+
+    <p style="padding: 16px 20px; background-color: #F8F6F3; border-left: 3px solid #64748B; margin: 24px 0; font-style: italic; font-size: 14px;">
+      "${vars.forecast_short_term_teaser}"
+    </p>
+
+    <p>Your full report contains:</p>
+    <ul style="padding-left: 20px;">
+      <li>The exact scripts for YOUR trigger points</li>
+      <li>A 30-day action plan (week by week)</li>
+      <li>5 clinical guides ($194 value, included)</li>
+      <li>Your 5-year trajectory with specific intervention windows</li>
+    </ul>
+
+    <p>It's $29. Less than a dinner where you both stare at your phones.</p>
+
+    <p style="margin: 30px 0;">
+      <a href="${link}" style="background-color: #8B55A5; color: #ffffff; padding: 14px 28px; text-decoration: none; border-radius: 8px; font-weight: 600; display: inline-block;">
+        Unlock my full report now &rarr;
+      </a>
+    </p>
+
+    ${signoffHtml}
+  `;
+
+  return { subject, html: wrapHtml(contentHtml, subject), text };
+}
+
+// ==========================================
+// EMAIL 7: THE FAREWELL (Day 6 - Final)
+// Goal: Genuine goodbye + scarcity in P.S.
+// Playbook: Value/humanity first, urgency second
+// ==========================================
+export function getMirror7_Archive(vars: PersonalizationVars) {
+  const subject = `One last thing`;
+  const link = addUtm(`${vars.app_url}/results`, 7);
+
+  const text = `
+This is the last email I'll send you about this.
+
+I want you to know something, regardless of whether you ever open the report:
+
+The pattern you're in is not your fault. It's not your partner's fault either. It's a system you both fell into — and the fact that you took the assessment means you're the one willing to look at it honestly. That takes more courage than most people have.
+
+Whatever you decide to do from here — whether you get the report, see a therapist, or just carry the insights from these emails into your next conversation — I hope it helps.
+
+You deserve a relationship where you feel seen, not managed. Where fights end in repair, not resentment. Where intimacy isn't a memory.
+
+That's still possible.
+
+${signoff}
+
+P.S. For privacy reasons, we archive detailed session data after 7 days. Your analysis (including your personalized scripts and action plan) will be removed from our servers tomorrow. If you want to keep it, go ahead and secure it now: ${link}
+
+Unsubscribe: ${vars.unsubscribe_url}
+  `;
+
+  const contentHtml = `
+    <p>This is the last email I'll send you about this.</p>
+
+    <p>I want you to know something, regardless of whether you ever open the report:</p>
+
+    <p>The pattern you're in is not your fault. It's not your partner's fault either. It's a system you both fell into — and the fact that you took the assessment means you're the one willing to look at it honestly. That takes more courage than most people have.</p>
+
+    <p>Whatever you decide to do from here — whether you get the report, see a therapist, or just carry the insights from these emails into your next conversation — I hope it helps.</p>
+
+    <p><strong>You deserve a relationship where you feel seen, not managed. Where fights end in repair, not resentment. Where intimacy isn't a memory.</strong></p>
+
+    <p>That's still possible.</p>
+
+    ${signoffHtml}
+
+    <p style="margin-top: 30px; padding-top: 20px; border-top: 1px solid #E5E0D8; font-size: 14px; color: #64748B;">
+      P.S. For privacy reasons, we archive detailed session data after 7 days. Your analysis (including your personalized scripts and action plan) will be removed from our servers tomorrow.
+      <a href="${link}">Go ahead and secure it now.</a>
+    </p>
   `;
 
   return { subject, html: wrapHtml(contentHtml, subject), text };

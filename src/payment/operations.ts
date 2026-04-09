@@ -189,6 +189,7 @@ export const createCheckoutSession: CreateCheckoutSession<
       billing_address_collection: 'auto', // Reduces friction
       phone_number_collection: { enabled: false }, // Don't ask for phone
       submit_type: 'pay', // Button says "Pay" not "Subscribe"
+      allow_promotion_codes: true, // Enable coupon/promo codes in checkout
       line_items: lineItems,
       mode: "payment",
       success_url: testSession.testType === 'toxic-men'

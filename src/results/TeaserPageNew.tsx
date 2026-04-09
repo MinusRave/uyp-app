@@ -173,106 +173,94 @@ const HeroSection = ({
                     </p>
                 </div>
 
-                {/* Dimensions Scores (Show Numbers, Block Meaning) */}
+                {/* Dimensions Scores (UNLOCKED — HVCO value delivery) */}
                 {(session?.advancedMetrics as any)?.dimensions && (
                     <div className="grid grid-cols-2 md:grid-cols-4 gap-4 max-w-4xl mx-auto mb-8">
                         {['communication', 'security', 'erotic', 'balance'].map((dimKey, idx) => {
                             const score = (session?.advancedMetrics as any)?.dimensions?.[dimKey]?.score || 0;
                             const dimNames: Record<string, string> = { communication: "Communication", security: "Trust & Safety", erotic: "Intimacy", balance: "Fairness" };
+                            const dimTeaser = (quickOverview?.dimensions as any)?.[dimKey]?.metric_insight || (quickOverview?.dimensions as any)?.[dimKey]?.teaser || "";
                             return (
-                                <div key={idx} className="bg-card border border-border/50 p-4 rounded-xl text-center shadow-sm relative overflow-hidden group">
+                                <div key={idx} className="bg-card border border-border/50 p-4 rounded-xl text-center shadow-sm">
                                     <h4 className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground mb-1">{dimNames[dimKey]}</h4>
                                     <div className={`text-3xl font-black mb-2 ${score < 40 ? 'text-red-500' : score < 70 ? 'text-orange-500' : 'text-emerald-500'}`}>
                                         {score}<span className="text-sm opacity-50">/100</span>
                                     </div>
-                                    <div className="bg-muted p-2 rounded flex items-center justify-center gap-1">
-                                        <Lock size={10} className="text-muted-foreground" />
-                                        <span className="text-[9px] font-bold uppercase tracking-wider text-muted-foreground">Meaning Locked</span>
-                                    </div>
+                                    {dimTeaser && (
+                                        <p className="text-[11px] text-muted-foreground leading-snug mt-1">{dimTeaser}</p>
+                                    )}
                                 </div>
                             );
                         })}
                     </div>
                 )}
 
-                {/* Diagnosis Card (PARTIAL REVEAL / BLURRED) */}
-                <div className="bg-card border-2 border-primary/20 p-8 rounded-2xl shadow-lg max-w-2xl mx-auto mb-8 relative overflow-hidden group cursor-pointer" onClick={() => onUnlock('diagnosis_lock')}>
+                {/* Diagnosis Card (FULLY UNLOCKED — HVCO value) */}
+                <div className="bg-card border-2 border-primary/20 p-8 rounded-2xl shadow-lg max-w-2xl mx-auto mb-8 relative overflow-hidden">
                     <div className="absolute top-0 inset-x-0 h-1 bg-linear-to-r from-transparent via-primary/50 to-transparent"></div>
                     <p className="text-xs font-bold text-muted-foreground uppercase tracking-wider mb-2">Your Pattern</p>
-                    <h2 className="text-3xl font-black text-primary mb-6">"{diagnosis}"</h2>
+                    <h2 className="text-3xl font-black text-primary mb-4">"{diagnosis}"</h2>
 
-                    {/* Blurred Body */}
-                    <div className="relative">
-                        <div className="filter blur-md opacity-40 select-none">
-                            <p className="text-lg text-muted-foreground leading-relaxed">
-                                This relationship dynamic is characterized by a cyclical pursuit and withdrawal interaction pattern. It usually forms when one partner feels unheard or unappreciated, while the other feels constantly pressured or criticized, leading to a predictable sequence of conflict that rarely resolves the underlying core issues...
-                            </p>
-                        </div>
-                        {/* Lock Overlay */}
-                        <div className="absolute inset-0 flex flex-col items-center justify-center bg-background/20 backdrop-blur-[1px]">
-                            <div className="bg-background/95 border border-primary/20 shadow-lg px-6 py-4 rounded-xl text-center transform group-hover:scale-105 transition-transform">
-                                <Lock className="mx-auto text-primary mb-2 h-6 w-6" />
-                                <p className="text-sm font-bold text-foreground">Why this pattern forms and the exact cycle you're stuck in — unlocked in your report</p>
-                            </div>
-                        </div>
+                    {/* UNLOCKED explanation */}
+                    <p className="text-base text-muted-foreground leading-relaxed mb-4">
+                        {quickOverview?.pulse?.summary || "This relationship dynamic is characterized by a cyclical pattern where one partner pushes for connection while the other withdraws to protect themselves. The more one pursues, the more the other retreats — creating a self-reinforcing spiral that neither partner can break alone."}
+                    </p>
+
+                    {/* Bridge to paid: tease the depth */}
+                    <div className="bg-primary/5 border border-primary/10 rounded-xl p-4 text-center">
+                        <p className="text-sm font-medium text-foreground">
+                            This is the pattern. <strong className="text-primary">The full report explains why it formed, what triggers it in YOUR specific relationship, and the exact protocol to break it.</strong>
+                        </p>
                     </div>
                 </div>
 
-                {/* THE BLURRED TRIGGERS */}
+                {/* WHAT THIS MEANS FOR YOU (HVCO — real actionable insight) */}
                 <div className="max-w-2xl mx-auto mb-16 mt-8">
                     <div className="text-center mb-6">
-                        <h3 className="text-xl font-bold text-foreground">We identified 3 specific conflict triggers in your relationship.</h3>
+                        <h3 className="text-xl font-bold text-foreground">What You Can Do Right Now</h3>
+                        <p className="text-sm text-muted-foreground mt-2">Based on your pattern, here's one thing that will make an immediate difference:</p>
                     </div>
-                    <div className="space-y-3 bg-secondary/10 border border-border/50 p-6 rounded-2xl relative">
-                        {/* Redacted lines */}
-                        {[1, 2, 3].map((num) => (
-                            <div key={num} className="flex items-center gap-4">
-                                <div className="shrink-0 h-6 w-6 rounded-full bg-primary/20 text-primary flex items-center justify-center text-xs font-bold">{num}</div>
-                                <div className="h-6 bg-foreground/90 rounded-sm w-full animate-pulse-slow max-w-sm" style={{ width: `${Math.random() * 40 + 50}%` }}></div>
+                    <div className="bg-primary/5 border border-primary/20 p-6 rounded-2xl space-y-4">
+                        <div className="flex items-start gap-4">
+                            <div className="shrink-0 h-8 w-8 rounded-full bg-primary/20 text-primary flex items-center justify-center text-sm font-bold">1</div>
+                            <div>
+                                <p className="font-bold text-foreground mb-1">Name the pattern out loud to yourself.</p>
+                                <p className="text-sm text-muted-foreground leading-relaxed">
+                                    Next time the cycle starts, say: "This is the {diagnosis} pattern happening right now."
+                                    This alone interrupts the automatic escalation by activating your prefrontal cortex instead of your fight-or-flight response.
+                                </p>
                             </div>
-                        ))}
-                        {/* Overlay CTA */}
-                        <div className="mt-6 pt-4 border-t border-border/50 flex items-center gap-2 justify-center text-primary font-bold text-sm">
-                            <Lock size={14} /> Your exact de-escalation scripts for each — Chapter 8
+                        </div>
+                        <div className="border-t border-primary/10 pt-4 text-center">
+                            <p className="text-sm text-muted-foreground">
+                                <strong className="text-foreground">Your full report includes 15+ specific scripts</strong> for your exact triggers — what to say, when to say it, and how to de-escalate in the moment.
+                            </p>
                         </div>
                     </div>
                 </div>
 
-                {/* Locked Forecast Section */}
-                <div className="max-w-xl mx-auto relative group">
-                    {/* Blurred Content */}
-                    <div className="filter blur-sm select-none opacity-50 transition-all duration-500">
-                        <div className="bg-secondary/20 p-6 rounded-xl border border-border space-y-4 text-left">
-                            <div className="flex justify-between items-center mb-2">
-                                <span className="font-bold text-sm">Sustainability Score</span>
-                                <span className={`font-bold ${sustainabilityColor}`}>{sustainabilityLabel}</span>
-                            </div>
-                            <div className="w-full bg-secondary h-2 rounded-full overflow-hidden">
-                                <div className="h-full bg-primary" style={{ width: sustainabilityWidth }}></div>
-                            </div>
-
-                            <div>
-                                <p className="text-xs font-bold text-muted-foreground uppercase mb-2">{forecastLabel}</p>
-                                <p className="text-sm text-foreground">{forecastText}</p>
-                                <p className="text-sm text-foreground my-2">Without intervention, the pattern will evolve into...</p>
-                            </div>
-                            <div className="p-3 bg-indigo-50 text-indigo-900 rounded-lg">
-                                <p className="font-bold text-sm">Recommended Action Plan available.</p>
-                            </div>
+                {/* Forecast Section (show direction, sell the detail) */}
+                <div className="max-w-xl mx-auto">
+                    <div className="bg-secondary/20 p-6 rounded-xl border border-border space-y-4 text-left">
+                        <div className="flex justify-between items-center mb-2">
+                            <span className="font-bold text-sm">Sustainability Score</span>
+                            <span className={`font-bold ${sustainabilityColor}`}>{sustainabilityLabel}</span>
                         </div>
-                    </div>
+                        <div className="w-full bg-secondary h-2 rounded-full overflow-hidden">
+                            <div className="h-full bg-primary" style={{ width: sustainabilityWidth }}></div>
+                        </div>
 
-                    {/* Lock Overlay */}
-                    <div className="absolute inset-0 z-10 flex flex-col items-center justify-center bg-background/40 backdrop-blur-[1px]">
-                        <div className="bg-background/95 border border-red-500/20 shadow-2xl p-6 rounded-2xl text-center max-w-sm mx-4 transform hover:scale-105 transition-all duration-300 cursor-pointer" onClick={() => onUnlock('hero_lock')}>
-                            <Lock className="mx-auto text-primary mb-3 h-8 w-8" />
-                            <h3 className="font-bold text-lg text-foreground mb-1 uppercase tracking-wide text-red-500">Warning: Forecast Locked</h3>
-                            <p className="text-xs text-muted-foreground mb-4 font-medium leading-relaxed">
-                                Our algorithm has predicted where this trajectory leads in 6 months. Unlock your <strong>Clinical Report</strong> to view your risk forecast and the exact protocols to begin de-escalation today.
+                        <div>
+                            <p className="text-xs font-bold text-muted-foreground uppercase mb-2">{forecastLabel}</p>
+                            <p className="text-sm text-foreground leading-relaxed">{forecastText}</p>
+                        </div>
+
+                        {/* Bridge to paid */}
+                        <div className="p-4 bg-primary/5 border border-primary/10 rounded-lg mt-4">
+                            <p className="text-sm font-bold text-foreground mb-1">Your full report includes:</p>
+                            <p className="text-xs text-muted-foreground leading-relaxed">
+                                The complete 5-year trajectory, specific timelines for when intervention becomes critical, and a step-by-step 30-day action plan designed for your exact pattern.
                             </p>
-                            <button className="bg-primary hover:bg-primary/90 text-primary-foreground text-sm font-bold py-3 px-6 rounded-full w-full shadow-lg">
-                                Unlock My Analysis Now &rarr;
-                            </button>
                         </div>
                     </div>
                 </div>
@@ -603,7 +591,7 @@ export default function TeaserPageNew() {
         trackPixelEvent('InitiateCheckout', {
             content_name: 'Full Relationship Report',
             content_category: 'Report',
-            value: addOrderBump ? 59 : 47,
+            value: addOrderBump ? 41 : 29,
             currency: 'USD',
             eventID: eventID
         });
@@ -671,41 +659,75 @@ export default function TeaserPageNew() {
 
             <MirrorSection narcissismAnalysis={session?.narcissismAnalysis} badge={quickOverview?.hero?.result_badge} />
 
-            {/* TESTIMONIAL A: LAURA (Relatability) */}
-            <div className="bg-secondary/5 border-y border-border py-12 px-6">
-                <div className="max-w-2xl mx-auto text-center">
-                    <div className="flex justify-center gap-1 text-yellow-500 mb-4">
-                        {[...Array(5)].map((_, i) => <Star key={i} size={16} fill="currentColor" />)}
+            {/* THE BRIDGE — Free value recap + transition to paid */}
+            <section className="py-20 px-6 bg-muted/20 border-y border-border">
+                <div className="max-w-3xl mx-auto">
+                    <div className="text-center mb-10">
+                        <h2 className="text-3xl md:text-4xl font-black text-foreground">What You Just Got — For Free</h2>
                     </div>
-                    <p className="text-xl italic font-serif text-muted-foreground mb-6 leading-relaxed">
-                        "I read this thing crying because finally someone put into words what I've been feeling for years and couldn't explain. idk if we'll stay together but at least now I KNOW I'm not crazy"
-                    </p>
-                    <div className="font-bold text-foreground">â€” Laura, 34, Chicago</div>
-                </div>
-            </div>
 
-            {/* 2.5 SILENT DIVORCE WARNING (Urgency Injection) */}
-            {
-                (session?.advancedMetrics as any)?.silent_divorce_risk > 70 && (
-                    <section className="bg-red-50 dark:bg-red-950/20 border-y border-red-200 dark:border-red-900 py-8 px-6">
-                        <div className="max-w-3xl mx-auto flex items-start gap-4">
-                            <div className="shrink-0 p-3 bg-red-100 dark:bg-red-900/40 text-red-600 rounded-full">
-                                <AlertTriangle size={24} />
-                            </div>
-                            <div>
-                                <h3 className="text-xl font-bold text-red-700 dark:text-red-400 mb-2">High Risk of "Silent Drift" Detected</h3>
-                                <p className="text-red-600/90 dark:text-red-300/80 leading-relaxed">
-                                    Your results indicate a <strong>{(session?.advancedMetrics as any)?.silent_divorce_risk}% probability</strong> of emotional detachment. This pattern is dangerous because it feels "calm" until it's too late. Immediate re-engagement is recommended.
-                                </p>
-                            </div>
+                    <div className="bg-card border border-border rounded-2xl p-8 shadow-sm mb-10">
+                        <ul className="space-y-4 text-foreground font-medium">
+                            <li className="flex items-start gap-3"><CheckCircle size={20} className="text-green-500 shrink-0 mt-0.5" /> Your relationship pattern — named and explained</li>
+                            <li className="flex items-start gap-3"><CheckCircle size={20} className="text-green-500 shrink-0 mt-0.5" /> Your 4 dimension scores — with what each one means</li>
+                            <li className="flex items-start gap-3"><CheckCircle size={20} className="text-green-500 shrink-0 mt-0.5" /> Your sustainability forecast and risk level</li>
+                            <li className="flex items-start gap-3"><CheckCircle size={20} className="text-green-500 shrink-0 mt-0.5" /> One actionable de-escalation technique you can use tonight</li>
+                        </ul>
+                    </div>
+
+                    <div className="text-center space-y-6">
+                        <p className="text-lg text-muted-foreground leading-relaxed">
+                            A therapist charges <strong className="text-foreground">$150/session for 4-6 weeks</strong> just to reach this diagnosis.<br />You got it in 10 minutes. For free.
+                        </p>
+
+                        <div className="h-px w-16 bg-primary/30 mx-auto"></div>
+
+                        <div className="space-y-4 max-w-xl mx-auto">
+                            <p className="text-xl font-bold text-foreground">
+                                But here's the truth.
+                            </p>
+                            <p className="text-lg text-muted-foreground leading-relaxed">
+                                Knowing the pattern is <strong className="text-foreground">step 1</strong>. It's the diagnosis.
+                            </p>
+                            <p className="text-lg text-muted-foreground leading-relaxed">
+                                The other 80% — the scripts, the action plan, the guides, the forecast — is the <strong className="text-foreground">treatment plan</strong>. And that's what the full report gives you.
+                            </p>
                         </div>
-                    </section>
-                )
-            }
+                    </div>
+                </div>
+            </section>
 
-            {/* 3. COST OF INACTION (The Forecast) */}
-            {/* 2.7 CLINICAL WARNING (High Impact Full Width Band) */}
+            {/* 3. THE VISION — Paint the PAID "after" picture */}
+            <section className="py-24 px-6 bg-background border-b border-border/50">
+                <div className="max-w-3xl mx-auto text-center space-y-8">
+                    <span className="inline-block px-3 py-1 bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-300 rounded-full text-xs font-bold uppercase tracking-widest">
+                        What The Full Report Gives You
+                    </span>
+                    <h2 className="text-3xl md:text-5xl font-black text-foreground tracking-tight">
+                        The Diagnosis Was Free.<br />The <span className="text-primary">Cure</span> Is Inside.
+                    </h2>
+
+                    <div className="space-y-6 text-lg text-muted-foreground leading-relaxed max-w-2xl mx-auto text-left">
+                        <p>
+                            Imagine opening your phone and reading the <strong className="text-foreground">exact sentence</strong> to say when tonight's argument starts — word for word, designed for your partner's specific psychology.
+                        </p>
+                        <p>
+                            Imagine knowing your <strong className="text-foreground">5-year forecast</strong> — the precise month where your window of intervention closes, and the specific actions that change the trajectory.
+                        </p>
+                        <p>
+                            Imagine having a <strong className="text-foreground">30-day action plan</strong> so clear that you don't have to think, you just follow it — and by week 3, the dynamic has already started to shift.
+                        </p>
+                    </div>
+
+                    <p className="text-foreground font-bold text-lg">
+                        That's not a fantasy. That's what's in your report, waiting to be unlocked.
+                    </p>
+                </div>
+            </section>
+
+            {/* CLINICAL WARNING — urgency from data */}
             <section className={`py-16 px-6 relative overflow-hidden border-y border-border/50 ${((session?.narcissismAnalysis as any)?.risk_level === "High" || (session?.narcissismAnalysis as any)?.risk_level === "Severe") ? "bg-red-50 dark:bg-red-950/20" : "bg-orange-50 dark:bg-orange-950/20"}`}>
+                <p className="text-center text-sm font-bold text-muted-foreground uppercase tracking-widest mb-10">But here's what makes this urgent</p>
                 <div className="max-w-4xl mx-auto relative z-10 text-center space-y-8">
                     {
                         (session?.narcissismAnalysis as any)?.risk_level === "High" || (session?.narcissismAnalysis as any)?.risk_level === "Severe" ? (
@@ -791,9 +813,9 @@ export default function TeaserPageNew() {
                         </div>
 
                         {/* Path 3 */}
-                        <div className="p-8 rounded-2xl bg-secondary/10 border border-border/60 relative overflow-hidden group hover:border-gray-500 hover:shadow-md transition-all duration-300">
-                            <div className="absolute top-0 left-0 w-full h-1 bg-gray-400/30 group-hover:bg-gray-500 transition-colors duration-300"></div>
-                            <div className="h-12 w-12 bg-gray-100 dark:bg-gray-800 rounded-xl flex items-center justify-center mb-6 text-gray-600 dark:text-gray-400">
+                        <div className="p-8 rounded-2xl bg-secondary/10 border border-border/60 relative overflow-hidden group hover:border-muted-foreground/50 hover:shadow-md transition-all duration-300">
+                            <div className="absolute top-0 left-0 w-full h-1 bg-muted-foreground/30 group-hover:bg-muted-foreground/50 transition-colors duration-300"></div>
+                            <div className="h-12 w-12 bg-muted dark:bg-muted rounded-xl flex items-center justify-center mb-6 text-muted-foreground">
                                 <Ghost size={24} />
                             </div>
                             <h3 className="font-bold text-2xl mb-3 text-foreground">The Fade</h3>
@@ -823,91 +845,85 @@ export default function TeaserPageNew() {
                     </div>
 
                     <div className="grid md:grid-cols-2 gap-12 items-center">
-                        {/* Visual Representation of Report (Abstract) */}
+                        {/* Visual Representation of Report */}
                         <div className="relative aspect-square md:aspect-3/4 max-w-sm mx-auto w-full bg-primary/90 rounded-2xl shadow-2xl p-6 md:p-8 transform md:-rotate-2 border border-primary/50 overflow-hidden group hover:rotate-0 transition-all duration-500">
-                            {/* Fake Content Layer */}
                             <div className="absolute top-0 right-0 p-4 opacity-20">
                                 <Activity size={120} className="text-white" />
                             </div>
                             <div className="relative z-10 text-white space-y-6">
                                 <div className="w-16 h-16 bg-white/20 backdrop-blur rounded-full flex items-center justify-center mb-4">
-                                    <Lock className="text-white" size={32} />
+                                    <FileText className="text-white" size={32} />
                                 </div>
                                 <div>
                                     <div className="h-2 w-32 bg-white/40 rounded mb-2"></div>
-                                    <h3 className="text-3xl font-black leading-none">Confidential<br />Report</h3>
+                                    <h3 className="text-3xl font-black leading-none">Your Personal<br />Report</h3>
                                 </div>
                                 <div className="space-y-3 pt-4 md:pt-8 opacity-80">
-                                    <div className="flex gap-3 items-center"><div className="w-6 h-6 shrink-0 rounded-full border border-white/50 flex items-center justify-center text-xs">1</div><div className="h-2 w-full bg-linear-to-r from-white/40 to-transparent rounded"></div></div>
-                                    <div className="flex gap-3 items-center"><div className="w-6 h-6 shrink-0 rounded-full border border-white/50 flex items-center justify-center text-xs">2</div><div className="h-2 w-3/4 bg-linear-to-r from-white/40 to-transparent rounded"></div></div>
-                                    <div className="flex gap-3 items-center"><div className="w-6 h-6 shrink-0 rounded-full border border-white/50 flex items-center justify-center text-xs">3</div><div className="h-2 w-5/6 bg-linear-to-r from-white/40 to-transparent rounded"></div></div>
+                                    <div className="flex gap-3 items-center"><div className="w-6 h-6 shrink-0 rounded-full border border-white/50 flex items-center justify-center text-xs">1</div><span className="text-xs font-medium">Deep Diagnosis</span></div>
+                                    <div className="flex gap-3 items-center"><div className="w-6 h-6 shrink-0 rounded-full border border-white/50 flex items-center justify-center text-xs">2</div><span className="text-xs font-medium">Custom Scripts</span></div>
+                                    <div className="flex gap-3 items-center"><div className="w-6 h-6 shrink-0 rounded-full border border-white/50 flex items-center justify-center text-xs">3</div><span className="text-xs font-medium">30-Day Plan</span></div>
                                 </div>
                             </div>
                         </div>
 
-                        {/* Report Components Breakdown */}
+                        {/* Report Components — BENEFIT-focused copy */}
                         <div className="space-y-8">
-                            {/* Component 1 */}
                             <div className="flex gap-5">
                                 <div className="shrink-0 h-10 w-10 bg-primary/10 text-primary rounded-lg flex items-center justify-center">
                                     <Activity size={20} />
                                 </div>
                                 <div>
-                                    <h4 className="text-xl font-bold mb-2">1. Your Core Diagnosis</h4>
+                                    <h4 className="text-xl font-bold mb-2">See the Exact Moment Trust Started Eroding</h4>
                                     <p className="text-muted-foreground text-sm leading-relaxed">
-                                        We map <strong>your</strong> relationship across 5 key dimensions (Communication, Trust, Intimacy, Fairness, Shared Future). You'll see exactly **where** the structure is failing.
+                                        Your 5-dimension deep dive reveals not just WHAT's broken — but the specific conversation pattern, the unspoken resentment, and the one dynamic that's quietly poisoning everything else.
                                     </p>
                                 </div>
                             </div>
 
-                            {/* Component 2 */}
                             <div className="flex gap-5">
                                 <div className="shrink-0 h-10 w-10 bg-purple-100 dark:bg-purple-900/50 text-purple-600 dark:text-purple-400 rounded-lg flex items-center justify-center">
                                     <Clock size={20} />
                                 </div>
                                 <div>
-                                    <h4 className="text-xl font-bold mb-2">2. Your Predictions (High Stakes)</h4>
+                                    <h4 className="text-xl font-bold mb-2">Know If You Still Have Time — Or If It's Already Too Late</h4>
                                     <p className="text-muted-foreground text-sm leading-relaxed">
-                                        6-month and 5-year clinical forecasts. We calculate your personalized <strong>Sustainability Score</strong>: what are the mathematical odds this relationship survives?
+                                        Your personalized 6-month and 5-year forecast. Not "relationships are hard." YOUR specific odds, YOUR intervention window, YOUR point of no return.
                                     </p>
                                 </div>
                             </div>
 
-                            {/* Component 3 */}
                             <div className="flex gap-5">
                                 <div className="shrink-0 h-10 w-10 bg-orange-100 dark:bg-orange-900/50 text-orange-600 dark:text-orange-400 rounded-lg flex items-center justify-center">
                                     <ShieldAlert size={20} />
                                 </div>
                                 <div>
-                                    <h4 className="text-xl font-bold mb-2 text-orange-600 dark:text-orange-400">3. The Toxicity & Narcissism Screen</h4>
+                                    <h4 className="text-xl font-bold mb-2 text-orange-600 dark:text-orange-400">End the "Am I Crazy?" Loop Forever</h4>
                                     <p className="text-muted-foreground text-sm leading-relaxed">
-                                        <strong>Is it just a rough patch, or is it abuse?</strong> A clinical 0-100 Danger Score. Definitive clarity on gaslighting and safety.
+                                        A definitive clinical answer to the question you've been afraid to ask. Rough patch or abuse? Your 0-100 Danger Score ends years of self-doubt in one page.
                                     </p>
                                 </div>
                             </div>
 
-                            {/* Component 4 */}
                             <div className="flex gap-5">
                                 <div className="shrink-0 h-10 w-10 bg-emerald-100 dark:bg-emerald-900/50 text-emerald-600 dark:text-emerald-400 rounded-lg flex items-center justify-center">
                                     <MessageCircle size={20} />
                                 </div>
                                 <div>
-                                    <h4 className="text-xl font-bold mb-2">4. Word-For-Word Custom Scripts</h4>
+                                    <h4 className="text-xl font-bold mb-2">Know What to Say Tonight — Word for Word</h4>
                                     <p className="text-muted-foreground text-sm leading-relaxed">
-                                        Stop guessing what to say. We give you <strong>exact phrases</strong> mathematically designed for your partner's specific psychological profile to instantly de-escalate fights and bypass their defenses.
+                                        When the fight starts, you'll have the exact sentence that stops the spiral. Designed for your partner's specific psychological profile. Not generic advice — phrases that bypass <em>their</em> defenses.
                                     </p>
                                 </div>
                             </div>
 
-                            {/* Component 5 (Biomarkers) */}
                             <div className="flex gap-5">
                                 <div className="shrink-0 h-10 w-10 bg-blue-100 dark:bg-blue-900/50 text-blue-600 dark:text-blue-400 rounded-lg flex items-center justify-center">
-                                    <Activity size={20} />
+                                    <Eye size={20} />
                                 </div>
                                 <div>
-                                    <h4 className="text-xl font-bold mb-2">5. The 12-Point Clinical Biomarker Dashboard</h4>
+                                    <h4 className="text-xl font-bold mb-2">See the 12 Hidden Drivers Most Couples Never Discover</h4>
                                     <p className="text-muted-foreground text-sm leading-relaxed">
-                                        Unlock your exact clinical scores across 12 hidden drivers of relationship decay, including: <em>The Erotic Death Spiral</em>, <em>CEO vs Intern Imbalance</em>, and <em>The Silent Divorce Risk</em>.
+                                        The invisible forces that kill relationships while you're focused on the surface fights. Including the one that's doing the most damage <em>right now</em> in yours.
                                     </p>
                                 </div>
                             </div>
@@ -916,14 +932,27 @@ export default function TeaserPageNew() {
                 </div>
             </section>
 
+            {/* Proof break — testimonial between solution and premiums */}
+            <div className="bg-secondary/5 border-y border-border py-12 px-6">
+                <div className="max-w-2xl mx-auto text-center">
+                    <div className="flex justify-center gap-1 text-yellow-500 mb-4">
+                        {[...Array(5)].map((_, i) => <Star key={`proof-break-${i}`} size={16} fill="currentColor" />)}
+                    </div>
+                    <p className="text-xl italic font-serif text-muted-foreground mb-6 leading-relaxed">
+                        "Six months of couples therapy and we weren't getting anywhere. This identified the problem in 10 pages. Brought it to the next session. Therapist said 'okay finally we know what to work on'."
+                    </p>
+                    <div className="font-bold text-foreground">— Robert, 42, Boston</div>
+                </div>
+            </div>
+
             {/* 5. TARGETED STRATEGIC TOOLS (Value Stack) */}
             <section className="py-24 px-6 bg-muted/30 relative overflow-hidden">
                 <div className="max-w-6xl mx-auto relative z-10">
                     <div className="text-center mb-16 space-y-4">
-                        <span className="text-primary font-bold tracking-widest uppercase text-xs">Included For Free Today</span>
+                        <span className="text-primary font-bold tracking-widest uppercase text-xs">$194 Value — Yours Free With Your Report</span>
                         <h2 className="text-3xl md:text-5xl font-black text-foreground">The Emergency Intervention Toolkit</h2>
                         <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
-                            Therapists normally charge $200+/hr to teach these frameworks. You get the exact clinical PDF protocols included securely in your dashboard today.
+                            Therapists charge $200+/hr to teach these frameworks. You get all 5 clinical PDF protocols included with your report at no extra cost.
                         </p>
                     </div>
 
@@ -1064,7 +1093,7 @@ export default function TeaserPageNew() {
                                     <div className="space-y-1">
                                         <p className="text-xs font-bold uppercase text-muted-foreground tracking-wider">Why you need this:</p>
                                         <p className="text-sm text-muted-foreground leading-relaxed">
-                                            If your Toxicity Score is 60+, you need to know if you're dealing with narcissism specificallyâ€”because the exit strategy is different. Covert narcissists are harder to detect (they play victim, use passive aggression).
+                                            If your Toxicity Score is 60+, you need to know if you're dealing with narcissism specificallyâ€"because the exit strategy is different. Covert narcissists are harder to detect (they play victim, use passive aggression).
                                         </p>
                                     </div>
 
@@ -1129,7 +1158,7 @@ export default function TeaserPageNew() {
                                     <div className="space-y-1">
                                         <p className="text-xs font-bold uppercase text-muted-foreground tracking-wider">Why you need this:</p>
                                         <p className="text-sm text-muted-foreground leading-relaxed">
-                                            If your Betrayal Vulnerability is 60%+, unmet needs are creating an opening for affairs. Emotional affairs are often MORE painful than physical onesâ€”they involve the heart, not just the body.
+                                            If your Betrayal Vulnerability is 60%+, unmet needs are creating an opening for affairs. Emotional affairs are often MORE painful than physical onesâ€"they involve the heart, not just the body.
                                         </p>
                                     </div>
 
@@ -1154,11 +1183,11 @@ export default function TeaserPageNew() {
                         <div className="group relative md:col-span-2 lg:col-span-2 h-full">
                             {/* Wider Landscape Document Effect - Auto Height */}
                             <div className="relative bg-card border border-border h-full rounded-r-xl shadow-xl transition-all duration-300 group-hover:-translate-y-2 group-hover:shadow-2xl overflow-hidden flex flex-col md:flex-row min-h-[300px]">
-                                <div className="absolute left-0 top-0 bottom-0 w-3 bg-gray-500/20 border-r border-border"></div>
+                                <div className="absolute left-0 top-0 bottom-0 w-3 bg-muted-foreground/20 border-r border-border"></div>
 
                                 <div className="p-6 md:w-1/3 border-b md:border-b-0 md:border-r border-border bg-card flex flex-col justify-between">
                                     <div>
-                                        <div className="bg-gray-100 dark:bg-gray-800 text-gray-500 p-2 rounded-lg inline-block mb-4">
+                                        <div className="bg-muted dark:bg-muted text-muted-foreground p-2 rounded-lg inline-block mb-4">
                                             <Compass size={32} />
                                         </div>
                                         <h3 className="text-2xl font-bold leading-tight text-foreground">Should I Stay or Should I Go?</h3>
@@ -1199,140 +1228,55 @@ export default function TeaserPageNew() {
                 </div>
             </section>
 
-            {/* TESTIMONIAL B: ROBERT (Efficacy) */}
-            <div className="bg-background border-b border-border py-12 px-6">
-                <div className="max-w-2xl mx-auto text-center">
-                    <div className="flex justify-center gap-1 text-yellow-500 mb-4">
-                        {[...Array(5)].map((_, i) => <Star key={i} size={16} fill="currentColor" />)}
-                    </div>
-                    <p className="text-xl italic font-serif text-muted-foreground mb-6 leading-relaxed">
-                        "Six months of couples therapy and we weren't getting anywhere. This report identified the problem in 10 pages. Brought it to the next session. Therapist said 'okay finally we know what to work on'. Best money I've spent."
-                    </p>
-                    <div className="font-bold text-foreground">— Robert, 42, Boston</div>
-                </div>
-            </div>
-
-            {/* 5.5 SOCIAL PROOF (Testimonials) */}
-            {/* 5.5 SOCIAL PROOF (Testimonials) */}
-            {/* 5.5 SOCIAL PROOF (Testimonials) */}
-            {/* 5.5 SOCIAL PROOF (Testimonials) */}
+            {/* SOCIAL PROOF — Consolidated testimonials */}
             <section className="py-24 px-6 bg-background border-t border-border">
                 <div className="max-w-6xl mx-auto">
                     <div className="text-center mb-16 space-y-4">
                         <h2 className="text-3xl md:text-4xl font-bold text-foreground">
-                            Real Stories
+                            People Who Were Exactly Where You Are
                         </h2>
                         <div className="flex justify-center gap-1 text-yellow-500">
                             {[...Array(5)].map((_, i) => <Star key={i} size={20} fill="currentColor" />)}
                         </div>
                     </div>
 
-                    <div className="grid md:grid-cols-2 lg:grid-cols-2 gap-6 max-w-4xl mx-auto">
-                        {/* Clarity / Confusion (Alexis) - Keeping as generalized example */}
-                        <div className="bg-card p-8 rounded-2xl shadow-sm border border-border">
-                            <div className="mb-4 text-primary"><Quote size={32} /></div>
-                            <div className="flex justify-center gap-1 text-yellow-500 mb-4"> {/* Added missing stars for Alexis/Claire consistency if desired, or skip */}
-                                {[...Array(5)].map((_, i) => <Star key={i} size={16} fill="currentColor" />)}
-                            </div>
-                            <p className="text-muted-foreground mb-6 italic text-sm leading-relaxed">
-                                "Bought this at 3am after he locked himself in the bedroom. I was asking myself 'what is happening?'. The report explained it. It wasn't what I wanted to hear. But it was what I NEEDED to hear. Thank you."
-                            </p>
-                            <div className="flex items-center gap-3">
-                                <div className="h-10 w-10 bg-primary/10 rounded-full flex items-center justify-center font-bold text-primary">A</div>
-                                <div>
-                                    <p className="font-bold text-foreground text-sm">Alexis, 40</p>
-                                    <p className="text-xs text-muted-foreground">Denver</p>
-                                </div>
-                            </div>
-                        </div>
-
-                        {/* Sexless / Desire (Claire) - Keeping as generalized example */}
-                        <div className="bg-card p-8 rounded-2xl shadow-sm border border-border">
-                            <div className="mb-4 text-pink-500"><Quote size={32} /></div>
-                            <div className="flex justify-center gap-1 text-yellow-500 mb-4">
-                                {[...Array(5)].map((_, i) => <Star key={i} size={16} fill="currentColor" />)}
-                            </div>
-                            <p className="text-muted-foreground mb-6 italic text-sm leading-relaxed">
-                                "My husband and I haven't had sex in 2 years. I always thought there was something wrong with me. Turns out I just work differently. We're trying something the guide suggested. Still awkward but at least we're trying."
-                            </p>
-                            <div className="flex items-center gap-3">
-                                <div className="h-10 w-10 bg-pink-100 dark:bg-pink-900/30 rounded-full flex items-center justify-center font-bold text-pink-600">C</div>
-                                <div>
-                                    <p className="font-bold text-foreground text-sm">Claire, 29</p>
-                                    <p className="text-xs text-muted-foreground">London</p>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </section>
-
-            {/* 6. SOFT URGENCY SECTION */}
-            <section className="bg-background py-16 px-6 border-b border-border">
-                <div className="max-w-3xl mx-auto text-center space-y-8">
-                    <h2 className="text-3xl font-black text-foreground">Your Analysis Is Already Generated</h2>
-                    <div className="bg-card border border-border rounded-xl p-6 text-left max-w-xl mx-auto shadow-sm">
-                        <p className="text-sm text-muted-foreground mb-4">Based on your 30 answers, the system has already calculated:</p>
-                        <ul className="space-y-2 text-sm font-medium">
-                            <li className="flex items-center gap-2"><Check size={16} className="text-green-500" /> Your 5 Core Dimension scores</li>
-                            <li className="flex items-center gap-2"><Check size={16} className="text-green-500" /> Your dominant conflict pattern</li>
-                            <li className="flex items-center gap-2"><Check size={16} className="text-green-500" /> Your 6-month and 5-year forecast</li>
-                            <li className="flex items-center gap-2"><Check size={16} className="text-green-500" /> Your toxicity assessment</li>
-                            <li className="flex items-center gap-2"><Check size={16} className="text-green-500" /> Your personalized action plan</li>
-                            <li className="flex items-center gap-2"><Check size={16} className="text-green-500" /> Your exact conversation scripts</li>
-                        </ul>
-                    </div>
-
-                    <div className="space-y-4">
-                        <p className="text-xl font-bold text-foreground">
-                            The question isn't whether it's ready. It is.<br />
-                            The question is: <span className="text-primary underline decoration-wavy">do you want to see it?</span>
+                    {/* Featured testimonial */}
+                    <div className="bg-secondary/5 border border-border rounded-2xl p-8 md:p-12 mb-8 max-w-3xl mx-auto text-center">
+                        <p className="text-xl md:text-2xl italic font-serif text-muted-foreground mb-6 leading-relaxed">
+                            "I read this thing crying because finally someone put into words what I've been feeling for years and couldn't explain. I don't know if we'll stay together but at least now I KNOW I'm not crazy."
                         </p>
+                        <div className="font-bold text-foreground">— Laura, 34, Chicago</div>
                     </div>
 
-                    <div className="bg-secondary/5 rounded-2xl p-8 border border-border mt-8">
-                        <h3 className="text-xl font-bold mb-4">Every Day You Don't Understand the Pattern...</h3>
-                        <p className="text-muted-foreground mb-6">...is another day the pattern controls you. How many more months of walking on eggshells, repetitive fights, and feeling like "roommates"?</p>
+                    <div className="grid md:grid-cols-3 gap-6 max-w-5xl mx-auto">
+                        <div className="bg-card p-6 rounded-2xl shadow-sm border border-border">
+                            <div className="flex gap-1 text-yellow-500 mb-3">{[...Array(5)].map((_, i) => <Star key={i} size={14} fill="currentColor" />)}</div>
+                            <p className="text-muted-foreground mb-4 italic text-sm leading-relaxed">
+                                "Six months of couples therapy and we weren't getting anywhere. This identified the problem in 10 pages. Brought it to the next session. Therapist said 'okay finally we know what to work on'."
+                            </p>
+                            <div className="font-bold text-foreground text-sm">— Robert, 42, Boston</div>
+                        </div>
 
-                        <div className="font-bold text-lg text-foreground">
-                            The pattern won't fix itself. You have to interrupt it.
+                        <div className="bg-card p-6 rounded-2xl shadow-sm border border-border">
+                            <div className="flex gap-1 text-yellow-500 mb-3">{[...Array(5)].map((_, i) => <Star key={i} size={14} fill="currentColor" />)}</div>
+                            <p className="text-muted-foreground mb-4 italic text-sm leading-relaxed">
+                                "Bought this at 3am after he locked himself in the bedroom. It wasn't what I wanted to hear. But it was what I NEEDED to hear."
+                            </p>
+                            <div className="font-bold text-foreground text-sm">— Alexis, 40, Denver</div>
+                        </div>
+
+                        <div className="bg-card p-6 rounded-2xl shadow-sm border border-border">
+                            <div className="flex gap-1 text-yellow-500 mb-3">{[...Array(5)].map((_, i) => <Star key={i} size={14} fill="currentColor" />)}</div>
+                            <p className="text-muted-foreground mb-4 italic text-sm leading-relaxed">
+                                "My husband and I haven't had sex in 2 years. Turns out I just work differently. We're trying something the guide suggested. Still awkward but at least we're trying."
+                            </p>
+                            <div className="font-bold text-foreground text-sm">— Claire, 29, London</div>
                         </div>
                     </div>
                 </div>
             </section>
 
-            {/* 6.2 A NOTE FROM THE AUTHORS */}
-            <section className="bg-background py-24 px-6 border-b border-border/50">
-                <div className="max-w-2xl mx-auto space-y-8">
-                    <div className="text-center mb-12">
-                        <h3 className="text-xs font-bold text-muted-foreground uppercase tracking-widest">A Note From The Creators</h3>
-                    </div>
-
-                    <div className="space-y-6 text-xl md:text-2xl text-foreground font-medium leading-relaxed opacity-90">
-                        <p>Maybe you feel like you're managing your partner instead of being with them.</p>
-                        <p>Maybe you're questioning if it's toxic... or just complicated.</p>
-                        <p>Or maybe nothing is "wrong" — and that's what scares you most.</p>
-                    </div>
-
-                    <div className="h-px w-24 bg-primary/20 mx-auto my-12 hidden md:block"></div>
-                    <div className="h-px w-16 bg-primary/20 my-8 md:hidden"></div>
-
-                    <div className="space-y-6 text-lg text-muted-foreground leading-relaxed">
-                        <p>We built this analysis for that in-between space.</p>
-                        <p>The place where love exists — but something isn't working.</p>
-                        <p>This isn't about blaming you. And it's not about labeling your partner.</p>
-                        <p className="text-foreground font-bold">It's about giving you solid ground under your feet.</p>
-                    </div>
-
-                    <div className="bg-primary/5 p-8 rounded-2xl mt-12 border border-primary/20 text-center">
-                        <p className="text-xl md:text-2xl font-serif italic text-primary font-medium leading-relaxed">
-                            "Whatever is happening in your relationship, you deserve to see it clearly — before you decide what comes next."
-                        </p>
-                    </div>
-                </div>
-            </section>
-
-            {/* 6.5. OFFER SECTION & GUARANTEE (VALUE STACK) */}
+            {/* OFFER SECTION & GUARANTEE (VALUE STACK) */}
             <section id="offer" className="py-24 px-6 bg-muted/20">
                 <div className="max-w-4xl mx-auto">
                     {/* Pricing Card */}
@@ -1341,10 +1285,10 @@ export default function TeaserPageNew() {
                         <div className="p-8 md:p-12">
                             <div className="text-center mb-10">
                                 <h2 className="text-3xl md:text-5xl font-black text-foreground mb-4">
-                                    Everything Included
+                                    Your Complete Treatment Plan
                                 </h2>
                                 <p className="text-muted-foreground text-lg">
-                                    Full Analysis + 5 Premium Clinical Guides
+                                    Full Analysis + 5 Premium Clinical Guides — Instant Access
                                 </p>
                             </div>
 
@@ -1359,7 +1303,7 @@ export default function TeaserPageNew() {
                                                 <span className="font-bold text-lg leading-tight">The Full Relationship Analysis</span>
                                                 <div className="text-right">
                                                     <span className="text-sm line-through text-red-500 opacity-80 mr-2">$99.00</span>
-                                                    <span className="font-bold text-lg">${import.meta.env.REACT_APP_REPORT_PRICE || "47.00"}</span>
+                                                    <span className="font-bold text-lg">${import.meta.env.REACT_APP_REPORT_PRICE || "29.00"}</span>
                                                 </div>
                                             </div>
                                             <p className="text-sm text-muted-foreground mt-1">Includes: Core Diagnosis, 5 Dimension Scores & Communication Breakdown</p>
@@ -1423,18 +1367,37 @@ export default function TeaserPageNew() {
                                     </p>
 
                                     <div className="pt-2 border-t border-border mt-4">
-                                        <div className="bg-green-50 dark:bg-green-900/10 border border-green-200 dark:border-green-900/30 p-2 text-center rounded text-sm font-medium text-green-800 dark:text-green-300 mb-4">
+                                        <div className="bg-green-50 dark:bg-green-900/10 border border-green-200 dark:border-green-900/30 p-3 text-center rounded text-sm font-medium text-green-800 dark:text-green-300 mb-4">
                                             <strong>Your report is already generated.</strong> 847 words written specifically about your relationship dynamics.
+                                            {session?.createdAt && (() => {
+                                                const expiresAt = new Date(session.createdAt).getTime() + 7 * 24 * 60 * 60 * 1000;
+                                                const msRemaining = expiresAt - Date.now();
+                                                const daysRemaining = Math.ceil(msRemaining / (24 * 60 * 60 * 1000));
+                                                const hoursRemaining = Math.floor((msRemaining % (24 * 60 * 60 * 1000)) / (60 * 60 * 1000));
+
+                                                return msRemaining > 0
+                                                    ? <span className="block mt-2 text-xs font-bold text-orange-700 dark:text-orange-400 bg-orange-50 dark:bg-orange-900/20 border border-orange-200 dark:border-orange-800 rounded-lg py-2 px-3">
+                                                        <Clock size={12} className="inline mr-1 -mt-0.5" />
+                                                        Session expires in {daysRemaining}d {hoursRemaining}h — unlock now to preserve your analysis
+                                                      </span>
+                                                    : <span className="block mt-2 text-xs font-bold text-red-600 dark:text-red-400 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg py-2 px-3">
+                                                        Session data expiring — unlock now before it's lost
+                                                      </span>;
+                                            })()}
                                         </div>
+                                        <p className="text-sm text-muted-foreground mb-3 max-w-md mx-auto leading-relaxed">
+                                            A therapist takes 4-6 sessions just to understand your dynamic. This analysis already knows it from your 30 answers — so you get clarity now, not 6 weeks from now.
+                                        </p>
                                         <p className="text-sm font-bold uppercase tracking-wider text-muted-foreground">Your Price Today</p>
-                                        <p className="text-6xl font-black text-primary">${import.meta.env.REACT_APP_REPORT_PRICE || "47.00"}</p>
+                                        <p className="text-6xl font-black text-primary">${import.meta.env.REACT_APP_REPORT_PRICE || "29.00"}</p>
+                                        <p className="text-sm text-muted-foreground mt-2">Less than a single therapy copay. Less than a dinner where you both stare at your phones. For the clarity that changes everything.</p>
                                     </div>
                                 </div>
 
                                 {/* ORDER BUMP */}
                                 <div className="w-full bg-yellow-50 dark:bg-yellow-900/10 border-2 border-dashed border-yellow-400 p-4 rounded-xl text-left cursor-pointer hover:bg-yellow-100 dark:hover:bg-yellow-900/20 transition-colors mb-8" onClick={() => setAddOrderBump(!addOrderBump)}>
                                     <div className="flex items-start gap-3">
-                                        <div className={`mt-1 h-5 w-5 shrink-0 rounded border flex items-center justify-center transition-colors ${addOrderBump ? 'bg-primary border-primary text-white' : 'bg-white border-gray-400'}`}>
+                                        <div className={`mt-1 h-5 w-5 shrink-0 rounded border flex items-center justify-center transition-colors ${addOrderBump ? 'bg-primary border-primary text-primary-foreground' : 'bg-card border-border'}`}>
                                             {addOrderBump && <Check size={14} strokeWidth={4} />}
                                         </div>
                                         <div>
@@ -1442,14 +1405,15 @@ export default function TeaserPageNew() {
                                                 YES! Add the <span className="text-primary">30-Day Reconnection Workbook</span> for just $12.
                                             </p>
                                             <p className="text-xs text-muted-foreground leading-relaxed mb-2 font-medium">
-                                                The report tells you <em>what's wrong.</em> This daily workbook forces you to actually <em>fix it</em>.
+                                                The report tells you <em>what's wrong.</em> Without this, you'll understand the problem but won't <em>do anything about it</em>.
                                             </p>
                                             <ul className="text-xs text-muted-foreground space-y-1">
-                                                <li className="flex items-start gap-2"><CheckCircle size={12} className="text-primary mt-0.5 shrink-0" /> <span className="leading-tight">Accountability: Just 5 minutes a day</span></li>
-                                                <li className="flex items-start gap-2"><CheckCircle size={12} className="text-primary mt-0.5 shrink-0" /> <span className="leading-tight">Conversation practice templates</span></li>
+                                                <li className="flex items-start gap-2"><CheckCircle size={12} className="text-primary mt-0.5 shrink-0" /> <span className="leading-tight">5-minute daily exercises that rewire the pattern (not vague advice)</span></li>
+                                                <li className="flex items-start gap-2"><CheckCircle size={12} className="text-primary mt-0.5 shrink-0" /> <span className="leading-tight">Word-for-word scripts for the 3 conversations that matter most</span></li>
+                                                <li className="flex items-start gap-2"><CheckCircle size={12} className="text-primary mt-0.5 shrink-0" /> <span className="leading-tight">Track your progress — see the dynamic shift week by week</span></li>
                                             </ul>
                                             <div className="mt-3 inline-block bg-yellow-100 dark:bg-yellow-900/50 text-yellow-800 dark:text-yellow-400 text-[10px] font-bold uppercase tracking-wider px-2 py-1 rounded">
-                                                Highly Recommended
+                                                Most Chosen Add-On
                                             </div>
                                         </div>
                                     </div>
@@ -1461,9 +1425,9 @@ export default function TeaserPageNew() {
                                 onClick={() => handleCheckout('offer_cta')}
                                 className="w-full md:w-auto bg-primary hover:bg-primary/90 text-primary-foreground text-xl font-bold py-5 px-12 rounded-full shadow-2xl hover:scale-105 transition-all flex items-center justify-center gap-3 animate-pulse-slow"
                             >
-                                {isCheckoutLoading ? "Processing..." : `Get Instant Access Now - $${addOrderBump ? 59 : 47}`} <ArrowRight size={24} />
+                                {isCheckoutLoading ? "Processing..." : `Unlock My Full Analysis — $${addOrderBump ? 41 : 29}`} <ArrowRight size={24} />
                             </button>
-                            <div className="flex items-center justify-center gap-4 mt-6 text-slate-400">
+                            <div className="flex items-center justify-center gap-4 mt-6 text-muted-foreground">
                                 <FaCcVisa className="h-7 w-auto opacity-70 hover:opacity-100 transition-opacity" />
                                 <FaCcMastercard className="h-7 w-auto opacity-70 hover:opacity-100 transition-opacity" />
                                 <FaCcPaypal className="h-7 w-auto opacity-70 hover:opacity-100 transition-opacity" />
@@ -1478,29 +1442,23 @@ export default function TeaserPageNew() {
 
 
 
-                {/* Guarantee */}
-                <div className="max-w-3xl mx-auto text-center mt-12 mb-20">
-                    <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-green-500/10 text-green-600 border border-green-500/20 text-sm font-bold mb-6">
-                        <ShieldCheck size={16} /> 100% Satisfaction Guarantee
-                    </div>
-                    <h3 className="text-2xl font-bold text-foreground mb-4">Try It Risk-Free</h3>
-                    <p className="text-muted-foreground">
-                        If you don't feel this report provides valuable insights into your relationship dynamics, simply email us within 30 days for a full refund. No questions asked.
-                    </p>
-                </div>
-
-
-
-                {/* Risk Reversal */}
-                <div className="bg-secondary/10 p-6 md:p-8 flex flex-col md:flex-row items-center gap-6 border-t border-border mt-8 rounded-b-3xl">
-                    <div className="shrink-0 p-3 bg-card rounded-full shadow-sm">
-                        <ShieldCheck className="text-primary w-8 h-8" />
-                    </div>
-                    <div className="text-left">
-                        <h3 className="font-bold text-foreground mb-1">The "Lightbulb Moment" Guarantee</h3>
-                        <p className="text-sm text-muted-foreground leading-relaxed">
-                            Read your personalized analysis. If you don't have at least one profound realization about your relationship that gives you clarity, email us for a full refund. No questions asked.
-                        </p>
+                {/* The "Lightbulb Moment" Guarantee */}
+                <div className="max-w-3xl mx-auto mt-12 mb-20">
+                    <div className="bg-secondary/10 p-8 md:p-10 flex flex-col md:flex-row items-center gap-8 rounded-3xl border border-border">
+                        <div className="shrink-0">
+                            <div className="w-20 h-20 bg-yellow-100 dark:bg-yellow-900/30 rounded-full flex items-center justify-center">
+                                <Shield className="text-yellow-600 dark:text-yellow-400 w-10 h-10" />
+                            </div>
+                        </div>
+                        <div className="text-center md:text-left">
+                            <h3 className="text-2xl font-bold text-foreground mb-3">The "Lightbulb Moment" Guarantee</h3>
+                            <p className="text-muted-foreground leading-relaxed">
+                                Read your personalized analysis. If you don't have at least one moment where you think <strong className="text-foreground">"that's EXACTLY what's happening"</strong> — full refund.
+                            </p>
+                            <p className="text-muted-foreground leading-relaxed mt-2">
+                                We've analyzed 52,847 relationships. If your report doesn't nail your situation, that's on us. Email us. Money back. 90 days.
+                            </p>
+                        </div>
                     </div>
                 </div>
 
@@ -1511,9 +1469,9 @@ export default function TeaserPageNew() {
                         onClick={handleScrollToOffer}
                         className="w-full bg-primary text-primary-foreground font-bold py-4 rounded-xl shadow-lg flex items-center justify-center gap-2 mb-3"
                     >
-                        Get Your Report <ArrowRight size={20} />
+                        Unlock My Full Analysis <ArrowRight size={20} />
                     </button>
-                    <div className="flex items-center justify-center gap-3 text-slate-400">
+                    <div className="flex items-center justify-center gap-3 text-muted-foreground">
                         <FaCcVisa className="h-6 w-auto opacity-80" />
                         <FaCcMastercard className="h-6 w-auto opacity-80" />
                         <FaCcPaypal className="h-6 w-auto opacity-80" />
@@ -1562,7 +1520,7 @@ export default function TeaserPageNew() {
                             </tr>
                             <tr className="bg-primary/5 hover:bg-primary/10 transition-colors border-l-4 border-l-primary">
                                 <td className="p-4 font-black text-primary text-base">This Analysis</td>
-                                <td className="p-4"><span className="font-black text-2xl text-primary">$47</span></td>
+                                <td className="p-4"><span className="font-black text-2xl text-primary">$29</span></td>
                                 <td className="p-4 font-bold text-foreground">Instant</td>
                                 <td className="p-4 font-bold text-foreground">Personalized to YOUR 30 answers. Pattern identified. 5 clinical guides. Exact scripts.</td>
                             </tr>
@@ -1588,73 +1546,49 @@ export default function TeaserPageNew() {
                 </div>
             </div>
 
-            {/* FAQ */}
-            < div className="max-w-3xl mx-auto space-y-8 mt-16" >
+            {/* FAQ — Collapsible accordion */}
+            <div className="max-w-3xl mx-auto space-y-8 mt-16 px-6">
                 <h3 className="text-2xl font-bold text-center mb-12 text-foreground">Common Questions & Concerns</h3>
 
-                <div className="space-y-4">
-                    {/* Q1 */}
-                    <div className="space-y-2">
-                        <h4 className="font-bold text-lg text-foreground">"Can't I just figure this out on my own?"</h4>
-                        <p className="text-muted-foreground leading-relaxed text-sm">
-                            You've been trying. That's why you took the test. The problem isn't intelligenceâ€”it's perspective. <strong>You can't read the label from inside the bottle.</strong> This analysis gives you the outside viewâ€”the clinical lens that cuts through emotions and shows you the STRUCTURE.
-                        </p>
-                    </div>
-
-                    {/* Q2 */}
-                    <div className="space-y-2">
-                        <h4 className="font-bold text-lg text-foreground">"What if my partner refuses to read it?"</h4>
-                        <p className="text-muted-foreground leading-relaxed text-sm">
-                            <strong>47% of our users never show it to their partner.</strong> They use it to change their OWN behaviorâ€”which inevitably forces the dynamic to shift. You don't need their permission to understand the pattern.
-                        </p>
-                    </div>
-
-                    {/* Q3 */}
-                    <div className="space-y-2">
-                        <h4 className="font-bold text-lg text-foreground">"What if it tells me something I don't want to hear?"</h4>
-                        <p className="text-muted-foreground leading-relaxed text-sm">
-                            Then you NEED to hear it. The worst thing isn't a painful truthâ€”it's wasting 5 more years on a comfortable lie. Look: You already KNOW something is wrong. That's why you took the test. The analysis doesn't create problemsâ€”it NAMES them.
-                        </p>
-                    </div>
-
-                    {/* Q4 */}
-                    <div className="space-y-2">
-                        <h4 className="font-bold text-lg text-foreground">"Is this therapy?"</h4>
-                        <p className="text-muted-foreground leading-relaxed text-sm">
-                            No, this is <strong>triage</strong>. Therapy requires finding a doctor, waiting weeks, and spending thousands. This report gives you the immediate diagnostic clarity you need *right now* to decide your next step. It's self-diagnosis before you see the doctor.
-                        </p>
-                    </div>
-
-                    {/* Q5 */}
-                    <div className="space-y-2">
-                        <h4 className="font-bold text-lg text-foreground">"What if I'm the problem?"</h4>
-                        <p className="text-muted-foreground leading-relaxed text-sm">
-                            That's actually the most empowering discovery possible. Because you can control YOUR behavior. Most people discover they're BOTH part of the problemâ€”one pattern triggering another. That means you can BOTH fix it.
-                        </p>
-                    </div>
-
-                    {/* Q6 */}
-                    <div className="space-y-2">
-                        <h4 className="font-bold text-lg text-foreground">"Is my data safe?"</h4>
-                        <p className="text-muted-foreground leading-relaxed text-sm">
-                            100%. We don't sell data. We don't share answers. You can delete your account and all data at any time.
-                        </p>
-                    </div>
+                <div className="space-y-3">
+                    {[
+                        { q: "Can't I just figure this out on my own?", a: "You've been trying. That's why you took the test. The problem isn't intelligence - it's perspective. You can't read the label from inside the bottle. This analysis gives you the outside view - the clinical lens that cuts through emotions and shows you the STRUCTURE." },
+                        { q: "What if my partner refuses to read it?", a: "47% of our users never show it to their partner. They use it to change their OWN behavior - which inevitably forces the dynamic to shift. You don't need their permission to understand the pattern." },
+                        { q: "What if it tells me something I don't want to hear?", a: "Then you NEED to hear it. The worst thing isn't a painful truth - it's wasting 5 more years on a comfortable lie. You already KNOW something is wrong. That's why you took the test. The analysis doesn't create problems - it NAMES them." },
+                        { q: "Is this therapy?", a: "No, this is triage. Therapy requires finding a doctor, waiting weeks, and spending thousands. This report gives you the immediate diagnostic clarity you need right now to decide your next step." },
+                        { q: "What if I'm the problem?", a: "That's actually the most empowering discovery possible. Because you can control YOUR behavior. Most people discover they're BOTH part of the problem - one pattern triggering another. That means you can BOTH fix it." },
+                        { q: "Is my data safe?", a: "100%. We don't sell data. We don't share answers. You can delete your account and all data at any time." }
+                    ].map((item, i) => (
+                        <div key={`faq-${i}`} className="border border-border rounded-xl overflow-hidden">
+                            <button
+                                onClick={() => setFaqOpen(faqOpen === i ? null : i)}
+                                className="w-full flex justify-between items-center p-5 text-left font-bold text-foreground hover:bg-muted/30 transition-colors"
+                            >
+                                <span>"{item.q}"</span>
+                                {faqOpen === i ? <ChevronUp size={20} className="text-muted-foreground shrink-0 ml-4" /> : <ChevronDown size={20} className="text-muted-foreground shrink-0 ml-4" />}
+                            </button>
+                            {faqOpen === i && (
+                                <div className="px-5 pb-5 text-muted-foreground text-sm leading-relaxed border-t border-border/50 pt-4">
+                                    {item.a}
+                                </div>
+                            )}
+                        </div>
+                    ))}
                 </div>
             </div>
 
             {/* Footer */}
-            <footer className="bg-slate-900 text-slate-500 py-12 text-center text-sm border-t border-slate-800">
+            <footer className="bg-foreground text-muted py-12 text-center text-sm border-t border-border">
                 <div className="max-w-4xl mx-auto px-6 space-y-4">
-                    <p>Â© 2026 UnderstandYourPartner.com â€¢ All Rights Reserved</p>
-                    <div className="flex justify-center gap-4">
-                        <span className="cursor-pointer hover:text-white">Privacy Policy</span>
-                        <span>â€¢</span>
-                        <span className="cursor-pointer hover:text-white">Terms of Service</span>
-                        <span>â€¢</span>
-                        <span className="cursor-pointer hover:text-white">Contact Support</span>
+                    <p className="text-muted-foreground/60">&copy; 2026 UnderstandYourPartner.com &bull; All Rights Reserved</p>
+                    <div className="flex justify-center gap-4 text-muted-foreground/60">
+                        <span className="cursor-pointer hover:text-primary-foreground">Privacy Policy</span>
+                        <span>&bull;</span>
+                        <span className="cursor-pointer hover:text-primary-foreground">Terms of Service</span>
+                        <span>&bull;</span>
+                        <span className="cursor-pointer hover:text-primary-foreground">Contact Support</span>
                     </div>
-                    <p className="max-w-xl mx-auto text-xs opacity-50 mt-6">
+                    <p className="max-w-xl mx-auto text-xs text-muted-foreground/40 mt-6">
                         Disclaimer: This analysis is based on psychological frameworks (Gottman, Attachment Theory) but is not a substitute for professional clinical therapy. If you are in immediate danger, please contact local authorities.
                     </p>
                 </div>

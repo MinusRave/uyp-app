@@ -74,19 +74,19 @@ export default function ToxicResultPage() {
     // Loading State (The "Hook" while waiting)
     if (isGenerating || (!pdfUrl && !error)) {
         return (
-            <div className="min-h-screen bg-slate-950 flex flex-col items-center justify-center p-4 font-sans">
-                <div className="max-w-md w-full bg-slate-900 border border-slate-800 rounded-3xl p-10 text-center shadow-2xl relative overflow-hidden">
+            <div className="min-h-screen bg-foreground flex flex-col items-center justify-center p-4 font-sans">
+                <div className="max-w-md w-full bg-foreground border border-border rounded-3xl p-10 text-center shadow-2xl relative overflow-hidden">
 
                     {/* Pulsing Accent */}
                     <div className="absolute top-0 left-0 w-full h-1 bg-linear-to-r from-red-600 to-orange-500 animate-pulse" />
 
-                    <div className="w-20 h-20 bg-slate-800 rounded-full flex items-center justify-center mx-auto mb-8 relative">
+                    <div className="w-20 h-20 bg-muted rounded-full flex items-center justify-center mx-auto mb-8 relative">
                         <Loader2 className="animate-spin text-red-500" size={40} />
                         <div className="absolute inset-0 rounded-full border-2 border-red-500/20 animate-ping"></div>
                     </div>
 
-                    <h2 className="text-2xl font-bold text-white mb-2">Generating Report</h2>
-                    <p className="text-slate-400 text-sm mb-8 animate-pulse">{statusMessage}</p>
+                    <h2 className="text-2xl font-bold text-primary-foreground mb-2">Generating Report</h2>
+                    <p className="text-muted-foreground text-sm mb-8 animate-pulse">{statusMessage}</p>
 
                     <div className="space-y-3 text-left pl-4">
                         <StepItem status={statusMessage.includes("Verifying") ? "current" : "done"} label="Payment Verification" />
@@ -102,15 +102,15 @@ export default function ToxicResultPage() {
 
     // Success State
     return (
-        <div className="min-h-screen bg-slate-50 flex flex-col items-center justify-center p-4 font-sans">
-            <div className="max-w-md w-full bg-white border border-slate-200 rounded-3xl p-10 text-center shadow-xl">
+        <div className="min-h-screen bg-muted/30 flex flex-col items-center justify-center p-4 font-sans">
+            <div className="max-w-md w-full bg-card border border-border rounded-3xl p-10 text-center shadow-xl">
 
                 <div className="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-6 text-green-600">
                     <CheckCircle size={40} />
                 </div>
 
-                <h1 className="text-3xl font-bold text-slate-900 mb-2">Analysis Ready</h1>
-                <p className="text-slate-500 mb-8">
+                <h1 className="text-3xl font-bold text-foreground mb-2">Analysis Ready</h1>
+                <p className="text-muted-foreground mb-8">
                     Your confidential report has been generated and secured.
                 </p>
 
@@ -130,18 +130,18 @@ export default function ToxicResultPage() {
                         href={pdfUrl!}
                         target="_blank"
                         rel="noreferrer"
-                        className="w-full bg-slate-900 hover:bg-slate-800 text-white font-bold py-4 rounded-xl shadow-lg flex items-center justify-center gap-3 transition-all transform active:scale-[0.98]"
+                        className="w-full bg-foreground hover:bg-muted text-primary-foreground font-bold py-4 rounded-xl shadow-lg flex items-center justify-center gap-3 transition-all transform active:scale-[0.98]"
                     >
                         <Download size={20} />
                         Download PDF Report
                     </a>
                 )}
 
-                <div className="mt-8 pt-6 border-t border-slate-100">
-                    <p className="text-xs text-slate-400 mb-4">
+                <div className="mt-8 pt-6 border-t border-border">
+                    <p className="text-xs text-muted-foreground mb-4">
                         A copy has also been sent to your email.
                     </p>
-                    <div className="flex justify-center gap-4 text-xs font-medium text-slate-500 uppercase tracking-widest">
+                    <div className="flex justify-center gap-4 text-xs font-medium text-muted-foreground uppercase tracking-widest">
                         <span className="flex items-center gap-1"><Lock size={12} /> Encrypted</span>
                         <span className="flex items-center gap-1"><FileText size={12} /> 15+ Pages</span>
                     </div>
@@ -159,12 +159,12 @@ function StepItem({ status, label }: { status: "waiting" | "current" | "done", l
         )}>
             <div className={cn("w-5 h-5 rounded-full flex items-center justify-center border transition-all duration-300",
                 status === "done" ? "bg-green-500 border-green-500 text-white" :
-                    status === "current" ? "border-red-500 text-red-500 bg-red-500/10" : "border-slate-600 text-transparent"
+                    status === "current" ? "border-red-500 text-red-500 bg-red-500/10" : "border-border text-transparent"
             )}>
                 {status === "done" && <CheckCircle size={12} />}
                 {status === "current" && <div className="w-2 h-2 bg-red-500 rounded-full animate-pulse" />}
             </div>
-            <span className={cn("text-sm font-medium", status === "current" ? "text-white" : "text-slate-300")}>
+            <span className={cn("text-sm font-medium", status === "current" ? "text-primary-foreground" : "text-muted-foreground")}>
                 {label}
             </span>
         </div>

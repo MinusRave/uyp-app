@@ -11,8 +11,8 @@ export default function UnsubscribePage() {
     }, [location]);
 
     return (
-        <div className="min-h-screen bg-gray-50 flex items-center justify-center px-4">
-            <div className="max-w-md w-full bg-white rounded-lg shadow-lg p-8">
+        <div className="min-h-screen bg-muted flex items-center justify-center px-4">
+            <div className="max-w-md w-full bg-card rounded-lg shadow-lg p-8">
                 {success ? (
                     <>
                         <div className="text-center mb-6">
@@ -31,10 +31,10 @@ export default function UnsubscribePage() {
                                     />
                                 </svg>
                             </div>
-                            <h1 className="text-2xl font-bold text-gray-900 mb-2">
+                            <h1 className="text-2xl font-bold text-foreground mb-2">
                                 You've been unsubscribed
                             </h1>
-                            <p className="text-gray-600">
+                            <p className="text-muted-foreground">
                                 You won't receive any more reminder emails from us.
                             </p>
                         </div>
@@ -64,10 +64,10 @@ export default function UnsubscribePage() {
                 ) : (
                     <>
                         <div className="text-center">
-                            <h1 className="text-2xl font-bold text-gray-900 mb-4">
+                            <h1 className="text-2xl font-bold text-foreground mb-4">
                                 Unsubscribe
                             </h1>
-                            <p className="text-gray-600">
+                            <p className="text-muted-foreground">
                                 Processing your unsubscribe request...
                             </p>
                         </div>

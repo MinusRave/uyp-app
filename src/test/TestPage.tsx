@@ -517,7 +517,7 @@ export default function TestPage() {
                     <form onSubmit={handleEmailSubmit} className="space-y-4">
                         <div>
                             <label className="text-sm font-medium text-muted-foreground block mb-2 text-left">
-                                Enter your email to access your confidential report:
+                                Where should we send your results?
                             </label>
                             <input
                                 type="email"
@@ -537,7 +537,7 @@ export default function TestPage() {
                             >
                                 <span className="relative z-10 flex items-center gap-2">
                                     {isSubmitting ? <Loader2 className="animate-spin" /> : <LockIcon size={20} />}
-                                    {isSubmitting ? "Unlocking..." : "Get Your Report Now"}
+                                    {isSubmitting ? "Unlocking..." : "Reveal My Analysis"}
                                 </span>
                                 <div className="absolute inset-0 bg-white/20 translate-y-full group-hover:translate-y-0 transition-transform duration-300"></div>
                             </button>

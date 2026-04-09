@@ -34,7 +34,7 @@ export default function ToxicSalesPage() {
     // FAQ State
     const [openFaq, setOpenFaq] = useState<number | null>(null);
 
-    if (isLoading) return <div className="p-12 text-center text-slate-500">Loading your analysis...</div>;
+    if (isLoading) return <div className="p-12 text-center text-muted-foreground">Loading your analysis...</div>;
     if (error || !session) return <div className="p-12 text-center text-red-500">Error loading session.</div>;
 
     const scores = (session.scores as any) || {};
@@ -64,10 +64,10 @@ export default function ToxicSalesPage() {
     };
 
     return (
-        <div className="font-sans text-slate-900 bg-white">
+        <div className="font-sans text-foreground bg-card">
 
             {/* SECTION 1: HERO (Personalized Results) */}
-            <section className="bg-slate-950 text-white py-16 px-4 relative overflow-hidden">
+            <section className="bg-foreground text-primary-foreground py-16 px-4 relative overflow-hidden">
                 <div className="absolute top-0 left-0 w-full h-1 bg-linear-to-r from-red-600 to-orange-500"></div>
 
                 <div className="max-w-3xl mx-auto text-center space-y-8 relative z-10">
@@ -75,25 +75,25 @@ export default function ToxicSalesPage() {
                         YOUR PERSONALIZED <span className="text-red-500">ANALYSIS</span>
                     </h1>
 
-                    <p className="text-xl text-slate-300">
+                    <p className="text-xl text-muted-foreground">
                         Based on <strong>YOUR</strong> 30 specific answers:
                     </p>
 
                     {/* Result Card */}
-                    <div className="bg-slate-900/80 border border-slate-700/50 backdrop-blur-sm rounded-3xl p-8 max-w-lg mx-auto shadow-2xl">
+                    <div className="bg-foreground/80 border border-border/50 backdrop-blur-sm rounded-3xl p-8 max-w-lg mx-auto shadow-2xl">
                         <div className="space-y-6">
-                            <div className="flex justify-between items-center border-b border-slate-700 pb-4">
-                                <span className="text-slate-400 font-medium">Toxicity Score</span>
+                            <div className="flex justify-between items-center border-b border-border pb-4">
+                                <span className="text-muted-foreground font-medium">Toxicity Score</span>
                                 <span className={cn("text-4xl font-black", finalScore >= 60 ? "text-red-500" : "text-orange-500")}>
                                     {finalScore}/100
                                 </span>
                             </div>
-                            <div className="flex justify-between items-center border-b border-slate-700 pb-4">
-                                <span className="text-slate-400 font-medium">Narcissism Type</span>
-                                <span className="text-xl font-bold text-white">{diagnosis}</span>
+                            <div className="flex justify-between items-center border-b border-border pb-4">
+                                <span className="text-muted-foreground font-medium">Narcissism Type</span>
+                                <span className="text-xl font-bold text-primary-foreground">{diagnosis}</span>
                             </div>
                             <div className="flex justify-between items-center">
-                                <span className="text-slate-400 font-medium">Danger Level</span>
+                                <span className="text-muted-foreground font-medium">Danger Level</span>
                                 <span className={cn("text-xl font-bold uppercase",
                                     riskLevel === "Severe" ? "text-red-600" :
                                         riskLevel === "High" ? "text-orange-500" : "text-yellow-500"
@@ -104,18 +104,18 @@ export default function ToxicSalesPage() {
                         </div>
 
                         {/* Blurred Preview */}
-                        <div className="mt-8 relative overflow-hidden bg-slate-800/50 rounded-xl p-4 text-left space-y-2 border border-slate-700/50">
-                            <div className="absolute inset-0 backdrop-blur-[6px] flex items-center justify-center bg-slate-900/10 z-10">
-                                <Lock className="text-slate-400 opacity-50 w-12 h-12" />
+                        <div className="mt-8 relative overflow-hidden bg-muted rounded-xl p-4 text-left space-y-2 border border-border/50">
+                            <div className="absolute inset-0 backdrop-blur-[6px] flex items-center justify-center bg-foreground/10 z-10">
+                                <Lock className="text-muted-foreground opacity-50 w-12 h-12" />
                             </div>
-                            <p className="text-slate-300 text-sm font-mono opacity-40">"Based on your answers about the financial control..."</p>
-                            <p className="text-slate-300 text-sm font-mono opacity-40">"When you said she isolates you from friends..."</p>
-                            <p className="text-slate-300 text-sm font-mono opacity-40">"Your situation with the kids requires immediate..."</p>
+                            <p className="text-muted-foreground text-sm font-mono opacity-40">"Based on your answers about the financial control..."</p>
+                            <p className="text-muted-foreground text-sm font-mono opacity-40">"When you said she isolates you from friends..."</p>
+                            <p className="text-muted-foreground text-sm font-mono opacity-40">"Your situation with the kids requires immediate..."</p>
                         </div>
                     </div>
 
                     <div className="space-y-4">
-                        <p className="text-lg text-slate-400">
+                        <p className="text-lg text-muted-foreground">
                             This isn't a generic report.<br />
                             This is <strong>YOUR</strong> relationship. Analyzed.
                         </p>
@@ -130,9 +130,9 @@ export default function ToxicSalesPage() {
             </section>
 
             {/* SECTION 2: EMOTIONAL MIRROR */}
-            <section className="py-20 px-4 bg-slate-50">
+            <section className="py-20 px-4 bg-muted/30">
                 <div className="max-w-2xl mx-auto space-y-10">
-                    <h2 className="text-3xl md:text-4xl font-bold text-slate-900 text-center">
+                    <h2 className="text-3xl md:text-4xl font-bold text-foreground text-center">
                         You Can't Talk About This. We Know.
                     </h2>
 
@@ -144,10 +144,10 @@ export default function ToxicSalesPage() {
                     </div>
 
                     <div className="text-center space-y-4 pt-6">
-                        <p className="text-xl font-bold text-slate-900">
+                        <p className="text-xl font-bold text-foreground">
                             You're not crazy. You need clarity.
                         </p>
-                        <p className="text-slate-600 leading-relaxed">
+                        <p className="text-muted-foreground leading-relaxed">
                             This analysis gives you what you can't get anywhere else:<br />
                             An objective breakdown of what's really happening.
                         </p>
@@ -156,28 +156,28 @@ export default function ToxicSalesPage() {
             </section>
 
             {/* SECTION 3: WHAT MAKES THIS PERSONALIZED */}
-            <section className="py-20 px-4 bg-white border-b border-slate-100">
+            <section className="py-20 px-4 bg-card border-b border-border/50">
                 <div className="max-w-3xl mx-auto">
                     <div className="text-center mb-12">
-                        <h2 className="text-3xl font-bold text-slate-900">Why This Isn't Generic</h2>
+                        <h2 className="text-3xl font-bold text-foreground">Why This Isn't Generic</h2>
                     </div>
 
                     <div className="grid md:grid-cols-2 gap-12 items-center">
                         <div className="space-y-4 opacity-50 grayscale">
-                            <div className="font-bold text-slate-400 text-lg">Most relationship advice:</div>
-                            <div className="p-6 bg-slate-100 rounded-2xl border border-slate-200">
-                                <p className="text-slate-500">"Narcissists do X, Y, Z"</p>
+                            <div className="font-bold text-muted-foreground text-lg">Most relationship advice:</div>
+                            <div className="p-6 bg-muted rounded-2xl border border-border">
+                                <p className="text-muted-foreground">"Narcissists do X, Y, Z"</p>
                                 <div className="flex justify-end mt-2"><X className="text-red-400" /></div>
                             </div>
                         </div>
 
                         <div className="space-y-4 relative">
                             <div className="absolute -left-6 top-1/2 -translate-y-1/2 hidden md:block">
-                                <ArrowRight className="text-slate-300" />
+                                <ArrowRight className="text-muted-foreground" />
                             </div>
                             <div className="font-bold text-red-600 text-lg">Your analysis:</div>
                             <div className="p-6 bg-red-50 rounded-2xl border border-red-100 shadow-sm">
-                                <p className="text-slate-800 font-medium">
+                                <p className="text-foreground font-medium">
                                     "Based on your answer to Q12, when you said she [exact thing], that's textbook [tactic].
                                     Here's why it works on you specifically..."
                                 </p>
@@ -186,21 +186,21 @@ export default function ToxicSalesPage() {
                         </div>
                     </div>
 
-                    <div className="mt-12 bg-slate-50 rounded-2xl p-8 text-center">
-                        <p className="font-bold text-slate-900 mb-4">Every section references YOUR answers:</p>
-                        <ul className="text-slate-600 space-y-2 inline-block text-left">
+                    <div className="mt-12 bg-muted/30 rounded-2xl p-8 text-center">
+                        <p className="font-bold text-foreground mb-4">Every section references YOUR answers:</p>
+                        <ul className="text-muted-foreground space-y-2 inline-block text-left">
                             <li className="flex items-center gap-2"><CheckCircle size={16} className="text-red-500" /> Her specific tactics (from your examples)</li>
                             <li className="flex items-center gap-2"><CheckCircle size={16} className="text-red-500" /> Why they work on YOU (your vulnerabilities)</li>
                             <li className="flex items-center gap-2"><CheckCircle size={16} className="text-red-500" /> Your exact situation (kids, finances, timeline)</li>
                             <li className="flex items-center gap-2"><CheckCircle size={16} className="text-red-500" /> What to do THIS WEEK (not generic steps)</li>
                         </ul>
-                        <p className="mt-6 text-slate-500 italic">52 people can take this test. 52 completely different reports.</p>
+                        <p className="mt-6 text-muted-foreground italic">52 people can take this test. 52 completely different reports.</p>
                     </div>
                 </div>
             </section>
 
             {/* SECTION 4: REPORT CONTENTS (Detailed) */}
-            <section className="py-20 px-4 bg-slate-900 text-white">
+            <section className="py-20 px-4 bg-foreground text-primary-foreground">
                 <div className="max-w-4xl mx-auto">
                     <div className="text-center mb-16">
                         <h2 className="text-3xl md:text-5xl font-black mb-4">
@@ -293,11 +293,11 @@ export default function ToxicSalesPage() {
             </section>
 
             {/* SECTION 5: EMOTIONAL TRUTH */}
-            <section className="py-20 px-4 bg-white">
+            <section className="py-20 px-4 bg-card">
                 <div className="max-w-2xl mx-auto text-center space-y-12">
                     <div className="space-y-4">
-                        <h2 className="text-3xl font-bold text-slate-900">The Real Reason You're Here</h2>
-                        <p className="text-lg text-slate-600">It's not the tactics. You could Google those.</p>
+                        <h2 className="text-3xl font-bold text-foreground">The Real Reason You're Here</h2>
+                        <p className="text-lg text-muted-foreground">It's not the tactics. You could Google those.</p>
                     </div>
 
                     <div className="grid gap-8 text-left">
@@ -308,16 +308,16 @@ export default function ToxicSalesPage() {
                         <EmotionalTruthItem title="GUILTY" quote="Maybe if I just tried harder. Spent more. Was more patient." />
                     </div>
 
-                    <div className="space-y-6 pt-8 border-t border-slate-100">
-                        <p className="text-xl font-medium text-slate-900">
+                    <div className="space-y-6 pt-8 border-t border-border/50">
+                        <p className="text-xl font-medium text-foreground">
                             This analysis doesn't judge you.<br />
                             It doesn't tell you what you SHOULD do.
                         </p>
-                        <p className="text-lg text-slate-600">
+                        <p className="text-lg text-muted-foreground">
                             It shows you what IS happening.<br />
                             Then gives you options.
                         </p>
-                        <p className="font-bold text-slate-900">
+                        <p className="font-bold text-foreground">
                             What you do with that clarity? Your choice.
                         </p>
                     </div>
@@ -325,9 +325,9 @@ export default function ToxicSalesPage() {
             </section>
 
             {/* SECTION 6: TESTIMONIALS */}
-            <section className="py-20 px-4 bg-slate-50 border-t border-slate-200">
+            <section className="py-20 px-4 bg-muted/30 border-t border-border">
                 <div className="max-w-6xl mx-auto">
-                    <h2 className="text-center text-sm font-bold tracking-widest text-slate-400 uppercase mb-12">Recent Results from Men Like You</h2>
+                    <h2 className="text-center text-sm font-bold tracking-widest text-muted-foreground uppercase mb-12">Recent Results from Men Like You</h2>
                     <div className="grid md:grid-cols-3 gap-8">
                         <TestimonialCard
                             quote="I read the section about 'financial control' and my stomach dropped. I've been giving her money thinking it would make her happy. It never does. Now I know why."
@@ -346,7 +346,7 @@ export default function ToxicSalesPage() {
             </section>
 
             {/* SECTION 7: URGENCY */}
-            <section className="py-20 px-4 bg-slate-900 text-white text-center">
+            <section className="py-20 px-4 bg-foreground text-primary-foreground text-center">
                 <div className="max-w-2xl mx-auto space-y-8">
                     <div className="inline-flex items-center gap-2 bg-red-500/10 text-red-500 px-4 py-1.5 rounded-full text-sm font-medium border border-red-500/20">
                         <Clock size={16} /> Status: Report Generated
@@ -354,7 +354,7 @@ export default function ToxicSalesPage() {
 
                     <h2 className="text-3xl md:text-4xl font-bold">Your Analysis Is Sitting On Our Server Right Now</h2>
 
-                    <div className="bg-slate-800/50 p-6 rounded-2xl text-left inline-block w-full max-w-md space-y-3 border border-slate-700">
+                    <div className="bg-muted p-6 rounded-2xl text-left inline-block w-full max-w-md space-y-3 border border-border">
                         <CheckItem text="Your toxicity score (calculated)" />
                         <CheckItem text="Her manipulation patterns (identified)" />
                         <CheckItem text="Your vulnerabilities (mapped)" />
@@ -364,11 +364,11 @@ export default function ToxicSalesPage() {
 
                     <div className="space-y-4">
                         <p className="text-xl font-bold">Question: Do you want to see it?</p>
-                        <p className="text-slate-400">
+                        <p className="text-muted-foreground">
                             Or do you want to keep Googling at 2am,<br />
                             hoping someone on Reddit has your exact situation?
                         </p>
-                        <p className="text-sm text-slate-500 italic">(They don't. Because no one has YOUR exact situation.)</p>
+                        <p className="text-sm text-muted-foreground italic">(They don't. Because no one has YOUR exact situation.)</p>
                     </div>
 
                     <button
@@ -381,18 +381,18 @@ export default function ToxicSalesPage() {
             </section>
 
             {/* SECTION 8: GUARANTEE */}
-            <section className="py-16 px-4 bg-white border-b border-slate-100">
+            <section className="py-16 px-4 bg-card border-b border-border/50">
                 <div className="max-w-3xl mx-auto flex flex-col md:flex-row gap-8 items-center">
                     <div className="w-24 h-24 bg-yellow-100 rounded-full flex items-center justify-center shrink-0">
                         <Shield className="text-yellow-600 w-12 h-12" />
                     </div>
                     <div className="space-y-4 text-center md:text-left">
-                        <h3 className="text-2xl font-bold text-slate-900">"Actually Helped" Guarantee</h3>
-                        <p className="text-slate-600 leading-relaxed">
+                        <h3 className="text-2xl font-bold text-foreground">"Actually Helped" Guarantee</h3>
+                        <p className="text-muted-foreground leading-relaxed">
                             Read it. If you don't have at least one moment where you think
                             "holy shit, that's EXACTLY what's happening" — full refund.
                         </p>
-                        <p className="text-slate-600">
+                        <p className="text-muted-foreground">
                             We've analyzed 52,847 relationships. We know what we're looking for.
                             If your report doesn't nail your situation, we fucked up.
                             Email us. Get your money back.
@@ -402,9 +402,9 @@ export default function ToxicSalesPage() {
             </section>
 
             {/* SECTION 9: FAQ */}
-            <section className="py-20 px-4 bg-slate-50">
+            <section className="py-20 px-4 bg-muted/30">
                 <div className="max-w-3xl mx-auto">
-                    <h2 className="text-3xl font-bold text-slate-900 text-center mb-12">Frequently Asked Questions</h2>
+                    <h2 className="text-3xl font-bold text-foreground text-center mb-12">Frequently Asked Questions</h2>
                     <div className="space-y-4">
                         <FaqItem
                             question="What if she finds this?"
@@ -436,11 +436,11 @@ export default function ToxicSalesPage() {
             </section>
 
             {/* SECTION 10: CHECKOUT & ORDER BUMP */}
-            <section id="checkout" className="py-20 px-4 bg-slate-900">
-                <div className="max-w-lg mx-auto bg-white rounded-3xl overflow-hidden shadow-2xl">
-                    <div className="p-8 pb-6 border-b border-slate-100">
-                        <h3 className="text-2xl font-black text-center text-slate-900 mb-2">Get My Personalized Analysis</h3>
-                        <div className="flex justify-center gap-4 text-xs font-medium text-slate-500 uppercase tracking-wide">
+            <section id="checkout" className="py-20 px-4 bg-foreground">
+                <div className="max-w-lg mx-auto bg-card rounded-3xl overflow-hidden shadow-2xl">
+                    <div className="p-8 pb-6 border-b border-border/50">
+                        <h3 className="text-2xl font-black text-center text-foreground mb-2">Get My Personalized Analysis</h3>
+                        <div className="flex justify-center gap-4 text-xs font-medium text-muted-foreground uppercase tracking-wide">
                             <span className="flex items-center gap-1"><CheckCircle size={12} className="text-green-500" /> Instant Access</span>
                             <span className="flex items-center gap-1"><Shield size={12} className="text-green-500" /> 30-Day Guarantee</span>
                         </div>
@@ -448,11 +448,11 @@ export default function ToxicSalesPage() {
 
                     <div className="p-8 space-y-6">
                         <div className="space-y-3">
-                            <div className="flex justify-between items-center text-slate-900 font-bold">
+                            <div className="flex justify-between items-center text-foreground font-bold">
                                 <span>Relationship Analysis (PDF)</span>
                                 <span>$47.00</span>
                             </div>
-                            <div className="flex justify-between items-center text-slate-600 text-sm">
+                            <div className="flex justify-between items-center text-muted-foreground text-sm">
                                 <span>5 Bonus Guides</span>
                                 <span className="text-green-600 font-bold">FREE</span>
                             </div>
@@ -462,24 +462,24 @@ export default function ToxicSalesPage() {
                         <div
                             className={cn(
                                 "border-2 rounded-xl p-4 cursor-pointer transition-all",
-                                addOrderBump ? "bg-red-50 border-red-500" : "bg-slate-50 border-slate-200 hover:border-slate-300"
+                                addOrderBump ? "bg-red-50 border-red-500" : "bg-muted/30 border-border hover:border-border"
                             )}
                             onClick={() => setAddOrderBump(!addOrderBump)}
                         >
                             <div className="flex gap-4">
                                 <div className={cn(
                                     "w-6 h-6 rounded border flex items-center justify-center shrink-0 mt-1 transition-colors",
-                                    addOrderBump ? "bg-red-600 border-red-600" : "bg-white border-slate-300"
+                                    addOrderBump ? "bg-red-600 border-red-600" : "bg-card border-border"
                                 )}>
                                     {addOrderBump && <CheckCircle size={16} className="text-white" />}
                                 </div>
                                 <div className="space-y-1">
                                     <div className="flex items-center gap-2">
                                         <span className="text-red-600 font-black text-sm uppercase tracking-wider">One-Time Offer</span>
-                                        <span className="text-slate-900 font-bold text-lg">+$9</span>
+                                        <span className="text-foreground font-bold text-lg">+$9</span>
                                     </div>
-                                    <div className="font-bold text-slate-900">Add Emergency Scripts Pack</div>
-                                    <p className="text-sm text-slate-600 leading-snug">
+                                    <div className="font-bold text-foreground">Add Emergency Scripts Pack</div>
+                                    <p className="text-sm text-muted-foreground leading-snug">
                                         When she says: "You're too sensitive" → You say: [exact response]<br />
                                         When she threatens: "I'll take the kids" → You say: [exact response]<br />
                                         <strong>20 scenarios. Exact words. Print it. Use tonight.</strong>
@@ -488,9 +488,9 @@ export default function ToxicSalesPage() {
                             </div>
                         </div>
 
-                        <div className="flex justify-between items-center pt-4 border-t border-slate-100">
-                            <span className="text-lg font-bold text-slate-700">Total</span>
-                            <span className="text-3xl font-black text-slate-900">${addOrderBump ? "56.00" : "47.00"}</span>
+                        <div className="flex justify-between items-center pt-4 border-t border-border/50">
+                            <span className="text-lg font-bold text-muted-foreground">Total</span>
+                            <span className="text-3xl font-black text-foreground">${addOrderBump ? "56.00" : "47.00"}</span>
                         </div>
 
                         <button
@@ -502,7 +502,7 @@ export default function ToxicSalesPage() {
                             <ArrowRight size={24} />
                         </button>
 
-                        <div className="flex items-center justify-center gap-4 mt-4 mb-2 text-slate-400">
+                        <div className="flex items-center justify-center gap-4 mt-4 mb-2 text-muted-foreground">
                             <FaCcVisa className="h-6 w-auto opacity-60 grayscale hover:grayscale-0 transition-all" />
                             <FaCcMastercard className="h-6 w-auto opacity-60 grayscale hover:grayscale-0 transition-all" />
                             <FaCcPaypal className="h-6 w-auto opacity-60 grayscale hover:grayscale-0 transition-all" />
@@ -511,7 +511,7 @@ export default function ToxicSalesPage() {
                         </div>
 
                         <div className="text-center">
-                            <p className="text-[10px] text-slate-400 uppercase tracking-wider">
+                            <p className="text-[10px] text-muted-foreground uppercase tracking-wider">
                                 Secure SSL Payment • 100% Confidential
                             </p>
                         </div>
@@ -527,11 +527,11 @@ export default function ToxicSalesPage() {
 
 function CheckboxItem({ text, subtext }: { text: string, subtext: string }) {
     return (
-        <div className="flex gap-4 p-5 bg-white rounded-xl border border-slate-200 shadow-sm items-start">
-            <div className="w-6 h-6 rounded border-2 border-slate-300 flex items-center justify-center shrink-0 mt-0.5" />
+        <div className="flex gap-4 p-5 bg-card rounded-xl border border-border shadow-sm items-start">
+            <div className="w-6 h-6 rounded border-2 border-border flex items-center justify-center shrink-0 mt-0.5" />
             <div>
-                <p className="text-slate-900 font-medium text-lg leading-tight">{text}</p>
-                <p className="text-slate-500 text-sm mt-1">{subtext}</p>
+                <p className="text-foreground font-medium text-lg leading-tight">{text}</p>
+                <p className="text-muted-foreground text-sm mt-1">{subtext}</p>
             </div>
         </div>
     )
@@ -539,14 +539,14 @@ function CheckboxItem({ text, subtext }: { text: string, subtext: string }) {
 
 function ReportSection({ emoji, title, items }: { emoji: string, title: string, items: string[] }) {
     return (
-        <div className="bg-slate-800 rounded-xl p-6 border border-slate-700">
-            <h3 className="font-bold text-lg text-white mb-4 flex items-center gap-3">
+        <div className="bg-muted rounded-xl p-6 border border-border">
+            <h3 className="font-bold text-lg text-primary-foreground mb-4 flex items-center gap-3">
                 <span className="text-2xl">{emoji}</span> {title}
             </h3>
             <ul className="space-y-2">
                 {items.map((item, i) => (
-                    <li key={i} className="flex items-start gap-3 text-slate-300">
-                        <span className="mt-2 w-1.5 h-1.5 rounded-full bg-slate-500 shrink-0" />
+                    <li key={i} className="flex items-start gap-3 text-muted-foreground">
+                        <span className="mt-2 w-1.5 h-1.5 rounded-full bg-muted-foreground shrink-0" />
                         <span>{item}</span>
                     </li>
                 ))}
@@ -558,20 +558,20 @@ function ReportSection({ emoji, title, items }: { emoji: string, title: string, 
 function EmotionalTruthItem({ title, quote }: { title: string, quote: string }) {
     return (
         <div className="border-l-4 border-red-100 pl-6 py-2">
-            <h4 className="font-black text-slate-900 text-sm tracking-widest mb-1">{title}</h4>
-            <p className="text-slate-600 italic font-serif text-lg">"{quote}"</p>
+            <h4 className="font-black text-foreground text-sm tracking-widest mb-1">{title}</h4>
+            <p className="text-muted-foreground italic font-serif text-lg">"{quote}"</p>
         </div>
     )
 }
 
 function TestimonialCard({ quote, author }: { quote: string, author: string }) {
     return (
-        <div className="bg-white p-8 rounded-2xl shadow-sm border border-slate-100 relative">
+        <div className="bg-card p-8 rounded-2xl shadow-sm border border-border/50 relative">
             <div className="text-6xl absolute top-4 left-4 text-red-100 font-serif leading-none select-none">"</div>
-            <p className="relative z-10 text-slate-700 font-medium mb-6 pt-6 italic">
+            <p className="relative z-10 text-muted-foreground font-medium mb-6 pt-6 italic">
                 {quote}
             </p>
-            <div className="font-bold text-slate-900 text-sm">— {author}</div>
+            <div className="font-bold text-foreground text-sm">— {author}</div>
             <div className="flex gap-1 mt-2 text-yellow-400">
                 {[1, 2, 3, 4, 5].map(i => <Star key={i} size={12} fill="currentColor" />)}
             </div>
@@ -583,20 +583,20 @@ function CheckItem({ text }: { text: string }) {
     return (
         <div className="flex items-center gap-3">
             <CheckCircle size={18} className="text-green-500 shrink-0" />
-            <span className="font-medium text-slate-200">{text}</span>
+            <span className="font-medium text-primary-foreground">{text}</span>
         </div>
     )
 }
 
 function FaqItem({ question, answer, isOpen, toggle }: { question: string, answer: string, isOpen: boolean, toggle: () => void }) {
     return (
-        <div className="bg-white rounded-xl border border-slate-200 overflow-hidden">
-            <button onClick={toggle} className="w-full flex justify-between items-center p-6 text-left hover:bg-slate-50 transition-colors">
-                <span className="font-bold text-slate-900">{question}</span>
-                {isOpen ? <ChevronUp className="text-slate-400" /> : <ChevronDown className="text-slate-400" />}
+        <div className="bg-card rounded-xl border border-border overflow-hidden">
+            <button onClick={toggle} className="w-full flex justify-between items-center p-6 text-left hover:bg-muted/30 transition-colors">
+                <span className="font-bold text-foreground">{question}</span>
+                {isOpen ? <ChevronUp className="text-muted-foreground" /> : <ChevronDown className="text-muted-foreground" />}
             </button>
             {isOpen && (
-                <div className="px-6 pb-6 text-slate-600 leading-relaxed border-t border-slate-100 pt-4">
+                <div className="px-6 pb-6 text-muted-foreground leading-relaxed border-t border-border/50 pt-4">
                     {answer}
                 </div>
             )}

@@ -137,7 +137,7 @@ export default function ToxicTestPage() {
 
     if (isInitializing) {
         return (
-            <div className="flex h-screen w-full items-center justify-center bg-slate-950">
+            <div className="flex h-screen w-full items-center justify-center bg-foreground">
                 <Loader2 className="animate-spin text-red-500" size={48} />
             </div>
         );
@@ -146,25 +146,25 @@ export default function ToxicTestPage() {
     if (!currentQuestion) return null;
 
     return (
-        <div className="min-h-screen bg-slate-950 text-slate-100 flex flex-col font-sans selection:bg-red-500/30">
+        <div className="min-h-screen bg-foreground text-primary-foreground flex flex-col font-sans selection:bg-red-500/30">
             {/* Header / Progress */}
-            <header className="sticky top-0 z-50 bg-slate-950/80 backdrop-blur border-b border-slate-800">
+            <header className="sticky top-0 z-50 bg-foreground/80 backdrop-blur border-b border-border">
                 <div className="max-w-2xl mx-auto px-4 h-16 flex items-center justify-between">
                     <div className="flex items-center gap-4">
                         {currentQIndex > 0 ? (
-                            <button onClick={handleBack} className="p-2 -ml-2 text-slate-400 hover:text-white transition-colors">
+                            <button onClick={handleBack} className="p-2 -ml-2 text-muted-foreground hover:text-primary-foreground transition-colors">
                                 <ChevronLeft size={24} />
                             </button>
                         ) : (
                             <div className="w-10" />
                         )}
-                        <span className="font-bold text-lg tracking-tight text-white/90">Assessment</span>
+                        <span className="font-bold text-lg tracking-tight text-primary-foreground/90">Assessment</span>
                     </div>
-                    <div className="text-xs font-medium text-slate-500 uppercase tracking-widest">
+                    <div className="text-xs font-medium text-muted-foreground uppercase tracking-widest">
                         {Math.round(progressPercentage)}% Complete
                     </div>
                 </div>
-                <div className="h-1 w-full bg-slate-900">
+                <div className="h-1 w-full bg-foreground">
                     <div
                         className="h-full bg-linear-to-r from-red-600 to-orange-600 transition-all duration-300 ease-out"
                         style={{ width: `${progressPercentage}%` }}
@@ -178,12 +178,12 @@ export default function ToxicTestPage() {
 
                     {/* Dimension Tag (Optional context) */}
                     <div className="mb-4 text-center">
-                        <span className="inline-block py-1 px-3 rounded-full bg-slate-900 border border-slate-800 text-[10px] font-bold uppercase tracking-wider text-slate-500">
+                        <span className="inline-block py-1 px-3 rounded-full bg-foreground border border-border text-[10px] font-bold uppercase tracking-wider text-muted-foreground">
                             {currentQuestion.dimension}
                         </span>
                     </div>
 
-                    <h2 className="text-2xl md:text-3xl font-bold text-center text-white mb-12 leading-tight">
+                    <h2 className="text-2xl md:text-3xl font-bold text-center text-primary-foreground mb-12 leading-tight">
                         {currentQuestion.text}
                     </h2>
 
@@ -199,12 +199,12 @@ export default function ToxicTestPage() {
                                 key={option.id}
                                 onClick={() => handleOptionClick(option.id)}
                                 className={cn(
-                                    "w-full p-4 md:p-5 text-left rounded-xl border border-slate-800 bg-slate-900/50 hover:bg-slate-800 hover:border-slate-700 transition-all duration-200 group relative overflow-hidden",
+                                    "w-full p-4 md:p-5 text-left rounded-xl border border-border bg-foreground/50 hover:bg-muted hover:border-border transition-all duration-200 group relative overflow-hidden",
                                     selectedAnswer === option.id && "border-red-500/50 bg-red-500/10 ring-1 ring-red-500/50"
                                 )}
                             >
                                 <div className="flex items-center justify-between">
-                                    <span className="text-base md:text-lg font-medium text-slate-200 group-hover:text-white transition-colors">
+                                    <span className="text-base md:text-lg font-medium text-muted-foreground group-hover:text-primary-foreground transition-colors">
                                         {option.text}
                                     </span>
                                     {selectedAnswer === option.id && (

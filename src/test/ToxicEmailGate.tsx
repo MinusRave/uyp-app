@@ -44,23 +44,23 @@ export default function ToxicEmailGate() {
     };
 
     return (
-        <div className="min-h-screen bg-slate-950 flex flex-col items-center justify-center p-4 font-sans text-slate-100">
+        <div className="min-h-screen bg-foreground flex flex-col items-center justify-center p-4 font-sans text-primary-foreground">
 
             {/* Container */}
-            <div className="max-w-md w-full bg-slate-900 border border-slate-800 rounded-3xl p-8 shadow-2xl relative overflow-hidden">
+            <div className="max-w-md w-full bg-foreground border border-border rounded-3xl p-8 shadow-2xl relative overflow-hidden">
 
                 {/* Top Accent */}
                 <div className="absolute top-0 left-0 w-full h-1.5 bg-linear-to-r from-red-600 to-orange-600" />
 
                 {/* Header */}
                 <div className="text-center space-y-4 mb-8">
-                    <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-slate-800 mb-2">
+                    <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-muted mb-2">
                         <Lock className="text-red-500" size={32} />
                     </div>
-                    <h1 className="text-2xl font-bold text-white">
+                    <h1 className="text-2xl font-bold text-primary-foreground">
                         Get Your Personalized Analysis
                     </h1>
-                    <p className="text-slate-400 text-sm leading-relaxed">
+                    <p className="text-muted-foreground text-sm leading-relaxed">
                         Your 30 answers reveal <strong>YOUR</strong> specific situation.
                         Not generic advice. Your pattern. Her tactics. Your options.
                     </p>
@@ -76,7 +76,7 @@ export default function ToxicEmailGate() {
                             placeholder="Enter your email"
                             value={email}
                             onChange={(e) => setEmail(e.target.value)}
-                            className="w-full bg-slate-950 border border-slate-700 rounded-xl px-4 py-3.5 text-white placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-red-500/50 transition-all"
+                            className="w-full bg-foreground border border-border rounded-xl px-4 py-3.5 text-primary-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-red-500/50 transition-all"
                             disabled={isSubmitting}
                         />
                     </div>
@@ -91,7 +91,7 @@ export default function ToxicEmailGate() {
                     <button
                         type="submit"
                         disabled={isSubmitting}
-                        className="w-full bg-white text-slate-950 font-bold rounded-xl py-3.5 flex items-center justify-center gap-2 hover:bg-slate-200 transition-all transform active:scale-[0.98] disabled:opacity-70 disabled:cursor-not-allowed"
+                        className="w-full bg-card text-foreground font-bold rounded-xl py-3.5 flex items-center justify-center gap-2 hover:bg-muted transition-all transform active:scale-[0.98] disabled:opacity-70 disabled:cursor-not-allowed"
                     >
                         {isSubmitting ? (
                             <span>Processing...</span>
@@ -104,15 +104,15 @@ export default function ToxicEmailGate() {
                 </form>
 
                 {/* Footer / Trust Badges */}
-                <div className="mt-8 pt-6 border-t border-slate-800 flex flex-col gap-3 text-center">
-                    <div className="flex items-center justify-center gap-4 text-xs text-slate-500 font-medium tracking-wide uppercase">
+                <div className="mt-8 pt-6 border-t border-border flex flex-col gap-3 text-center">
+                    <div className="flex items-center justify-center gap-4 text-xs text-muted-foreground font-medium tracking-wide uppercase">
                         <span className="flex items-center gap-1.5"><Lock size={12} /> Confidential</span>
-                        <span className="w-1 h-1 bg-slate-700 rounded-full" />
+                        <span className="w-1 h-1 bg-border rounded-full" />
                         <span className="flex items-center gap-1.5"><ShieldCheck size={12} /> Secure</span>
-                        <span className="w-1 h-1 bg-slate-700 rounded-full" />
+                        <span className="w-1 h-1 bg-border rounded-full" />
                         <span>Unsubscribe Anytime</span>
                     </div>
-                    <p className="text-[10px] text-slate-600">
+                    <p className="text-[10px] text-muted-foreground">
                         We respect your privacy. Reports are generated securely.
                     </p>
                 </div>

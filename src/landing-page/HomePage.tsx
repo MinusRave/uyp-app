@@ -58,7 +58,7 @@ export default function HomePage() {
 
                 <div className="max-w-4xl mx-auto text-center space-y-8 z-10 relative">
                     <h1 className="text-4xl md:text-6xl font-black tracking-tight leading-tight mb-6">
-                        Understand Your Relationship Pattern in 10 Minutes
+                        The 10-Minute Assessment That Reveals the Hidden Pattern <span className="text-primary">Destroying</span> Your Relationship
                     </h1>
 
                     <p className="text-xl md:text-2xl text-muted-foreground max-w-2xl mx-auto leading-relaxed font-light">
@@ -66,7 +66,15 @@ export default function HomePage() {
                         Finally see the hidden dynamic that's controlling your relationship.
                     </p>
 
-                    <div className="flex flex-col items-center gap-4 pt-8">
+                    {/* Fascination Bullets */}
+                    <ul className="max-w-md mx-auto text-left space-y-2 text-sm text-muted-foreground pt-2">
+                        <li className="flex items-start gap-2"><ArrowRight size={14} className="text-primary mt-0.5 shrink-0" /> The one phrase that de-escalates 90% of arguments</li>
+                        <li className="flex items-start gap-2"><ArrowRight size={14} className="text-primary mt-0.5 shrink-0" /> Why "trying harder" almost always makes it <strong className="text-foreground">WORSE</strong></li>
+                        <li className="flex items-start gap-2"><ArrowRight size={14} className="text-primary mt-0.5 shrink-0" /> The pattern that predicts divorce with 94% accuracy</li>
+                        <li className="flex items-start gap-2"><ArrowRight size={14} className="text-primary mt-0.5 shrink-0" /> Whether you're in a rough patch — or something more dangerous</li>
+                    </ul>
+
+                    <div className="flex flex-col items-center gap-4 pt-6">
                         <Link
                             to="/test"
                             onClick={() => trackCTA('hero')}
@@ -103,9 +111,9 @@ export default function HomePage() {
                             <div className="w-14 h-14 bg-primary/10 text-primary rounded-full flex items-center justify-center mb-6">
                                 <ListChecks size={28} />
                             </div>
-                            <h3 className="text-xl font-bold mb-4">Answer 30 Questions</h3>
+                            <h3 className="text-xl font-bold mb-4">10 Minutes of Honest Answers</h3>
                             <p className="text-muted-foreground leading-relaxed">
-                                10 minutes. About communication, intimacy, trust, fairness, and your shared future.
+                                Not therapy-speak. Real questions about what's actually happening — fights, silence, distance, control.
                             </p>
                         </div>
 
@@ -114,9 +122,9 @@ export default function HomePage() {
                             <div className="w-14 h-14 bg-purple-100 text-purple-600 rounded-full flex items-center justify-center mb-6">
                                 <Search size={28} />
                             </div>
-                            <h3 className="text-xl font-bold mb-4">Get Your Pattern</h3>
+                            <h3 className="text-xl font-bold mb-4">See the Pattern You Can't See From Inside</h3>
                             <p className="text-muted-foreground leading-relaxed">
-                                We identify your relationship's unique dynamic and primary vulnerabilities.
+                                Pursuer-Withdrawer? Silent Divorce? Emotional landlord? We name the exact dynamic running your relationship.
                             </p>
                         </div>
 
@@ -125,9 +133,9 @@ export default function HomePage() {
                             <div className="w-14 h-14 bg-green-100 text-green-600 rounded-full flex items-center justify-center mb-6">
                                 <Lightbulb size={28} />
                             </div>
-                            <h3 className="text-xl font-bold mb-4">Understand What to Do</h3>
+                            <h3 className="text-xl font-bold mb-4">Know Exactly What to Do Next</h3>
                             <p className="text-muted-foreground leading-relaxed">
-                                Personalized action plan with exact scripts and clinical guides.
+                                Not "communicate better". Specific scripts, specific guides, specific to YOUR pattern and YOUR partner.
                             </p>
                         </div>
                     </div>
@@ -208,9 +216,9 @@ export default function HomePage() {
                                 <Activity size={24} />
                             </div>
                             <div>
-                                <h3 className="text-xl font-bold mb-2">Your Relationship Pattern</h3>
+                                <h3 className="text-xl font-bold mb-2">The Dynamic That's Running the Show</h3>
                                 <p className="text-muted-foreground text-sm leading-relaxed">
-                                    Pursuer-Withdrawer? Manager-Employee? Silent Divorce? We identify which dynamic is controlling you.
+                                    Pursuer-Withdrawer? Manager-Employee? Silent Divorce? We name the exact dynamic controlling you — so you can finally see it.
                                 </p>
                             </div>
                         </div>
@@ -221,9 +229,9 @@ export default function HomePage() {
                                 <TrendingUp size={24} />
                             </div>
                             <div>
-                                <h3 className="text-xl font-bold mb-2">Your 5 Core Scores</h3>
+                                <h3 className="text-xl font-bold mb-2">See Exactly Which Dimension Is Bleeding</h3>
                                 <p className="text-muted-foreground text-sm leading-relaxed">
-                                    Communication, Trust, Intimacy, Fairness, Shared Future. See exactly where the structure is failing.
+                                    Communication, Trust, Intimacy, Fairness, Shared Future — scored and ranked. Know precisely where the structure is cracking, not just "something feels off."
                                 </p>
                             </div>
                         </div>
@@ -234,9 +242,9 @@ export default function HomePage() {
                                 <AlertTriangle size={24} />
                             </div>
                             <div>
-                                <h3 className="text-xl font-bold mb-2">Your Toxicity Level</h3>
+                                <h3 className="text-xl font-bold mb-2">Is This Fixable — Or Is It Dangerous?</h3>
                                 <p className="text-muted-foreground text-sm leading-relaxed">
-                                    Clinical 0-100 assessment. Is it a rough patch, or is it abuse? Definitive clarity.
+                                    Clinical 0-100 toxicity assessment. A definitive answer to the question you've been afraid to ask.
                                 </p>
                             </div>
                         </div>
@@ -247,9 +255,9 @@ export default function HomePage() {
                                 <ShieldCheck size={24} />
                             </div>
                             <div>
-                                <h3 className="text-xl font-bold mb-2">Your Future Forecast</h3>
+                                <h3 className="text-xl font-bold mb-2">Where This Is Headed If Nothing Changes</h3>
                                 <p className="text-muted-foreground text-sm leading-relaxed">
-                                    6-month and 5-year predictions. Where is this relationship headed if nothing changes?
+                                    6-month and 5-year trajectory projections. Based on YOUR specific pattern and scores — not generic statistics.
                                 </p>
                             </div>
                         </div>
@@ -424,7 +432,7 @@ export default function HomePage() {
                         <Link
                             to="/test"
                             onClick={() => trackCTA('final')}
-                            className="inline-flex items-center gap-2 bg-primary hover:bg-primary/90 text-primary-foreground font-black text-2xl py-6 px-12 rounded-full shadow-2xl hover:scale-105 transition-all animate-pulse"
+                            className="inline-flex items-center gap-2 bg-primary hover:bg-primary/90 text-primary-foreground font-black text-2xl py-6 px-12 rounded-full shadow-2xl hover:scale-105 transition-all"
                         >
                             Take the Free 10-Minute Assessment <ArrowRight size={24} />
                         </Link>
@@ -437,36 +445,28 @@ export default function HomePage() {
             </section>
 
             {/* 10. FOOTER (Shared/Mirrored) */}
-            <footer className="bg-slate-900 text-slate-500 py-16 px-6 text-sm border-t border-slate-800">
-                <div className="max-w-6xl mx-auto grid md:grid-cols-4 gap-12 mb-12">
+            <footer className="bg-foreground text-muted-foreground/60 py-16 px-6 text-sm border-t border-border">
+                <div className="max-w-6xl mx-auto grid md:grid-cols-3 gap-12 mb-12">
                     <div>
-                        <h4 className="text-slate-300 font-bold mb-4">Product</h4>
+                        <h4 className="text-primary-foreground/80 font-bold mb-4">Product</h4>
                         <ul className="space-y-2">
-                            <li><Link to="/test" className="hover:text-white transition-colors">How It Works</Link></li>
-                            <li><Link to="/test" className="hover:text-white transition-colors">Why It's Accurate</Link></li>
-                            <li><Link to="/test" className="hover:text-white transition-colors">About</Link></li>
+                            <li><Link to="/#how-it-works" className="hover:text-primary-foreground transition-colors">How It Works</Link></li>
+                            <li><Link to="/test" className="hover:text-primary-foreground transition-colors">Take the Assessment</Link></li>
                         </ul>
                     </div>
                     <div>
-                        <h4 className="text-slate-300 font-bold mb-4">Legal</h4>
+                        <h4 className="text-primary-foreground/80 font-bold mb-4">Legal</h4>
                         <ul className="space-y-2">
-                            <li><Link to="/privacy-policy" className="hover:text-white transition-colors">Privacy Policy</Link></li>
-                            <li><Link to="/terms-of-service" className="hover:text-white transition-colors">Terms of Service</Link></li>
-                            <li><a href="mailto:admin@understandyourpartner.com" className="hover:text-white transition-colors">Contact Support</a></li>
-                        </ul>
-                    </div>
-                    <div>
-                        <h4 className="text-slate-300 font-bold mb-4">Resources</h4>
-                        <ul className="space-y-2">
-                            <li><Link to="/test" className="hover:text-white transition-colors">Blog</Link></li>
-                            <li><Link to="/test" className="hover:text-white transition-colors">Press</Link></li>
+                            <li><Link to="/privacy-policy" className="hover:text-primary-foreground transition-colors">Privacy Policy</Link></li>
+                            <li><Link to="/terms-of-service" className="hover:text-primary-foreground transition-colors">Terms of Service</Link></li>
+                            <li><a href="mailto:admin@understandyourpartner.com" className="hover:text-primary-foreground transition-colors">Contact Support</a></li>
                         </ul>
                     </div>
                 </div>
 
-                <div className="max-w-6xl mx-auto border-t border-slate-800 pt-8 text-center space-y-4">
-                    <p>© 2026 UnderstandYourPartner.com • All Rights Reserved</p>
-                    <p className="max-w-3xl mx-auto text-xs opacity-60 leading-relaxed">
+                <div className="max-w-6xl mx-auto border-t border-muted-foreground/20 pt-8 text-center space-y-4">
+                    <p>&copy; 2026 UnderstandYourPartner.com &bull; All Rights Reserved</p>
+                    <p className="max-w-3xl mx-auto text-xs text-muted-foreground/40 leading-relaxed">
                         Disclaimer: This assessment is based on clinical frameworks (Gottman Method, Attachment Theory, EFT) but is not a substitute for professional therapy. If you are experiencing abuse or are in immediate danger, please contact local authorities or a crisis hotline.
                     </p>
                 </div>

@@ -40,8 +40,8 @@ export default function EmergencyPage() {
         }
     }, [step]);
 
-    if (isLoading) return <div className="min-h-screen bg-black text-white flex items-center justify-center"><Loader2 className="animate-spin" /></div>;
-    if (!session) return <div className="min-h-screen bg-black text-white p-10 text-center">No session found.</div>;
+    if (isLoading) return <div className="min-h-screen bg-foreground text-primary-foreground flex items-center justify-center"><Loader2 className="animate-spin" /></div>;
+    if (!session) return <div className="min-h-screen bg-foreground text-primary-foreground p-10 text-center">No session found.</div>;
 
     const scores = session.scores as any; // Cast to bypass strict type for now
     const dominantLens = scores?.dominantLens as DimensionType;
@@ -52,14 +52,14 @@ export default function EmergencyPage() {
     const content = (QUADRANT_CONTENT as any)[dominantLens]?.[state] || QUADRANT_CONTENT["communication"]["Amplified Distress"];
 
     return (
-        <div className="min-h-screen bg-slate-950 text-slate-50 flex flex-col font-sans selection:bg-blue-500/30">
+        <div className="min-h-screen bg-foreground text-primary-foreground flex flex-col font-sans selection:bg-blue-500/30">
 
             {/* Top Bar */}
             <div className="p-6 flex justify-between items-center z-10">
-                <button onClick={() => navigate('/report')} className="text-slate-400 hover:text-white flex items-center gap-2 transition-colors">
+                <button onClick={() => navigate('/report')} className="text-muted-foreground hover:text-primary-foreground flex items-center gap-2 transition-colors">
                     <ArrowLeft size={20} /> Exit
                 </button>
-                <div className="text-xs font-bold uppercase tracking-widest text-slate-500">Emergency Protocol</div>
+                <div className="text-xs font-bold uppercase tracking-widest text-muted-foreground">Emergency Protocol</div>
             </div>
 
             {/* Main Content Area */}
@@ -68,7 +68,7 @@ export default function EmergencyPage() {
                 {/* STEP 1: BREATHE */}
                 {step === "breathe" && (
                     <div className="animate-in fade-in zoom-in duration-700 space-y-12">
-                        <h1 className="text-2xl md:text-4xl font-light text-slate-200">Let's regulate your nervous system.</h1>
+                        <h1 className="text-2xl md:text-4xl font-light text-muted-foreground">Let's regulate your nervous system.</h1>
 
                         <div className="relative flex items-center justify-center py-10">
                             {/* Breathing Ball Animation */}
@@ -78,7 +78,7 @@ export default function EmergencyPage() {
                             </div>
                         </div>
 
-                        <p className="text-lg text-slate-400">Take a deep breath in... and slow out.</p>
+                        <p className="text-lg text-muted-foreground">Take a deep breath in... and slow out.</p>
                     </div>
                 )}
 
@@ -95,7 +95,7 @@ export default function EmergencyPage() {
                             You are in <span className="text-emerald-300">{state}</span>.
                         </h1>
 
-                        <p className="text-xl md:text-2xl text-slate-300 leading-relaxed max-w-lg mx-auto">
+                        <p className="text-xl md:text-2xl text-muted-foreground leading-relaxed max-w-lg mx-auto">
                             "{content.analysis}"
                         </p>
 
@@ -117,21 +117,21 @@ export default function EmergencyPage() {
 
                         <h2 className="text-sm font-bold uppercase tracking-widest text-blue-400">Read this Exact Sentence</h2>
 
-                        <div className="bg-slate-900 p-8 md:p-12 rounded-3xl border border-slate-800 shadow-2xl relative overflow-hidden">
-                            <Quote className="absolute top-4 left-4 text-slate-800" size={48} />
-                            <blockquote className="relative z-10 text-2xl md:text-4xl font-serif italic text-white leading-relaxed">
+                        <div className="bg-foreground p-8 md:p-12 rounded-3xl border border-border shadow-2xl relative overflow-hidden">
+                            <Quote className="absolute top-4 left-4 text-muted" size={48} />
+                            <blockquote className="relative z-10 text-2xl md:text-4xl font-serif italic text-primary-foreground leading-relaxed">
                                 "{content.scripts.inTheMoment}"
                             </blockquote>
-                            <Quote className="absolute bottom-4 right-4 text-slate-800 rotate-180" size={48} />
+                            <Quote className="absolute bottom-4 right-4 text-muted rotate-180" size={48} />
                         </div>
 
-                        <p className="text-slate-400 max-w-md mx-auto">
+                        <p className="text-muted-foreground max-w-md mx-auto">
                             Stop explaining. Stop defending. Just say this sentence and stop.
                         </p>
 
                         <button
                             onClick={() => navigate('/report')}
-                            className="mt-8 text-slate-500 hover:text-white underline decoration-slate-700 hover:decoration-white underline-offset-4 transition-all"
+                            className="mt-8 text-muted-foreground hover:text-primary-foreground underline decoration-border hover:decoration-primary-foreground underline-offset-4 transition-all"
                         >
                             Return to Report
                         </button>
