@@ -420,10 +420,14 @@ const MirrorSection = ({ narcissismAnalysis, badge }: { narcissismAnalysis?: any
 export default function TeaserPageNew() {
     const navigate = useNavigate();
     const { data: user } = useAuth();
+    // Read session ID from URL params (email links, Stripe cancel redirect) then localStorage
+    const urlParams = typeof window !== "undefined" ? new URLSearchParams(window.location.search) : null;
+    const urlSessionId = urlParams?.get("session") || urlParams?.get("sessionId") || urlParams?.get("session_id") || null;
     const localSessionId = typeof window !== "undefined" ? localStorage.getItem("uyp-session-id") : null;
+    const sessionIdToUse = urlSessionId || localSessionId || undefined;
 
-    // 1. Fetch Session (Copied logic)
-    const { data: session, isLoading: isSessionLoading, refetch } = useQuery(getTestSession, { sessionId: localSessionId || undefined });
+    // 1. Fetch Session
+    const { data: session, isLoading: isSessionLoading, refetch } = useQuery(getTestSession, { sessionId: sessionIdToUse });
 
     // 2. Local State
     const [quickOverview, setQuickOverview] = useState<QuickOverviewData | null>(null);
@@ -449,6 +453,11 @@ export default function TeaserPageNew() {
     const [showEmailModal, setShowEmailModal] = useState(false);
     const [pendingAction, setPendingAction] = useState<(() => void) | null>(null);
     const [isEmailSubmitting, setIsEmailSubmitting] = useState(false);
+
+    // Persist URL session ID to localStorage for subsequent navigations
+    useEffect(() => {
+        if (urlSessionId) localStorage.setItem("uyp-session-id", urlSessionId);
+    }, [urlSessionId]);
 
     useEffect(() => {
         const handleScroll = () => {
@@ -640,13 +649,54 @@ export default function TeaserPageNew() {
         }
     };
 
-    if (!session) return <div className="min-h-screen flex items-center justify-center bg-background text-foreground">Session not found.</div>;
+    // No session ID at all (no URL param, no localStorage) → show "not found" with retake link
+    if (!session && !sessionIdToUse) return (
+        <div className="min-h-screen flex items-center justify-center bg-background text-foreground">
+            <div className="text-center space-y-4 p-8">
+                <p className="text-xl font-bold">Session not found</p>
+                <p className="text-muted-foreground">Your session may have expired or you're on a different device.</p>
+                <a href="/test" className="text-primary font-bold hover:underline">Take the assessment &rarr;</a>
+            </div>
+        </div>
+    );
+
+    // Session ID exists but data hasn't loaded yet (hydration gap, network delay)
+    if (!session) return (
+        <div className="min-h-screen flex items-center justify-center bg-background">
+            <Activity className="animate-spin text-primary" size={32} />
+        </div>
+    );
 
     const badge = quickOverview?.hero?.result_badge || "CALCULATING...";
+
+    // Stale session detection
+    const daysSinceTest = session.createdAt
+        ? Math.floor((Date.now() - new Date(session.createdAt).getTime()) / (1000 * 60 * 60 * 24))
+        : 0;
+    const isStaleSession = daysSinceTest > 14;
+    const testDate = session.createdAt
+        ? new Date(session.createdAt).toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric" })
+        : null;
 
     return (
         <div className="min-h-screen bg-background font-sans text-foreground selection:bg-primary selection:text-primary-foreground">
 
+            {isStaleSession && (
+                <div className="bg-amber-50 dark:bg-amber-950/20 border-b border-amber-200 dark:border-amber-800 px-6 py-3">
+                    <div className="max-w-3xl mx-auto flex items-center justify-between gap-4 text-sm">
+                        <div className="flex items-center gap-2 text-amber-800 dark:text-amber-300">
+                            <Clock size={16} />
+                            <span>This analysis was generated on {testDate}. Your relationship may have changed.</span>
+                        </div>
+                        <button
+                            onClick={() => { localStorage.removeItem("uyp-session-id"); navigate("/test"); }}
+                            className="whitespace-nowrap text-amber-900 dark:text-amber-200 font-medium underline hover:text-amber-700"
+                        >
+                            Retake the test
+                        </button>
+                    </div>
+                </div>
+            )}
 
             <HeroSection
                 badge={badge}

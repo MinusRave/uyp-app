@@ -117,21 +117,29 @@ export const getTestSession: GetTestSession<{ sessionId?: string }, TestSession 
         });
     }
 
-    // 2. Fallback: If user is logged in, find their latest session
+    // 2. Fallback: If user is logged in, find their latest ACTIVE session
+    // Filters out archived unpaid sessions, but always includes paid ones
     if (context.user) {
-        // Search for session by UserID OR by Email (if unliked)
-        // Prisma doesn't support complex OR across fields easily in one finding without raw query or explicit OR.
-        // Let's use OR operator.
         return context.entities.TestSession.findFirst({
             where: {
-                OR: [
-                    { userId: context.user.id },
-                    { email: context.user.email, userId: null } // Match email if session has no user yet
+                AND: [
+                    {
+                        OR: [
+                            { userId: context.user.id },
+                            { email: context.user.email, userId: null }
+                        ]
+                    },
+                    {
+                        OR: [
+                            { isArchived: false },
+                            { isPaid: true }
+                        ]
+                    }
                 ]
             },
             orderBy: [
-                { isPaid: "desc" },   // Prioritize Paid Sessions
-                { createdAt: "desc" } // Then Latest
+                { isPaid: "desc" },
+                { createdAt: "desc" }
             ],
         });
     }

@@ -61,8 +61,9 @@ export async function sendRetentionEmail(
         }
 
         // Get personalization data (from cache or build fresh)
+        // Rebuild if cached data is missing session_id (pre-migration cache)
         let personalizationData: PersonalizationVars;
-        if (session.personalizationData) {
+        if (session.personalizationData && (session.personalizationData as any).session_id) {
             personalizationData = session.personalizationData as unknown as PersonalizationVars;
         } else {
             const appUrl = process.env.WASP_WEB_CLIENT_URL || "http://localhost:3000";

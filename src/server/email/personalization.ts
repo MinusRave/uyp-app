@@ -38,6 +38,8 @@ export interface PersonalizationVars {
     forecast_short_term_teaser: string;
     // NEW: App URL for links
     app_url: string;
+    // Session ID for deep-linking from emails
+    session_id: string;
 }
 
 // Likert scale mapping (1-5 to human-readable labels)
@@ -206,7 +208,8 @@ export function buildPersonalizationData(
         metric_compatibility_quotient,
         metric_ceo_vs_intern,
         forecast_short_term_teaser,
-        app_url: appUrl
+        app_url: appUrl,
+        session_id: session.id,
     };
 }
 

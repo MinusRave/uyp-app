@@ -197,7 +197,7 @@ export const createCheckoutSession: CreateCheckoutSession<
         : `${config.frontendUrl}/report?success=true&session_id=${sessionId}`,
       cancel_url: testSession.testType === 'toxic-men'
         ? `${config.frontendUrl}/toxic-offer?sessionId=${sessionId}&checkout_cancelled=true`
-        : `${config.frontendUrl}/results?checkout_cancelled=true`,
+        : `${config.frontendUrl}/results?session=${sessionId}&checkout_cancelled=true`,
       customer_email: customerEmail || undefined,
       metadata: {
         testSessionId: sessionId,

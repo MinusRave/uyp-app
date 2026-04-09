@@ -284,7 +284,7 @@ export default function FullReport() {
     // If entered via Post-Payment redirect, sessionId is in URL query param.
 
     const [searchParams] = useState(new URLSearchParams(window.location.search));
-    const urlSessionId = searchParams.get("session_id");
+    const urlSessionId = searchParams.get("session_id") || searchParams.get("session") || searchParams.get("sessionId");
     const localSessionId = typeof window !== "undefined" ? localStorage.getItem("uyp-session-id") : null;
 
     const sessionIdToUse = urlSessionId || localSessionId || undefined;
@@ -352,6 +352,15 @@ export default function FullReport() {
     if (!session) return <div className="min-h-screen flex items-center justify-center">Session not found.</div>;
     if (!session.isPaid) return null; // Redirection handled in useEffect
 
+    // Stale session detection
+    const daysSinceTest = session.createdAt
+        ? Math.floor((Date.now() - new Date(session.createdAt).getTime()) / (1000 * 60 * 60 * 24))
+        : 0;
+    const isStaleSession = daysSinceTest > 14;
+    const testDate = session.createdAt
+        ? new Date(session.createdAt).toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric" })
+        : null;
+
     // Render Logic
     const metrics = (session.advancedMetrics as any) || {};
 
@@ -380,6 +389,22 @@ export default function FullReport() {
     return (
         <div className="min-h-screen bg-background font-sans pb-24 text-foreground selection:bg-primary selection:text-primary-foreground">
 
+            {isStaleSession && (
+                <div className="bg-amber-50 dark:bg-amber-950/20 border-b border-amber-200 dark:border-amber-800 px-6 py-3">
+                    <div className="max-w-3xl mx-auto flex items-center justify-between gap-4 text-sm">
+                        <div className="flex items-center gap-2 text-amber-800 dark:text-amber-300">
+                            <Clock size={16} />
+                            <span>This report was generated on {testDate}. Retake the test for updated insights.</span>
+                        </div>
+                        <button
+                            onClick={() => { localStorage.removeItem("uyp-session-id"); navigate("/test"); }}
+                            className="whitespace-nowrap text-amber-900 dark:text-amber-200 font-medium underline hover:text-amber-700"
+                        >
+                            Retake
+                        </button>
+                    </div>
+                </div>
+            )}
 
             {/* 1. HERO SECTION (Updated to match TeaserPageNew) */}
             <header className="bg-background pt-12 pb-20 px-6 relative overflow-hidden text-center border-b border-border/40">
