@@ -1326,192 +1326,396 @@ export default function TeaserPageNew() {
                 </div>
             </section>
 
-            {/* OFFER SECTION & GUARANTEE (VALUE STACK) */}
+            {/* GODFATHER OFFER SECTION */}
             <section id="offer" className="py-24 px-6 bg-muted/20">
                 <div className="max-w-4xl mx-auto">
-                    {/* Pricing Card */}
-                    <div className="bg-card rounded-3xl shadow-2xl border-2 border-primary overflow-hidden mb-16 relative">
+
+                    {/* ─── BLOCK 1: PERSONALIZED BRIDGE — MIND-READ LEVEL ─── */}
+                    {(() => {
+                        const metrics = session?.advancedMetrics as any;
+                        const scores = session?.scores as any;
+                        const narcissism = session?.narcissismAnalysis as any;
+                        const diagnosis = quickOverview?.pulse?.primary_diagnosis || "Identified";
+                        const attachmentStyle = scores?.attachmentStyle || "";
+                        const phase = scores?.phase || "";
+                        const dominantLens = scores?.dominantLens || "";
+                        const dominantDim = scores?.dimensions?.[dominantLens];
+                        const repairEff = metrics?.repair_efficiency ?? 0;
+                        const sustainability = metrics?.sustainability_forecast ?? 0;
+                        const eroticSpiral = metrics?.erotic_death_spiral ?? 0;
+                        const betrayalVuln = metrics?.betrayal_vulnerability ?? 0;
+                        const silentDivorce = metrics?.silent_divorce_risk ?? 0;
+                        const ceoIntern = metrics?.ceo_vs_intern ?? 0;
+                        const burnout = metrics?.nervous_system_load ?? 0;
+                        const malice = metrics?.internalized_malice ?? 0;
+                        const eroticPotential = metrics?.erotic_potential ?? 0;
+                        const resilience = metrics?.resilience_battery ?? 0;
+                        const toxicityScore = narcissism?.relationship_health?.toxicity_score;
+                        const partnerStyle = session?.partnerConflictStyle;
+                        const partnerStyleShort = partnerStyle === "Shuts down / Stonewalls" ? "shuts down" : partnerStyle === "Escalates / Yells" ? "escalates" : partnerStyle === "Deflects / Blames you" ? "deflects blame" : "avoids conflict";
+                        const biggestFear = session?.biggestFear;
+                        const fightFreq = session?.fightFrequency;
+                        const repairFreq = session?.repairFrequency;
+                        const duration = session?.relationshipDuration;
+
+                        // Find the most alarming metric
+                        const alarmMetrics = [
+                            { id: "erotic_death_spiral", val: eroticSpiral, label: "Parent-Trap Index", desc: "managing your partner is killing your desire" },
+                            { id: "betrayal_vulnerability", val: betrayalVuln, label: "Betrayal Vulnerability", desc: "unmet needs are creating an opening for outside connection" },
+                            { id: "silent_divorce_risk", val: silentDivorce, label: "Silent Divorce Risk", desc: "you've stopped fighting — but you've also stopped connecting" },
+                            { id: "internalized_malice", val: malice, label: "Resentment Index", desc: "you're starting to see your partner as the enemy, not a teammate" },
+                            { id: "nervous_system_load", val: burnout, label: "Burnout Rate", desc: "this relationship is physically and mentally draining you" },
+                        ].filter(m => m.val >= 55).sort((a, b) => b.val - a.val);
+
+                        const topAlarm = alarmMetrics[0];
+
+                        // Find one positive signal (if it exists)
+                        const positiveSignals = [
+                            { val: eroticPotential, label: "Hidden Spark", desc: "the fire isn't gone — it's buried under stress" },
+                            { val: resilience, label: "Anchor Score", desc: "you have deep shared history to survive a crisis" },
+                            { val: metrics?.compatibility_quotient ?? 0, label: "Soulmate Sync", desc: "your core values still align" },
+                        ].filter(s => s.val >= 60).sort((a, b) => b.val - a.val);
+
+                        const topPositive = positiveSignals[0];
+
+                        return (
+                    <>
+                    <div className="text-center mb-16 space-y-6">
+                        <span className="inline-block px-3 py-1 bg-primary/10 text-primary rounded-full text-xs font-bold uppercase tracking-widest">
+                            Your Analysis Is Ready
+                        </span>
+                        <h2 className="text-3xl md:text-5xl font-black text-foreground tracking-tight">
+                            Your Pattern Is Called <span className="text-primary">"{diagnosis}"</span>
+                        </h2>
+
+                        {/* ── MIND-READ SNAPSHOT: 4 key numbers from THEIR data ── */}
+                        <div className="grid grid-cols-2 md:grid-cols-4 gap-3 max-w-2xl mx-auto">
+                            <div className="bg-card border border-border/50 p-3 rounded-xl text-center">
+                                <p className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">Repair Rate</p>
+                                <p className={`text-2xl font-black ${repairEff < 40 ? 'text-red-500' : repairEff < 70 ? 'text-orange-500' : 'text-emerald-500'}`}>
+                                    {repairEff}<span className="text-xs opacity-50">%</span>
+                                </p>
+                            </div>
+                            <div className="bg-card border border-border/50 p-3 rounded-xl text-center">
+                                <p className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">Sustainability</p>
+                                <p className={`text-2xl font-black ${sustainability < 40 ? 'text-red-500' : sustainability < 70 ? 'text-orange-500' : 'text-emerald-500'}`}>
+                                    {sustainability}<span className="text-xs opacity-50">%</span>
+                                </p>
+                            </div>
+                            <div className="bg-card border border-border/50 p-3 rounded-xl text-center">
+                                <p className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">Burnout</p>
+                                <p className={`text-2xl font-black ${burnout >= 60 ? 'text-red-500' : burnout >= 40 ? 'text-orange-500' : 'text-emerald-500'}`}>
+                                    {burnout}<span className="text-xs opacity-50">%</span>
+                                </p>
+                            </div>
+                            <div className="bg-card border border-border/50 p-3 rounded-xl text-center">
+                                <p className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">Toxicity</p>
+                                <p className={`text-2xl font-black ${(toxicityScore || 0) >= 60 ? 'text-red-500' : (toxicityScore || 0) >= 35 ? 'text-orange-500' : 'text-emerald-500'}`}>
+                                    {toxicityScore || "—"}<span className="text-xs opacity-50">/100</span>
+                                </p>
+                            </div>
+                        </div>
+
+                        {/* ── THE "HOW DO THEY KNOW THIS" PARAGRAPH ── */}
+                        <div className="max-w-2xl mx-auto text-left bg-card border border-border/60 rounded-2xl p-6 space-y-3">
+                            <p className="text-sm text-muted-foreground leading-relaxed">
+                                You're in a <strong className="text-foreground">{duration || ""}</strong> relationship{attachmentStyle ? <> with a <strong className="text-foreground">{attachmentStyle}</strong> attachment pattern</> : null}{phase ? <>, currently stuck in <strong className="text-foreground">{phase}</strong></> : null}.
+                                {partnerStyle ? <> Your partner {partnerStyleShort} during conflict.</> : null}
+                                {repairFreq ? <> You {repairFreq === "always" ? "repair quickly" : repairFreq === "sometimes" ? "sometimes repair" : repairFreq === "rarely" ? "rarely repair" : "almost never repair"} after arguments.</> : null}
+                            </p>
+
+                            {topAlarm && (
+                                <p className="text-sm text-muted-foreground leading-relaxed">
+                                    Your most critical signal: <strong className="text-red-600 dark:text-red-400">{topAlarm.label} at {topAlarm.val}%</strong> — {topAlarm.desc}.
+                                </p>
+                            )}
+
+                            {topPositive && (
+                                <p className="text-sm text-muted-foreground leading-relaxed">
+                                    But there's something important: your <strong className="text-emerald-600 dark:text-emerald-400">{topPositive.label} is {topPositive.val}%</strong> — {topPositive.desc}. This means there's still something to fight for.
+                                </p>
+                            )}
+
+                            {biggestFear && (
+                                <p className="text-sm text-foreground font-medium leading-relaxed border-t border-border/50 pt-3">
+                                    You told us your biggest fear is: <em>"{biggestFear}"</em>. The full report addresses this directly — with data, not reassurance.
+                                </p>
+                            )}
+                        </div>
+
+                        <p className="text-lg text-muted-foreground max-w-2xl mx-auto leading-relaxed">
+                            <strong className="text-foreground">The question isn't whether you have a problem. You already know you do. The question is: do you understand it well enough to fix it?</strong>
+                        </p>
+                    </div>
+
+                    {/* ─── BLOCK 2: BENEFITS WITH VALUE ANCHORS (hyper-personal) ─── */}
+                    <div className="space-y-8 mb-16">
+                        <h3 className="text-2xl font-black text-center text-foreground">What Your Full Report Unlocks</h3>
+
+                        {/* Benefit 1: The full cycle analysis */}
+                        <div className="bg-card border border-border/60 rounded-2xl p-6 md:p-8 relative overflow-hidden">
+                            <div className="absolute top-0 left-0 w-1.5 h-full bg-primary"></div>
+                            <div className="flex items-start gap-4">
+                                <div className="shrink-0 h-10 w-10 bg-primary/10 text-primary rounded-lg flex items-center justify-center mt-1">
+                                    <Activity size={20} />
+                                </div>
+                                <div className="flex-1">
+                                    <div className="flex justify-between items-start mb-2">
+                                        <h4 className="text-lg font-bold text-foreground">Why "{diagnosis}" keeps repeating — and how to break it</h4>
+                                        <span className="text-xs text-muted-foreground whitespace-nowrap ml-4 mt-1 hidden md:block">$99 standalone</span>
+                                    </div>
+                                    <p className="text-muted-foreground text-sm leading-relaxed">
+                                        You've tried talking. You've tried apologizing. You've tried giving space. None of it works because you're treating symptoms, not the structure. Your Repair Rate is {repairEff}% — {repairEff < 40 ? "meaning most fights never actually get resolved, they just get buried" : repairEff < 70 ? "meaning you recover, but the same issues keep resurfacing" : "which is decent, but the cycle still repeats because speed of repair isn't the problem"}. The report maps the complete cycle and shows where it can be interrupted.
+                                    </p>
+                                    <p className="text-xs text-muted-foreground/70 mt-2 italic">A therapist charges $150/session and takes 4-6 sessions to reach this diagnosis.</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* Benefit 2: Scripts */}
+                        <div className="bg-card border border-border/60 rounded-2xl p-6 md:p-8 relative overflow-hidden">
+                            <div className="absolute top-0 left-0 w-1.5 h-full bg-purple-500"></div>
+                            <div className="flex items-start gap-4">
+                                <div className="shrink-0 h-10 w-10 bg-purple-100 dark:bg-purple-900/50 text-purple-600 dark:text-purple-400 rounded-lg flex items-center justify-center mt-1">
+                                    <MessageCircle size={20} />
+                                </div>
+                                <div className="flex-1">
+                                    <div className="flex justify-between items-start mb-2">
+                                        <h4 className="text-lg font-bold text-foreground">5 word-for-word scripts for a partner who {partnerStyleShort}</h4>
+                                        <span className="text-xs text-muted-foreground whitespace-nowrap ml-4 mt-1 hidden md:block">$49 standalone</span>
+                                    </div>
+                                    <p className="text-muted-foreground text-sm leading-relaxed">
+                                        {partnerStyleShort === "shuts down"
+                                            ? "When they stonewall, your nervous system interprets it as rejection. So you pursue harder — which makes them withdraw more. These scripts bypass the shutdown by removing the perceived threat."
+                                            : partnerStyleShort === "escalates"
+                                            ? "When they escalate, matching their energy feels instinctive but it pours gasoline on the fire. These scripts de-escalate without conceding — so you stay heard without the explosion."
+                                            : partnerStyleShort === "deflects blame"
+                                            ? "When they deflect, you end up defending yourself instead of addressing the issue. These scripts sidestep the blame game entirely and redirect to the actual problem."
+                                            : "These scripts are designed to make difficult conversations feel safe enough to actually have — so avoidance stops being the default."
+                                        }
+                                        {" "}Exact phrases, the tone to use, and what to do if they react defensively.
+                                    </p>
+                                    <p className="text-xs text-muted-foreground/70 mt-2 italic">Communication coaching packages start at $200+.</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* Benefit 3: Forecast — uses sustainability + silent divorce */}
+                        <div className="bg-card border border-border/60 rounded-2xl p-6 md:p-8 relative overflow-hidden">
+                            <div className="absolute top-0 left-0 w-1.5 h-full bg-orange-500"></div>
+                            <div className="flex items-start gap-4">
+                                <div className="shrink-0 h-10 w-10 bg-orange-100 dark:bg-orange-900/50 text-orange-600 dark:text-orange-400 rounded-lg flex items-center justify-center mt-1">
+                                    <TrendingDown size={20} />
+                                </div>
+                                <div className="flex-1">
+                                    <div className="flex justify-between items-start mb-2">
+                                        <h4 className="text-lg font-bold text-foreground">Your 5-year forecast — and whether you still have time</h4>
+                                        <span className="text-xs text-muted-foreground whitespace-nowrap ml-4 mt-1 hidden md:block">$49 standalone</span>
+                                    </div>
+                                    <p className="text-muted-foreground text-sm leading-relaxed">
+                                        Your Sustainability Score is {sustainability}%{sustainability < 40 ? " — in the critical zone" : sustainability < 60 ? " — declining" : ""}.
+                                        {silentDivorce > 60
+                                            ? ` Your Silent Divorce Risk is ${silentDivorce}%. You may not be fighting, but you're also not connecting — and that quiet erosion is statistically harder to reverse than open conflict.`
+                                            : betrayalVuln > 60
+                                            ? ` Your Betrayal Vulnerability is ${betrayalVuln}%. When emotional needs go unmet long enough, the risk of outside connection grows — not because anyone is "bad," but because unmet needs seek an outlet.`
+                                            : ` The report shows the specific timeline: what happens at 6 months, 3 years, and 5 years if nothing changes — and the exact intervention window you're in right now.`
+                                        }
+                                    </p>
+                                    <p className="text-xs text-muted-foreground/70 mt-2 italic">Predictive relationship assessments cost $300-500 with a clinical psychologist.</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* Benefit 4: Toxicity screen */}
+                        <div className="bg-card border border-red-200 dark:border-red-900/50 rounded-2xl p-6 md:p-8 relative overflow-hidden">
+                            <div className="absolute top-0 left-0 w-1.5 h-full bg-red-500"></div>
+                            <div className="flex items-start gap-4">
+                                <div className="shrink-0 h-10 w-10 bg-red-100 dark:bg-red-900/50 text-red-600 dark:text-red-400 rounded-lg flex items-center justify-center mt-1">
+                                    <ShieldAlert size={20} />
+                                </div>
+                                <div className="flex-1">
+                                    <div className="flex justify-between items-start mb-2">
+                                        <h4 className="text-lg font-bold text-red-700 dark:text-red-400">The answer to the question you're afraid to ask</h4>
+                                        <span className="text-xs text-muted-foreground whitespace-nowrap ml-4 mt-1 hidden md:block">$49 standalone</span>
+                                    </div>
+                                    <p className="text-muted-foreground text-sm leading-relaxed">
+                                        Your Toxicity Score is {toxicityScore || "—"}/100{malice > 50 ? ` and your Resentment Index is ${malice}% — you're starting to see your partner as the problem instead of the pattern` : ""}. Is this a rough patch, a structural incompatibility, or something darker? The full report gives you a definitive clinical assessment — not ambiguity, not "it depends." {toxicityScore && toxicityScore >= 60 ? "Including safety scripts and a clear action plan." : "Including exactly where the line is for YOUR situation."}
+                                    </p>
+                                    <p className="text-xs text-muted-foreground/70 mt-2 italic">Specialized abuse screening assessments cost $200-400.</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* Benefit 5: 30-day plan — uses phase + erotic data */}
+                        <div className="bg-card border border-border/60 rounded-2xl p-6 md:p-8 relative overflow-hidden">
+                            <div className="absolute top-0 left-0 w-1.5 h-full bg-emerald-500"></div>
+                            <div className="flex items-start gap-4">
+                                <div className="shrink-0 h-10 w-10 bg-emerald-100 dark:bg-emerald-900/50 text-emerald-600 dark:text-emerald-400 rounded-lg flex items-center justify-center mt-1">
+                                    <ListChecks size={20} />
+                                </div>
+                                <div className="flex-1">
+                                    <div className="flex justify-between items-start mb-2">
+                                        <h4 className="text-lg font-bold text-foreground">A 30-day plan you can start tomorrow morning</h4>
+                                        <span className="text-xs text-muted-foreground whitespace-nowrap ml-4 mt-1 hidden md:block">$79 standalone</span>
+                                    </div>
+                                    <p className="text-muted-foreground text-sm leading-relaxed">
+                                        Week-by-week. Daily actions under 10 minutes. Success metrics so you know it's working.
+                                        {ceoIntern > 60
+                                            ? ` Your power imbalance score is ${ceoIntern}% — week 1 starts with rebalancing the mental load before anything else can improve.`
+                                            : eroticSpiral > 60
+                                            ? ` Your intimacy erosion score is ${eroticSpiral}% — the plan addresses desire reconnection before it's too late.`
+                                            : ` Designed specifically for the "${diagnosis}" pattern — not generic relationship advice.`
+                                        }
+                                        {eroticPotential > 60 ? ` Your Hidden Spark score is ${eroticPotential}% — the desire isn't gone, it's buried. The plan is designed to uncover it.` : ""}
+                                    </p>
+                                    <p className="text-xs text-muted-foreground/70 mt-2 italic">Structured therapy homework programs are billed as additional sessions ($150+/each).</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* ─── BLOCK 3: PREMIUMS (INSIDE THE OFFER) ─── */}
+                    <div className="mb-16">
+                        <div className="text-center mb-8">
+                            <span className="text-primary font-bold tracking-widest uppercase text-xs">Included Free — $194 Value</span>
+                            <h3 className="text-2xl font-black text-foreground mt-2">+ 5 Clinical PDF Guides</h3>
+                        </div>
+                        <div className="grid grid-cols-2 md:grid-cols-5 gap-3">
+                            {[
+                                { name: "Mental Load Equalizer", icon: <FileText size={18} />, value: "$47", metric: ceoIntern, threshold: 50 },
+                                { name: "Dead Bedroom Revival", icon: <Heart size={18} />, value: "$39", metric: eroticSpiral, threshold: 50 },
+                                { name: "Narcissist Detection", icon: <ShieldAlert size={18} />, value: "$47", metric: toxicityScore || 0, threshold: 50 },
+                                { name: "Emotional Affair Warning", icon: <MessageCircle size={18} />, value: "$47", metric: betrayalVuln, threshold: 50 },
+                                { name: "Stay or Go Matrix", icon: <Compass size={18} />, value: "$14", metric: sustainability < 40 ? 100 : 0, threshold: 50 },
+                            ].map((guide, idx) => (
+                                <div key={`premium-${idx}`} className={`bg-card border rounded-xl p-4 text-center space-y-2 relative ${guide.metric >= guide.threshold ? 'border-primary/50 ring-1 ring-primary/20' : 'border-border'}`}>
+                                    {guide.metric >= guide.threshold && (
+                                        <span className="absolute -top-2 left-1/2 -translate-x-1/2 bg-primary text-primary-foreground text-[9px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full whitespace-nowrap">
+                                            Critical for you
+                                        </span>
+                                    )}
+                                    <div className="h-8 w-8 bg-primary/10 text-primary rounded-lg flex items-center justify-center mx-auto">
+                                        {guide.icon}
+                                    </div>
+                                    <p className="text-xs font-bold text-foreground leading-tight">{guide.name}</p>
+                                    <p className="text-[10px] text-muted-foreground line-through">{guide.value}</p>
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+
+                    {/* ─── BLOCK 4: PRICE REVEAL + RATIONALE + GUARANTEE + CTA ─── */}
+                    <div className="bg-card rounded-3xl shadow-2xl border-2 border-primary overflow-hidden relative">
                         <div className="absolute top-0 inset-x-0 h-2 bg-linear-to-r from-primary to-purple-500"></div>
                         <div className="p-8 md:p-12">
-                            <div className="text-center mb-10">
-                                <h2 className="text-3xl md:text-5xl font-black text-foreground mb-4">
-                                    Your Complete Treatment Plan
-                                </h2>
-                                <p className="text-muted-foreground text-lg">
-                                    Full Analysis + 5 Premium Clinical Guides — Instant Access
+
+                            {/* Value total */}
+                            <div className="text-center mb-8">
+                                <p className="text-sm font-bold uppercase tracking-wider text-muted-foreground mb-1">Total Value of Everything Above</p>
+                                <p className="text-4xl font-black text-foreground line-through decoration-red-500 decoration-2 opacity-60">$520+</p>
+                            </div>
+
+                            {/* Rationale — NO AI mention */}
+                            <div className="max-w-xl mx-auto text-center mb-8 space-y-3">
+                                <h3 className="text-xl font-bold text-foreground">Why this costs $29 instead of $520</h3>
+                                <p className="text-sm text-muted-foreground leading-relaxed">
+                                    A therapist charges $150/session. It takes 4-6 sessions just to identify your pattern — that's $600-900 and 6 weeks before they even start helping.
+                                </p>
+                                <p className="text-sm text-muted-foreground leading-relaxed">
+                                    We automated the diagnostic phase using the same clinical frameworks therapists use (Gottman, Attachment Theory, Cluster B screening) — so you get the same depth of analysis at a fraction of the cost. <strong className="text-foreground">This doesn't replace therapy. It replaces the 6 weeks of expensive guesswork that comes before therapy starts working.</strong>
                                 </p>
                             </div>
 
-                            {/* Streamlined Value Stack */}
-                            <div className="max-w-xl mx-auto bg-card rounded-2xl border border-border shadow-sm p-6 md:p-8 mb-10 text-left">
-                                <h3 className="font-black text-foreground mb-6 text-center text-xl uppercase tracking-wider">What You're Getting Securely Today</h3>
-                                <ul className="space-y-5 text-sm md:text-base text-foreground mb-8">
-                                    <li className="flex items-start gap-4">
-                                        <CheckCircle className="text-primary shrink-0 mt-1" size={24} />
-                                        <div className="flex-1">
-                                            <div className="flex justify-between items-start">
-                                                <span className="font-bold text-lg leading-tight">The Full Relationship Analysis</span>
-                                                <div className="text-right">
-                                                    <span className="text-sm line-through text-red-500 opacity-80 mr-2">$99.00</span>
-                                                    <span className="font-bold text-lg">${import.meta.env.REACT_APP_REPORT_PRICE || "29.00"}</span>
-                                                </div>
-                                            </div>
-                                            <p className="text-sm text-muted-foreground mt-1">Includes: Core Diagnosis, 5 Dimension Scores & Communication Breakdown</p>
-                                        </div>
-                                    </li>
+                            {/* Report ready callout */}
+                            <div className="bg-green-50 dark:bg-green-900/10 border border-green-200 dark:border-green-900/30 p-3 text-center rounded-xl text-sm font-medium text-green-800 dark:text-green-300 mb-6 max-w-lg mx-auto">
+                                <strong>Your report is already generated.</strong> Personalized to your 30 answers and waiting to be unlocked.
+                                {session?.createdAt && (() => {
+                                    const expiresAt = new Date(session.createdAt).getTime() + 7 * 24 * 60 * 60 * 1000;
+                                    const msRemaining = expiresAt - Date.now();
+                                    const daysRemaining = Math.ceil(msRemaining / (24 * 60 * 60 * 1000));
+                                    const hoursRemaining = Math.floor((msRemaining % (24 * 60 * 60 * 1000)) / (60 * 60 * 1000));
 
-                                    <li className="flex items-start gap-4 pt-5 border-t border-border/50">
-                                        <CheckCircle className="text-green-500 shrink-0 mt-1" size={24} />
-                                        <div className="flex-1">
-                                            <div className="flex justify-between items-start">
-                                                <span className="font-bold text-lg leading-tight">5-Year Trajectory Forecast</span>
-                                                <div className="text-right">
-                                                    <span className="text-sm line-through text-red-500 opacity-80 mr-2">$49.00</span>
-                                                    <span className="font-bold text-green-600">Included</span>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </li>
+                                    return msRemaining > 0
+                                        ? <span className="block mt-2 text-xs font-bold text-orange-700 dark:text-orange-400 bg-orange-50 dark:bg-orange-900/20 border border-orange-200 dark:border-orange-800 rounded-lg py-2 px-3">
+                                            <Clock size={12} className="inline mr-1 -mt-0.5" />
+                                            Session expires in {daysRemaining}d {hoursRemaining}h — unlock now to preserve your analysis
+                                          </span>
+                                        : <span className="block mt-2 text-xs font-bold text-red-600 dark:text-red-400 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg py-2 px-3">
+                                            Session data expiring — unlock now before it's lost
+                                          </span>;
+                                })()}
+                            </div>
 
-                                    <li className="flex items-start gap-4 pt-5 border-t border-border/50 bg-red-50/50 dark:bg-red-950/10 -mx-4 px-4 py-4 rounded-lg border border-red-100/50 dark:border-red-900/30">
-                                        <ShieldAlert className="text-red-500 shrink-0 mt-1" size={24} />
-                                        <div className="flex-1">
-                                            <div className="flex justify-between items-start">
-                                                <span className="font-bold text-lg leading-tight text-red-700 dark:text-red-400">CRITICAL: Toxic & Narcissistic Screen</span>
-                                                <div className="text-right">
-                                                    <span className="text-sm line-through text-red-500 opacity-80 mr-2">$49.00</span>
-                                                    <span className="font-bold text-red-600 dark:text-red-500 uppercase">Free</span>
-                                                </div>
-                                            </div>
-                                            <p className="text-sm text-red-600/80 dark:text-red-400/80 mt-1">Includes: The Danger Score & Gaslighting Counter-Scripts</p>
-                                        </div>
-                                    </li>
+                            {/* Price */}
+                            <div className="text-center mb-6">
+                                <p className="text-sm font-bold uppercase tracking-wider text-muted-foreground">Your Price Today</p>
+                                <p className="text-6xl font-black text-primary">${import.meta.env.REACT_APP_REPORT_PRICE || "29.00"}</p>
+                                <p className="text-sm text-muted-foreground mt-2">Less than a single therapy copay. Less than a dinner where you both stare at your phones.</p>
+                            </div>
 
-                                    <li className="flex items-start gap-4 pt-5 border-t border-border/50">
-                                        <CheckCircle className="text-green-500 shrink-0 mt-1" size={24} />
-                                        <div className="flex-1">
-                                            <div className="flex justify-between items-start">
-                                                <span className="font-bold text-lg leading-tight">The Emergency Intervention Toolkit</span>
-                                                <div className="text-right">
-                                                    <span className="text-sm line-through text-red-500 opacity-80 mr-2">$126.00</span>
-                                                    <span className="font-bold text-green-600">Included</span>
-                                                </div>
-                                            </div>
-                                            <p className="text-sm text-muted-foreground mt-1">Includes: 5 Premium Clinical PDF Guides</p>
-                                        </div>
-                                    </li>
-                                </ul>
-                                <div className="pt-6 border-t border-border flex justify-between items-center bg-secondary/10 -mx-6 md:-mx-8 -mb-6 md:-mb-8 px-6 md:px-8 py-5 rounded-b-2xl">
-                                    <span className="font-black uppercase tracking-wider text-foreground text-lg">Total Real Value</span>
-                                    <span className="text-2xl font-black text-foreground line-through decoration-red-500 opacity-70">$323.00</span>
+                            {/* Guarantee — INSIDE the card, before CTA */}
+                            <div className="bg-yellow-50 dark:bg-yellow-900/10 border border-yellow-200 dark:border-yellow-800 rounded-2xl p-5 md:p-6 mb-8 max-w-lg mx-auto flex items-start gap-4">
+                                <div className="shrink-0">
+                                    <div className="w-12 h-12 bg-yellow-100 dark:bg-yellow-900/30 rounded-full flex items-center justify-center">
+                                        <Shield className="text-yellow-600 dark:text-yellow-400 w-6 h-6" />
+                                    </div>
+                                </div>
+                                <div>
+                                    <h4 className="font-bold text-foreground mb-1">The "Lightbulb Moment" Guarantee</h4>
+                                    <p className="text-sm text-muted-foreground leading-relaxed">
+                                        If you don't have at least one moment where you think <strong className="text-foreground">"that's EXACTLY what happens"</strong> — full refund. No questions. 90 days. We've analyzed thousands of relationships. If your report doesn't nail your situation, that's on us.
+                                    </p>
                                 </div>
                             </div>
 
-                            <div className="flex flex-col items-center gap-6">
-                                <div className="space-y-4 text-center max-w-lg mx-auto">
-                                    <p className="text-base font-medium text-foreground">
-                                        You already know something is wrong. <span className="text-primary font-bold">That's why you took the test.</span>
-                                    </p>
-                                    <p className="text-base font-medium text-foreground pb-2">
-                                        The pattern identified in your analysis doesn't wait. <span className="text-red-500 font-bold dark:text-red-400">Every day without clarity, the pattern gets stronger.</span>
-                                    </p>
-
-                                    <div className="pt-2 border-t border-border mt-4">
-                                        <div className="bg-green-50 dark:bg-green-900/10 border border-green-200 dark:border-green-900/30 p-3 text-center rounded text-sm font-medium text-green-800 dark:text-green-300 mb-4">
-                                            <strong>Your report is already generated.</strong> 847 words written specifically about your relationship dynamics.
-                                            {session?.createdAt && (() => {
-                                                const expiresAt = new Date(session.createdAt).getTime() + 7 * 24 * 60 * 60 * 1000;
-                                                const msRemaining = expiresAt - Date.now();
-                                                const daysRemaining = Math.ceil(msRemaining / (24 * 60 * 60 * 1000));
-                                                const hoursRemaining = Math.floor((msRemaining % (24 * 60 * 60 * 1000)) / (60 * 60 * 1000));
-
-                                                return msRemaining > 0
-                                                    ? <span className="block mt-2 text-xs font-bold text-orange-700 dark:text-orange-400 bg-orange-50 dark:bg-orange-900/20 border border-orange-200 dark:border-orange-800 rounded-lg py-2 px-3">
-                                                        <Clock size={12} className="inline mr-1 -mt-0.5" />
-                                                        Session expires in {daysRemaining}d {hoursRemaining}h — unlock now to preserve your analysis
-                                                      </span>
-                                                    : <span className="block mt-2 text-xs font-bold text-red-600 dark:text-red-400 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg py-2 px-3">
-                                                        Session data expiring — unlock now before it's lost
-                                                      </span>;
-                                            })()}
-                                        </div>
-                                        <p className="text-sm text-muted-foreground mb-3 max-w-md mx-auto leading-relaxed">
-                                            A therapist takes 4-6 sessions just to understand your dynamic. This analysis already knows it from your 30 answers — so you get clarity now, not 6 weeks from now.
+                            {/* ORDER BUMP */}
+                            <div className="w-full bg-yellow-50 dark:bg-yellow-900/10 border-2 border-dashed border-yellow-400 p-4 rounded-xl text-left cursor-pointer hover:bg-yellow-100 dark:hover:bg-yellow-900/20 transition-colors mb-8 max-w-lg mx-auto" onClick={() => setAddOrderBump(!addOrderBump)}>
+                                <div className="flex items-start gap-3">
+                                    <div className={`mt-1 h-5 w-5 shrink-0 rounded border flex items-center justify-center transition-colors ${addOrderBump ? 'bg-primary border-primary text-primary-foreground' : 'bg-card border-border'}`}>
+                                        {addOrderBump && <Check size={14} strokeWidth={4} />}
+                                    </div>
+                                    <div>
+                                        <p className="font-bold text-foreground text-sm leading-tight mb-2">
+                                            YES! Add the <span className="text-primary">30-Day Reconnection Workbook</span> for just $12.
                                         </p>
-                                        <p className="text-sm font-bold uppercase tracking-wider text-muted-foreground">Your Price Today</p>
-                                        <p className="text-6xl font-black text-primary">${import.meta.env.REACT_APP_REPORT_PRICE || "29.00"}</p>
-                                        <p className="text-sm text-muted-foreground mt-2">Less than a single therapy copay. Less than a dinner where you both stare at your phones. For the clarity that changes everything.</p>
-                                    </div>
-                                </div>
-
-                                {/* ORDER BUMP */}
-                                <div className="w-full bg-yellow-50 dark:bg-yellow-900/10 border-2 border-dashed border-yellow-400 p-4 rounded-xl text-left cursor-pointer hover:bg-yellow-100 dark:hover:bg-yellow-900/20 transition-colors mb-8" onClick={() => setAddOrderBump(!addOrderBump)}>
-                                    <div className="flex items-start gap-3">
-                                        <div className={`mt-1 h-5 w-5 shrink-0 rounded border flex items-center justify-center transition-colors ${addOrderBump ? 'bg-primary border-primary text-primary-foreground' : 'bg-card border-border'}`}>
-                                            {addOrderBump && <Check size={14} strokeWidth={4} />}
-                                        </div>
-                                        <div>
-                                            <p className="font-bold text-foreground text-sm leading-tight mb-2">
-                                                YES! Add the <span className="text-primary">30-Day Reconnection Workbook</span> for just $12.
-                                            </p>
-                                            <p className="text-xs text-muted-foreground leading-relaxed mb-2 font-medium">
-                                                The report tells you <em>what's wrong.</em> Without this, you'll understand the problem but won't <em>do anything about it</em>.
-                                            </p>
-                                            <ul className="text-xs text-muted-foreground space-y-1">
-                                                <li className="flex items-start gap-2"><CheckCircle size={12} className="text-primary mt-0.5 shrink-0" /> <span className="leading-tight">5-minute daily exercises that rewire the pattern (not vague advice)</span></li>
-                                                <li className="flex items-start gap-2"><CheckCircle size={12} className="text-primary mt-0.5 shrink-0" /> <span className="leading-tight">Word-for-word scripts for the 3 conversations that matter most</span></li>
-                                                <li className="flex items-start gap-2"><CheckCircle size={12} className="text-primary mt-0.5 shrink-0" /> <span className="leading-tight">Track your progress — see the dynamic shift week by week</span></li>
-                                            </ul>
-                                            <div className="mt-3 inline-block bg-yellow-100 dark:bg-yellow-900/50 text-yellow-800 dark:text-yellow-400 text-[10px] font-bold uppercase tracking-wider px-2 py-1 rounded">
-                                                Most Chosen Add-On
-                                            </div>
+                                        <p className="text-xs text-muted-foreground leading-relaxed mb-2 font-medium">
+                                            The report tells you <em>what's wrong.</em> Without this, you'll understand the problem but won't <em>do anything about it</em>.
+                                        </p>
+                                        <ul className="text-xs text-muted-foreground space-y-1">
+                                            <li className="flex items-start gap-2"><CheckCircle size={12} className="text-primary mt-0.5 shrink-0" /> <span className="leading-tight">5-minute daily exercises that rewire the pattern</span></li>
+                                            <li className="flex items-start gap-2"><CheckCircle size={12} className="text-primary mt-0.5 shrink-0" /> <span className="leading-tight">Word-for-word scripts for the 3 conversations that matter most</span></li>
+                                            <li className="flex items-start gap-2"><CheckCircle size={12} className="text-primary mt-0.5 shrink-0" /> <span className="leading-tight">Track your progress — see the dynamic shift week by week</span></li>
+                                        </ul>
+                                        <div className="mt-3 inline-block bg-yellow-100 dark:bg-yellow-900/50 text-yellow-800 dark:text-yellow-400 text-[10px] font-bold uppercase tracking-wider px-2 py-1 rounded">
+                                            Most Chosen Add-On
                                         </div>
                                     </div>
                                 </div>
-
                             </div>
 
-                            <button
-                                onClick={() => handleCheckout('offer_cta')}
-                                className="w-full md:w-auto bg-primary hover:bg-primary/90 text-primary-foreground text-xl font-bold py-5 px-12 rounded-full shadow-2xl hover:scale-105 transition-all flex items-center justify-center gap-3 animate-pulse-slow"
-                            >
-                                {isCheckoutLoading ? "Processing..." : `Unlock My Full Analysis — $${addOrderBump ? 41 : 29}`} <ArrowRight size={24} />
-                            </button>
-                            <div className="flex items-center justify-center gap-4 mt-6 text-muted-foreground">
-                                <FaCcVisa className="h-7 w-auto opacity-70 hover:opacity-100 transition-opacity" />
-                                <FaCcMastercard className="h-7 w-auto opacity-70 hover:opacity-100 transition-opacity" />
-                                <FaCcPaypal className="h-7 w-auto opacity-70 hover:opacity-100 transition-opacity" />
-                                <FaApplePay className="h-7 w-auto opacity-70 hover:opacity-100 transition-opacity" />
-                                <FaGooglePay className="h-7 w-auto opacity-70 hover:opacity-100 transition-opacity" />
+                            {/* CTA */}
+                            <div className="flex flex-col items-center">
+                                <button
+                                    onClick={() => handleCheckout('offer_cta')}
+                                    className="w-full md:w-auto bg-primary hover:bg-primary/90 text-primary-foreground text-xl font-bold py-5 px-12 rounded-full shadow-2xl hover:scale-105 transition-all flex items-center justify-center gap-3 animate-pulse-slow"
+                                >
+                                    {isCheckoutLoading ? "Processing..." : `Unlock My Full Analysis — $${addOrderBump ? 41 : 29}`} <ArrowRight size={24} />
+                                </button>
+                                <div className="flex items-center justify-center gap-4 mt-6 text-muted-foreground">
+                                    <FaCcVisa className="h-7 w-auto opacity-70 hover:opacity-100 transition-opacity" />
+                                    <FaCcMastercard className="h-7 w-auto opacity-70 hover:opacity-100 transition-opacity" />
+                                    <FaCcPaypal className="h-7 w-auto opacity-70 hover:opacity-100 transition-opacity" />
+                                    <FaApplePay className="h-7 w-auto opacity-70 hover:opacity-100 transition-opacity" />
+                                    <FaGooglePay className="h-7 w-auto opacity-70 hover:opacity-100 transition-opacity" />
+                                </div>
+                                <p className="text-xs text-muted-foreground mt-4">Secure One-Time Payment • Instant Access</p>
                             </div>
-                            <p className="text-xs text-muted-foreground mt-4">Secure One-Time Payment • Instant PDF Download</p>
                         </div>
                     </div>
+                    </>
+                        );
+                    })()}
                 </div>
-
-
-
-
-                {/* The "Lightbulb Moment" Guarantee */}
-                <div className="max-w-3xl mx-auto mt-12 mb-20">
-                    <div className="bg-secondary/10 p-8 md:p-10 flex flex-col md:flex-row items-center gap-8 rounded-3xl border border-border">
-                        <div className="shrink-0">
-                            <div className="w-20 h-20 bg-yellow-100 dark:bg-yellow-900/30 rounded-full flex items-center justify-center">
-                                <Shield className="text-yellow-600 dark:text-yellow-400 w-10 h-10" />
-                            </div>
-                        </div>
-                        <div className="text-center md:text-left">
-                            <h3 className="text-2xl font-bold text-foreground mb-3">The "Lightbulb Moment" Guarantee</h3>
-                            <p className="text-muted-foreground leading-relaxed">
-                                Read your personalized analysis. If you don't have at least one moment where you think <strong className="text-foreground">"that's EXACTLY what's happening"</strong> — full refund.
-                            </p>
-                            <p className="text-muted-foreground leading-relaxed mt-2">
-                                We've analyzed 52,847 relationships. If your report doesn't nail your situation, that's on us. Email us. Money back. 90 days.
-                            </p>
-                        </div>
-                    </div>
-                </div>
-
 
                 {/* Sticky Mobile CTA */}
                 <div className={`fixed bottom-0 left-0 w-full bg-background border-t border-border p-4 md:hidden transform transition-transform duration-300 z-50 ${showStickyCTA ? 'translate-y-0' : 'translate-y-full'}`}>
