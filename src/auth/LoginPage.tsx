@@ -34,9 +34,9 @@ export default function Login() {
         </div>
 
         {isSent ? (
-          <div className="bg-green-50 dark:bg-green-900/20 p-6 rounded-xl text-center border border-green-200 dark:border-green-900">
+          <div className="bg-success/10 p-6 rounded-xl text-center border border-success/30">
             <div className="flex justify-center mb-4">
-              <CheckCircle2 className="text-green-600 dark:text-green-400" size={48} />
+              <CheckCircle2 className="text-success" size={48} />
             </div>
             <h3 className="font-semibold text-lg mb-2">Check your inbox!</h3>
             <p className="text-sm text-muted-foreground">

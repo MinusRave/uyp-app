@@ -1,4 +1,4 @@
-import { LogIn, Menu } from "lucide-react";
+import { LogIn, Menu, ArrowRight } from "lucide-react";
 import { Dispatch, SetStateAction, useEffect, useState } from "react";
 import { Link as ReactRouterLink } from "react-router";
 import { useAuth } from "wasp/client/auth";
@@ -122,9 +122,9 @@ function NavBarDesktopUserDropdown({ isScrolled }: { isScrolled: boolean }) {
       </ul>
       {isUserLoading ? null : !user ? (
         <>
-          <Button variant="default" size={isScrolled ? "sm" : "default"} className="font-semibold" asChild>
+          <Button variant="default" size={isScrolled ? "sm" : "default"} className="font-bold rounded-full shadow-lg" asChild>
             <WaspRouterLink to={routes.TestRoute.to}>
-              Start Test
+              Start Test <ArrowRight size={16} className="ml-1" />
             </WaspRouterLink>
           </Button>
           <WaspRouterLink

@@ -75,9 +75,9 @@ export default function LoginRedirectPage() {
     }, [session, isSessionLoading, user, navigate]);
 
     return (
-        <div className="min-h-screen flex flex-col items-center justify-center bg-slate-50 dark:bg-slate-950">
+        <div className="min-h-screen flex flex-col items-center justify-center bg-background">
             <Activity className="h-10 w-10 text-primary animate-spin mb-4" />
-            <p className="text-slate-500 font-medium animate-pulse">Redirecting you to your dashboard...</p>
+            <p className="text-muted-foreground font-medium">Redirecting you to your dashboard...</p>
         </div>
     );
 }

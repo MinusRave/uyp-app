@@ -118,8 +118,8 @@ const DIMENSIONS: DimensionType[] = [
 
 // Mapping Table (Based on New Question Set)
 const DIMENSION_MAPPING: Record<DimensionType, { PM: number[]; SL: number[] }> = {
-    communication: { PM: [2, 4, 5], SL: [1, 3, 6] },
-    emotional_safety: { PM: [8, 11, 12], SL: [7, 9, 10] },
+    communication: { PM: [2, 4, 5, 29], SL: [1, 3, 6] },
+    emotional_safety: { PM: [8, 11, 12, 30], SL: [7, 9, 10] },
     physical_intimacy: { PM: [15, 16, 18], SL: [13, 14, 17] },
     power_fairness: { PM: [20, 24], SL: [19, 21, 22, 23] },
     future_values: { PM: [26, 28], SL: [25, 27] }

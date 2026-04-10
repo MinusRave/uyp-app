@@ -4,14 +4,14 @@ import heroImage from "../../client/static/hero-couple-silence.png";
 
 export default function Hero() {
   return (
-    <div className="relative w-full overflow-hidden bg-slate-50 pt-16 pb-20 lg:pb-32 lg:pt-32 text-slate-900">
+    <div className="relative w-full overflow-hidden bg-background pt-16 pb-20 lg:pb-32 lg:pt-32 text-foreground">
       <div className="mx-auto max-w-7xl px-6 lg:px-8">
         <div className="grid max-w-2xl grid-cols-1 gap-x-8 gap-y-16 lg:max-w-none lg:grid-cols-2 lg:items-center">
           <div className="max-w-xl lg:max-w-lg">
-            <h1 className="text-4xl font-bold tracking-tight text-slate-900 sm:text-6xl">
+            <h1 className="text-4xl font-bold tracking-tight text-foreground sm:text-6xl">
               Why do we keep having the same fight over and over?
             </h1>
-            <p className="mt-6 text-lg leading-8 text-slate-600">
+            <p className="mt-6 text-lg leading-8 text-muted-foreground">
               It's not what you're saying—it's how you're both hearing it differently.
               <br />
               Take the test to see what's really happening.
@@ -23,9 +23,9 @@ export default function Hero() {
                 </WaspRouterLink>
               </Button>
             </div>
-            <div className="mt-6 flex items-center gap-4 text-sm text-slate-500">
-              <span className="flex items-center gap-1"><span className="text-green-500">✔</span> Takes 10 min</span>
-              <span className="flex items-center gap-1"><span className="text-green-500">✔</span> No Sign Up Required</span>
+            <div className="mt-6 flex items-center gap-4 text-sm text-muted-foreground">
+              <span className="flex items-center gap-1"><span className="text-success">✔</span> Takes 10 min</span>
+              <span className="flex items-center gap-1"><span className="text-success">✔</span> No Sign Up Required</span>
             </div>
           </div>
           <div className="relative">
@@ -35,7 +35,7 @@ export default function Hero() {
               width={1000}
               height={1000}
               loading="lazy"
-              className="relative rounded-xl shadow-2xl ring-1 ring-slate-900/10"
+              className="relative rounded-xl shadow-2xl ring-1 ring-border"
             />
           </div>
         </div>

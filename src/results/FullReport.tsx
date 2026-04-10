@@ -204,6 +204,58 @@ const DimensionCard = ({
     );
 };
 
+// --- SCRIPT CARD (collapsible on mobile) ---
+const ScriptCard = ({ script, idx }: { script: any; idx: number }) => {
+    const [isOpen, setIsOpen] = useState(idx === 0); // First script expanded by default
+    return (
+        <div className="bg-black/20 rounded-xl border border-emerald-900/50 shadow-inner overflow-hidden">
+            {/* Trigger — always visible */}
+            <button
+                onClick={() => setIsOpen(!isOpen)}
+                className="w-full p-4 md:p-6 text-left flex items-center justify-between gap-4 md:cursor-default"
+            >
+                <div className="flex-1 min-w-0">
+                    <span className="text-xs font-bold uppercase tracking-wider text-emerald-500 mb-1 block">Script {idx + 1}</span>
+                    <p className="text-emerald-100 font-medium truncate md:whitespace-normal">{script.situation}</p>
+                </div>
+                <ChevronDown size={18} className={`text-emerald-400 shrink-0 transition-transform duration-300 md:hidden ${isOpen ? 'rotate-180' : ''}`} />
+            </button>
+
+            {/* Content — collapsible on mobile, always visible on desktop */}
+            <div className={`md:block transition-all duration-300 ${isOpen ? 'block' : 'hidden'}`}>
+                <div className="px-4 pb-4 md:px-6 md:pb-6 space-y-4">
+                    <div className="bg-emerald-900/30 p-4 rounded-lg border-l-4 border-emerald-400">
+                        <span className="text-[10px] font-bold uppercase tracking-widest text-emerald-400/80 mb-2 block flex items-center gap-2">
+                            <Quote size={10} /> The Script
+                        </span>
+                        <p className="text-lg md:text-xl font-medium text-white italic leading-relaxed">
+                            "{script.phrase}"
+                        </p>
+                    </div>
+                    <div className="grid md:grid-cols-2 gap-4 text-sm">
+                        <div>
+                            <span className="text-[10px] uppercase text-emerald-500 font-bold block mb-1">Tone to Use</span>
+                            <span className="bg-emerald-950/50 text-emerald-300 px-2 py-1 rounded inline-block border border-emerald-800/50">{script.tone}</span>
+                        </div>
+                        <div>
+                            <span className="text-[10px] uppercase text-emerald-500 font-bold block mb-1">Why it works</span>
+                            <p className="text-emerald-200/80">{script.why_it_works}</p>
+                        </div>
+                        <div>
+                            <span className="text-[10px] uppercase text-emerald-500 font-bold block mb-1">Expected Response</span>
+                            <p className="text-emerald-200/80">{script.expected_response}</p>
+                        </div>
+                        <div>
+                            <span className="text-[10px] uppercase text-emerald-500 font-bold block mb-1">If it fails</span>
+                            <p className="text-emerald-200/80 border border-red-500/20 bg-red-500/10 rounded p-2 text-red-200">{script.if_it_fails}</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    );
+};
+
 // --- DOWNLOAD GUIDES COMPONENT ---
 const GuideCard = ({ title, format, desc, icon, color, filename, sessionId }: any) => {
     const [downloading, setDownloading] = useState(false);
@@ -230,27 +282,27 @@ const GuideCard = ({ title, format, desc, icon, color, filename, sessionId }: an
     return (
         <div className="group relative">
             {/* 3D Document Effect */}
-            <div className="relative bg-card border border-border aspect-3/4 rounded-r-xl shadow-md transition-all duration-300 group-hover:-translate-y-2 group-hover:shadow-xl overflow-hidden flex flex-col h-full bg-white dark:bg-slate-900">
+            <div className="relative bg-card border border-border aspect-3/4 rounded-r-xl shadow-md transition-all duration-300 group-hover:-translate-y-2 group-hover:shadow-xl overflow-hidden flex flex-col h-full">
                 {/* Spine/Binding */}
-                <div className={`absolute left-0 top-0 bottom-0 w-3 border-r border-slate-200 dark:border-slate-700 ${color.bgLight}`}></div>
+                <div className={`absolute left-0 top-0 bottom-0 w-3 border-r border-border ${color.bgLight}`}></div>
 
                 {/* Header / Cover Top */}
-                <div className="p-6 pb-4 border-b border-slate-100 dark:border-slate-800 bg-white dark:bg-slate-900">
+                <div className="p-6 pb-4 border-b border-border bg-card">
                     <div className="flex justify-between items-start mb-4">
                         <div className={`p-2 rounded-lg ${color.bgLight} ${color.text}`}>
                             {icon}
                         </div>
                         <div className="text-right">
-                            <span className="block text-[10px] font-bold text-slate-400 uppercase tracking-wider">Format</span>
-                            <span className="text-xs font-bold text-slate-900 dark:text-white">{format}</span>
+                            <span className="block text-[10px] font-bold text-muted-foreground uppercase tracking-wider">Format</span>
+                            <span className="text-xs font-bold text-foreground">{format}</span>
                         </div>
                     </div>
-                    <h3 className="text-xl font-bold leading-tight text-slate-900 dark:text-white min-h-12">{title}</h3>
+                    <h3 className="text-xl font-bold leading-tight text-foreground min-h-12">{title}</h3>
                 </div>
 
                 {/* Body */}
-                <div className="p-6 grow bg-slate-50 dark:bg-slate-800/20">
-                    <p className="text-sm text-slate-500 dark:text-slate-400 leading-relaxed mb-4">
+                <div className="p-6 grow bg-muted/30">
+                    <p className="text-sm text-muted-foreground leading-relaxed mb-4">
                         {desc}
                     </p>
                 </div>
@@ -302,15 +354,15 @@ export default function FullReport() {
     const quickOverviewInitiated = useRef(false);
     const fullReportInitiated = useRef(false);
 
-    // Validate Payment
+    // Validate Payment (bypass with ?dev=1 query param for development)
+    const isDev = typeof window !== "undefined" && new URLSearchParams(window.location.search).get("dev") === "1";
     useEffect(() => {
         if (!isSessionLoading && session) {
-            if (!session.isPaid) {
-                // Redirect to Teaser if not paid
+            if (!session.isPaid && !isDev) {
                 navigate("/results");
             }
         }
-    }, [session, isSessionLoading, navigate]);
+    }, [session, isSessionLoading, navigate, isDev]);
 
 
     // 3. Trigger AI Calls on Load (if not present)
@@ -350,7 +402,7 @@ export default function FullReport() {
 
     if (isSessionLoading) return <div className="min-h-screen flex items-center justify-center bg-slate-50 dark:bg-slate-950"><Activity className="animate-spin text-primary" /></div>;
     if (!session) return <div className="min-h-screen flex items-center justify-center">Session not found.</div>;
-    if (!session.isPaid) return null; // Redirection handled in useEffect
+    if (!session.isPaid && !isDev) return null; // Redirection handled in useEffect
 
     // Stale session detection
     const daysSinceTest = session.createdAt
@@ -412,10 +464,12 @@ export default function FullReport() {
                 <div className={`absolute top-0 left-0 w-full h-full bg-[radial-gradient(ellipse_at_top,var(--tw-gradient-stops))] ${(session.narcissismAnalysis as any)?.score > 40 ? 'from-orange-500/20 via-background to-background' : 'from-primary/10 via-background to-background'} -z-20`} />
 
                 <div className="max-w-4xl mx-auto space-y-6 relative z-10 animate-fade-in">
-                    <div className="flex justify-center mb-6">
-                        <span className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-green-500/10 text-green-600 border border-green-500/20 text-xs font-bold uppercase tracking-widest">
-                            <CheckCircle size={14} /> Analysis Unlocked
+                    {/* Welcome banner */}
+                    <div className="inline-flex flex-col items-center gap-3 mb-2">
+                        <span className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-success/10 text-success border border-success/20 text-xs font-bold uppercase tracking-widest">
+                            <CheckCircle size={14} /> Your Report Is Ready
                         </span>
+                        <p className="text-sm text-muted-foreground">Thank you for your courage. Here's everything we found.</p>
                     </div>
 
                     <h1 className="text-4xl md:text-6xl font-black tracking-tight leading-tight mb-4">
@@ -725,40 +779,9 @@ export default function FullReport() {
                                         ))}
                                     </div>
                                 ) : (
-                                    <div className="grid gap-6">
+                                    <div className="grid gap-4 md:gap-6">
                                         {fullReport?.chapter8_roadmap?.scripts?.map((script, idx: number) => (
-                                            <div key={idx} className="bg-black/20 p-6 rounded-xl border border-emerald-900/50 shadow-inner">
-                                                <div className="mb-4">
-                                                    <span className="text-xs font-bold uppercase tracking-wider text-emerald-500 mb-1 block">Context</span>
-                                                    <p className="text-emerald-100 font-medium">{script.situation}</p>
-                                                </div>
-                                                <div className="bg-emerald-900/30 p-4 rounded-lg border-l-4 border-emerald-400 mb-4">
-                                                    <span className="text-[10px] font-bold uppercase tracking-widest text-emerald-400/80 mb-2 block flex items-center gap-2">
-                                                        <Quote size={10} /> The Script
-                                                    </span>
-                                                    <p className="text-lg md:text-xl font-medium text-white italic leading-relaxed">
-                                                        "{script.phrase}"
-                                                    </p>
-                                                </div>
-                                                <div className="grid md:grid-cols-2 gap-4 text-sm mt-4">
-                                                    <div>
-                                                        <span className="text-[10px] uppercase text-emerald-500 font-bold block mb-1">Tone to Use</span>
-                                                        <span className="bg-emerald-950/50 text-emerald-300 px-2 py-1 rounded inline-block border border-emerald-800/50">{script.tone}</span>
-                                                    </div>
-                                                    <div>
-                                                        <span className="text-[10px] uppercase text-emerald-500 font-bold block mb-1">Why it works</span>
-                                                        <p className="text-emerald-200/80">{script.why_it_works}</p>
-                                                    </div>
-                                                    <div>
-                                                        <span className="text-[10px] uppercase text-emerald-500 font-bold block mb-1">Expected Response</span>
-                                                        <p className="text-emerald-200/80">{script.expected_response}</p>
-                                                    </div>
-                                                    <div>
-                                                        <span className="text-[10px] uppercase text-emerald-500 font-bold block mb-1">If it fails</span>
-                                                        <p className="text-emerald-200/80 border border-red-500/20 bg-red-500/10 rounded p-2 text-red-200">{script.if_it_fails}</p>
-                                                    </div>
-                                                </div>
-                                            </div>
+                                            <ScriptCard key={idx} script={script} idx={idx} />
                                         ))}
                                     </div>
                                 )}

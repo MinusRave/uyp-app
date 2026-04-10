@@ -369,6 +369,91 @@ The most important section on the page — where free transitions to paid.
 - The thin horizontal line (`h-px w-16 bg-primary/30`) is a visual pause — the "beat" before the key message
 - Green checkmarks for free items (they HAVE these) — celebration, not sales
 
+### 5.8 The Trajectory Timeline
+
+The "cost of inaction" section. Uses a timeline with year circles and progressive accent colors to communicate deterioration over time — all within the warm palette.
+
+```tsx
+<section className="py-24 px-6 bg-muted/30 border-y border-border/50">
+  <div className="max-w-5xl mx-auto">
+    <h2 className="text-3xl md:text-5xl font-black text-foreground">
+      Where This Leads in <span className="text-primary">5 Years</span>
+    </h2>
+
+    <div className="grid md:grid-cols-3 gap-8">
+      {paths.map((path, idx) => (
+        <div className="flex flex-col items-center">
+          {/* Year circle — bg-card with colored border */}
+          <div className={`h-[72px] w-[72px] rounded-full bg-card shadow-sm border-2
+                          flex items-center justify-center
+                          ${idx === 0 ? "border-primary/40 text-primary" :
+                            idx === 1 ? "border-secondary/40 text-secondary" :
+                            "border-border text-muted-foreground"}`}>
+            <span className="text-2xl font-black">{yearNumber}</span>
+          </div>
+
+          {/* Card — bg-card with accent border */}
+          <div className={`bg-card rounded-2xl border overflow-hidden
+                          ${idx === 0 ? "border-primary/20" :
+                            idx === 1 ? "border-secondary/20" :
+                            "border-border/60"}`}>
+            <div className={`h-1 ${
+              idx === 0 ? "bg-primary" :
+              idx === 1 ? "bg-secondary" :
+              "bg-muted-foreground/30"
+            }`} />
+            <div className="p-6 md:p-8">
+              <h3 className="font-black text-xl text-foreground">{path.title}</h3>
+              <p className="text-sm text-muted-foreground leading-relaxed">{path.desc}</p>
+            </div>
+          </div>
+        </div>
+      ))}
+    </div>
+  </div>
+</section>
+```
+
+**Rules:**
+- Background: `bg-muted/30` — warm sand, consistent with the page rhythm. Never dark backgrounds.
+- Cards: `bg-card` with colored borders — `border-primary/20`, `border-secondary/20`, `border-border/60`.
+- Year circles: `bg-card shadow-sm` with `border-2` in accent color. Large `text-2xl font-black` numbers.
+- Accent color progression: primary (purple) → secondary (warm peach) → muted-foreground (neutral). Warm throughout.
+- Top accent bar: `h-1` matching the card's accent — primary → secondary → muted-foreground/30.
+- Icon boxes: `bg-primary/10 text-primary` → `bg-secondary/10 text-secondary` → `bg-muted text-muted-foreground`.
+- Text: standard `text-foreground` for titles, `text-muted-foreground` for body. No special opacity modifiers.
+- Horizontal connecting line on desktop: `from-primary/30 via-secondary/20 to-border`.
+- Vertical segments on mobile: `w-px h-6 bg-gradient-to-b from-border to-transparent`.
+
+### 5.9 The Clinical Snapshot Grid
+
+A compact grid of 6 key metrics displayed as small score cards. Used in the HVCO Hero to demonstrate data depth at a glance.
+
+```tsx
+<div className="grid grid-cols-3 md:grid-cols-6 gap-3 max-w-3xl mx-auto">
+  {metrics.map((m) => (
+    <div className="bg-card border border-border/50 p-3 rounded-xl text-center">
+      <p className="text-[9px] font-bold uppercase tracking-wider text-muted-foreground mb-1">
+        {m.label}
+      </p>
+      <p className={`text-xl font-black ${
+        isBad ? 'text-red-500' : isGood ? 'text-emerald-500' : 'text-orange-500'
+      }`}>
+        {m.val}<span className="text-[10px] opacity-50">%</span>
+      </p>
+    </div>
+  ))}
+</div>
+```
+
+**Rules:**
+- 3 columns on mobile, 6 on desktop — compact, scannable
+- `text-[9px]` labels — smallest readable size, uppercase + tracking-wider for legibility
+- `text-xl font-black` values — the number IS the card
+- Color encodes meaning instantly — red/orange/green, no legend needed
+- For "inverted" metrics (Burnout, Resentment — where high = bad), flip the color logic
+- No descriptions or teasers — this is a dashboard, not a reading section
+
 ---
 
 ## 6. PAGE RHYTHM TEMPLATE
@@ -403,9 +488,10 @@ The complete emotional arc for a selling page, with design tokens:
 │  Key element: Clinical data, not marketing hype  │
 ├─────────────────────────────────────────────────┤
 │  TRAJECTORIES (Cost of inaction)                 │
-│  bg-card, py-24                                  │
-│  Emotion: Fear of loss                           │
-│  Key element: 3-path cards                       │
+│  bg-muted/30, py-24, border-y border-border/50  │
+│  Emotion: Fear of loss, inevitability            │
+│  Key element: Timeline with year circles +       │
+│    warm cards with accent color progression      │
 ├─────────────────────────────────────────────────┤
 │  SOLUTION (Report breakdown)                     │
 │  bg-background, py-24                            │

@@ -1,7 +1,17 @@
 import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router';
-import { ArrowRight, Check, X, CheckCircle, MessageCircle, Search, Lightbulb, Activity, TrendingUp, AlertTriangle, ShieldCheck, Star, Quote, ChevronDown, ChevronUp, ListChecks } from 'lucide-react';
+import { ArrowRight, Check, X, CheckCircle, MessageCircle, Search, Lightbulb, Activity, TrendingUp, AlertTriangle, ShieldCheck, Star, Quote, ChevronDown, ListChecks } from 'lucide-react';
 import { useAuth } from 'wasp/client/auth';
+import { useInView } from '../client/hooks/useInView';
+
+function Reveal({ children, className = "" }: { children: React.ReactNode; className?: string }) {
+    const { ref, isInView } = useInView();
+    return (
+        <div ref={ref} className={`${isInView ? 'reveal-visible' : 'reveal-hidden'} ${className}`}>
+            {children}
+        </div>
+    );
+}
 
 export default function HomePage() {
     const [faqOpen, setFaqOpen] = useState<number | null>(null);
@@ -86,13 +96,13 @@ export default function HomePage() {
 
                     <div className="flex flex-col md:flex-row items-center justify-center gap-4 md:gap-8 text-sm font-medium text-muted-foreground pt-4">
                         <div className="flex items-center gap-2">
-                            <Check className="text-green-500" size={16} /> 52,847 couples analyzed
+                            <Check className="text-success" size={16} /> 52,847 couples analyzed
                         </div>
                         <div className="flex items-center gap-2">
-                            <Check className="text-green-500" size={16} /> Based on Gottman Method & Attachment Theory
+                            <Check className="text-success" size={16} /> Based on Gottman Method & Attachment Theory
                         </div>
                         <div className="flex items-center gap-2">
-                            <Check className="text-green-500" size={16} /> 100% private & confidential
+                            <Check className="text-success" size={16} /> 100% private & confidential
                         </div>
                     </div>
                 </div>
@@ -100,44 +110,32 @@ export default function HomePage() {
 
             {/* 3. HOW IT WORKS */}
             <section id="how-it-works" className="py-24 px-6 bg-muted/30">
+                <Reveal>
                 <div className="max-w-6xl mx-auto">
                     <div className="text-center mb-16">
                         <h2 className="text-3xl md:text-4xl font-bold text-foreground">How It Works</h2>
                     </div>
 
-                    <div className="grid md:grid-cols-3 gap-8">
-                        {/* Card 1 */}
-                        <div className="bg-card border border-border rounded-xl p-8 shadow-sm flex flex-col items-center text-center hover:shadow-md transition-all">
-                            <div className="w-14 h-14 bg-primary/10 text-primary rounded-full flex items-center justify-center mb-6">
-                                <ListChecks size={28} />
-                            </div>
-                            <h3 className="text-xl font-bold mb-4">10 Minutes of Honest Answers</h3>
-                            <p className="text-muted-foreground leading-relaxed">
-                                Not therapy-speak. Real questions about what's actually happening — fights, silence, distance, control.
-                            </p>
-                        </div>
+                    <div className="grid md:grid-cols-3 gap-8 relative">
+                        {/* Connecting line (desktop only) */}
+                        <div className="hidden md:block absolute top-16 left-[20%] right-[20%] h-px bg-gradient-to-r from-primary/20 via-primary/30 to-primary/20 z-0" />
 
-                        {/* Card 2 */}
-                        <div className="bg-card border border-border rounded-xl p-8 shadow-sm flex flex-col items-center text-center hover:shadow-md transition-all">
-                            <div className="w-14 h-14 bg-purple-100 text-purple-600 rounded-full flex items-center justify-center mb-6">
-                                <Search size={28} />
+                        {[
+                            { icon: ListChecks, step: 1, title: "10 Minutes of Honest Answers", desc: "Not therapy-speak. Real questions about what's actually happening — fights, silence, distance, control." },
+                            { icon: Search, step: 2, title: "See the Pattern You Can't See From Inside", desc: "Pursuer-Withdrawer? Silent Divorce? Emotional landlord? We name the exact dynamic running your relationship." },
+                            { icon: Lightbulb, step: 3, title: "Know Exactly What to Do Next", desc: "Not \"communicate better\". Specific scripts, specific guides, specific to YOUR pattern and YOUR partner." },
+                        ].map(({ icon: Icon, step, title, desc }) => (
+                            <div key={step} className="bg-card border border-border rounded-xl p-8 shadow-sm flex flex-col items-center text-center hover:shadow-md hover:border-primary/30 transition-all relative z-10">
+                                <div className="w-9 h-9 bg-primary text-primary-foreground rounded-full flex items-center justify-center font-bold text-sm mb-4">
+                                    {step}
+                                </div>
+                                <div className="w-14 h-14 bg-primary/10 text-primary rounded-full flex items-center justify-center mb-6">
+                                    <Icon size={28} />
+                                </div>
+                                <h3 className="text-xl font-bold mb-4">{title}</h3>
+                                <p className="text-muted-foreground leading-relaxed">{desc}</p>
                             </div>
-                            <h3 className="text-xl font-bold mb-4">See the Pattern You Can't See From Inside</h3>
-                            <p className="text-muted-foreground leading-relaxed">
-                                Pursuer-Withdrawer? Silent Divorce? Emotional landlord? We name the exact dynamic running your relationship.
-                            </p>
-                        </div>
-
-                        {/* Card 3 */}
-                        <div className="bg-card border border-border rounded-xl p-8 shadow-sm flex flex-col items-center text-center hover:shadow-md transition-all">
-                            <div className="w-14 h-14 bg-green-100 text-green-600 rounded-full flex items-center justify-center mb-6">
-                                <Lightbulb size={28} />
-                            </div>
-                            <h3 className="text-xl font-bold mb-4">Know Exactly What to Do Next</h3>
-                            <p className="text-muted-foreground leading-relaxed">
-                                Not "communicate better". Specific scripts, specific guides, specific to YOUR pattern and YOUR partner.
-                            </p>
-                        </div>
+                        ))}
                     </div>
 
                     <div className="text-center mt-16">
@@ -150,6 +148,7 @@ export default function HomePage() {
                         </Link>
                     </div>
                 </div>
+                </Reveal>
             </section>
 
             {/* 4. THE PROBLEM (Mirror Effect) */}
@@ -204,6 +203,7 @@ export default function HomePage() {
 
             {/* 5. WHAT YOU DISCOVER */}
             <section className="py-24 px-6 bg-muted/30">
+                <Reveal>
                 <div className="max-w-5xl mx-auto">
                     <div className="text-center mb-16">
                         <h2 className="text-3xl md:text-4xl font-bold text-foreground">What Your Assessment Reveals</h2>
@@ -212,7 +212,7 @@ export default function HomePage() {
                     <div className="grid md:grid-cols-2 gap-6">
                         {/* Card 1 */}
                         <div className="bg-card border border-border rounded-xl p-8 shadow-sm flex gap-6 hover:shadow-md transition-all">
-                            <div className="shrink-0 w-12 h-12 bg-blue-100 text-blue-600 rounded-lg flex items-center justify-center">
+                            <div className="shrink-0 w-12 h-12 bg-primary/10 text-primary rounded-lg flex items-center justify-center">
                                 <Activity size={24} />
                             </div>
                             <div>
@@ -225,7 +225,7 @@ export default function HomePage() {
 
                         {/* Card 2 */}
                         <div className="bg-card border border-border rounded-xl p-8 shadow-sm flex gap-6 hover:shadow-md transition-all">
-                            <div className="shrink-0 w-12 h-12 bg-purple-100 text-purple-600 rounded-lg flex items-center justify-center">
+                            <div className="shrink-0 w-12 h-12 bg-primary/10 text-primary rounded-lg flex items-center justify-center">
                                 <TrendingUp size={24} />
                             </div>
                             <div>
@@ -238,7 +238,7 @@ export default function HomePage() {
 
                         {/* Card 3 */}
                         <div className="bg-card border border-border rounded-xl p-8 shadow-sm flex gap-6 hover:shadow-md transition-all">
-                            <div className="shrink-0 w-12 h-12 bg-orange-100 text-orange-600 rounded-lg flex items-center justify-center">
+                            <div className="shrink-0 w-12 h-12 bg-secondary/10 text-secondary rounded-lg flex items-center justify-center">
                                 <AlertTriangle size={24} />
                             </div>
                             <div>
@@ -251,7 +251,7 @@ export default function HomePage() {
 
                         {/* Card 4 */}
                         <div className="bg-card border border-border rounded-xl p-8 shadow-sm flex gap-6 hover:shadow-md transition-all">
-                            <div className="shrink-0 w-12 h-12 bg-green-100 text-green-600 rounded-lg flex items-center justify-center">
+                            <div className="shrink-0 w-12 h-12 bg-primary/10 text-primary rounded-lg flex items-center justify-center">
                                 <ShieldCheck size={24} />
                             </div>
                             <div>
@@ -273,6 +273,7 @@ export default function HomePage() {
                         </Link>
                     </div>
                 </div>
+                </Reveal>
             </section>
 
             {/* 6. SOCIAL PROOF */}
@@ -293,23 +294,25 @@ export default function HomePage() {
                         </div>
                     </div>
 
-                    <div className="grid md:grid-cols-3 gap-6">
-                        {/* Testimonial 1 */}
-                        <div className="bg-card p-8 rounded-2xl shadow-sm border border-border flex flex-col justify-between">
-                            <div>
-                                <Quote size={24} className="text-primary/40 mb-4" />
-                                <p className="text-muted-foreground italic mb-6 leading-relaxed">
-                                    "I read this thing crying because finally someone put into words what I've been feeling for years. I don't know if we'll stay together but at least now I KNOW I'm not crazy."
-                                </p>
-                            </div>
-                            <div className="font-bold text-foreground text-sm">— Laura, 34, Chicago</div>
+                    {/* Featured Testimonial */}
+                    <div className="bg-secondary/5 border border-border rounded-2xl p-8 md:p-12 max-w-3xl mx-auto text-center mb-8">
+                        <p className="text-xl md:text-2xl italic font-serif text-muted-foreground mb-6 leading-relaxed">
+                            "I read this thing crying because finally someone put into words what I've been feeling for years. I don't know if we'll stay together but at least now I KNOW I'm not crazy."
+                        </p>
+                        <div className="flex items-center justify-center gap-1 text-yellow-500 mb-3">
+                            {[...Array(5)].map((_, i) => <Star key={i} size={16} fill="currentColor" />)}
                         </div>
+                        <div className="font-bold text-foreground">— Laura, 34, Chicago</div>
+                    </div>
 
+                    <div className="grid md:grid-cols-2 gap-6 max-w-4xl mx-auto">
                         {/* Testimonial 2 */}
-                        <div className="bg-card p-8 rounded-2xl shadow-sm border border-border flex flex-col justify-between">
+                        <div className="bg-card p-6 rounded-2xl shadow-sm border border-border flex flex-col justify-between">
                             <div>
-                                <Quote size={24} className="text-primary/40 mb-4" />
-                                <p className="text-muted-foreground italic mb-6 leading-relaxed">
+                                <div className="flex gap-1 text-yellow-500 mb-3">
+                                    {[...Array(5)].map((_, i) => <Star key={i} size={14} fill="currentColor" />)}
+                                </div>
+                                <p className="text-muted-foreground italic mb-4 text-sm leading-relaxed">
                                     "Six months of couples therapy and we weren't getting anywhere. This identified the problem in 10 pages. Brought it to the next session. Therapist said 'okay finally we know what to work on'."
                                 </p>
                             </div>
@@ -317,10 +320,12 @@ export default function HomePage() {
                         </div>
 
                         {/* Testimonial 3 */}
-                        <div className="bg-card p-8 rounded-2xl shadow-sm border border-border flex flex-col justify-between">
+                        <div className="bg-card p-6 rounded-2xl shadow-sm border border-border flex flex-col justify-between">
                             <div>
-                                <Quote size={24} className="text-primary/40 mb-4" />
-                                <p className="text-muted-foreground italic mb-6 leading-relaxed">
+                                <div className="flex gap-1 text-yellow-500 mb-3">
+                                    {[...Array(5)].map((_, i) => <Star key={i} size={14} fill="currentColor" />)}
+                                </div>
+                                <p className="text-muted-foreground italic mb-4 text-sm leading-relaxed">
                                     "The report basically said 'you're already done, you're just waiting for someone to say it'. We broke up 3 days later. But it was peaceful. We needed permission to leave."
                                 </p>
                             </div>
@@ -399,19 +404,21 @@ export default function HomePage() {
                             { q: "What if I'm the problem?", a: "That's actually the most empowering discovery. Because you can control YOUR behavior. Most people find they're BOTH part of the pattern—one triggering the other. That means you can BOTH fix it." },
                             { q: "Do I need to be in a relationship to take this?", a: "You can take it about a current or past relationship. Many people take it after breakups to understand what happened and avoid repeating the pattern." }
                         ].map((item, i) => (
-                            <div key={i} className="border border-border rounded-lg overflow-hidden">
+                            <div key={i} className="border border-border rounded-xl overflow-hidden">
                                 <button
                                     onClick={() => setFaqOpen(faqOpen === i ? null : i)}
-                                    className="w-full flex justify-between items-center p-4 text-left font-bold text-foreground hover:bg-muted/30 transition-colors"
+                                    className="w-full flex justify-between items-center p-5 text-left font-bold text-foreground hover:bg-muted/30 transition-colors"
                                 >
                                     {item.q}
-                                    {faqOpen === i ? <ChevronUp size={20} className="text-muted-foreground" /> : <ChevronDown size={20} className="text-muted-foreground" />}
+                                    <ChevronDown size={20} className={`text-muted-foreground shrink-0 ml-4 transition-transform duration-300 ${faqOpen === i ? 'rotate-180' : ''}`} />
                                 </button>
-                                {faqOpen === i && (
-                                    <div className="p-4 pt-0 text-muted-foreground text-sm leading-relaxed border-t border-border/50 bg-muted/10">
-                                        {item.a}
+                                <div className={`grid transition-all duration-300 ease-in-out ${faqOpen === i ? 'grid-rows-[1fr] opacity-100' : 'grid-rows-[0fr] opacity-0'}`}>
+                                    <div className="overflow-hidden">
+                                        <div className="px-5 pb-5 text-muted-foreground text-sm leading-relaxed border-t border-border/50">
+                                            <div className="pt-4">{item.a}</div>
+                                        </div>
                                     </div>
-                                )}
+                                </div>
                             </div>
                         ))}
                     </div>

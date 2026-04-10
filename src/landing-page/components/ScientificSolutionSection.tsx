@@ -20,16 +20,16 @@ export default function ScientificSolutionSection() {
     ];
 
     return (
-        <div className="bg-slate-50 py-24 sm:py-32">
+        <div className="bg-muted/30 py-24 sm:py-32">
             <div className="mx-auto max-w-7xl px-6 lg:px-8">
                 <div className="mx-auto max-w-2xl lg:text-center">
                     <h2 className="text-base font-semibold leading-7 text-primary">
                         How Our Relationship Test Works
                     </h2>
-                    <p className="mt-2 text-3xl font-bold tracking-tight text-slate-900 sm:text-4xl">
+                    <p className="mt-2 text-3xl font-bold tracking-tight text-foreground sm:text-4xl">
                         From Questions to Clarity in 3 Steps
                     </p>
-                    <p className="mt-6 text-lg leading-8 text-slate-600">
+                    <p className="mt-6 text-lg leading-8 text-muted-foreground">
                         Most relationship quizzes just label you. We measure the gap between your perception and your reaction.
                     </p>
                 </div>
@@ -42,7 +42,7 @@ export default function ScientificSolutionSection() {
                             return (
                                 <div key={index}>
                                     {/* Step Card */}
-                                    <div className="flex gap-6 items-start bg-white rounded-2xl p-8 shadow-sm ring-1 ring-gray-200 hover:shadow-md transition-shadow">
+                                    <div className="flex gap-6 items-start bg-card rounded-2xl p-8 shadow-sm ring-1 ring-border hover:shadow-md transition-shadow">
                                         {/* Step Number */}
                                         <div className="shrink-0 flex items-center justify-center w-12 h-12 rounded-full bg-primary text-primary-foreground font-bold text-lg">
                                             {index + 1}
@@ -55,10 +55,10 @@ export default function ScientificSolutionSection() {
 
                                         {/* Content */}
                                         <div className="flex-1">
-                                            <h3 className="text-xl font-bold text-slate-900 mb-2">
+                                            <h3 className="text-xl font-bold text-foreground mb-2">
                                                 {step.title}
                                             </h3>
-                                            <p className="text-slate-600 leading-relaxed">
+                                            <p className="text-muted-foreground leading-relaxed">
                                                 {step.description}
                                             </p>
                                         </div>
@@ -78,7 +78,7 @@ export default function ScientificSolutionSection() {
 
                 {/* Bottom Note */}
                 <div className="mt-12 text-center">
-                    <p className="text-sm text-slate-500 italic">
+                    <p className="text-sm text-muted-foreground italic">
                         Based on attachment theory, Gottman principles, and nervous system science
                     </p>
                 </div>

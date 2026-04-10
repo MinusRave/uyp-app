@@ -340,6 +340,9 @@ export const completeTest: CompleteTest<CompleteTestArgs, void> = async (
 
     if (!session) throw new HttpError(404, "Session not found");
 
+    // Idempotency: skip recalculation if already completed
+    if (session.isCompleted) return;
+
     // Extract answers as { questionId: rawScore }
     const answers = (session.answers as Record<string, any>) || {};
     const answersMap: Record<number, number> = {};

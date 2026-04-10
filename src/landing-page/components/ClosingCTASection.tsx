@@ -5,7 +5,7 @@ export default function ClosingCTASection() {
     return (
         <section className="relative py-24 overflow-hidden">
             {/* Gradient Background */}
-            <div className="absolute inset-0 bg-linear-to-br from-primary/10 via-purple-500/10 to-blue-500/10"></div>
+            <div className="absolute inset-0 bg-linear-to-br from-primary/10 via-primary/5 to-secondary/10"></div>
             <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,var(--tw-gradient-stops))] from-primary/20 via-transparent to-transparent"></div>
 
             <div className="relative mx-auto max-w-4xl px-6 lg:px-8 text-center">
@@ -29,15 +29,15 @@ export default function ClosingCTASection() {
                 {/* Trust Indicators */}
                 <div className="mt-8 flex flex-wrap items-center justify-center gap-6 text-sm text-muted-foreground">
                     <div className="flex items-center gap-2">
-                        <CheckCircle2 size={16} className="text-green-500" />
+                        <CheckCircle2 size={16} className="text-success" />
                         <span>No sign-up required</span>
                     </div>
                     <div className="flex items-center gap-2">
-                        <CheckCircle2 size={16} className="text-green-500" />
+                        <CheckCircle2 size={16} className="text-success" />
                         <span>Results in 10 minutes</span>
                     </div>
                     <div className="flex items-center gap-2">
-                        <CheckCircle2 size={16} className="text-green-500" />
+                        <CheckCircle2 size={16} className="text-success" />
                         <span>Used by 500+ couples this month</span>
                     </div>
                 </div>

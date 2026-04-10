@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router";
 import { startTest, submitAnswer, completeTest, getTestSession, useQuery, captureLead, updateConflictDescription, updateWizardProgress, updateSessionActivity, generateQuickOverview, assessNarcissism, getSystemConfig } from "wasp/client/operations";
 import { routes } from "wasp/client/router";
-import { Loader2, Mail, MessageSquare, ChevronLeft, BadgeCheck, AlertTriangle, Activity, ShieldCheck, Lock as LockIcon } from "lucide-react";
+import { Loader2, Mail, MessageSquare, ChevronLeft, BadgeCheck, AlertTriangle, Activity, ShieldCheck, Lock as LockIcon, Check } from "lucide-react";
 import { cn } from "../client/utils";
 import { ProcessingOverlay } from "./ProcessingOverlay";
 import { trackPixelEvent } from "../analytics/pixel";
@@ -38,6 +38,7 @@ export default function TestPage() {
     const [currentQIndex, setCurrentQIndex] = useState(0);
     const [selectedAnswer, setSelectedAnswer] = useState<number | null>(null);
     const [isSubmitting, setIsSubmitting] = useState(false);
+    const [localAnswers, setLocalAnswers] = useState<Record<number, number>>({}); // qIndex -> answerId
 
     // Gates
     const [email, setEmail] = useState("");
@@ -88,6 +89,9 @@ export default function TestPage() {
 
     // State for Profile Form
     const [showProfileForm, setShowProfileForm] = useState(false);
+
+    // Prevents quiz flash before session check runs
+    const [isSessionChecked, setIsSessionChecked] = useState(false);
 
     // Guard against double-initialization
     const isCreatingSession = React.useRef(false);
@@ -145,6 +149,7 @@ export default function TestPage() {
                     setShowProfileForm(true);
                 }
 
+                setIsSessionChecked(true);
             } else {
                 // No session found.
                 // If we had a localSessionId but query returned null, it's invalid.
@@ -177,6 +182,7 @@ export default function TestPage() {
                     console.error("Failed to create guest session", e);
                 } finally {
                     isCreatingSession.current = false;
+                    setIsSessionChecked(true);
                 }
             }
         };
@@ -200,7 +206,7 @@ export default function TestPage() {
         }
     };
 
-    const isLoading = isSessionLoading && !showProfileForm; // Don't show loader if form is ready
+    const isLoading = (isSessionLoading || !isSessionChecked) && !showProfileForm; // Don't show loader if form is ready
 
     const currentQuestion = QUESTIONS[currentQIndex];
     const progressPercentage = ((currentQIndex) / QUESTIONS.length) * 100;
@@ -242,6 +248,9 @@ export default function TestPage() {
                 dimension: currentQuestion.dimension,
                 type: currentQuestion.type
             });
+
+            // Track answer locally for back-navigation restoration
+            setLocalAnswers(prev => ({ ...prev, [currentQIndex]: answerId }));
 
             if (currentQIndex < QUESTIONS.length - 1) {
                 setCurrentQIndex(prev => prev + 1);
@@ -533,7 +542,7 @@ export default function TestPage() {
                             <button
                                 type="submit"
                                 disabled={isSubmitting}
-                                className="w-full py-4 rounded-xl bg-primary text-primary-foreground font-bold text-lg hover:shadow-lg hover:bg-primary/90 transition-all flex items-center justify-center gap-2 group overflow-hidden relative"
+                                className="w-full py-4 rounded-full bg-primary text-primary-foreground font-bold text-lg shadow-2xl hover:shadow-3xl hover:bg-primary/90 hover:scale-105 transition-all flex items-center justify-center gap-2 group overflow-hidden relative"
                             >
                                 <span className="relative z-10 flex items-center gap-2">
                                     {isSubmitting ? <Loader2 className="animate-spin" /> : <LockIcon size={20} />}
@@ -541,22 +550,22 @@ export default function TestPage() {
                                 </span>
                                 <div className="absolute inset-0 bg-white/20 translate-y-full group-hover:translate-y-0 transition-transform duration-300"></div>
                             </button>
-                            <p className="text-xs text-center text-muted-foreground mt-3 flex items-center justify-center gap-1.5 opacity-80">
-                                <ShieldCheck size={12} className="text-green-600" />
+                            <p className="text-xs text-center text-muted-foreground mt-3 flex items-center justify-center gap-1.5">
+                                <ShieldCheck size={12} className="text-success" />
                                 100% Secure. We respect your privacy & zero spam.
                             </p>
                         </div>
-                        <div className="bg-blue-50 dark:bg-blue-950/20 rounded-lg p-3 text-left space-y-1.5">
-                            <div className="flex items-center gap-2 text-xs text-blue-900 dark:text-blue-100">
-                                <span className="text-blue-600 dark:text-blue-400">✓</span>
+                        <div className="bg-primary/5 rounded-xl p-3 text-left space-y-1.5 border border-primary/10">
+                            <div className="flex items-center gap-2 text-xs text-foreground">
+                                <Check size={12} className="text-primary shrink-0" />
                                 <span className="font-medium">Fully encrypted & confidential</span>
                             </div>
-                            <div className="flex items-center gap-2 text-xs text-blue-900 dark:text-blue-100">
-                                <span className="text-blue-600 dark:text-blue-400">✓</span>
+                            <div className="flex items-center gap-2 text-xs text-foreground">
+                                <Check size={12} className="text-primary shrink-0" />
                                 <span className="font-medium">Never shared with third parties</span>
                             </div>
-                            <div className="flex items-center gap-2 text-xs text-blue-900 dark:text-blue-100">
-                                <span className="text-blue-600 dark:text-blue-400">✓</span>
+                            <div className="flex items-center gap-2 text-xs text-foreground">
+                                <Check size={12} className="text-primary shrink-0" />
                                 <span className="font-medium">Delete anytime from your account</span>
                             </div>
                         </div>
@@ -568,8 +577,9 @@ export default function TestPage() {
 
     const handleBack = () => {
         if (currentQIndex > 0) {
-            setCurrentQIndex((prev) => prev - 1);
-            setSelectedAnswer(null); // Clear selection or we could try to reload previous answer from session if available locally
+            const prevIndex = currentQIndex - 1;
+            setCurrentQIndex(prevIndex);
+            setSelectedAnswer(localAnswers[prevIndex] ?? null);
         }
     };
 
@@ -596,10 +606,10 @@ export default function TestPage() {
                         {currentQIndex + 1}/{QUESTIONS.length}
                     </div>
                 </div>
-                <div className="h-1.5 w-full bg-muted">
+                <div className="h-2 w-full bg-muted">
                     <div
-                        className="h-full bg-primary transition-all duration-500 ease-out"
-                        style={{ width: `${progressPercentage}%` }}
+                        className="h-full bg-primary transition-all duration-500 ease-out rounded-r-full"
+                        style={{ width: `${progressPercentage}%`, boxShadow: '0 0 8px hsl(var(--primary) / 0.4)' }}
                     />
                 </div>
             </header>
@@ -628,13 +638,13 @@ export default function TestPage() {
                                 )}
                             >
                                 <div className={cn(
-                                    "w-6 h-6 md:w-6 md:h-6 rounded-full border-2 mr-3 md:mr-4 flex items-center justify-center transition-colors shrink-0",
+                                    "w-6 h-6 rounded-full border-2 mr-3 md:mr-4 flex items-center justify-center transition-all duration-200 shrink-0",
                                     selectedAnswer === option.id
-                                        ? "border-primary bg-primary"
+                                        ? "border-primary bg-primary scale-110"
                                         : "border-muted-foreground/30 group-hover:border-primary"
                                 )}>
                                     {selectedAnswer === option.id && (
-                                        <div className="w-2.5 h-2.5 md:w-3 md:h-3 rounded-full bg-white" />
+                                        <Check size={14} className="text-white" strokeWidth={3} />
                                     )}
                                 </div>
                                 <span className="text-base md:text-lg font-medium leading-tight">{option.text}</span>
