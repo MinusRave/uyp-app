@@ -172,40 +172,7 @@ page ProcessingPage {
 
 // Placeholder for Teaser (implemented next)
 
-route ToxicTestRoute { path: "/toxic-relationship-test-for-men", to: ToxicTestPage }
-page ToxicTestPage {
-  component: import ToxicTestPage from "@src/test/ToxicTestPage"
-}
-
-route ToxicEmailGateRoute { path: "/toxic-analysis", to: ToxicEmailGatePage }
-page ToxicEmailGatePage {
-  component: import ToxicEmailGate from "@src/test/ToxicEmailGate"
-}
-
-route ToxicSalesRoute { path: "/toxic-offer", to: ToxicSalesPage }
-page ToxicSalesPage {
-  component: import ToxicSalesPage from "@src/sales/ToxicSalesPage"
-}
-
-route ToxicResultRoute { path: "/toxic-results", to: ToxicResultPage }
-page ToxicResultPage {
-  component: import ToxicResultPage from "@src/results/ToxicResultPage"
-}
-
-action submitToxicTest {
-  fn: import { submitToxicTest } from "@src/test/toxicOperations",
-  entities: [TestSession]
-}
-
-action captureToxicLead {
-  fn: import { captureToxicLead } from "@src/test/toxicOperations",
-  entities: [TestSession]
-}
-
-action finalizeToxicReport {
-  fn: import { finalizeToxicReport } from "@src/test/toxicOperations",
-  entities: [TestSession, AiLog]
-}
+// Toxic test flow removed
 
 
 // Selling Page
@@ -254,24 +221,19 @@ api unsubscribeApi {
   httpRoute: (GET, "/api/unsubscribe")
 }
 
-action startTest {
-  fn: import { startTest } from "@src/test/operations",
+action saveCompletedTest {
+  fn: import { saveCompletedTest } from "@src/test/operations",
   entities: [TestSession, User]
 }
 
-action submitAnswer {
-  fn: import { submitAnswer } from "@src/test/operations",
+action deactivateSession {
+  fn: import { deactivateSession } from "@src/test/operations",
   entities: [TestSession]
 }
 
-action completeTest {
-  fn: import { completeTest } from "@src/test/operations",
-  entities: [TestSession, AiLog]
-}
-
-action captureLead {
-  fn: import { captureLead } from "@src/test/operations",
-  entities: [TestSession, User, MagicLinkToken]
+action trackQuizEvent {
+  fn: import { trackQuizEvent } from "@src/test/operations",
+  entities: [QuizEvent]
 }
 
 query getTestSession {
@@ -327,10 +289,7 @@ action skipOnboarding {
   entities: [TestSession]
 }
 
-action updateWizardProgress {
-  fn: import { updateWizardProgress } from "@src/test/operations",
-  entities: [TestSession]
-}
+// updateWizardProgress removed — wizard data stored client-side until email submission
 
 action updateSessionActivity {
   fn: import { updateSessionActivity } from "@src/test/operations",
@@ -586,10 +545,7 @@ page AdminMessagesPage {
 }
 //#endregion
 
-action claimSession {
-  fn: import { claimSession } from "@src/test/operations",
-  entities: [TestSession]
-}
+// claimSession removed — no anonymous sessions in new model
 
 query getTestSessions {
   fn: import { getTestSessions } from "@src/admin/operations",
@@ -638,6 +594,11 @@ page AdminAiLogsPage {
 query getSessionAnalytics {
   fn: import { getSessionAnalytics } from "@src/admin/operations",
   entities: [TestSession]
+}
+
+query getQuizFunnelStats {
+  fn: import { getQuizFunnelStats } from "@src/admin/operations",
+  entities: [QuizEvent, TestSession]
 }
 
 action deleteSession {

@@ -243,8 +243,17 @@ export const verifyMagicLink = async (req: any, res: any, context: any) => {
         let redirectPath = "/test"; // Default: start/resume test
 
         const latestSession = await context.entities.TestSession.findFirst({
-            where: { userId: user.id },
-            orderBy: { createdAt: 'desc' }
+            where: {
+                userId: user.id,
+                OR: [
+                    { isArchived: false },
+                    { isPaid: true }
+                ]
+            },
+            orderBy: [
+                { isPaid: 'desc' },
+                { createdAt: 'desc' }
+            ]
         });
 
         if (latestSession) {

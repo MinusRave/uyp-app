@@ -3,8 +3,7 @@ import { useNavigate } from "react-router";
 import { ArrowRight, Lock, CheckCircle, AlertTriangle, TrendingUp, Shield, Heart, BadgeCheck, Compass, Zap, X, Activity, ChevronDown, Check, Eye, Microscope, ListChecks, ShieldAlert, Clock, MessageCircle, Brain, Quote, Star, Play, TrendingDown, Battery, Thermometer, FileWarning, Download, FileText, Loader2 } from "lucide-react";
 import { useQuery, generateQuickOverview, generateFullReportV2, getTestSession, verifyPayment } from "wasp/client/operations";
 import { useAuth } from "wasp/client/auth";
-import { api } from "wasp/client/api";
-import { config } from "wasp/client";
+// api and config imports removed — unused
 import GaugeChart from "../components/GaugeChart";
 
 import { NarcissismSection } from "./sections/NarcissismSection";

@@ -251,3 +251,14 @@ model SystemConfig {
   enableSoftGate     Boolean @default(false)
   enableCookieBanner Boolean @default(true)
 }
+
+model QuizEvent {
+  id            String   @id @default(uuid())
+  type          String   // "quiz_start" | "quiz_abandon"
+  questionIndex Int?     // last question answered (for abandon events)
+  deviceType    String?
+  referrer      String?
+  utm_source    String?
+  utm_medium    String?
+  createdAt     DateTime @default(now())
+}

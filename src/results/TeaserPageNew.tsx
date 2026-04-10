@@ -1,13 +1,13 @@
 ﻿import React, { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router";
 import { ArrowRight, Lock, CheckCircle, AlertTriangle, TrendingUp, Shield, Heart, BadgeCheck, Compass, Zap, X, Activity, ChevronDown, Check, Eye, Microscope, ListChecks, ShieldAlert, Clock, MessageCircle, Brain, Quote, Star, Play, TrendingDown, Battery, Thermometer, FileWarning, BookOpen, Users, FileText, ShieldCheck, Info, ChevronUp, Link, Repeat, Ghost } from "lucide-react";
-import { useQuery, generateQuickOverview, generateFullReportV2, createCheckoutSession, getTestSession, getSystemConfig, captureLead } from "wasp/client/operations";
+import { useQuery, generateQuickOverview, generateFullReportV2, createCheckoutSession, getTestSession, getSystemConfig, deactivateSession } from "wasp/client/operations";
 import { useAuth } from "wasp/client/auth";
 
 import { trackPixelEvent } from '../analytics/pixel';
 import { FaCcVisa, FaCcMastercard, FaCcPaypal, FaApplePay, FaGooglePay } from "react-icons/fa";
 
-import EmailCaptureModal from "./components/EmailCaptureModal";
+// EmailCaptureModal removed — users always have email in new session model
 
 // --- TYPES ---
 type QuickOverviewData = {
@@ -695,32 +695,7 @@ export default function TeaserPageNew() {
         }
     };
 
-    const handleEmailSubmit = async (email: string) => {
-        if (!session) return;
-        setIsEmailSubmitting(true);
-        try {
-            // Capture lead
-            await captureLead({
-                sessionId: session.id,
-                email,
-                eventID: 'soft-gate-' + Date.now()
-            });
-
-            // Close modal
-            setShowEmailModal(false);
-
-            // Execute pending action (checkout)
-            if (pendingAction) {
-                pendingAction();
-                setPendingAction(null);
-            }
-        } catch (e) {
-            console.error(e);
-            alert("Error saving email. Please try again.");
-        } finally {
-            setIsEmailSubmitting(false);
-        }
-    };
+    // Email capture removed — users always have email in new session model
 
     // No session ID at all (no URL param, no localStorage) → show "not found" with retake link
     if (!session && !sessionIdToUse) return (
@@ -762,7 +737,11 @@ export default function TeaserPageNew() {
                             <span>This analysis was generated on {testDate}. Your relationship may have changed.</span>
                         </div>
                         <button
-                            onClick={() => { localStorage.removeItem("uyp-session-id"); navigate("/test"); }}
+                            onClick={async () => {
+                                if (session) { try { await deactivateSession({ sessionId: session.id }); } catch (e) { console.error(e); } }
+                                localStorage.removeItem("uyp-session-id");
+                                navigate("/test");
+                            }}
                             className="whitespace-nowrap text-amber-900 dark:text-amber-200 font-medium underline hover:text-amber-700"
                         >
                             Retake the test
@@ -1912,12 +1891,7 @@ export default function TeaserPageNew() {
 
 
 
-            <EmailCaptureModal
-                isOpen={showEmailModal}
-                onClose={() => setShowEmailModal(false)}
-                onSubmit={handleEmailSubmit}
-                isSubmitting={isEmailSubmitting}
-            />
+            {/* EmailCaptureModal removed — users always have email in new session model */}
 
         </div >
     );

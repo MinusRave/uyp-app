@@ -1,12 +1,11 @@
 import { TestSession } from "wasp/entities";
 import { HttpError } from "wasp/server";
 import {
-    type StartTest,
-    type SubmitAnswer,
-    type CompleteTest,
     type GetTestSession,
+    type SaveCompletedTest,
+    type DeactivateSession,
+    type TrackQuizEvent,
 } from "wasp/server/operations";
-import { sendMagicLink } from "../auth/magicLink";
 
 import crypto from "crypto";
 // @ts-ignore
@@ -14,163 +13,31 @@ import { createUser } from "wasp/server/auth";
 // @ts-ignore
 import argon2 from "argon2";
 
-// --- Queries ---
-
 import { sendCapiEvent } from "../server/analytics/metaCapi";
+import { calculateScore } from "./scoring";
+import { calculateAdvancedMetrics } from "./calculateMetrics";
 
-type CaptureLeadArgs = { sessionId: string; email: string; eventID?: string };
+// --- Types ---
 
-export const captureLead = async ({ sessionId, email, eventID }: CaptureLeadArgs, context: any) => {
-    const session = await context.entities.TestSession.findUnique({
-        where: { id: sessionId },
-    });
-
-    if (!session) {
-        throw new HttpError(404, "Session not found");
-    }
-
-    const normalizedEmail = email.toLowerCase();
-    let user: any = null;
-
-    // 1. Find existing User (Case-Insensitive)
-    user = await context.entities.User.findFirst({
-        where: {
-            email: { equals: normalizedEmail, mode: 'insensitive' }
-        }
-    });
-
-    // 2. Create User if not exists
-    if (!user) {
-        try {
-            // Generate random password (token)
-            const token = crypto.randomBytes(32).toString('hex');
-            const hashedPassword = await argon2.hash(token);
-            const providerData = JSON.stringify({
-                hashedPassword,
-                isEmailVerified: true // Implicitly verified presumably, or false? Let's say true for lead friction reduction if they pay.
-            });
-
-            // createUser(providerId, providerData, userFields)
-            user = await createUser(
-                { providerName: "email", providerUserId: normalizedEmail },
-                providerData,
-                { email: normalizedEmail }
-            );
-            console.log(`[captureLead] Created new user: ${user.id}`);
-        } catch (e: any) {
-            console.error("[captureLead] Failed to create user:", e);
-            // Fallback: Proceed without user linking if creation fails (shouldn't happen)
-        }
-    }
-
-    // 3. Link Session to User & Email
-    await context.entities.TestSession.update({
-        where: { id: sessionId },
-        data: {
-            email: normalizedEmail,
-            userId: user ? user.id : undefined, // Link immediately!
-            // Set email sequence type for test abandonment if not completed
-            emailSequenceType: !session.isCompleted ? "test_abandonment" : undefined,
-        }
-    });
-
-    // 4. Send Meta CAPI Lead Event
-    if (eventID) {
-        // Run in background / don't await execution to avoid blocking response
-        sendCapiEvent({
-            eventName: 'Lead',
-            eventId: eventID,
-            eventSourceUrl: context.req?.headers?.referer || 'https://understandyourpartner.com/test',
-            userData: {
-                email: normalizedEmail,
-                clientIp: context.req?.ip,
-                userAgent: context.req?.headers?.['user-agent'],
-                // Try to get fbp/fbc from cookies if available in context
-                fbp: context.req?.cookies?.['_fbp'],
-                fbc: context.req?.cookies?.['_fbc'],
-            }
-        });
-    }
-
-    // 5. Persist cookies to TestSession for future use (e.g. Purchase Webhook)
-    const fbp = context.req?.cookies?.['_fbp'];
-    const fbc = context.req?.cookies?.['_fbc'];
-    if (fbp || fbc) {
-        await context.entities.TestSession.update({
-            where: { id: sessionId },
-            data: {
-                fbp: fbp || undefined,
-                fbc: fbc || undefined
-            }
-        });
-    }
-};
-
-export const getTestSession: GetTestSession<{ sessionId?: string }, TestSession | null> = async (
-    args,
-    context
-) => {
-    // 1. Try explicit session ID (from localStorage/client)
-    if (args && args.sessionId) {
-        return context.entities.TestSession.findUnique({
-            where: { id: args.sessionId },
-        });
-    }
-
-    // 2. Fallback: If user is logged in, find their latest ACTIVE session
-    // Filters out archived unpaid sessions, but always includes paid ones
-    if (context.user) {
-        return context.entities.TestSession.findFirst({
-            where: {
-                AND: [
-                    {
-                        OR: [
-                            { userId: context.user.id },
-                            { email: context.user.email, userId: null }
-                        ]
-                    },
-                    {
-                        OR: [
-                            { isArchived: false },
-                            { isPaid: true }
-                        ]
-                    }
-                ]
-            },
-            orderBy: [
-                { isPaid: "desc" },
-                { createdAt: "desc" }
-            ],
-        });
-    }
-
-    return null;
-};
-
-// --- Actions ---
-
-// --- User Profile Type ---
 export type UserProfile = {
     userGender: string;
     partnerGender: string;
     userAgeRange: string;
     partnerAgeRange: string;
     relationshipStatus: string;
-    // Relationship history (optional)
     relationshipDuration?: string;
     livingTogether?: boolean;
     hasChildren?: boolean;
     previousRelationships?: string;
     previousMarriage?: boolean;
     majorLifeTransition?: string;
-    // Partner behavior (optional)
     partnerConflictStyle?: string;
     fightFrequency?: string;
     repairFrequency?: string;
     partnerHurtfulBehavior?: string;
+    biggestFear?: string;
 };
 
-// --- Device Info Type ---
 type DeviceInfo = {
     deviceType?: string;
     deviceOS?: string;
@@ -185,10 +52,7 @@ type DeviceInfo = {
     deviceTimezone?: string;
 };
 
-// Update startTest signature
-// args: UserProfile & { fbclid?: string, utm_source?: string, utm_medium?: string, utm_campaign?: string, utm_content?: string, utm_term?: string, referrer?: string } | void
-
-export const startTest: StartTest<UserProfile & DeviceInfo & {
+type Attribution = {
     fbclid?: string;
     utm_source?: string;
     utm_medium?: string;
@@ -196,220 +60,324 @@ export const startTest: StartTest<UserProfile & DeviceInfo & {
     utm_content?: string;
     utm_term?: string;
     referrer?: string;
-    testType?: string; // NEW
-} | void, TestSession> = async (args, context) => {
-    // Create a new test session with profile data
+};
+
+type AnswerEntry = {
+    answerId: number;
+    score: number;
+    dimension: string;
+    type: string;
+};
+
+// --- Queries ---
+
+export const getTestSession: GetTestSession<{ sessionId?: string }, TestSession | null> = async (
+    args,
+    context
+) => {
+    // 1. Try explicit session ID
+    if (args && args.sessionId) {
+        const session = await context.entities.TestSession.findUnique({
+            where: { id: args.sessionId },
+        });
+        // Return null if archived AND unpaid (expired session)
+        if (session?.isArchived && !session?.isPaid) return null;
+        return session;
+    }
+
+    // 2. Fallback: If user is logged in, find their latest ACTIVE session
+    if (context.user) {
+        return context.entities.TestSession.findFirst({
+            where: {
+                userId: context.user.id,
+                OR: [
+                    { isArchived: false },
+                    { isPaid: true }
+                ]
+            },
+            orderBy: [
+                { isPaid: "desc" },
+                { createdAt: "desc" }
+            ],
+        });
+    }
+
+    return null;
+};
+
+// --- Actions ---
+
+// saveCompletedTest: Atomic operation that creates user + session with all quiz data
+type SaveCompletedTestArgs = {
+    email: string;
+    profile: UserProfile;
+    answers: Record<number, AnswerEntry>;
+    attribution?: Attribution;
+    deviceInfo?: DeviceInfo;
+    eventID?: string;
+    testType?: string;
+};
+
+type SaveCompletedTestResult = {
+    sessionId: string;
+    loginToken: string;
+    email: string;
+};
+
+export const saveCompletedTest: SaveCompletedTest<SaveCompletedTestArgs, SaveCompletedTestResult> = async (
+    args,
+    context
+) => {
+    const normalizedEmail = args.email.toLowerCase();
+
+    // 1. Find or create user
+    let user: any = null;
+    let rawToken = crypto.randomBytes(32).toString('hex');
+    const hashedPassword = await argon2.hash(rawToken);
+    const providerData = JSON.stringify({
+        hashedPassword,
+        isEmailVerified: true
+    });
+
+    user = await context.entities.User.findFirst({
+        where: { email: { equals: normalizedEmail, mode: 'insensitive' } },
+        include: { auth: { include: { identities: true } } }
+    });
+
+    if (!user) {
+        // Create new user
+        user = await createUser(
+            { providerName: "email", providerUserId: normalizedEmail },
+            providerData,
+            { email: normalizedEmail }
+        );
+        console.log(`[saveCompletedTest] Created new user: ${user.id}`);
+    } else {
+        // Existing user: update password for auto-login (same pattern as verifyMagicLink)
+        const auth = user.auth;
+        const existingIdentity = auth?.identities?.find((i: any) => i.providerName === 'email');
+
+        if (existingIdentity) {
+            await context.entities.User.update({
+                where: { id: user.id },
+                data: {
+                    auth: {
+                        update: {
+                            identities: {
+                                update: {
+                                    where: {
+                                        providerName_providerUserId: {
+                                            providerName: 'email',
+                                            providerUserId: existingIdentity.providerUserId
+                                        }
+                                    },
+                                    data: { providerData }
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        } else if (auth) {
+            await context.entities.User.update({
+                where: { id: user.id },
+                data: {
+                    auth: {
+                        update: {
+                            identities: {
+                                create: {
+                                    providerName: 'email',
+                                    providerUserId: normalizedEmail,
+                                    providerData
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        } else {
+            await context.entities.User.update({
+                where: { id: user.id },
+                data: {
+                    auth: {
+                        create: {
+                            identities: {
+                                create: {
+                                    providerName: 'email',
+                                    providerUserId: normalizedEmail,
+                                    providerData
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        }
+        console.log(`[saveCompletedTest] Updated auth for existing user: ${user.id}`);
+    }
+
+    // 2. Archive all active unpaid sessions for this user
+    await context.entities.TestSession.updateMany({
+        where: {
+            userId: user.id,
+            isArchived: false,
+            isPaid: false,
+        },
+        data: { isArchived: true }
+    });
+
+    // 3. Build answers in DB format and calculate scores
+    const answersForDb: Record<string, any> = {};
+    const answersMap: Record<number, number> = {};
+
+    Object.entries(args.answers).forEach(([qId, entry]) => {
+        const id = parseInt(qId);
+        answersForDb[qId] = {
+            answerId: entry.answerId,
+            score: entry.score,
+            dimension: entry.dimension,
+            type: entry.type,
+            answeredAt: new Date().toISOString(),
+        };
+        answersMap[id] = entry.score;
+    });
+
+    const scoreResult = calculateScore(answersMap, args.profile);
+    const advancedMetrics = calculateAdvancedMetrics(answersForDb, args.profile);
+
+    // 4. Create TestSession with ALL data
     const session = await context.entities.TestSession.create({
         data: {
-            userId: context.user ? context.user.id : undefined,
-            testType: args?.testType || "standard", // Default to standard
-            currentQuestionIndex: 0,
-            answers: {},
-            // Profile data (optional at start)
-            userGender: args?.userGender,
-            partnerGender: args?.partnerGender,
-            userAgeRange: args?.userAgeRange,
-            partnerAgeRange: args?.partnerAgeRange,
-            relationshipStatus: args?.relationshipStatus,
-            // Relationship history
-            relationshipDuration: args?.relationshipDuration,
-            livingTogether: args?.livingTogether,
-            hasChildren: args?.hasChildren,
-            previousRelationships: args?.previousRelationships,
-            previousMarriage: args?.previousMarriage,
-            majorLifeTransition: args?.majorLifeTransition,
-            // Partner behavior
-            partnerConflictStyle: args?.partnerConflictStyle,
-            fightFrequency: args?.fightFrequency,
-            repairFrequency: args?.repairFrequency,
-            partnerHurtfulBehavior: args?.partnerHurtfulBehavior,
-            // Meta Attribution
-            fbclid: args?.fbclid,
-            // UTMs & Referrer
-            utm_source: args?.utm_source,
-            utm_medium: args?.utm_medium,
-            utm_campaign: args?.utm_campaign,
-            utm_content: args?.utm_content,
-            utm_term: args?.utm_term,
-            referrer: args?.referrer,
-            // Device Information
-            deviceType: args?.deviceType,
-            deviceOS: args?.deviceOS,
-            deviceOSVersion: args?.deviceOSVersion,
-            deviceBrand: args?.deviceBrand,
-            deviceModel: args?.deviceModel,
-            browser: args?.browser,
-            browserVersion: args?.browserVersion,
-            screenResolution: args?.screenResolution,
-            viewportSize: args?.viewportSize,
-            deviceLanguage: args?.deviceLanguage,
-            deviceTimezone: args?.deviceTimezone,
-            // Session tracking
+            userId: user.id,
+            email: normalizedEmail,
+            testType: args.testType || "standard",
+            currentQuestionIndex: Object.keys(args.answers).length,
+            isCompleted: true,
+            answers: answersForDb,
+            scores: scoreResult as any,
+            advancedMetrics: advancedMetrics as any,
+            emailSequenceType: "teaser_viewer",
+            // Profile
+            userGender: args.profile.userGender,
+            partnerGender: args.profile.partnerGender,
+            userAgeRange: args.profile.userAgeRange,
+            partnerAgeRange: args.profile.partnerAgeRange,
+            relationshipStatus: args.profile.relationshipStatus,
+            relationshipDuration: args.profile.relationshipDuration,
+            livingTogether: args.profile.livingTogether,
+            hasChildren: args.profile.hasChildren,
+            previousRelationships: args.profile.previousRelationships,
+            previousMarriage: args.profile.previousMarriage,
+            majorLifeTransition: args.profile.majorLifeTransition,
+            partnerConflictStyle: args.profile.partnerConflictStyle,
+            fightFrequency: args.profile.fightFrequency,
+            repairFrequency: args.profile.repairFrequency,
+            partnerHurtfulBehavior: args.profile.partnerHurtfulBehavior,
+            biggestFear: args.profile.biggestFear,
+            // Attribution
+            fbclid: args.attribution?.fbclid,
+            utm_source: args.attribution?.utm_source,
+            utm_medium: args.attribution?.utm_medium,
+            utm_campaign: args.attribution?.utm_campaign,
+            utm_content: args.attribution?.utm_content,
+            utm_term: args.attribution?.utm_term,
+            referrer: args.attribution?.referrer,
+            // Device
+            deviceType: args.deviceInfo?.deviceType,
+            deviceOS: args.deviceInfo?.deviceOS,
+            deviceOSVersion: args.deviceInfo?.deviceOSVersion,
+            deviceBrand: args.deviceInfo?.deviceBrand,
+            deviceModel: args.deviceInfo?.deviceModel,
+            browser: args.deviceInfo?.browser,
+            browserVersion: args.deviceInfo?.browserVersion,
+            screenResolution: args.deviceInfo?.screenResolution,
+            viewportSize: args.deviceInfo?.viewportSize,
+            deviceLanguage: args.deviceInfo?.deviceLanguage,
+            deviceTimezone: args.deviceInfo?.deviceTimezone,
+            // Cookies (for Purchase CAPI later)
+            fbp: (context as any).req?.cookies?.['_fbp'],
+            fbc: (context as any).req?.cookies?.['_fbc'],
+            // Timestamps
             sessionStartedAt: new Date(),
             lastActivityAt: new Date(),
         },
     });
 
-    return session;
+    // 5. Send Meta CAPI Lead event
+    if (args.eventID) {
+        sendCapiEvent({
+            eventName: 'Lead',
+            eventId: args.eventID,
+            eventSourceUrl: (context as any).req?.headers?.referer || 'https://understandyourpartner.com/test',
+            userData: {
+                email: normalizedEmail,
+                clientIp: (context as any).req?.ip,
+                userAgent: (context as any).req?.headers?.['user-agent'],
+                fbp: (context as any).req?.cookies?.['_fbp'],
+                fbc: (context as any).req?.cookies?.['_fbc'],
+            }
+        });
+    }
+
+    console.log(`[saveCompletedTest] Created session ${session.id} for user ${user.id}`);
+
+    return {
+        sessionId: session.id,
+        loginToken: rawToken,
+        email: normalizedEmail,
+    };
 };
 
-export const updateWizardProgress = async (args: any, context: any) => {
-    if (!args.sessionId) throw new HttpError(400, "Session ID required");
+// deactivateSession: Archives a session (for retake)
+type DeactivateSessionArgs = { sessionId: string };
 
-    // Clean args to remove sessionId from data payload
-    const data = { ...args };
-    delete data.sessionId;
+export const deactivateSession: DeactivateSession<DeactivateSessionArgs, void> = async (
+    args,
+    context
+) => {
+    if (!context.user) throw new HttpError(401, "Must be logged in");
 
-    // We update whatever profile fields are passed, plus the wizard step if provided
-    // This allows for incremental saving
+    const session = await context.entities.TestSession.findUnique({
+        where: { id: args.sessionId },
+    });
+
+    if (!session) throw new HttpError(404, "Session not found");
+    if (session.userId !== context.user.id) throw new HttpError(403, "Not your session");
+    if (session.isPaid) throw new HttpError(400, "Cannot deactivate a paid session");
+
     await context.entities.TestSession.update({
         where: { id: args.sessionId },
-        data: data
+        data: { isArchived: true },
     });
 };
 
-type SubmitAnswerArgs = {
-    sessionId: string;
-    questionId: number;
-    answerId: number;
-    score: number; // 1-5
-    dimension: string; // e.g., "silence_distance"
-    type: string; // "PM" or "SL"
+// trackQuizEvent: Lightweight analytics event (no PII, no session link)
+type TrackQuizEventArgs = {
+    type: "quiz_start" | "quiz_abandon";
+    questionIndex?: number;
+    deviceType?: string;
+    referrer?: string;
+    utm_source?: string;
+    utm_medium?: string;
 };
 
-export const submitAnswer: SubmitAnswer<SubmitAnswerArgs, void> = async (
+export const trackQuizEvent: TrackQuizEvent<TrackQuizEventArgs, void> = async (
     args,
     context
 ) => {
-    const { sessionId, questionId, answerId, score, dimension, type } = args;
-
-    const session = await context.entities.TestSession.findUnique({
-        where: { id: sessionId },
-    });
-
-    if (!session) {
-        throw new HttpError(404, "Session not found");
-    }
-
-    // Update answers
-    // We cast the JSON to any to modify it easily, then save back.
-    // In a real app, strict typing for the JSON column is better.
-    const currentAnswers = (session.answers as any) || {};
-
-    currentAnswers[questionId] = {
-        answerId,
-        score,
-        dimension,
-        type,
-        answeredAt: new Date().toISOString(),
-    };
-
-    // Determine if we need to advance the index
-    // We trust the client to send the right QuestionId, but we can also calc max index here.
-    // For MVP, simply updating currentQuestionIndex if this question is > current.
-    // NOTE: Logic to advance index could be strictly sequential or flexible.
-    // Let's assume sequential for safety:
-    const nextIndex = Math.max(session.currentQuestionIndex, Object.keys(currentAnswers).length);
-
-    await context.entities.TestSession.update({
-        where: { id: sessionId },
+    await context.entities.QuizEvent.create({
         data: {
-            answers: currentAnswers,
-            currentQuestionIndex: nextIndex,
+            type: args.type,
+            questionIndex: args.questionIndex,
+            deviceType: args.deviceType,
+            referrer: args.referrer,
+            utm_source: args.utm_source,
+            utm_medium: args.utm_medium,
         },
     });
 };
 
-type CompleteTestArgs = {
-    sessionId: string;
-};
-
-import { calculateScore } from "./scoring";
-import { calculateAdvancedMetrics } from "./calculateMetrics";
-
-
-export const completeTest: CompleteTest<CompleteTestArgs, void> = async (
-    args,
-    context
-) => {
-    const { sessionId } = args;
-
-    const session = await context.entities.TestSession.findUnique({
-        where: { id: sessionId },
-    });
-
-    if (!session) throw new HttpError(404, "Session not found");
-
-    // Idempotency: skip recalculation if already completed
-    if (session.isCompleted) return;
-
-    // Extract answers as { questionId: rawScore }
-    const answers = (session.answers as Record<string, any>) || {};
-    const answersMap: Record<number, number> = {};
-
-    Object.keys(answers).forEach((k) => {
-        answersMap[parseInt(k)] = answers[k].score;
-    });
-
-    // Build userProfile object from session data
-    const userProfile = {
-        userGender: session.userGender,
-        partnerGender: session.partnerGender,
-        userAgeRange: session.userAgeRange,
-        partnerAgeRange: session.partnerAgeRange,
-        relationshipStatus: session.relationshipStatus,
-        relationshipDuration: session.relationshipDuration,
-        livingTogether: session.livingTogether,
-        hasChildren: session.hasChildren,
-        previousRelationships: session.previousRelationships,
-        previousMarriage: session.previousMarriage,
-        majorLifeTransition: session.majorLifeTransition,
-        partnerConflictStyle: session.partnerConflictStyle,
-        fightFrequency: session.fightFrequency,
-        repairFrequency: session.repairFrequency,
-        partnerHurtfulBehavior: session.partnerHurtfulBehavior,
-        biggestFear: session.biggestFear
-    };
-
-    // Calculate detailed scores WITH user profile data
-    const scoreResult = calculateScore(answersMap, userProfile);
-    const advancedMetrics = calculateAdvancedMetrics(answers, userProfile);
-
-    await context.entities.TestSession.update({
-        where: { id: sessionId },
-        data: {
-            isCompleted: true,
-            scores: scoreResult as any,
-            advancedMetrics: advancedMetrics as any,
-            emailSequenceType: !session.isPaid ? "teaser_viewer" : undefined,
-        },
-    });
-
-
-};
-
-type ClaimSessionArgs = { sessionId: string };
-
-export const claimSession = async ({ sessionId }: ClaimSessionArgs, context: any) => {
-    if (!context.user) throw new HttpError(401, "Must be logged in to claim session");
-
-    const session = await context.entities.TestSession.findUnique({ where: { id: sessionId } });
-    if (!session) throw new HttpError(404, "Session not found");
-
-    // If session is already linked to ME, do nothing
-    if (session.userId === context.user.id) return;
-
-    // If session is linked to SOMEONE ELSE, forbid
-    if (session.userId) {
-        throw new HttpError(403, "Session already owned by another user");
-    }
-
-    // Link it
-    await context.entities.TestSession.update({
-        where: { id: sessionId },
-        data: { userId: context.user.id }
-    });
-};
+// --- Kept Operations ---
 
 type UpdateConflictArgs = { sessionId: string; description: string };
 
@@ -421,7 +389,6 @@ export const updateConflictDescription = async ({ sessionId, description }: Upda
     return session;
 };
 
-// --- Update Session Activity ---
 type UpdateSessionActivityArgs = {
     sessionId: string;
     sessionDuration?: number;

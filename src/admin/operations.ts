@@ -1,6 +1,6 @@
 
 import { type TestSession, type User } from "wasp/entities";
-import { type GetTestSessions, type GetSessionDetail, type GetFunnelStats, type GetDemographicStats, type GetEmailStats, type GetAiLogs, type GetSessionAnalytics } from "wasp/server/operations";
+import { type GetTestSessions, type GetSessionDetail, type GetFunnelStats, type GetDemographicStats, type GetEmailStats, type GetAiLogs, type GetSessionAnalytics, type GetQuizFunnelStats } from "wasp/server/operations";
 import { HttpError } from "wasp/server";
 
 // --- Types ---
@@ -174,24 +174,26 @@ export const getFunnelStats: GetFunnelStats<void, FunnelStats> = async (_args, c
         throw new HttpError(401, "Unauthorized");
     }
 
-    const started = await context.entities.TestSession.count();
+    // Filter: only active (non-archived) sessions, plus paid sessions
+    const activeFilter = { OR: [{ isArchived: false }, { isPaid: true }] };
+
+    const started = await context.entities.TestSession.count({ where: activeFilter });
 
     // Wizard Steps (onboardingStep)
-    // Step 1 Completed means onboardingStep >= 1
-    const step1 = await context.entities.TestSession.count({ where: { onboardingStep: { gte: 1 } } });
-    const step2 = await context.entities.TestSession.count({ where: { onboardingStep: { gte: 2 } } });
-    const step3 = await context.entities.TestSession.count({ where: { onboardingStep: { gte: 3 } } });
-    const step4 = await context.entities.TestSession.count({ where: { onboardingStep: { gte: 4 } } });
+    const step1 = await context.entities.TestSession.count({ where: { ...activeFilter, onboardingStep: { gte: 1 } } });
+    const step2 = await context.entities.TestSession.count({ where: { ...activeFilter, onboardingStep: { gte: 2 } } });
+    const step3 = await context.entities.TestSession.count({ where: { ...activeFilter, onboardingStep: { gte: 3 } } });
+    const step4 = await context.entities.TestSession.count({ where: { ...activeFilter, onboardingStep: { gte: 4 } } });
 
-    const onboarding = await context.entities.TestSession.count({ where: { onboardingStep: { gt: 0 } } }); // Keeping legacy metric
-    const emailCaptured = await context.entities.TestSession.count({ where: { email: { not: null } } });
-    const completed = await context.entities.TestSession.count({ where: { isCompleted: true } });
+    const onboarding = await context.entities.TestSession.count({ where: { ...activeFilter, onboardingStep: { gt: 0 } } });
+    const emailCaptured = await context.entities.TestSession.count({ where: { ...activeFilter, email: { not: null } } });
+    const completed = await context.entities.TestSession.count({ where: { ...activeFilter, isCompleted: true } });
     const paid = await context.entities.TestSession.count({ where: { isPaid: true } });
 
     // Detailed Question Funnel
-    // Get distribution of users by their current question index
     const progressGroups = await context.entities.TestSession.groupBy({
         by: ['currentQuestionIndex'],
+        where: activeFilter,
         _count: { currentQuestionIndex: true }
     });
 
@@ -201,8 +203,8 @@ export const getFunnelStats: GetFunnelStats<void, FunnelStats> = async (_args, c
         progressMap.set(g.currentQuestionIndex, g._count.currentQuestionIndex);
     });
 
-    // Calculate funnel for each question (1 to 28)
-    const totalQuestions = 28;
+    // Calculate funnel for each question (1 to 30)
+    const totalQuestions = 30;
     const questionCounts: number[] = [];
 
     // For each question Q_i (1-indexed), the number of people who "reached" it
@@ -251,6 +253,8 @@ export const getConversionFunnelMetrics = async (_args: void, context: any): Pro
         throw new HttpError(401, "Unauthorized");
     }
 
+    const activeFilter = { OR: [{ isArchived: false }, { isPaid: true }] as any[] };
+
     const [
         totalSessions,
         testStarted,
@@ -259,12 +263,11 @@ export const getConversionFunnelMetrics = async (_args: void, context: any): Pro
         checkoutStarted,
         purchased
     ] = await Promise.all([
-        // Total sessions created
-        context.entities.TestSession.count(),
+        context.entities.TestSession.count({ where: activeFilter }),
 
-        // Test started = anyone who progressed past initial creation (onboardingStep > 0 OR currentQuestionIndex > 0)
         context.entities.TestSession.count({
             where: {
+                ...activeFilter,
                 OR: [
                     { onboardingStep: { gt: 0 } },
                     { currentQuestionIndex: { gt: 0 } }
@@ -272,22 +275,18 @@ export const getConversionFunnelMetrics = async (_args: void, context: any): Pro
             }
         }),
 
-        // Email captured
         context.entities.TestSession.count({
-            where: { email: { not: null } }
+            where: { ...activeFilter, email: { not: null } }
         }),
 
-        // Results viewed = completed test
         context.entities.TestSession.count({
-            where: { isCompleted: true }
+            where: { ...activeFilter, isCompleted: true }
         }),
 
-        // Checkout started
         context.entities.TestSession.count({
-            where: { checkoutStartedAt: { not: null } }
+            where: { ...activeFilter, checkoutStartedAt: { not: null } }
         }),
 
-        // Purchased
         context.entities.TestSession.count({
             where: { isPaid: true }
         })
@@ -573,6 +572,53 @@ export const getSessionAnalytics: GetSessionAnalytics<GetSessionAnalyticsArgs, S
             completionRate: totalStarted > 0 ? (totalLeads / totalStarted) * 100 : 0 // Proxying completion as lead capture for now
         },
         dailyStats
+    };
+};
+
+// Quiz Funnel Stats from QuizEvent (anonymous tracking) + TestSession (post-email)
+type QuizFunnelStatsResult = {
+    quizStarts: number;
+    quizAbandons: number;
+    leads: number;
+    purchased: number;
+    startToLeadRate: number;
+    leadToPurchaseRate: number;
+    dropOffDistribution: { questionIndex: number; count: number }[];
+};
+
+export const getQuizFunnelStats: GetQuizFunnelStats<void, QuizFunnelStatsResult> = async (_args, context) => {
+    if (!context.user?.isAdmin) {
+        throw new HttpError(401, "Unauthorized");
+    }
+
+    const [quizStarts, quizAbandons, leads, purchased] = await Promise.all([
+        context.entities.QuizEvent.count({ where: { type: 'quiz_start' } }),
+        context.entities.QuizEvent.count({ where: { type: 'quiz_abandon' } }),
+        context.entities.TestSession.count({ where: { email: { not: null }, OR: [{ isArchived: false }, { isPaid: true }] } }),
+        context.entities.TestSession.count({ where: { isPaid: true } }),
+    ]);
+
+    // Drop-off distribution: group abandons by question index
+    const dropOffGroups = await context.entities.QuizEvent.groupBy({
+        by: ['questionIndex'],
+        where: { type: 'quiz_abandon', questionIndex: { not: null } },
+        _count: { questionIndex: true },
+        orderBy: { questionIndex: 'asc' },
+    });
+
+    const dropOffDistribution = dropOffGroups.map((g: any) => ({
+        questionIndex: g.questionIndex as number,
+        count: g._count.questionIndex as number,
+    }));
+
+    return {
+        quizStarts,
+        quizAbandons,
+        leads,
+        purchased,
+        startToLeadRate: quizStarts > 0 ? Math.round((leads / quizStarts) * 100) : 0,
+        leadToPurchaseRate: leads > 0 ? Math.round((purchased / leads) * 100) : 0,
+        dropOffDistribution,
     };
 };
 

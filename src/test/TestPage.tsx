@@ -1,17 +1,15 @@
-import React, { useEffect, useState } from "react";
-import { Link, useNavigate } from "react-router";
-import { startTest, submitAnswer, completeTest, getTestSession, useQuery, captureLead, updateConflictDescription, updateWizardProgress, updateSessionActivity, generateQuickOverview, assessNarcissism, getSystemConfig } from "wasp/client/operations";
+import React, { useEffect, useState, useRef } from "react";
+import { useNavigate } from "react-router";
+import { saveCompletedTest, trackQuizEvent, getTestSession, useQuery, generateQuickOverview, assessNarcissism } from "wasp/client/operations";
+import { login, useAuth } from "wasp/client/auth";
 import { routes } from "wasp/client/router";
-import { Loader2, Mail, MessageSquare, ChevronLeft, BadgeCheck, AlertTriangle, Activity, ShieldCheck, Lock as LockIcon, Check } from "lucide-react";
+import { Loader2, Mail, ChevronLeft, BadgeCheck, Activity, ShieldCheck, Lock as LockIcon } from "lucide-react";
 import { cn } from "../client/utils";
 import { ProcessingOverlay } from "./ProcessingOverlay";
 import { trackPixelEvent } from "../analytics/pixel";
 import { generateEventId } from "../analytics/eventId";
 import { getDeviceInfo } from "../client/utils/deviceDetection";
-// import { useSessionTracking } from "../client/hooks/useSessionTracking"; // DISABLED - causing excessive DB writes
 
-// --- Data: Questions ---
-// Imported from config
 import { TEST_CONFIG } from "./testConfig";
 
 const QUESTIONS = TEST_CONFIG.questions;
@@ -19,406 +17,205 @@ const ANSWERS = TEST_CONFIG.answerOptions;
 
 export default function TestPage() {
     const navigate = useNavigate();
+    const { data: user } = useAuth();
 
-    // 1. Get Session ID from LocalStorage if available
-    const localSessionId = typeof window !== 'undefined' ? localStorage.getItem("uyp-session-id") : null;
+    // Check if logged-in user already has an active session → redirect
+    const { data: existingSession, isLoading: isSessionLoading } = useQuery(
+        getTestSession,
+        {},
+        { enabled: !!user }
+    );
 
-    // 2. Query for existing session
-    const { data: existingSession, isLoading: isSessionLoading } = useQuery(getTestSession, {
-        sessionId: localSessionId || undefined
-    });
+    // Phase: loading → wizard → questions → email-gate → analyzing
+    const [phase, setPhase] = useState<'loading' | 'wizard' | 'questions' | 'email-gate' | 'analyzing'>(user ? 'loading' : 'wizard');
 
-    // 3. Query for System Config
-    const { data: systemConfig } = useQuery(getSystemConfig);
-    const enableSoftGate = systemConfig?.enableSoftGate ?? false;
-    // Hard Gate is ENABLED if Soft Gate is DISABLED.
-    const isHardGateEnabled = !enableSoftGate;
-
-    const [sessionId, setSessionId] = useState<string | null>(null);
+    // Client-side quiz state (NO DB writes until email submission)
+    const [wizardData, setWizardData] = useState<any>(null);
+    const [answers, setAnswers] = useState<Record<number, { answerId: number; score: number; dimension: string; type: string }>>({});
     const [currentQIndex, setCurrentQIndex] = useState(0);
     const [selectedAnswer, setSelectedAnswer] = useState<number | null>(null);
+    const [localAnswers, setLocalAnswers] = useState<Record<number, number>>({});
     const [isSubmitting, setIsSubmitting] = useState(false);
-    const [localAnswers, setLocalAnswers] = useState<Record<number, number>>({}); // qIndex -> answerId
-
-    // Gates
     const [email, setEmail] = useState("");
-    const [showEmailGate, setShowEmailGate] = useState(false);
 
-    // NEW: Conflict Gate
-    const [conflictText, setConflictText] = useState("");
-    const [showConflictGate, setShowConflictGate] = useState(false);
-
-    // NEW: Lead Magnet Optimization
-    const [isAnalyzing, setIsAnalyzing] = useState(false);
-    const [analysisData, setAnalysisData] = useState<{ quickOverview?: any, narcissism?: any } | null>(null);
-
-    // Session tracking - DISABLED due to excessive database writes
-    // TODO: Optimize this to batch updates or reduce frequency
-    /*
-    const { trackPageView, getTrackingData } = useSessionTracking({
-        sessionId: sessionId || '',
-        onUpdate: async (data) => {
-            if (sessionId) {
-                try {
-                    await updateSessionActivity({
-                        sessionId,
-                        sessionDuration: data.sessionDuration,
-                        pageViews: data.pageViews,
-                        interactionEvents: data.interactionEvents,
-                    });
-                } catch (e) {
-                    console.error('Failed to update session activity', e);
-                }
-            }
-        },
-        updateInterval: 30000, // 30 seconds
+    // Attribution & device info (captured once on mount)
+    const [attribution] = useState(() => {
+        try {
+            const params = new URLSearchParams(window.location.search);
+            return {
+                fbclid: params.get('fbclid') || localStorage.getItem('uyp_fbclid') || undefined,
+                utm_source: params.get('utm_source') || localStorage.getItem('uyp_utm_source') || undefined,
+                utm_medium: params.get('utm_medium') || localStorage.getItem('uyp_utm_medium') || undefined,
+                utm_campaign: params.get('utm_campaign') || localStorage.getItem('uyp_utm_campaign') || undefined,
+                utm_content: params.get('utm_content') || localStorage.getItem('uyp_utm_content') || undefined,
+                utm_term: params.get('utm_term') || localStorage.getItem('uyp_utm_term') || undefined,
+                referrer: document.referrer || undefined,
+            };
+        } catch { return {}; }
     });
-    */
+    const [deviceInfo] = useState(() => getDeviceInfo());
 
-    // Sync session ID to local storage whenever it changes
-    useEffect(() => {
-        if (sessionId) {
-            localStorage.setItem("uyp-session-id", sessionId);
-        }
-    }, [sessionId]);
+    const isAdvancing = useRef(false);
+    const quizStartTracked = useRef(false);
 
     // Track ViewContent on mount
     useEffect(() => {
         trackPixelEvent('ViewContent', { content_name: 'Relationship Test' });
     }, []);
 
-    // State for Profile Form
-    const [showProfileForm, setShowProfileForm] = useState(false);
-
-    // Prevents quiz flash before session check runs
-    const [isSessionChecked, setIsSessionChecked] = useState(false);
-
-    // Guard against double-initialization
-    const isCreatingSession = React.useRef(false);
-    // Guard against double-advance
-    const isAdvancing = React.useRef(false);
-
+    // Redirect logged-in user with existing session
     useEffect(() => {
-        const handleSessionCheck = async () => {
-            if (isSessionLoading) return;
-
-            if (existingSession) {
-                // If session exists
-                if (existingSession.isCompleted) {
-                    // Lead Magnet Optimization:
-                    // Only redirect if we have everything we need (Email provided OR Gate Disabled)
-                    // Or if they already paid.
-                    const hasEmail = !!existingSession.email;
-                    const isPaid = !!existingSession.isPaid;
-
-                    // Logic Update: If Hard Gate is ENABLED, we force email.
-                    // If Hard Gate is DISABLED (Soft Gate ON), we allow through if completed.
-                    const canProceed = isPaid || hasEmail || !isHardGateEnabled;
-
-                    if (canProceed) {
-                        navigate(routes.TeaserRoute.build());
-                        return;
-                    }
-                    // Otherwise: Stay here to show Email Gate
-                }
-                setSessionId(existingSession.id);
-
-
-                // If we have a session, assume we might be resuming
-                // Check if wizard is done (we can infer this from profile data being present, e.g., gender)
-                const isWizardDone = !!existingSession.userGender;
-
-                if (isWizardDone) {
-                    setShowProfileForm(false);
-                    // Set Q index
-                    const savedIndex = existingSession.currentQuestionIndex || 0;
-                    if (savedIndex >= QUESTIONS.length) {
-                        setShowEmailGate(true);
-                        // Hydrate analysis data if available
-                        if (existingSession.quickOverview || existingSession.narcissismAnalysis) {
-                            setAnalysisData({
-                                quickOverview: existingSession.quickOverview,
-                                narcissism: existingSession.narcissismAnalysis
-                            });
-                        }
-                    } else {
-                        setCurrentQIndex(savedIndex);
-                    }
-                } else {
-                    // Wizard not done, show it (with pre-filled data if any)
-                    setShowProfileForm(true);
-                }
-
-                setIsSessionChecked(true);
+        if (!user) { setPhase('wizard'); return; }
+        if (isSessionLoading) return;
+        if (existingSession) {
+            if (existingSession.isPaid) {
+                navigate('/report');
             } else {
-                // No session found.
-                // If we had a localSessionId but query returned null, it's invalid.
-                if (localSessionId) {
-                    localStorage.removeItem("uyp-session-id");
-                }
-
-                // Create "Guest Session" IMMEDIATELY
-                if (isCreatingSession.current) return;
-                isCreatingSession.current = true;
-
-                try {
-                    // Get fbclid and UTMs from local storage if available
-                    const { getFbclid, getUtmParams } = await import("../analytics/utils");
-                    const fbclid = getFbclid();
-                    const utms = getUtmParams();
-
-                    // Capture device information
-                    const deviceInfo = getDeviceInfo();
-
-                    const newSession = await startTest({
-                        fbclid: fbclid || undefined,
-                        ...utms,
-                        ...deviceInfo
-                    } as any);
-                    setSessionId(newSession.id);
-                    localStorage.setItem("uyp-session-id", newSession.id);
-                    setShowProfileForm(true);
-                } catch (e) {
-                    console.error("Failed to create guest session", e);
-                } finally {
-                    isCreatingSession.current = false;
-                    setIsSessionChecked(true);
-                }
+                navigate('/results');
             }
+        } else {
+            setPhase('wizard');
+        }
+    }, [user, existingSession, isSessionLoading, navigate]);
+
+    // Track quiz abandon on page unload
+    useEffect(() => {
+        if (phase !== 'questions') return;
+        const handleUnload = () => {
+            trackQuizEvent({
+                type: 'quiz_abandon',
+                questionIndex: currentQIndex,
+                deviceType: deviceInfo?.deviceType,
+                referrer: attribution?.referrer,
+                utm_source: attribution?.utm_source,
+                utm_medium: attribution?.utm_medium,
+            }).catch(() => {});
         };
+        window.addEventListener('beforeunload', handleUnload);
+        return () => window.removeEventListener('beforeunload', handleUnload);
+    }, [phase, currentQIndex, deviceInfo, attribution]);
 
-        handleSessionCheck();
-    }, [existingSession, isSessionLoading, navigate]);
+    // Wizard completed → start questions
+    const handleProfileSubmit = (data: any) => {
+        setWizardData(data);
+        setPhase('questions');
 
-    // Wizard is now just updating the DB
-    const handleProfileSubmit = async (data: any) => {
-        setIsSubmitting(true);
-        try {
-            if (!sessionId) return;
-            // Final save of demographics
-            await updateWizardProgress({ sessionId, ...data });
-            setShowProfileForm(false);
-        } catch (e) {
-            console.error("Failed to save wizard data", e);
-            alert("Error initializing test.");
-        } finally {
-            setIsSubmitting(false);
+        if (!quizStartTracked.current) {
+            quizStartTracked.current = true;
+            trackPixelEvent('CustomEvent', { content_name: 'QuizStart' });
+            trackQuizEvent({
+                type: 'quiz_start',
+                deviceType: deviceInfo?.deviceType,
+                referrer: attribution?.referrer,
+                utm_source: attribution?.utm_source,
+                utm_medium: attribution?.utm_medium,
+            }).catch(() => {});
         }
     };
-
-    const isLoading = (isSessionLoading || !isSessionChecked) && !showProfileForm; // Don't show loader if form is ready
 
     const currentQuestion = QUESTIONS[currentQIndex];
     const progressPercentage = ((currentQIndex) / QUESTIONS.length) * 100;
 
     const handleOptionClick = (answerId: number) => {
         if (isSubmitting || isAdvancing.current) return;
-
         setSelectedAnswer(answerId);
         isAdvancing.current = true;
-
-        // Auto-advance after small delay for visual feedback
-        setTimeout(() => {
-            handleNext(answerId);
-        }, 250);
+        setTimeout(() => { handleNext(answerId); }, 250);
     };
 
-    const handleNext = async (answerIdOverride?: number) => {
-        // Use override if provided (for auto-advance), otherwise state
+    const handleNext = (answerIdOverride?: number) => {
         const answerId = answerIdOverride ?? selectedAnswer;
-
-        if (!sessionId || answerId === null) {
-            isAdvancing.current = false;
-            return;
-        }
-        if (!currentQuestion) {
+        if (answerId === null || !currentQuestion) {
             isAdvancing.current = false;
             return;
         }
 
-        setIsSubmitting(true);
-        try {
-            const answerObj = ANSWERS.find(a => a.id === answerId);
+        const answerObj = ANSWERS.find(a => a.id === answerId);
 
-            await submitAnswer({
-                sessionId,
-                questionId: currentQuestion.id,
-                answerId: answerId,
-                score: answerObj?.score || 3, // Raw score 1-5
+        // Store answer in local state (NO DB call)
+        setAnswers(prev => ({
+            ...prev,
+            [currentQuestion.id]: {
+                answerId,
+                score: answerObj?.score || 3,
                 dimension: currentQuestion.dimension,
-                type: currentQuestion.type
-            });
-
-            // Track answer locally for back-navigation restoration
-            setLocalAnswers(prev => ({ ...prev, [currentQIndex]: answerId }));
-
-            if (currentQIndex < QUESTIONS.length - 1) {
-                setCurrentQIndex(prev => prev + 1);
-                setSelectedAnswer(null);
-            } else {
-                // Finished Questions -> Trigger Analysis IMMEDIATELY
-                await triggerAnalysis();
+                type: currentQuestion.type,
             }
+        }));
+        setLocalAnswers(prev => ({ ...prev, [currentQIndex]: answerId }));
 
-        } catch (e) {
-            console.error("Error submitting answer", e);
-            alert("Errore di connessione. Riprova.");
-        } finally {
-            setIsSubmitting(false);
-            isAdvancing.current = false;
+        if (currentQIndex < QUESTIONS.length - 1) {
+            setCurrentQIndex(prev => prev + 1);
+            setSelectedAnswer(null);
+        } else {
+            setPhase('email-gate');
         }
+
+        isAdvancing.current = false;
     };
-
-    const triggerAnalysis = async () => {
-        setIsAnalyzing(true);
-        setShowConflictGate(false); // Ensure this is hidden
-        // Ensure email gate is hidden until analysis is done
-        setShowEmailGate(false);
-
-        try {
-            // NEW: Lead Magnet Optimization - Trigger Analysis on Quiz Completion
-            const startTime = Date.now();
-
-            if (!sessionId) {
-                console.error("No sessionId available for analysis");
-                setShowEmailGate(true); // Fallback
-                return;
-            }
-
-            // Lead Magnet Optimization:
-            // 1. Mark test as complete and Calculate Metrics FIRST
-            // This ensures 'advancedMetrics' are popualared in the DB so the AI has data to work with.
-            await completeTest({ sessionId });
-
-            // 2. Run parallel AI requests
-            const [quickOverviewRes, narcissismRes] = await Promise.allSettled([
-                generateQuickOverview({ sessionId }),
-                assessNarcissism({ sessionId })
-            ]);
-
-            const quickOverview = quickOverviewRes.status === 'fulfilled' ? quickOverviewRes.value : null;
-            const narcissism = narcissismRes.status === 'fulfilled' ? narcissismRes.value?.json : null;
-
-            setAnalysisData({
-                quickOverview: quickOverview?.json,
-                narcissism: narcissism
-            });
-
-            // Ensure minimum display time for the "Analyzing..." effect (e.g. 4 seconds)
-            const elapsedTime = Date.now() - startTime;
-            const minTime = 4000;
-            if (elapsedTime < minTime) {
-                await new Promise(resolve => setTimeout(resolve, minTime - elapsedTime));
-            }
-
-            // Track Test Completion (Pixel)
-            trackPixelEvent('SubmitApplication', { status: 'completed' });
-
-            if (isHardGateEnabled) {
-                setShowEmailGate(true);
-            } else {
-                // If gate disabled (Soft Gate Mode), go straight to results (we already waited)
-                navigate(routes.TeaserRoute.build());
-            }
-
-        } catch (err) {
-            console.error("Analysis failed:", err);
-            // Fallback: Show email gate anyway if enabled
-            if (isHardGateEnabled) {
-                setShowEmailGate(true);
-            } else {
-                navigate(routes.TeaserRoute.build());
-            }
-        } finally {
-            setIsAnalyzing(false);
-        }
-    };
-
-    // Removed handleConflictSubmit as it's no longer used
-    /*
-    const handleConflictSubmit = async (e: React.FormEvent) => {
-        e.preventDefault();
-        if (!sessionId) return;
-
-        // Validation: Min 50 chars (Relationship Spec)
-        if (conflictText.length < 50) {
-            alert("Please describe the situation in more detail (at least 50 characters) so our AI can analyze it accurately.");
-            return;
-        }
-
-        setIsSubmitting(true);
-        setIsAnalyzing(true); // Show Overlay
-
-        try {
-            await updateConflictDescription({ sessionId, description: conflictText });
-
-            // RUN ANALYSIS NOW (Lead Magnet Optimization)
-            const startTime = Date.now();
-
-            // Run parallel requests
-            const [quickOverviewRes, narcissismRes] = await Promise.allSettled([
-                generateQuickOverview({ sessionId }),
-                assessNarcissism({ sessionId })
-            ]);
-
-            const quickOverview = quickOverviewRes.status === 'fulfilled' ? quickOverviewRes.value : null;
-            const narcissism = narcissismRes.status === 'fulfilled' ? narcissismRes.value?.json : null;
-
-            setAnalysisData({
-                quickOverview: quickOverview?.json,
-                narcissism: narcissism
-            });
-
-            // Ensure minimum display time for the "Analyzing..." effect (e.g. 4 seconds)
-            const elapsedTime = Date.now() - startTime;
-            const minTime = 4000;
-            if (elapsedTime < minTime) {
-                await new Promise(resolve => setTimeout(resolve, minTime - elapsedTime));
-            }
-
-            setShowConflictGate(false);
-            setShowEmailGate(true);
-        } catch (err) {
-            console.error(err);
-            // Even if analysis fails, we still want to move to email gate (just without juicy data)
-            setShowConflictGate(false);
-            setShowEmailGate(true);
-        } finally {
-            setIsSubmitting(false);
-            setIsAnalyzing(false);
-        }
-    };
-    */
 
     const handleEmailSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-        if (!email || !sessionId) return;
+        if (!email || !wizardData) return;
         setIsSubmitting(true);
+        setPhase('analyzing');
 
-        // Generate Event ID for deduplication
         const eventID = generateEventId();
+        trackPixelEvent('Lead', { eventID });
 
         try {
-            await captureLead({ sessionId, email, eventID });
-            // completeTest was already called in triggerAnalysis
-            // await completeTest({ sessionId });
+            const startTime = Date.now();
 
-            // Add Client Pixel Event (was missing)
-            trackPixelEvent('Lead', { eventID });
+            // Single atomic server call: create user + session + scores
+            const result = await saveCompletedTest({
+                email,
+                profile: wizardData,
+                answers,
+                attribution: attribution as any,
+                deviceInfo: deviceInfo as any,
+                eventID,
+            });
 
-            // Small delay to ensure Pixel event has time to fire before navigation
-            await new Promise(resolve => setTimeout(resolve, 300));
+            // Store session ID for downstream pages
+            localStorage.setItem("uyp-session-id", result.sessionId);
 
+            // Auto-login the user
+            await login({ email: result.email, password: result.loginToken });
+
+            // Fire-and-forget AI analysis
+            Promise.allSettled([
+                generateQuickOverview({ sessionId: result.sessionId }),
+                assessNarcissism({ sessionId: result.sessionId }),
+            ]);
+
+            // Minimum display time for processing overlay
+            const elapsed = Date.now() - startTime;
+            if (elapsed < 4000) {
+                await new Promise(resolve => setTimeout(resolve, 4000 - elapsed));
+            }
+
+            trackPixelEvent('SubmitApplication', { status: 'completed' });
             navigate(routes.TeaserRoute.build());
         } catch (err) {
-            console.error(err);
-            alert("Errore. Riprova");
+            console.error("Failed to save test:", err);
+            setPhase('email-gate');
+            alert("Something went wrong. Please try again.");
         } finally {
             setIsSubmitting(false);
         }
     };
 
-    if (isLoading) {
+    const handleBack = () => {
+        if (currentQIndex > 0) {
+            const prevIndex = currentQIndex - 1;
+            setCurrentQIndex(prevIndex);
+            setSelectedAnswer(localAnswers[prevIndex] ?? null);
+        }
+    };
+
+    // --- RENDER ---
+
+    if (phase === 'loading') {
         return (
             <div className="flex h-dvh w-full items-center justify-center bg-background">
                 <Loader2 className="animate-spin text-primary" size={48} />
@@ -426,20 +223,15 @@ export default function TestPage() {
         );
     }
 
-    // Global Processing Overlay (for when analysis is triggered after quiz)
-    if (isAnalyzing) {
-        return <ProcessingOverlay isVisible={isAnalyzing} />;
+    if (phase === 'analyzing') {
+        return <ProcessingOverlay isVisible={true} />;
     }
 
-    // PROFILE FORM UI (Now QuizWizard)
-    if (showProfileForm) {
-        return <QuizWizard onSubmit={handleProfileSubmit} isSubmitting={isSubmitting} sessionId={sessionId} />;
+    if (phase === 'wizard') {
+        return <QuizWizard onSubmit={handleProfileSubmit} isSubmitting={isSubmitting} />;
     }
 
-    // CONFLICT GATE UI (Removed per user request)
-
-    // EMAIL GATE UI
-    if (showEmailGate || (!currentQuestion && !isLoading && sessionId)) {
+    if (phase === 'email-gate') {
         return (
             <div className="min-h-dvh bg-background flex flex-col items-center justify-start pt-8 md:pt-12 p-4 md:p-6 animate-fade-in overflow-y-auto">
                 <div className="max-w-lg w-full bg-card p-6 md:p-8 rounded-2xl shadow-xl border border-border">
@@ -448,80 +240,19 @@ export default function TestPage() {
                     </div>
 
                     <h2 className="text-2xl md:text-3xl font-bold mb-4 md:mb-6 text-center">
-                        {analysisData?.quickOverview ? "Your Relationship Profile is Ready" : "Generating Your Relationship Profile"}
+                        Your Relationship Profile is Ready
                     </h2>
 
-
-                    {analysisData?.quickOverview ? (
-                        <div className="animate-fade-in space-y-6">
-                            {/* Analysis Complete Badge */}
-                            <div className="flex items-center justify-center gap-2 text-green-600 bg-green-50 dark:bg-green-900/20 py-2 px-4 rounded-full w-fit mx-auto mb-4 border border-green-200">
-                                <BadgeCheck size={18} className="fill-green-100 dark:fill-green-900" />
-                                <span className="font-bold text-sm tracking-wide uppercase">Analysis Complete</span>
-                            </div>
-
-                            {/* Primary Result Card */}
-                            <div className="bg-card border-2 border-primary/20 rounded-2xl p-6 shadow-lg transform transition-all hover:scale-[1.01] relative overflow-hidden">
-                                <div className="absolute top-0 left-0 w-full h-1 bg-linear-to-r from-primary via-purple-500 to-indigo-500"></div>
-
-                                <div className="text-center mb-6">
-                                    {/* Headline */}
-                                    <h3 className="text-lg font-bold text-foreground mb-2 leading-tight">
-                                        "{analysisData.quickOverview.hero.headline}"
-                                    </h3>
-
-                                    {/* Primary Diagnosis */}
-                                    <div className="text-3xl md:text-4xl font-black text-foreground leading-tight bg-clip-text text-transparent bg-linear-to-r from-primary to-purple-600 mb-4">
-                                        {analysisData.quickOverview.pulse.primary_diagnosis}
-                                    </div>
-
-                                    {/* Result Badge */}
-                                    <div className="inline-block px-3 py-1 rounded-full bg-primary/10 text-primary font-bold text-xs uppercase tracking-wider border border-primary/20">
-                                        {analysisData.quickOverview.hero.result_badge}
-                                    </div>
-                                </div>
-
-                                {/* Risk Level & Red Flags Grid */}
-                                <div className="grid grid-cols-2 gap-4 mb-6">
-                                    {(analysisData.narcissism?.partner_analysis?.risk_level === "High" || analysisData.narcissism?.partner_analysis?.risk_level === "Severe") && (
-                                        <div className={cn("p-3 rounded-xl border text-center flex flex-col items-center justify-center bg-red-50 border-red-200 text-red-700")}>
-                                            <div className="text-[10px] font-bold uppercase opacity-75 mb-1">Toxicity Risk</div>
-                                            <div className="font-black text-lg flex items-center justify-center gap-1">
-                                                <AlertTriangle size={16} />
-                                                {analysisData.narcissism.partner_analysis.risk_level}
-                                            </div>
-                                        </div>
-                                    )}
-                                    <div className="p-3 rounded-xl border bg-orange-50 border-orange-200 text-orange-800 text-center flex flex-col items-center justify-center">
-                                        <div className="text-[10px] font-bold uppercase opacity-75 mb-1">Red Flags Detected</div>
-                                        <div className="font-black text-lg flex items-center gap-1">
-                                            <AlertTriangle size={16} />
-                                            {analysisData.narcissism?.relationship_health?.red_flags?.length || 0} Critical
-                                        </div>
-                                    </div>
-                                </div>
-
-                                {/* Value Prop Teaser */}
-                                <div className="bg-muted/50 rounded-xl p-4 text-sm text-muted-foreground leading-relaxed border border-border/50">
-                                    <p className="font-medium text-foreground mb-1">Your Full Report is Ready.</p>
-                                    <p>
-                                        We've mapped out exactly how this pattern started, why it's escalating, and the <strong>specific roadmap</strong> to break free before it's too late.
-                                    </p>
-                                </div>
-                            </div>
+                    <div className="bg-muted/30 rounded-xl p-6 mb-8 text-center space-y-4 border border-border">
+                        <h3 className="text-xl font-bold">Your Profile is Ready</h3>
+                        <p className="text-muted-foreground leading-relaxed">
+                            We've analyzed your answers against 5 key relationship dimensions. Your results include a detailed breakdown of your conflict style, hidden emotional needs, and a personalized roadmap to connection.
+                        </p>
+                        <div className="flex justify-center gap-4 text-sm font-medium text-muted-foreground">
+                            <span className="flex items-center gap-1"><BadgeCheck size={16} className="text-green-500" /> Confidential</span>
+                            <span className="flex items-center gap-1"><Activity size={16} className="text-primary" /> Clinical-Grade</span>
                         </div>
-                    ) : (
-                        <div className="bg-muted/30 rounded-xl p-6 mb-8 text-center space-y-4 border border-border">
-                            <h3 className="text-xl font-bold">Your Profile is Ready</h3>
-                            <p className="text-muted-foreground leading-relaxed">
-                                We've analyzed your answers against 5 key relationship dimensions. Your results include a detailed breakdown of your conflict style, hidden emotional needs, and a personalized roadmap to connection.
-                            </p>
-                            <div className="flex justify-center gap-4 text-sm font-medium text-muted-foreground">
-                                <span className="flex items-center gap-1"><BadgeCheck size={16} className="text-green-500" /> Confidential</span>
-                                <span className="flex items-center gap-1"><Activity size={16} className="text-primary" /> Clinical-Grade</span>
-                            </div>
-                        </div>
-                    )}
+                    </div>
 
                     <form onSubmit={handleEmailSubmit} className="space-y-4">
                         <div>
@@ -542,7 +273,7 @@ export default function TestPage() {
                             <button
                                 type="submit"
                                 disabled={isSubmitting}
-                                className="w-full py-4 rounded-full bg-primary text-primary-foreground font-bold text-lg shadow-2xl hover:shadow-3xl hover:bg-primary/90 hover:scale-105 transition-all flex items-center justify-center gap-2 group overflow-hidden relative"
+                                className="w-full py-4 rounded-xl bg-primary text-primary-foreground font-bold text-lg hover:shadow-lg hover:bg-primary/90 transition-all flex items-center justify-center gap-2 group overflow-hidden relative"
                             >
                                 <span className="relative z-10 flex items-center gap-2">
                                     {isSubmitting ? <Loader2 className="animate-spin" /> : <LockIcon size={20} />}
@@ -550,22 +281,22 @@ export default function TestPage() {
                                 </span>
                                 <div className="absolute inset-0 bg-white/20 translate-y-full group-hover:translate-y-0 transition-transform duration-300"></div>
                             </button>
-                            <p className="text-xs text-center text-muted-foreground mt-3 flex items-center justify-center gap-1.5">
-                                <ShieldCheck size={12} className="text-success" />
+                            <p className="text-xs text-center text-muted-foreground mt-3 flex items-center justify-center gap-1.5 opacity-80">
+                                <ShieldCheck size={12} className="text-green-600" />
                                 100% Secure. We respect your privacy & zero spam.
                             </p>
                         </div>
-                        <div className="bg-primary/5 rounded-xl p-3 text-left space-y-1.5 border border-primary/10">
-                            <div className="flex items-center gap-2 text-xs text-foreground">
-                                <Check size={12} className="text-primary shrink-0" />
+                        <div className="bg-blue-50 dark:bg-blue-950/20 rounded-lg p-3 text-left space-y-1.5">
+                            <div className="flex items-center gap-2 text-xs text-blue-900 dark:text-blue-100">
+                                <span className="text-blue-600 dark:text-blue-400">✓</span>
                                 <span className="font-medium">Fully encrypted & confidential</span>
                             </div>
-                            <div className="flex items-center gap-2 text-xs text-foreground">
-                                <Check size={12} className="text-primary shrink-0" />
+                            <div className="flex items-center gap-2 text-xs text-blue-900 dark:text-blue-100">
+                                <span className="text-blue-600 dark:text-blue-400">✓</span>
                                 <span className="font-medium">Never shared with third parties</span>
                             </div>
-                            <div className="flex items-center gap-2 text-xs text-foreground">
-                                <Check size={12} className="text-primary shrink-0" />
+                            <div className="flex items-center gap-2 text-xs text-blue-900 dark:text-blue-100">
+                                <span className="text-blue-600 dark:text-blue-400">✓</span>
                                 <span className="font-medium">Delete anytime from your account</span>
                             </div>
                         </div>
@@ -575,14 +306,7 @@ export default function TestPage() {
         );
     }
 
-    const handleBack = () => {
-        if (currentQIndex > 0) {
-            const prevIndex = currentQIndex - 1;
-            setCurrentQIndex(prevIndex);
-            setSelectedAnswer(localAnswers[prevIndex] ?? null);
-        }
-    };
-
+    // QUESTIONS PHASE
     if (!currentQuestion) return null;
 
     return (
@@ -606,10 +330,10 @@ export default function TestPage() {
                         {currentQIndex + 1}/{QUESTIONS.length}
                     </div>
                 </div>
-                <div className="h-2 w-full bg-muted">
+                <div className="h-1.5 w-full bg-muted">
                     <div
-                        className="h-full bg-primary transition-all duration-500 ease-out rounded-r-full"
-                        style={{ width: `${progressPercentage}%`, boxShadow: '0 0 8px hsl(var(--primary) / 0.4)' }}
+                        className="h-full bg-primary transition-all duration-500 ease-out"
+                        style={{ width: `${progressPercentage}%` }}
                     />
                 </div>
             </header>
@@ -638,13 +362,13 @@ export default function TestPage() {
                                 )}
                             >
                                 <div className={cn(
-                                    "w-6 h-6 rounded-full border-2 mr-3 md:mr-4 flex items-center justify-center transition-all duration-200 shrink-0",
+                                    "w-6 h-6 md:w-6 md:h-6 rounded-full border-2 mr-3 md:mr-4 flex items-center justify-center transition-colors shrink-0",
                                     selectedAnswer === option.id
-                                        ? "border-primary bg-primary scale-110"
+                                        ? "border-primary bg-primary"
                                         : "border-muted-foreground/30 group-hover:border-primary"
                                 )}>
                                     {selectedAnswer === option.id && (
-                                        <Check size={14} className="text-white" strokeWidth={3} />
+                                        <div className="w-2.5 h-2.5 md:w-3 md:h-3 rounded-full bg-white" />
                                     )}
                                 </div>
                                 <span className="text-base md:text-lg font-medium leading-tight">{option.text}</span>
@@ -654,10 +378,7 @@ export default function TestPage() {
                 </div>
             </main>
 
-            {/* Hidden Footer Space to ensure scrolling if needed, but no button to save vertical space */}
             <div className="h-6 w-full md:hidden"></div>
-
-            {/* Desktop-only back/next controls if we wanted them, but for now we hide completely for mobile-first focus */}
         </div>
     );
 }
@@ -665,7 +386,7 @@ export default function TestPage() {
 
 // --- Wizard Components ---
 
-function QuizWizard({ onSubmit, isSubmitting, sessionId }: { onSubmit: (data: any) => void, isSubmitting: boolean, sessionId: string | null }) {
+function QuizWizard({ onSubmit, isSubmitting }: { onSubmit: (data: any) => void, isSubmitting: boolean }) {
     const [step, setStep] = useState(1);
     const [formData, setFormData] = useState({
         userGender: "",
@@ -690,50 +411,34 @@ function QuizWizard({ onSubmit, isSubmitting, sessionId }: { onSubmit: (data: an
         setFormData(prev => ({ ...prev, [key]: value }));
     };
 
-    const nextStep = async (currentStepData?: any) => {
+    const nextStep = (currentStepData?: any) => {
+        if (currentStepData) {
+            setFormData(prev => ({ ...prev, ...currentStepData }));
+        }
         setStep(prev => Math.min(prev + 1, totalSteps));
 
-        // Save progress to DB if we have a session
-        if (sessionId) {
-            try {
-                // We save whatever data we have so far, plus the step we just finished
-                // If valid currentStepData is passed (e.g. from Step1), merge it
-                const payload = { ...formData, ...currentStepData, sessionId, onboardingStep: step };
-                await updateWizardProgress(payload);
-
-                import("../analytics/pixel").then(({ trackPixelEvent }) => {
-                    trackPixelEvent("CustomEvent", {
-                        content_name: "WizardStep",
-                        step_number: step,
-                        step_name: `Step_${step}`
-                    });
-                });
-
-            } catch (e) {
-                console.error("Background save failed", e);
-            }
-        }
+        // Track wizard step (pixel only, no DB)
+        trackPixelEvent("CustomEvent", {
+            content_name: "WizardStep",
+            step_number: step,
+            step_name: `Step_${step}`
+        });
     };
 
     const prevStep = () => setStep(prev => Math.max(prev - 1, 1));
 
-    const handleFinalSubmit = async () => {
-        // Track final step
-        import("../analytics/pixel").then(({ trackPixelEvent }) => {
-            trackPixelEvent("CustomEvent", {
-                content_name: "WizardStep",
-                step_number: totalSteps,
-                step_name: "BiggestFear"
-            });
+    const handleFinalSubmit = () => {
+        trackPixelEvent("CustomEvent", {
+            content_name: "WizardStep",
+            step_number: totalSteps,
+            step_name: "BiggestFear"
         });
         onSubmit(formData);
     };
 
-    // Wizard Steps
     return (
         <div className="min-h-screen bg-background flex flex-col items-center justify-center p-4 animate-fade-in">
             <div className="w-full max-w-lg">
-                {/* Progress Bar (Liquid) */}
                 <div className="mb-8 h-1.5 w-full bg-muted rounded-full overflow-hidden">
                     <div
                         className="h-full bg-primary transition-all duration-500 ease-out"
@@ -1073,7 +778,6 @@ function Step6_Demographics({ data, updateData, onNext, onBack }: { data: any, u
                         <span className="text-xs font-bold uppercase text-muted-foreground bg-muted px-2 py-1 rounded">You</span>
                     </div>
                     <div className="grid grid-cols-2 gap-3">
-                        {/* Gender */}
                         <div className="flex bg-muted/30 p-1 rounded-lg">
                             {['Male', 'Female'].map(g => (
                                 <button
@@ -1087,7 +791,6 @@ function Step6_Demographics({ data, updateData, onNext, onBack }: { data: any, u
                                 </button>
                             ))}
                         </div>
-                        {/* Age */}
                         <select
                             value={data.userAgeRange}
                             onChange={(e) => updateData('userAgeRange', e.target.value)}
@@ -1107,7 +810,6 @@ function Step6_Demographics({ data, updateData, onNext, onBack }: { data: any, u
                         <span className="text-xs font-bold uppercase text-muted-foreground bg-muted px-2 py-1 rounded">Partner</span>
                     </div>
                     <div className="grid grid-cols-2 gap-3">
-                        {/* Gender */}
                         <div className="flex bg-muted/30 p-1 rounded-lg">
                             {['Male', 'Female'].map(g => (
                                 <button
@@ -1121,7 +823,6 @@ function Step6_Demographics({ data, updateData, onNext, onBack }: { data: any, u
                                 </button>
                             ))}
                         </div>
-                        {/* Age */}
                         <select
                             value={data.partnerAgeRange}
                             onChange={(e) => updateData('partnerAgeRange', e.target.value)}
@@ -1163,7 +864,7 @@ function Step7_Fear({ data, updateData, onSubmit, onBack, isSubmitting }: { data
     const handleSelect = (val: string) => {
         setIsOther(false);
         updateData('biggestFear', val);
-        onSubmit(); // Auto-submit on selection
+        onSubmit();
     };
 
     const handleOther = () => {
@@ -1177,7 +878,6 @@ function Step7_Fear({ data, updateData, onSubmit, onBack, isSubmitting }: { data
         updateData('biggestFear', val);
     };
 
-    // Valid if selected from options OR (Other is selected AND text > 3 chars)
     const isValid = !!data.biggestFear && (isOther ? data.biggestFear.length > 3 : true);
 
     return (
@@ -1245,5 +945,3 @@ function Step7_Fear({ data, updateData, onSubmit, onBack, isSubmitting }: { data
         </div>
     );
 }
-
-

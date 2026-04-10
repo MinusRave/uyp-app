@@ -110,17 +110,9 @@ export const createCheckoutSession: CreateCheckoutSession<
   // This supports the "Skip Email Gate" A/B test case.
 
   // 3. Send Meta CAPI InitiateCheckout Event
-  // DETECT PRODUCT TYPE
-  let reportPrice = parseFloat(process.env.REPORT_PRICE || "29.00");
-  let workbookPrice = 12.00;
-  let productName = "Understand Your Partner - Full Analysis";
-
-  // CHECK IF TOXIC TEST
-  if (testSession.testType === 'toxic-men') {
-    reportPrice = 47.00;
-    workbookPrice = 9.00; // Special offer
-    productName = "Toxic Relationship Analysis (Men)";
-  }
+  const reportPrice = parseFloat(process.env.REPORT_PRICE || "29.00");
+  const workbookPrice = 12.00;
+  const productName = "Understand Your Partner - Full Analysis";
 
   let totalPrice = reportPrice;
   if (addWorkbook) totalPrice += workbookPrice;
@@ -143,7 +135,7 @@ export const createCheckoutSession: CreateCheckoutSession<
         value: totalPrice,
         content_name: productName,
         content_category: 'Report',
-        content_ids: [testSession.testType === 'toxic-men' ? 'report-toxic-men' : 'report-full'],
+        content_ids: ['report-full'],
         content_type: 'product',
       }
     });
@@ -159,9 +151,7 @@ export const createCheckoutSession: CreateCheckoutSession<
         currency: "usd",
         product_data: {
           name: productName,
-          description: testSession.testType === 'toxic-men'
-            ? "Complete Toxic Dynamic Analysis, Vulnerability Map, and Strategic Action Plan."
-            : "Complete Relationship Diagnosis, 5-Year Forecast, and 5 Targeted Strategic Protocol Guides.",
+          description: "Complete Relationship Diagnosis, 5-Year Forecast, and 5 Targeted Strategic Protocol Guides.",
         },
         unit_amount: Math.round(reportPrice * 100),
       },
@@ -174,8 +164,8 @@ export const createCheckoutSession: CreateCheckoutSession<
       price_data: {
         currency: "usd",
         product_data: {
-          name: testSession.testType === 'toxic-men' ? "Emergency Scripts Pack (+20 Scenarios)" : "The 30-Day Reconnection Workbook",
-          description: testSession.testType === 'toxic-men' ? "Exact words to use during conflicts or threats." : "Daily guided exercises to rebuild connection.",
+          name: "The 30-Day Reconnection Workbook",
+          description: "Daily guided exercises to rebuild connection.",
         },
         unit_amount: Math.round(workbookPrice * 100),
       },
@@ -193,12 +183,8 @@ export const createCheckoutSession: CreateCheckoutSession<
       allow_promotion_codes: true, // Enable coupon/promo codes in checkout
       line_items: lineItems,
       mode: "payment",
-      success_url: testSession.testType === 'toxic-men'
-        ? `${config.frontendUrl}/toxic-results?success=true&sessionId=${sessionId}`
-        : `${config.frontendUrl}/report?success=true&session_id=${sessionId}`,
-      cancel_url: testSession.testType === 'toxic-men'
-        ? `${config.frontendUrl}/toxic-offer?sessionId=${sessionId}&checkout_cancelled=true`
-        : `${config.frontendUrl}/results?session=${sessionId}&checkout_cancelled=true`,
+      success_url: `${config.frontendUrl}/report?success=true&session_id=${sessionId}`,
+      cancel_url: `${config.frontendUrl}/results?session=${sessionId}&checkout_cancelled=true`,
       customer_email: customerEmail || undefined,
       metadata: {
         testSessionId: sessionId,
