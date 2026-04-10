@@ -338,6 +338,7 @@ export default function FullReport() {
     const [searchParams] = useState(new URLSearchParams(window.location.search));
     const urlSessionId = searchParams.get("session_id") || searchParams.get("session") || searchParams.get("sessionId");
     const localSessionId = typeof window !== "undefined" ? localStorage.getItem("uyp-session-id") : null;
+    const isPostCheckout = searchParams.get("success") === "true";
 
     const sessionIdToUse = urlSessionId || localSessionId || undefined;
 
@@ -349,6 +350,7 @@ export default function FullReport() {
     const [fullReport, setFullReport] = useState<FullReportData | null>(null);
     const [loadingQuick, setLoadingQuick] = useState(false);
     const [loadingFull, setLoadingFull] = useState(false);
+    const [waitingForPayment, setWaitingForPayment] = useState(isPostCheckout);
 
     // Guards
     const quickOverviewInitiated = useRef(false);
@@ -356,13 +358,39 @@ export default function FullReport() {
 
     // Validate Payment (bypass with ?dev=1 query param for development)
     const isDev = typeof window !== "undefined" && new URLSearchParams(window.location.search).get("dev") === "1";
+
+    // Poll for payment confirmation after Stripe redirect (webhook race condition)
+    useEffect(() => {
+        if (!isPostCheckout || !session || session.isPaid || isDev) {
+            setWaitingForPayment(false);
+            return;
+        }
+        // Webhook hasn't fired yet — poll by refetching
+        const pollInterval = setInterval(() => {
+            // Wasp reactive queries auto-refetch; force a re-check via window focus trick
+            window.dispatchEvent(new Event('focus'));
+        }, 2000);
+        const timeout = setTimeout(() => {
+            // Stop waiting after 15s — webhook should have fired by now
+            setWaitingForPayment(false);
+        }, 15000);
+        return () => { clearInterval(pollInterval); clearTimeout(timeout); };
+    }, [isPostCheckout, session?.isPaid, isDev]);
+
+    // Mark payment confirmed when session updates
+    useEffect(() => {
+        if (session?.isPaid) {
+            setWaitingForPayment(false);
+        }
+    }, [session?.isPaid]);
+
     useEffect(() => {
         if (!isSessionLoading && session) {
-            if (!session.isPaid && !isDev) {
+            if (!session.isPaid && !isDev && !waitingForPayment) {
                 navigate("/results");
             }
         }
-    }, [session, isSessionLoading, navigate, isDev]);
+    }, [session, isSessionLoading, navigate, isDev, waitingForPayment]);
 
 
     // 3. Trigger AI Calls on Load (if not present)
@@ -402,6 +430,13 @@ export default function FullReport() {
 
     if (isSessionLoading) return <div className="min-h-screen flex items-center justify-center bg-slate-50 dark:bg-slate-950"><Activity className="animate-spin text-primary" /></div>;
     if (!session) return <div className="min-h-screen flex items-center justify-center">Session not found.</div>;
+    if (waitingForPayment) return (
+        <div className="min-h-screen flex flex-col items-center justify-center bg-slate-50 dark:bg-slate-950 gap-4">
+            <Activity className="animate-spin text-primary" size={48} />
+            <p className="text-lg font-medium text-foreground">Confirming your payment...</p>
+            <p className="text-sm text-muted-foreground">This usually takes a few seconds.</p>
+        </div>
+    );
     if (!session.isPaid && !isDev) return null; // Redirection handled in useEffect
 
     // Stale session detection
