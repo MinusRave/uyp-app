@@ -3,6 +3,7 @@ import type {
   GenerateCheckoutSession,
   CreateCheckoutSession,
   GetCustomerPortalUrl,
+  VerifyPayment,
 } from "wasp/server/operations";
 import * as z from "zod";
 import { PaymentPlanId, paymentPlans } from "../payment/plans";
@@ -233,6 +234,39 @@ export const createCheckoutSession: CreateCheckoutSession<
     sessionUrl: session.url,
     sessionId: session.id,
   };
+};
+
+// Verify payment status directly with Stripe (fallback when webhook is delayed)
+export const verifyPayment: VerifyPayment<{ sessionId: string }, { isPaid: boolean }> = async ({ sessionId }, context) => {
+  const testSession = await context.entities.TestSession.findUnique({
+    where: { id: sessionId },
+  });
+  if (!testSession) throw new HttpError(404, "Session not found");
+
+  // Already paid — no need to check Stripe
+  if (testSession.isPaid) return { isPaid: true };
+
+  // No Stripe checkout session — can't verify
+  if (!testSession.stripeCheckoutSessionId) return { isPaid: false };
+
+  try {
+    const stripeSession = await stripeClient.checkout.sessions.retrieve(testSession.stripeCheckoutSessionId);
+    if (stripeSession.payment_status === "paid") {
+      // Webhook missed or delayed — update DB now
+      await context.entities.TestSession.update({
+        where: { id: sessionId },
+        data: {
+          isPaid: true,
+          emailSequenceType: null,
+        },
+      });
+      return { isPaid: true };
+    }
+  } catch (e) {
+    console.error("[verifyPayment] Stripe check failed:", e);
+  }
+
+  return { isPaid: false };
 };
 
 export const getCustomerPortalUrl: GetCustomerPortalUrl<

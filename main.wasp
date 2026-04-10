@@ -392,6 +392,11 @@ action createCheckoutSession {
   entities: [User, TestSession]
 }
 
+action verifyPayment {
+  fn: import { verifyPayment } from "@src/payment/operations",
+  entities: [TestSession]
+}
+
 api stripeWebhook {
   fn: import { stripeWebhook } from "@src/payment/reportWebhook",
   entities: [TestSession],

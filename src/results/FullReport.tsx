@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router";
 import { ArrowRight, Lock, CheckCircle, AlertTriangle, TrendingUp, Shield, Heart, BadgeCheck, Compass, Zap, X, Activity, ChevronDown, Check, Eye, Microscope, ListChecks, ShieldAlert, Clock, MessageCircle, Brain, Quote, Star, Play, TrendingDown, Battery, Thermometer, FileWarning, Download, FileText, Loader2 } from "lucide-react";
-import { useQuery, generateQuickOverview, generateFullReportV2, getTestSession } from "wasp/client/operations";
+import { useQuery, generateQuickOverview, generateFullReportV2, getTestSession, verifyPayment } from "wasp/client/operations";
 import { useAuth } from "wasp/client/auth";
 import { api } from "wasp/client/api";
 import { config } from "wasp/client";
@@ -343,7 +343,7 @@ export default function FullReport() {
     const sessionIdToUse = urlSessionId || localSessionId || undefined;
 
     // 1. Fetch Session
-    const { data: session, isLoading: isSessionLoading } = useQuery(getTestSession, { sessionId: sessionIdToUse });
+    const { data: session, isLoading: isSessionLoading, refetch: refetchSession } = useQuery(getTestSession, { sessionId: sessionIdToUse });
 
     // 2. Local State for AI Results
     const [quickOverview, setQuickOverview] = useState<QuickOverviewData | null>(null);
@@ -355,33 +355,61 @@ export default function FullReport() {
     // Guards
     const quickOverviewInitiated = useRef(false);
     const fullReportInitiated = useRef(false);
+    const verifyAttempted = useRef(false);
 
     // Validate Payment (bypass with ?dev=1 query param for development)
     const isDev = typeof window !== "undefined" && new URLSearchParams(window.location.search).get("dev") === "1";
 
-    // Poll for payment confirmation after Stripe redirect (webhook race condition)
+    // Verify payment with Stripe directly (handles webhook delays/failures)
     useEffect(() => {
-        if (!isPostCheckout || !session || session.isPaid || isDev) {
-            setWaitingForPayment(false);
-            return;
-        }
-        // Webhook hasn't fired yet — poll by refetching
-        const pollInterval = setInterval(() => {
-            // Wasp reactive queries auto-refetch; force a re-check via window focus trick
-            window.dispatchEvent(new Event('focus'));
-        }, 2000);
-        const timeout = setTimeout(() => {
-            // Stop waiting after 15s — webhook should have fired by now
-            setWaitingForPayment(false);
-        }, 15000);
-        return () => { clearInterval(pollInterval); clearTimeout(timeout); };
-    }, [isPostCheckout, session?.isPaid, isDev]);
+        if (!session || session.isPaid || isDev || verifyAttempted.current) return;
+        if (!isPostCheckout && !session.stripeCheckoutSessionId) return;
+
+        verifyAttempted.current = true;
+        let cancelled = false;
+
+        const verify = async () => {
+            try {
+                const result = await verifyPayment({ sessionId: session.id });
+                if (cancelled) return;
+                if (result.isPaid) {
+                    await refetchSession();
+                    setWaitingForPayment(false);
+                } else {
+                    // Webhook hasn't fired and Stripe hasn't confirmed — poll a few times
+                    let attempts = 0;
+                    const poll = setInterval(async () => {
+                        attempts++;
+                        if (cancelled || attempts > 5) {
+                            clearInterval(poll);
+                            if (!cancelled) setWaitingForPayment(false);
+                            return;
+                        }
+                        try {
+                            const retry = await verifyPayment({ sessionId: session.id });
+                            if (retry.isPaid) {
+                                clearInterval(poll);
+                                if (!cancelled) {
+                                    await refetchSession();
+                                    setWaitingForPayment(false);
+                                }
+                            }
+                        } catch { /* ignore poll errors */ }
+                    }, 3000);
+                }
+            } catch (e) {
+                console.error("[FullReport] Payment verification failed:", e);
+                if (!cancelled) setWaitingForPayment(false);
+            }
+        };
+
+        verify();
+        return () => { cancelled = true; };
+    }, [session?.id, session?.isPaid, isDev, isPostCheckout]);
 
     // Mark payment confirmed when session updates
     useEffect(() => {
-        if (session?.isPaid) {
-            setWaitingForPayment(false);
-        }
+        if (session?.isPaid) setWaitingForPayment(false);
     }, [session?.isPaid]);
 
     useEffect(() => {
