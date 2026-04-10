@@ -294,6 +294,14 @@ const HeroSection = ({
                     <span className="text-foreground font-bold">This is a turning point.</span> Your relationship dynamics aren't random. They are deeply predictable — which means they are solvable.
                 </p>
 
+                {/* Hero CTA — catch the 3% ready now */}
+                <button
+                    onClick={() => onUnlock('hero_cta')}
+                    className="mt-6 inline-flex items-center gap-2 text-primary font-bold text-sm hover:underline underline-offset-4 transition-all group"
+                >
+                    Already convinced? Unlock the full report <ArrowRight size={16} className="group-hover:translate-x-1 transition-transform" />
+                </button>
+
             </div>
         </header>
     );
@@ -811,6 +819,17 @@ export default function TeaserPageNew() {
                                 The other 80% — the scripts, the action plan, the guides, the forecast — is the <strong className="text-foreground">treatment plan</strong>. And that's what the full report gives you.
                             </p>
                         </div>
+
+                        {/* Fascination bullets — tease without revealing */}
+                        <div className="bg-card border border-border/60 rounded-2xl p-6 max-w-xl mx-auto text-left space-y-3">
+                            <p className="text-xs font-bold uppercase tracking-wider text-muted-foreground mb-2">Inside the full report</p>
+                            <ul className="space-y-2.5 text-sm text-muted-foreground">
+                                <li className="flex items-start gap-2"><Lock size={14} className="text-primary shrink-0 mt-0.5" /><span>The one metric that predicts whether your relationship survives the next 12 months <em>(hint: it's not communication)</em></span></li>
+                                <li className="flex items-start gap-2"><Lock size={14} className="text-primary shrink-0 mt-0.5" /><span>Why "trying harder" is making things worse — and the counterintuitive move that actually works for your pattern</span></li>
+                                <li className="flex items-start gap-2"><Lock size={14} className="text-primary shrink-0 mt-0.5" /><span>The exact sentence to say the next time your partner {session?.partnerConflictStyle === "Shuts down / Stonewalls" ? "shuts down mid-argument" : session?.partnerConflictStyle === "Escalates / Yells" ? "starts raising their voice" : session?.partnerConflictStyle === "Deflects / Blames you" ? "turns it around on you" : "avoids the conversation entirely"}</span></li>
+                                <li className="flex items-start gap-2"><Lock size={14} className="text-primary shrink-0 mt-0.5" /><span>The specific month your intervention window closes — and what happens after</span></li>
+                            </ul>
+                        </div>
                     </div>
                 </div>
             </section>
@@ -840,6 +859,38 @@ export default function TeaserPageNew() {
                     <p className="text-foreground font-bold text-lg">
                         That's not a fantasy. That's what's in your report, waiting to be unlocked.
                     </p>
+                </div>
+            </section>
+
+            {/* VIDEO SHOWCASE — standalone section for maximum impact */}
+            <section className="py-16 px-6 bg-muted/20 border-y border-border/50">
+                <div className="max-w-2xl mx-auto text-center space-y-6">
+                    <div className="space-y-2">
+                        <span className="inline-flex items-center gap-2 text-xs font-bold uppercase tracking-widest text-muted-foreground">
+                            <Play size={14} className="text-primary" /> 60-Second Walkthrough
+                        </span>
+                        <h3 className="text-2xl md:text-3xl font-black text-foreground">See What's Inside Your Report</h3>
+                        <p className="text-sm text-muted-foreground">This is a sample report — yours is personalized to your 30 answers.</p>
+                    </div>
+                    <div className="relative max-w-sm mx-auto w-full">
+                        <div className="rounded-2xl overflow-hidden shadow-2xl border-2 border-border bg-foreground">
+                            <video
+                                src="/demo/screen-capture.webm"
+                                className="w-full"
+                                controls
+                                playsInline
+                                muted
+                                preload="metadata"
+                                poster=""
+                            />
+                        </div>
+                    </div>
+                    <button
+                        onClick={handleScrollToOffer}
+                        className="inline-flex items-center gap-2 text-primary font-bold text-sm hover:underline underline-offset-4 transition-all group"
+                    >
+                        Get my personalized report <ArrowRight size={16} className="group-hover:translate-x-1 transition-transform" />
+                    </button>
                 </div>
             </section>
 
@@ -1040,9 +1091,9 @@ export default function TeaserPageNew() {
                 );
             })()}
 
-            {/* 4. THE SOLUTION: REPORT BREAKDOWN */}
+            {/* 4. THE SOLUTION: REPORT BREAKDOWN — full-width benefits */}
             <section className="py-24 px-6 bg-background">
-                <div className="max-w-5xl mx-auto">
+                <div className="max-w-3xl mx-auto">
                     <div className="text-center mb-16">
                         <div className="inline-block px-3 py-1 bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-300 rounded-full text-xs font-bold uppercase tracking-widest mb-4">
                             Love is not enough
@@ -1053,85 +1104,64 @@ export default function TeaserPageNew() {
                         </p>
                     </div>
 
-                    <div className="grid md:grid-cols-2 gap-12 items-center">
-                        {/* Inline video — real report walkthrough */}
-                        <div className="relative max-w-sm mx-auto w-full">
-                            <div className="rounded-2xl overflow-hidden shadow-2xl border-2 border-border bg-foreground">
-                                <video
-                                    src="/demo/screen-capture.webm"
-                                    className="w-full"
-                                    controls
-                                    playsInline
-                                    muted
-                                    preload="metadata"
-                                    poster=""
-                                />
+                    <div className="space-y-8">
+                        <div className="flex gap-5">
+                            <div className="shrink-0 h-10 w-10 bg-primary/10 text-primary rounded-lg flex items-center justify-center">
+                                <Activity size={20} />
                             </div>
-                            <p className="text-center text-xs text-muted-foreground mt-3">
-                                Sample report walkthrough — yours will be personalized to your answers
-                            </p>
+                            <div>
+                                <h4 className="text-xl font-bold mb-2">See the Exact Moment Trust Started Eroding</h4>
+                                <p className="text-muted-foreground text-sm leading-relaxed">
+                                    Your 5-dimension deep dive reveals not just WHAT's broken — but the specific conversation pattern, the unspoken resentment, and the one dynamic that's quietly poisoning everything else.
+                                </p>
+                            </div>
                         </div>
 
-                        {/* Report Components — BENEFIT-focused copy */}
-                        <div className="space-y-8">
-                            <div className="flex gap-5">
-                                <div className="shrink-0 h-10 w-10 bg-primary/10 text-primary rounded-lg flex items-center justify-center">
-                                    <Activity size={20} />
-                                </div>
-                                <div>
-                                    <h4 className="text-xl font-bold mb-2">See the Exact Moment Trust Started Eroding</h4>
-                                    <p className="text-muted-foreground text-sm leading-relaxed">
-                                        Your 5-dimension deep dive reveals not just WHAT's broken — but the specific conversation pattern, the unspoken resentment, and the one dynamic that's quietly poisoning everything else.
-                                    </p>
-                                </div>
+                        <div className="flex gap-5">
+                            <div className="shrink-0 h-10 w-10 bg-purple-100 dark:bg-purple-900/50 text-purple-600 dark:text-purple-400 rounded-lg flex items-center justify-center">
+                                <Clock size={20} />
                             </div>
-
-                            <div className="flex gap-5">
-                                <div className="shrink-0 h-10 w-10 bg-purple-100 dark:bg-purple-900/50 text-purple-600 dark:text-purple-400 rounded-lg flex items-center justify-center">
-                                    <Clock size={20} />
-                                </div>
-                                <div>
-                                    <h4 className="text-xl font-bold mb-2">Know If You Still Have Time — Or If It's Already Too Late</h4>
-                                    <p className="text-muted-foreground text-sm leading-relaxed">
-                                        Your personalized 6-month and 5-year forecast. Not "relationships are hard." YOUR specific odds, YOUR intervention window, YOUR point of no return.
-                                    </p>
-                                </div>
+                            <div>
+                                <h4 className="text-xl font-bold mb-2">Know If You Still Have Time — Or If It's Already Too Late</h4>
+                                <p className="text-muted-foreground text-sm leading-relaxed">
+                                    Your personalized 6-month and 5-year forecast. Not "relationships are hard." YOUR specific odds, YOUR intervention window, YOUR point of no return.
+                                </p>
                             </div>
+                        </div>
 
-                            <div className="flex gap-5">
-                                <div className="shrink-0 h-10 w-10 bg-orange-100 dark:bg-orange-900/50 text-orange-600 dark:text-orange-400 rounded-lg flex items-center justify-center">
-                                    <ShieldAlert size={20} />
-                                </div>
-                                <div>
-                                    <h4 className="text-xl font-bold mb-2 text-orange-600 dark:text-orange-400">End the "Am I Crazy?" Loop Forever</h4>
-                                    <p className="text-muted-foreground text-sm leading-relaxed">
-                                        A definitive clinical answer to the question you've been afraid to ask. Rough patch or abuse? Your 0-100 Danger Score ends years of self-doubt in one page.
-                                    </p>
-                                </div>
+                        <div className="flex gap-5">
+                            <div className="shrink-0 h-10 w-10 bg-orange-100 dark:bg-orange-900/50 text-orange-600 dark:text-orange-400 rounded-lg flex items-center justify-center">
+                                <ShieldAlert size={20} />
                             </div>
-
-                            <div className="flex gap-5">
-                                <div className="shrink-0 h-10 w-10 bg-emerald-100 dark:bg-emerald-900/50 text-emerald-600 dark:text-emerald-400 rounded-lg flex items-center justify-center">
-                                    <MessageCircle size={20} />
-                                </div>
-                                <div>
-                                    <h4 className="text-xl font-bold mb-2">Know What to Say Tonight — Word for Word</h4>
-                                    <p className="text-muted-foreground text-sm leading-relaxed">
-                                        When the fight starts, you'll have the exact sentence that stops the spiral. Designed for your partner's specific psychological profile. Not generic advice — phrases that bypass <em>their</em> defenses.
-                                    </p>
-                                </div>
+                            <div>
+                                <h4 className="text-xl font-bold mb-2 text-orange-600 dark:text-orange-400">End the "Am I Crazy?" Loop Forever</h4>
+                                <p className="text-muted-foreground text-sm leading-relaxed">
+                                    A definitive clinical answer to the question you've been afraid to ask. Rough patch or abuse? Your 0-100 Danger Score ends years of self-doubt in one page.
+                                </p>
                             </div>
+                        </div>
 
-                            <div className="flex gap-5">
-                                <div className="shrink-0 h-10 w-10 bg-blue-100 dark:bg-blue-900/50 text-blue-600 dark:text-blue-400 rounded-lg flex items-center justify-center">
-                                    <Eye size={20} />
-                                </div>
-                                <div>
-                                    <h4 className="text-xl font-bold mb-2">See the 12 Hidden Drivers Most Couples Never Discover</h4>
-                                    <p className="text-muted-foreground text-sm leading-relaxed">
-                                        The invisible forces that kill relationships while you're focused on the surface fights. Including the one that's doing the most damage <em>right now</em> in yours.
-                                    </p>
-                                </div>
+                        <div className="flex gap-5">
+                            <div className="shrink-0 h-10 w-10 bg-emerald-100 dark:bg-emerald-900/50 text-emerald-600 dark:text-emerald-400 rounded-lg flex items-center justify-center">
+                                <MessageCircle size={20} />
+                            </div>
+                            <div>
+                                <h4 className="text-xl font-bold mb-2">Know What to Say Tonight — Word for Word</h4>
+                                <p className="text-muted-foreground text-sm leading-relaxed">
+                                    When the fight starts, you'll have the exact sentence that stops the spiral. Designed for your partner's specific psychological profile. Not generic advice — phrases that bypass <em>their</em> defenses.
+                                </p>
+                            </div>
+                        </div>
+
+                        <div className="flex gap-5">
+                            <div className="shrink-0 h-10 w-10 bg-blue-100 dark:bg-blue-900/50 text-blue-600 dark:text-blue-400 rounded-lg flex items-center justify-center">
+                                <Eye size={20} />
+                            </div>
+                            <div>
+                                <h4 className="text-xl font-bold mb-2">See the 12 Hidden Drivers Most Couples Never Discover</h4>
+                                <p className="text-muted-foreground text-sm leading-relaxed">
+                                    The invisible forces that kill relationships while you're focused on the surface fights. Including the one that's doing the most damage <em>right now</em> in yours.
+                                </p>
                             </div>
                         </div>
                     </div>
@@ -1314,6 +1344,57 @@ export default function TeaserPageNew() {
                 </div>
             </section>
 
+            {/* COMPARISON TABLE — value-building before offer */}
+            <section className="max-w-4xl mx-auto py-12 px-2">
+                <div className="text-center mb-10 space-y-2">
+                    <h2 className="text-3xl font-black text-foreground">Why This Price? (And Why It's Worth 10x More)</h2>
+                    <p className="text-muted-foreground">Most people spend thousands trying to understand their relationship. Here's what you'd pay elsewhere:</p>
+                </div>
+
+                <div className="overflow-x-auto rounded-2xl border border-border bg-card shadow-sm">
+                    <table className="w-full text-left border-collapse">
+                        <thead>
+                            <tr className="bg-muted/50 border-b border-border text-xs uppercase tracking-wider text-muted-foreground">
+                                <th className="p-4 font-bold">What You're Comparing</th>
+                                <th className="p-4 font-bold">Cost</th>
+                                <th className="p-4 font-bold">Time to Results</th>
+                                <th className="p-4 font-bold">What You Get</th>
+                            </tr>
+                        </thead>
+                        <tbody className="text-sm divide-y divide-border">
+                            <tr className="hover:bg-muted/10 transition-colors">
+                                <td className="p-4 font-bold text-foreground">Couples Therapy</td>
+                                <td className="p-4 text-muted-foreground">$150/session x 6-10 = <span className="font-bold text-red-500 block">$900-1,500</span></td>
+                                <td className="p-4 text-muted-foreground">6-12 weeks minimum</td>
+                                <td className="p-4 text-muted-foreground">Depends on therapist quality. Takes 4-5 sessions just to identify your pattern.</td>
+                            </tr>
+                            <tr className="hover:bg-muted/10 transition-colors">
+                                <td className="p-4 font-bold text-foreground">Self-Help Books</td>
+                                <td className="p-4 text-muted-foreground">$20 x 5-8 books = <span className="font-bold block">$100-160</span></td>
+                                <td className="p-4 text-muted-foreground">20-40 hours reading</td>
+                                <td className="p-4 text-muted-foreground">Generic advice for everyone. Not specific to YOUR relationship pattern.</td>
+                            </tr>
+                            <tr className="hover:bg-muted/10 transition-colors">
+                                <td className="p-4 font-bold text-foreground">Online Course</td>
+                                <td className="p-4 text-muted-foreground"><span className="font-bold block">$97-297</span></td>
+                                <td className="p-4 text-muted-foreground">8-12 hours of video</td>
+                                <td className="p-4 text-muted-foreground">General frameworks. No personalized diagnosis. No action plan.</td>
+                            </tr>
+                            <tr className="bg-primary/5 hover:bg-primary/10 transition-colors border-l-4 border-l-primary">
+                                <td className="p-4 font-black text-primary text-base">This Analysis</td>
+                                <td className="p-4"><span className="font-black text-2xl text-primary">$29</span></td>
+                                <td className="p-4 font-bold text-foreground">Instant</td>
+                                <td className="p-4 font-bold text-foreground">Personalized to YOUR 30 answers. Pattern identified. 5 clinical guides. Exact scripts.</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <p className="text-center text-sm text-muted-foreground italic mt-6">
+                    You'll spend more on a dinner where you both scroll your phones than on understanding what's actually destroying your relationship.
+                </p>
+            </section>
+
             {/* SOCIAL PROOF — Consolidated testimonials */}
             <section className="py-24 px-6 bg-background border-t border-border">
                 <div className="max-w-6xl mx-auto">
@@ -1336,15 +1417,15 @@ export default function TeaserPageNew() {
 
                     <div className="grid md:grid-cols-3 gap-6 max-w-5xl mx-auto">
                         <div className="bg-card p-6 rounded-2xl shadow-sm border border-border">
-                            <div className="flex gap-1 text-yellow-500 mb-3">{[...Array(5)].map((_, i) => <Star key={i} size={14} fill="currentColor" />)}</div>
+                            <div className="flex gap-1 text-yellow-500 mb-3">{[...Array(5)].map((_, i) => <Star key={`social-robert-${i}`} size={14} fill="currentColor" />)}</div>
                             <p className="text-muted-foreground mb-4 italic text-sm leading-relaxed">
-                                "Six months of couples therapy and we weren't getting anywhere. This identified the problem in 10 pages. Brought it to the next session. Therapist said 'okay finally we know what to work on'."
+                                "We were 2 months from filing. This identified the exact trigger — something neither of us saw. We brought it to one therapy session and made more progress in 50 minutes than in the previous 6 months."
                             </p>
-                            <div className="font-bold text-foreground text-sm">— Robert, 42, Boston</div>
+                            <div className="font-bold text-foreground text-sm">— David, 45, Austin</div>
                         </div>
 
                         <div className="bg-card p-6 rounded-2xl shadow-sm border border-border">
-                            <div className="flex gap-1 text-yellow-500 mb-3">{[...Array(5)].map((_, i) => <Star key={i} size={14} fill="currentColor" />)}</div>
+                            <div className="flex gap-1 text-yellow-500 mb-3">{[...Array(5)].map((_, i) => <Star key={`social-alexis-${i}`} size={14} fill="currentColor" />)}</div>
                             <p className="text-muted-foreground mb-4 italic text-sm leading-relaxed">
                                 "Bought this at 3am after he locked himself in the bedroom. It wasn't what I wanted to hear. But it was what I NEEDED to hear."
                             </p>
@@ -1698,9 +1779,9 @@ export default function TeaserPageNew() {
                                     </div>
                                 </div>
                                 <div>
-                                    <h4 className="font-bold text-foreground mb-1">The "Lightbulb Moment" Guarantee</h4>
+                                    <h4 className="font-bold text-foreground mb-1">The "Finally Someone Gets It" Guarantee</h4>
                                     <p className="text-sm text-muted-foreground leading-relaxed">
-                                        If you don't have at least one moment where you think <strong className="text-foreground">"that's EXACTLY what happens"</strong> — full refund. No questions. 90 days. We've analyzed thousands of relationships. If your report doesn't nail your situation, that's on us.
+                                        If you don't think <strong className="text-foreground">"that's EXACTLY what happens"</strong> at least 3 times in the first 5 pages — full refund. No questions. No forms. 90 days. We've analyzed thousands of relationships. If your report doesn't nail your situation, that's on us.
                                     </p>
                                 </div>
                             </div>
@@ -1775,57 +1856,6 @@ export default function TeaserPageNew() {
                     </div>
                 </div>
 
-            </section >
-
-            {/* 6.5 COMPARISON TABLE */}
-            < section className="max-w-4xl mx-auto py-12 px-2" >
-                <div className="text-center mb-10 space-y-2">
-                    <h2 className="text-3xl font-black text-foreground">Why This Price? (And Why It's Worth 10x More)</h2>
-                    <p className="text-muted-foreground">Most people spend thousands trying to understand their relationship. Here's what you'd pay elsewhere:</p>
-                </div>
-
-                <div className="overflow-x-auto rounded-2xl border border-border bg-card shadow-sm">
-                    <table className="w-full text-left border-collapse">
-                        <thead>
-                            <tr className="bg-muted/50 border-b border-border text-xs uppercase tracking-wider text-muted-foreground">
-                                <th className="p-4 font-bold">What You're Comparing</th>
-                                <th className="p-4 font-bold">Cost</th>
-                                <th className="p-4 font-bold">Time to Results</th>
-                                <th className="p-4 font-bold">What You Get</th>
-                            </tr>
-                        </thead>
-                        <tbody className="text-sm divide-y divide-border">
-                            <tr className="hover:bg-muted/10 transition-colors">
-                                <td className="p-4 font-bold text-foreground">Couples Therapy</td>
-                                <td className="p-4 text-muted-foreground">$150/session × 6-10 = <span className="font-bold text-red-500 block">$900-1,500</span></td>
-                                <td className="p-4 text-muted-foreground">6-12 weeks minimum</td>
-                                <td className="p-4 text-muted-foreground">Depends on therapist quality. Takes 4-5 sessions just to identify your pattern.</td>
-                            </tr>
-                            <tr className="hover:bg-muted/10 transition-colors">
-                                <td className="p-4 font-bold text-foreground">Self-Help Books</td>
-                                <td className="p-4 text-muted-foreground">$20 × 5-8 books = <span className="font-bold block">$100-160</span></td>
-                                <td className="p-4 text-muted-foreground">20-40 hours reading</td>
-                                <td className="p-4 text-muted-foreground">Generic advice for everyone. Not specific to YOUR relationship pattern.</td>
-                            </tr>
-                            <tr className="hover:bg-muted/10 transition-colors">
-                                <td className="p-4 font-bold text-foreground">Online Course</td>
-                                <td className="p-4 text-muted-foreground"><span className="font-bold block">$97-297</span></td>
-                                <td className="p-4 text-muted-foreground">8-12 hours of video</td>
-                                <td className="p-4 text-muted-foreground">General frameworks. No personalized diagnosis. No action plan.</td>
-                            </tr>
-                            <tr className="bg-primary/5 hover:bg-primary/10 transition-colors border-l-4 border-l-primary">
-                                <td className="p-4 font-black text-primary text-base">This Analysis</td>
-                                <td className="p-4"><span className="font-black text-2xl text-primary">$29</span></td>
-                                <td className="p-4 font-bold text-foreground">Instant</td>
-                                <td className="p-4 font-bold text-foreground">Personalized to YOUR 30 answers. Pattern identified. 5 clinical guides. Exact scripts.</td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
-
-                <p className="text-center text-sm text-muted-foreground italic mt-6">
-                    You'll spend more on a dinner where you both scroll your phones than on understanding what's actually destroying your relationship.
-                </p>
             </section >
 
             {/* TESTIMONIAL C: MARTA (Risk Reversal / Emotional Safety) */}

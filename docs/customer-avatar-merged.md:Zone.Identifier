@@ -1,0 +1,4 @@
+[ZoneTransfer]
+ZoneId=3
+ReferrerUrl=https://claude.ai/chat/7b1b477c-c767-421e-9bec-2d4c2ae611f8
+HostUrl=https://claude.ai/api/organizations/4ef62bb9-6ef7-45c5-9129-c5716c16866b/conversations/7b1b477c-c767-421e-9bec-2d4c2ae611f8/wiggle/download-file?path=%2Fmnt%2Fuser-data%2Foutputs%2Fcustomer-avatar-merged.md
