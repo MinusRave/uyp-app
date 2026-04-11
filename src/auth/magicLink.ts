@@ -258,9 +258,9 @@ export const verifyMagicLink = async (req: any, res: any, context: any) => {
 
         if (latestSession) {
             if (latestSession.isPaid) {
-                redirectPath = "/report";
+                redirectPath = `/report?session_id=${latestSession.id}`;
             } else if (latestSession.isCompleted) {
-                redirectPath = "/results"; // Teaser/Paywall
+                redirectPath = `/results?session=${latestSession.id}`;
             }
             // If neither, it stays "/test" which auto-resumes
         }

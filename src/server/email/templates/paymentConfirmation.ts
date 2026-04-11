@@ -13,7 +13,7 @@ export function getPaymentConfirmationEmail(vars: PersonalizationVars): {
 
 Your full relationship report is now unlocked and ready to view:
 
-${vars.app_url}/results?session=${vars.session_id}
+${vars.app_url}/report?session_id=${vars.session_id}
 
 If you have any questions, just reply to this email.
 
@@ -30,11 +30,11 @@ If you have any questions, just reply to this email.
       </div>
 
       <p>Thank you for your purchase. Your payment has been processed successfully.</p>
-      
+
       <p><strong>Your full relationship report is now unlocked and ready to view.</strong></p>
-      
+
       <p style="text-align: center; margin: 30px 0;">
-        <a href="${vars.app_url}/results?session=${vars.session_id}" class="button">
+        <a href="${vars.app_url}/report?session_id=${vars.session_id}" class="button">
           View Your Report →
         </a>
       </p>

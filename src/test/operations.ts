@@ -75,14 +75,11 @@ export const getTestSession: GetTestSession<{ sessionId?: string }, TestSession 
     args,
     context
 ) => {
-    // 1. Try explicit session ID
+    // 1. Try explicit session ID — always return if found (email links, checkout returns)
     if (args && args.sessionId) {
-        const session = await context.entities.TestSession.findUnique({
+        return context.entities.TestSession.findUnique({
             where: { id: args.sessionId },
         });
-        // Return null if archived AND unpaid (expired session)
-        if (session?.isArchived && !session?.isPaid) return null;
-        return session;
     }
 
     // 2. Fallback: If user is logged in, find their latest ACTIVE session

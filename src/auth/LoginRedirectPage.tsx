@@ -21,9 +21,9 @@ export default function LoginRedirectPage() {
         // No claimSession needed — just route based on session state
         if (session) {
             if (session.isPaid) {
-                navigate('/report');
+                navigate(`/report?session_id=${session.id}`);
             } else {
-                navigate('/results');
+                navigate(`/results?session=${session.id}`);
             }
         } else {
             navigate('/test');

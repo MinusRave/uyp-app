@@ -541,6 +541,13 @@ export default function TeaserPageNew() {
         if (urlSessionId) localStorage.setItem("uyp-session-id", urlSessionId);
     }, [urlSessionId]);
 
+    // Redirect paid users to the full report
+    useEffect(() => {
+        if (session?.isPaid) {
+            navigate(urlSessionId ? `/report?session_id=${urlSessionId}` : '/report');
+        }
+    }, [session?.isPaid, urlSessionId, navigate]);
+
     useEffect(() => {
         const offerSection = document.getElementById('offer');
         if (!offerSection) return;
