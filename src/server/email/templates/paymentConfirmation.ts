@@ -13,7 +13,7 @@ export function getPaymentConfirmationEmail(vars: PersonalizationVars): {
 
 Your full relationship report is now unlocked and ready to view:
 
-${vars.app_url}/report?session_id=${vars.session_id}
+${vars.api_url}/api/session-redirect?to=report&session_id=${vars.session_id}
 
 If you have any questions, just reply to this email.
 
@@ -34,7 +34,7 @@ If you have any questions, just reply to this email.
       <p><strong>Your full relationship report is now unlocked and ready to view.</strong></p>
 
       <p style="text-align: center; margin: 30px 0;">
-        <a href="${vars.app_url}/report?session_id=${vars.session_id}" class="button">
+        <a href="${vars.api_url}/api/session-redirect?to=report&session_id=${vars.session_id}" class="button">
           View Your Report →
         </a>
       </p>

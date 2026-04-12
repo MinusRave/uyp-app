@@ -63,8 +63,10 @@ export default function TestPage() {
         trackPixelEvent('ViewContent', { content_name: 'Relationship Test' });
     }, []);
 
-    // Redirect logged-in user with existing session
+    // Redirect logged-in user with existing session (only on initial page load)
+    // Skip when we're in the email-gate or analyzing phase — handleEmailSubmit owns navigation then
     useEffect(() => {
+        if (phase === 'email-gate' || phase === 'analyzing') return;
         if (!user) { setPhase('wizard'); return; }
         if (isSessionLoading) return;
         if (existingSession) {
@@ -76,7 +78,7 @@ export default function TestPage() {
         } else {
             setPhase('wizard');
         }
-    }, [user, existingSession, isSessionLoading, navigate]);
+    }, [user, existingSession, isSessionLoading, navigate, phase]);
 
     // Track quiz abandon on page unload
     useEffect(() => {
@@ -182,17 +184,16 @@ export default function TestPage() {
             // Auto-login the user
             await login({ email: result.email, password: result.loginToken });
 
-            // Fire-and-forget AI analysis
-            Promise.allSettled([
+            // Run AI analysis in parallel with minimum display time
+            await Promise.allSettled([
                 generateQuickOverview({ sessionId: result.sessionId }),
                 assessNarcissism({ sessionId: result.sessionId }),
+                // Minimum 4s display time for processing overlay
+                new Promise(resolve => {
+                    const elapsed = Date.now() - startTime;
+                    setTimeout(resolve, Math.max(0, 4000 - elapsed));
+                }),
             ]);
-
-            // Minimum display time for processing overlay
-            const elapsed = Date.now() - startTime;
-            if (elapsed < 4000) {
-                await new Promise(resolve => setTimeout(resolve, 4000 - elapsed));
-            }
 
             trackPixelEvent('SubmitApplication', { status: 'completed' });
             navigate(routes.TeaserRoute.build());

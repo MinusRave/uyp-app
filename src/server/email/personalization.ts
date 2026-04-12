@@ -38,6 +38,8 @@ export interface PersonalizationVars {
     forecast_short_term_teaser: string;
     // NEW: App URL for links
     app_url: string;
+    // Server API URL for session redirects (Stripe returns, email links)
+    api_url: string;
     // Session ID for deep-linking from emails
     session_id: string;
 }
@@ -209,6 +211,7 @@ export function buildPersonalizationData(
         metric_ceo_vs_intern,
         forecast_short_term_teaser,
         app_url: appUrl,
+        api_url: apiUrl,
         session_id: session.id,
     };
 }

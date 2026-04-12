@@ -559,7 +559,7 @@ export default function TeaserPageNew() {
         }, { threshold: 0.1 });
         observer.observe(offerSection);
         return () => { observer.disconnect(); window.removeEventListener('scroll', handleScroll); };
-    }, []);
+    }, [session?.id]);
 
 
 

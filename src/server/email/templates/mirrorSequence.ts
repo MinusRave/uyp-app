@@ -11,8 +11,8 @@ import { wrapHtml } from "../emailLayout";
 // - Plain text preferred; minimal HTML styling
 // ==========================================
 
-const addUtm = (url: string, stage: number, sessionId: string) => {
-  return `${url}?session=${sessionId}&utm_source=email&utm_medium=retention&utm_campaign=mirror&utm_content=mirror_${stage}`;
+const addUtm = (apiUrl: string, stage: number, sessionId: string) => {
+  return `${apiUrl}/api/session-redirect?to=results&session_id=${sessionId}&utm_source=email&utm_medium=retention&utm_campaign=mirror&utm_content=mirror_${stage}`;
 };
 
 const signoff = `Talk soon,\nG.`;
@@ -25,7 +25,7 @@ const signoffHtml = `<p>Talk soon,<br/>G.</p>`;
 // ==========================================
 export function getMirror1_ColdTruth(vars: PersonalizationVars) {
   const subject = `Read this tonight`;
-  const link = addUtm(`${vars.app_url}/results`, 1, vars.session_id);
+  const link = addUtm(vars.api_url, 1, vars.session_id);
 
   const text = `
 You just spent 10 minutes answering questions most people avoid for years. That took guts.
@@ -84,7 +84,7 @@ Unsubscribe: ${vars.unsubscribe_url}
 // ==========================================
 export function getMirror2_VitalSign(vars: PersonalizationVars) {
   const subject = `Your repair score is ${vars.metric_repair_efficiency}%`;
-  const link = addUtm(`${vars.app_url}/results`, 2, vars.session_id);
+  const link = addUtm(vars.api_url, 2, vars.session_id);
 
   const text = `
 "We have communication issues."
@@ -151,7 +151,7 @@ Unsubscribe: ${vars.unsubscribe_url}
 // ==========================================
 export function getMirror3_Forecast(vars: PersonalizationVars) {
   const subject = `You're compatible`;
-  const link = addUtm(`${vars.app_url}/results`, 3, vars.session_id);
+  const link = addUtm(vars.api_url, 3, vars.session_id);
 
   const text = `
 I want to show you one number that should change how you see everything.
@@ -210,7 +210,7 @@ Unsubscribe: ${vars.unsubscribe_url}
 // ==========================================
 export function getMirror4_Manager(vars: PersonalizationVars) {
   const subject = `Manager or partner?`;
-  const link = addUtm(`${vars.app_url}/results`, 4, vars.session_id);
+  const link = addUtm(vars.api_url, 4, vars.session_id);
 
   const text = `
 I need to tell you something uncomfortable.
@@ -267,7 +267,7 @@ Unsubscribe: ${vars.unsubscribe_url}
 // ==========================================
 export function getMirror5_Hope(vars: PersonalizationVars) {
   const subject = `It's a loop, not a flaw`;
-  const link = addUtm(`${vars.app_url}/results`, 5, vars.session_id);
+  const link = addUtm(vars.api_url, 5, vars.session_id);
 
   const text = `
 You've probably tried talking. You've probably tried "trying harder."
@@ -342,7 +342,7 @@ Unsubscribe: ${vars.unsubscribe_url}
 // ==========================================
 export function getMirror6_Loop(vars: PersonalizationVars) {
   const subject = `What happens in 5 years if you change nothing`;
-  const link = addUtm(`${vars.app_url}/results`, 6, vars.session_id);
+  const link = addUtm(vars.api_url, 6, vars.session_id);
 
   const text = `
 Over the last few days, I've shown you:
@@ -430,7 +430,7 @@ Unsubscribe: ${vars.unsubscribe_url}
 // ==========================================
 export function getMirror7_Archive(vars: PersonalizationVars) {
   const subject = `One last thing`;
-  const link = addUtm(`${vars.app_url}/results`, 7, vars.session_id);
+  const link = addUtm(vars.api_url, 7, vars.session_id);
 
   const text = `
 This is the last email I'll send you about this.

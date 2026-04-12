@@ -183,8 +183,8 @@ export const createCheckoutSession: CreateCheckoutSession<
       allow_promotion_codes: true, // Enable coupon/promo codes in checkout
       line_items: lineItems,
       mode: "payment",
-      success_url: `${config.frontendUrl}/report?success=true&session_id=${sessionId}`,
-      cancel_url: `${config.frontendUrl}/results?session=${sessionId}&checkout_cancelled=true`,
+      success_url: `${config.serverUrl}/api/session-redirect?to=report&success=true&session_id=${sessionId}`,
+      cancel_url: `${config.serverUrl}/api/session-redirect?to=results&session_id=${sessionId}`,
       customer_email: customerEmail || undefined,
       metadata: {
         testSessionId: sessionId,

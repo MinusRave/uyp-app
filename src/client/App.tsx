@@ -1,5 +1,5 @@
 import { useEffect, useMemo } from "react";
-import { Outlet, useLocation } from "react-router";
+import { Outlet, useLocation, useNavigate } from "react-router";
 import { routes } from "wasp/client/router";
 import { Toaster } from "../client/components/ui/toaster";
 import "./Main.css";
@@ -19,6 +19,18 @@ let isPixelInitialized = false;
 
 export default function App() {
   const location = useLocation();
+  const navigate = useNavigate();
+
+  // Handle server-side redirects: /?_to=/report?session_id=xxx
+  // The server sends users here because direct /report hits the static file server 404.
+  // We pick up the target path and navigate client-side where React Router handles it.
+  useEffect(() => {
+    const params = new URLSearchParams(location.search);
+    const redirectTo = params.get("_to");
+    if (redirectTo && location.pathname === "/") {
+      navigate(redirectTo, { replace: true });
+    }
+  }, []);
   const isMarketingPage = useMemo(() => {
     return (
       location.pathname === "/" || location.pathname.startsWith("/pricing")

@@ -377,6 +377,14 @@ api sendgridWebhook {
 }
 //#endregion
 
+// Session redirect — server-side entry point for Stripe returns & email links
+api sessionRedirect {
+  fn: import { sessionRedirect } from "@src/server/sessionRedirect",
+  entities: [TestSession],
+  middlewareConfigFn: import { sessionRedirectMiddlewareConfigFn } from "@src/server/sessionRedirect",
+  httpRoute: (GET, "/api/session-redirect")
+}
+
  // Magic Link
  action requestMagicLink {
    fn: import { requestMagicLink } from "@src/auth/magicLink",
