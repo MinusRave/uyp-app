@@ -178,10 +178,10 @@ page ProcessingPage {
 // Selling Page
 
 
-// NEW Teaser Page (Live)
-route TeaserRoute { path: "/results", to: TeaserPageNew }
-page TeaserPageNew {
-  component: import TeaserPageNew from "@src/results/TeaserPageNew"
+// Results Page (Value-first funnel)
+route TeaserRoute { path: "/results", to: ResultsPage }
+page ResultsPage {
+  component: import ResultsPage from "@src/results/ResultsPage"
 }
 
 // Full Paid Report

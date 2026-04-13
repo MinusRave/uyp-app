@@ -245,17 +245,19 @@ export default function TestPage() {
                     </div>
 
                     <h2 className="text-2xl md:text-3xl font-bold mb-4 md:mb-6 text-center">
-                        Your Relationship Profile is Ready
+                        Your Results Are Ready
                     </h2>
 
                     <div className="bg-muted/30 rounded-xl p-6 mb-8 text-center space-y-4 border border-border">
-                        <h3 className="text-xl font-bold">Your Profile is Ready</h3>
+                        <p className="text-foreground leading-relaxed font-medium">
+                            Those questions weren't easy. Most people avoid them for years. You just answered all of them.
+                        </p>
                         <p className="text-muted-foreground leading-relaxed">
-                            We've analyzed your answers against 5 key relationship dimensions. Your results include a detailed breakdown of your conflict style, hidden emotional needs, and a personalized roadmap to connection.
+                            Your answers paint a clear picture. Where things are working. Where they're breaking. And why you keep ending up in the same place.
                         </p>
                         <div className="flex justify-center gap-4 text-sm font-medium text-muted-foreground">
-                            <span className="flex items-center gap-1"><BadgeCheck size={16} className="text-green-500" /> Confidential</span>
-                            <span className="flex items-center gap-1"><Activity size={16} className="text-primary" /> Clinical-Grade</span>
+                            <span className="flex items-center gap-1"><BadgeCheck size={16} className="text-green-500" /> Private</span>
+                            <span className="flex items-center gap-1"><Activity size={16} className="text-primary" /> Built from your answers</span>
                         </div>
                     </div>
 
@@ -282,13 +284,13 @@ export default function TestPage() {
                             >
                                 <span className="relative z-10 flex items-center gap-2">
                                     {isSubmitting ? <Loader2 className="animate-spin" /> : <LockIcon size={20} />}
-                                    {isSubmitting ? "Unlocking..." : "Reveal My Analysis"}
+                                    {isSubmitting ? "Building your results..." : "Show Me What You Found"}
                                 </span>
                                 <div className="absolute inset-0 bg-white/20 translate-y-full group-hover:translate-y-0 transition-transform duration-300"></div>
                             </button>
                             <p className="text-xs text-center text-muted-foreground mt-3 flex items-center justify-center gap-1.5 opacity-80">
                                 <ShieldCheck size={12} className="text-green-600" />
-                                100% Secure. We respect your privacy & zero spam.
+                                100% private. No spam. Ever.
                             </p>
                         </div>
                         <div className="bg-blue-50 dark:bg-blue-950/20 rounded-lg p-3 text-left space-y-1.5">

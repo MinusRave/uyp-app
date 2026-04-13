@@ -1,5 +1,9 @@
 :{$PORT} {
-	root * /app/static
+	root * /app
+
+	@webm path *.webm
+	header @webm Content-Type video/webm
+
 	try_files {path} /index.html
 	file_server
 	encode gzip

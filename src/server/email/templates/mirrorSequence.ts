@@ -25,6 +25,7 @@ const signoffHtml = `<p>Talk soon,<br/>G.</p>`;
 // ==========================================
 export function getMirror1_ColdTruth(vars: PersonalizationVars) {
   const subject = `Read this tonight`;
+  const preheader = `One sentence that changes how your next fight ends.`;
   const link = addUtm(vars.app_url, 1, vars.session_id);
 
   const text = `
@@ -38,7 +39,7 @@ The next time you feel the tension rising — the familiar knot in your stomach,
 
 That's it. Don't fix anything. Don't say anything to your partner. Just name it silently.
 
-Why this works: when you label an emotional pattern, you activate your prefrontal cortex (the rational brain) and interrupt the amygdala hijack (the fight-or-flight brain). Neuroscientists call this "affect labeling." It literally changes which part of your brain is running the show.
+Why this works: when you name what's happening, your brain switches from panic mode to thinking mode. You go from reacting to observing. That one shift changes everything.
 
 One sentence. Tonight. Try it.
 
@@ -62,7 +63,7 @@ Unsubscribe: ${vars.unsubscribe_url}
 
     <p>That's it. Don't fix anything. Don't say anything to your partner. Just name it silently.</p>
 
-    <p><strong>Why this works:</strong> when you label an emotional pattern, you activate your prefrontal cortex (the rational brain) and interrupt the amygdala hijack (the fight-or-flight brain). Neuroscientists call this "affect labeling." It literally changes which part of your brain is running the show.</p>
+    <p><strong>Why this works:</strong> when you name what's happening, your brain switches from panic mode to thinking mode. You go from reacting to observing. That one shift changes everything.</p>
 
     <p>One sentence. Tonight. Try it.</p>
 
@@ -74,7 +75,7 @@ Unsubscribe: ${vars.unsubscribe_url}
     </p>
   `;
 
-  return { subject, html: wrapHtml(contentHtml, subject), text };
+  return { subject, html: wrapHtml(contentHtml, subject, preheader), text };
 }
 
 // ==========================================
@@ -83,7 +84,8 @@ Unsubscribe: ${vars.unsubscribe_url}
 // Playbook: Magic Lantern piece #2
 // ==========================================
 export function getMirror2_VitalSign(vars: PersonalizationVars) {
-  const subject = `Your repair score is ${vars.metric_repair_efficiency}%`;
+  const subject = `Your bounce-back speed is ${vars.metric_repair_efficiency}%`;
+  const preheader = `This is why your fights drag on for days.`;
   const link = addUtm(vars.app_url, 2, vars.session_id);
 
   const text = `
@@ -91,9 +93,9 @@ export function getMirror2_VitalSign(vars: PersonalizationVars) {
 
 Everyone says that. It's too vague to fix.
 
-Your data tells a more specific story: your Repair Efficiency is ${vars.metric_repair_efficiency}%.
+Your data tells a more specific story: your bounce-back speed is ${vars.metric_repair_efficiency}%.
 
-This number measures how quickly you and your partner recover after a fight. Low repair = arguments that linger for days. High repair = you fight, you fix, you move on.
+This measures how fast you and your partner get back to normal after a fight. Low = fights drag on for days. High = you fight, you fix it, you move on.
 
 Here's Exit Code #1 (couples with high repair scores all use this):
 
@@ -101,13 +103,13 @@ When a fight is escalating, one partner says: "I need 20 minutes. I'm not leavin
 
 That's it. Not "I need space" (feels like abandonment). Not storming out (feels like punishment). A specific time. A specific promise to return.
 
-Research shows this drops cortisol levels by 40% in both partners within the pause window. When you reconvene, the rational brain is back online.
+This works because a 20-minute break lets both of you calm down. When you come back, you can think clearly again instead of just reacting.
 
 Try it next time. Even if it feels awkward.
 
 ${signoff}
 
-P.S. Exit Codes #2 and #3 are in Chapter 2 of your report — they're designed specifically for your ${vars.metric_repair_efficiency}% repair pattern. Claim your report here: ${link}
+P.S. Exit Codes #2 and #3 are in Chapter 2 of your report — they're designed for your specific situation. Claim your report here: ${link}
 
 Unsubscribe: ${vars.unsubscribe_url}
   `;
@@ -117,9 +119,9 @@ Unsubscribe: ${vars.unsubscribe_url}
 
     <p>Everyone says that. It's too vague to fix.</p>
 
-    <p>Your data tells a more specific story: your <strong>Repair Efficiency is ${vars.metric_repair_efficiency}%</strong>.</p>
+    <p>Your data tells a more specific story: your <strong>bounce-back speed is ${vars.metric_repair_efficiency}%</strong>.</p>
 
-    <p>This number measures how quickly you and your partner recover after a fight. Low repair = arguments that linger for days. High repair = you fight, you fix, you move on.</p>
+    <p>This measures how fast you and your partner get back to normal after a fight. Low = fights drag on for days. High = you fight, you fix it, you move on.</p>
 
     <p><strong>Here's Exit Code #1</strong> (couples with high repair scores all use this):</p>
 
@@ -129,19 +131,19 @@ Unsubscribe: ${vars.unsubscribe_url}
 
     <p>That's it. Not "I need space" (feels like abandonment). Not storming out (feels like punishment). A specific time. A specific promise to return.</p>
 
-    <p>Research shows this drops cortisol levels by 40% in both partners within the pause window. When you reconvene, the rational brain is back online.</p>
+    <p>This works because a 20-minute break lets both of you calm down. When you come back, you can think clearly again instead of just reacting.</p>
 
     <p>Try it next time. Even if it feels awkward.</p>
 
     ${signoffHtml}
 
     <p style="margin-top: 30px; padding-top: 20px; border-top: 1px solid #E5E0D8; font-size: 14px; color: #64748B;">
-      P.S. Exit Codes #2 and #3 are in Chapter 2 of your report — designed specifically for your ${vars.metric_repair_efficiency}% repair pattern.
+      P.S. Exit Codes #2 and #3 are in Chapter 2 of your report — designed for your specific situation.
       <a href="${link}">Claim your report here.</a>
     </p>
   `;
 
-  return { subject, html: wrapHtml(contentHtml, subject), text };
+  return { subject, html: wrapHtml(contentHtml, subject, preheader), text };
 }
 
 // ==========================================
@@ -151,26 +153,27 @@ Unsubscribe: ${vars.unsubscribe_url}
 // ==========================================
 export function getMirror3_Forecast(vars: PersonalizationVars) {
   const subject = `You're compatible`;
+  const preheader = `This number surprised me. It should surprise you too.`;
   const link = addUtm(vars.app_url, 3, vars.session_id);
 
   const text = `
 I want to show you one number that should change how you see everything.
 
-Your Compatibility Quotient: ${vars.metric_compatibility_quotient}%
+How well you two fit together: ${vars.metric_compatibility_quotient}%
 
 I know — you probably expected bad news. But this is the tragedy of your situation: you value the same things. You want the same future. You are good teammates who have forgotten how to pass the ball.
 
 Most couples who break up are genuinely incompatible — different values, different life goals, different visions. That's not you.
 
-You're at risk of breaking up because you're uncalibrated. The machine works. The settings are off.
+You're at risk of breaking up because you're out of sync. The parts work. The timing is off.
 
-Here's one thing to sit with today: the next time you feel frustrated with your partner, ask yourself — "Is this a values problem, or a calibration problem?"
+Here's one thing to sit with today: the next time you feel frustrated with your partner, ask yourself — "Is this a values problem, or a timing problem?"
 
-If the answer is calibration (and based on your data, it almost certainly is), that changes everything. Because calibration is fixable. Incompatibility isn't.
+If the answer is timing (and based on your data, it almost certainly is), that changes everything. Because timing can be fixed. Being wrong for each other can't.
 
 ${signoff}
 
-P.S. Your report contains the exact calibration protocol for your specific pattern — step by step, week by week. Open it here: ${link}
+P.S. Your report contains the exact step-by-step plan for your specific pattern — step by step, week by week. Open it here: ${link}
 
 Unsubscribe: ${vars.unsubscribe_url}
   `;
@@ -179,7 +182,7 @@ Unsubscribe: ${vars.unsubscribe_url}
     <p>I want to show you one number that should change how you see everything.</p>
 
     <p style="padding: 16px 20px; background-color: #ECFDF5; border-left: 3px solid #10B981; margin: 24px 0; font-size: 18px;">
-      <strong>Your Compatibility Quotient: ${vars.metric_compatibility_quotient}%</strong>
+      <strong>How well you two fit together: ${vars.metric_compatibility_quotient}%</strong>
     </p>
 
     <p>I know — you probably expected bad news. But this is the tragedy of your situation: you value the same things. You want the same future. You are good teammates who have forgotten how to pass the ball.</p>
@@ -188,19 +191,19 @@ Unsubscribe: ${vars.unsubscribe_url}
 
     <p>You're at risk of breaking up because you're <strong>uncalibrated</strong>. The machine works. The settings are off.</p>
 
-    <p>Here's one thing to sit with today: the next time you feel frustrated with your partner, ask yourself — <em>"Is this a values problem, or a calibration problem?"</em></p>
+    <p>Here's one thing to sit with today: the next time you feel frustrated with your partner, ask yourself — <em>"Is this a values problem, or a timing problem?"</em></p>
 
-    <p>If the answer is calibration (and based on your data, it almost certainly is), that changes everything. Because calibration is fixable. Incompatibility isn't.</p>
+    <p>If the answer is timing (and based on your data, it almost certainly is), that changes everything. Because timing can be fixed. Being wrong for each other can't.</p>
 
     ${signoffHtml}
 
     <p style="margin-top: 30px; padding-top: 20px; border-top: 1px solid #E5E0D8; font-size: 14px; color: #64748B;">
-      P.S. Your report contains the exact calibration protocol for your specific pattern — step by step, week by week.
+      P.S. Your report contains the exact step-by-step plan for your specific pattern — step by step, week by week.
       <a href="${link}">Open it here.</a>
     </p>
   `;
 
-  return { subject, html: wrapHtml(contentHtml, subject), text };
+  return { subject, html: wrapHtml(contentHtml, subject, preheader), text };
 }
 
 // ==========================================
@@ -210,18 +213,19 @@ Unsubscribe: ${vars.unsubscribe_url}
 // ==========================================
 export function getMirror4_Manager(vars: PersonalizationVars) {
   const subject = `Manager or partner?`;
+  const preheader = `The #1 thing that kills desire. And you're doing it.`;
   const link = addUtm(vars.app_url, 4, vars.session_id);
 
   const text = `
 I need to tell you something uncomfortable.
 
-Your CEO vs Intern Score is ${vars.metric_ceo_vs_intern}%.
+Your "who does more" score is ${vars.metric_ceo_vs_intern}%.
 
-This means there's a significant power imbalance in your relationship. One of you is "managing" — tracking the groceries, the appointments, the kids' schedules, the emotional temperature of the house. The other is "reporting in."
+This means one of you is carrying way more than the other. One of you is "managing" — tracking the groceries, the appointments, the kids' schedules, the emotional temperature of the house. The other is "reporting in."
 
 Here's the brutal truth: you cannot desire someone you are managing. And they cannot desire someone who acts like their parent.
 
-This imbalance is the #1 killer of intimacy. (Your Erotic Potential score is ${vars.metric_erotic_potential}% — and now you know why.)
+This is the #1 thing that kills desire. (Your spark score is ${vars.metric_erotic_potential}% — and now you know why.)
 
 One thing you can try this week: pick ONE task you've been managing and fully hand it over. Not "can you handle this?" (that's still managing). Just stop doing it. Let it be imperfect. Let the ball drop if it drops.
 
@@ -243,7 +247,7 @@ Unsubscribe: ${vars.unsubscribe_url}
 
     <p>Here's the brutal truth: <strong>you cannot desire someone you are managing.</strong> And they cannot desire someone who acts like their parent.</p>
 
-    <p>This imbalance is the #1 killer of intimacy. (Your Erotic Potential score is ${vars.metric_erotic_potential}% — and now you know why.)</p>
+    <p>This is the #1 thing that kills desire. (Your spark score is ${vars.metric_erotic_potential}% — and now you know why.)</p>
 
     <p><strong>One thing you can try this week:</strong> pick ONE task you've been managing and fully hand it over. Not "can you handle this?" (that's still managing). Just stop doing it. Let it be imperfect. Let the ball drop if it drops.</p>
 
@@ -257,7 +261,7 @@ Unsubscribe: ${vars.unsubscribe_url}
     </p>
   `;
 
-  return { subject, html: wrapHtml(contentHtml, subject), text };
+  return { subject, html: wrapHtml(contentHtml, subject, preheader), text };
 }
 
 // ==========================================
@@ -267,6 +271,7 @@ Unsubscribe: ${vars.unsubscribe_url}
 // ==========================================
 export function getMirror5_Hope(vars: PersonalizationVars) {
   const subject = `It's a loop, not a flaw`;
+  const preheader = `Neither of you is the problem. Here's what is.`;
   const link = addUtm(vars.app_url, 5, vars.session_id);
 
   const text = `
@@ -332,7 +337,7 @@ Unsubscribe: ${vars.unsubscribe_url}
     </p>
   `;
 
-  return { subject, html: wrapHtml(contentHtml, subject), text };
+  return { subject, html: wrapHtml(contentHtml, subject, preheader), text };
 }
 
 // ==========================================
@@ -342,6 +347,7 @@ Unsubscribe: ${vars.unsubscribe_url}
 // ==========================================
 export function getMirror6_Loop(vars: PersonalizationVars) {
   const subject = `What happens in 5 years if you change nothing`;
+  const preheader = `Your data paints a clear picture. Here it is.`;
   const link = addUtm(vars.app_url, 6, vars.session_id);
 
   const text = `
@@ -357,7 +363,7 @@ You now understand more about your relationship than most couples learn in a yea
 
 But understanding isn't enough. Understanding without action is just awareness of the problem while it gets worse.
 
-Your Sustainability Score is ${vars.metric_sustainability_score}%.
+Your long-term outlook score is ${vars.metric_sustainability_score}%.
 
 Here's what that number means in plain English:
 
@@ -420,7 +426,7 @@ Unsubscribe: ${vars.unsubscribe_url}
     ${signoffHtml}
   `;
 
-  return { subject, html: wrapHtml(contentHtml, subject), text };
+  return { subject, html: wrapHtml(contentHtml, subject, preheader), text };
 }
 
 // ==========================================
@@ -430,6 +436,7 @@ Unsubscribe: ${vars.unsubscribe_url}
 // ==========================================
 export function getMirror7_Archive(vars: PersonalizationVars) {
   const subject = `One last thing`;
+  const preheader = `This is the last email. I mean it.`;
   const link = addUtm(vars.app_url, 7, vars.session_id);
 
   const text = `
@@ -473,5 +480,5 @@ Unsubscribe: ${vars.unsubscribe_url}
     </p>
   `;
 
-  return { subject, html: wrapHtml(contentHtml, subject), text };
+  return { subject, html: wrapHtml(contentHtml, subject, preheader), text };
 }

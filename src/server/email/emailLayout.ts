@@ -1,5 +1,8 @@
 
-export const wrapHtml = (content: string, title: string = "UnderstandYourPartner"): string => {
+export const wrapHtml = (content: string, title: string = "UnderstandYourPartner", preheader?: string): string => {
+    const preheaderHtml = preheader
+        ? `<div style="display:none;font-size:1px;color:#FAF8F5;line-height:1px;max-height:0px;max-width:0px;opacity:0;overflow:hidden;">${preheader}</div>`
+        : "";
     return `<!DOCTYPE html>
 <html lang="en">
 <head>
@@ -64,6 +67,7 @@ export const wrapHtml = (content: string, title: string = "UnderstandYourPartner
     </style>
 </head>
 <body>
+    ${preheaderHtml}
     <table class="wrapper" role="presentation">
         <tr>
             <td>
