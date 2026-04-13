@@ -183,8 +183,8 @@ export const createCheckoutSession: CreateCheckoutSession<
       allow_promotion_codes: true, // Enable coupon/promo codes in checkout
       line_items: lineItems,
       mode: "payment",
-      success_url: `${config.serverUrl}/api/session-redirect?to=report&success=true&session_id=${sessionId}`,
-      cancel_url: `${config.serverUrl}/api/session-redirect?to=results&session_id=${sessionId}`,
+      success_url: `${process.env.WASP_WEB_CLIENT_URL || "http://localhost:3000"}/report?success=true&session_id=${sessionId}`,
+      cancel_url: `${process.env.WASP_WEB_CLIENT_URL || "http://localhost:3000"}/results?session=${sessionId}`,
       customer_email: customerEmail || undefined,
       metadata: {
         testSessionId: sessionId,

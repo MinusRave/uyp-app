@@ -712,21 +712,21 @@ export default function TeaserPageNew() {
 
     // Email capture removed — users always have email in new session model
 
-    // No session ID at all (no URL param, no localStorage) → show "not found" with retake link
-    if (!session && !sessionIdToUse) return (
+    // Still loading — show spinner
+    if (isSessionLoading) return (
+        <div className="min-h-screen flex items-center justify-center bg-background">
+            <Activity className="animate-spin text-primary" size={32} />
+        </div>
+    );
+
+    // No session found (no ID, or ID didn't match any session) → show "not found" with retake link
+    if (!session) return (
         <div className="min-h-screen flex items-center justify-center bg-background text-foreground">
             <div className="text-center space-y-4 p-8">
                 <p className="text-xl font-bold">Session not found</p>
                 <p className="text-muted-foreground">Your session may have expired or you're on a different device.</p>
                 <a href="/test" className="text-primary font-bold hover:underline">Take the assessment &rarr;</a>
             </div>
-        </div>
-    );
-
-    // Session ID exists but data hasn't loaded yet (hydration gap, network delay)
-    if (!session) return (
-        <div className="min-h-screen flex items-center justify-center bg-background">
-            <Activity className="animate-spin text-primary" size={32} />
         </div>
     );
 

@@ -341,6 +341,11 @@ export default function FullReport() {
 
     const sessionIdToUse = urlSessionId || localSessionId || undefined;
 
+    // Persist URL session ID to localStorage for subsequent navigations
+    useEffect(() => {
+        if (urlSessionId) localStorage.setItem("uyp-session-id", urlSessionId);
+    }, [urlSessionId]);
+
     // 1. Fetch Session
     const { data: session, isLoading: isSessionLoading, refetch: refetchSession } = useQuery(getTestSession, { sessionId: sessionIdToUse });
 
@@ -412,12 +417,16 @@ export default function FullReport() {
     }, [session?.isPaid]);
 
     useEffect(() => {
-        if (!isSessionLoading && session) {
-            if (!session.isPaid && !isDev && !waitingForPayment) {
-                navigate("/results");
-            }
+        if (isSessionLoading) return;
+        if (!session && !sessionIdToUse) {
+            // No session found and no way to find one — redirect to test
+            navigate("/test", { replace: true });
+            return;
         }
-    }, [session, isSessionLoading, navigate, isDev, waitingForPayment]);
+        if (session && !session.isPaid && !isDev && !waitingForPayment) {
+            navigate(`/results?session=${session.id}`, { replace: true });
+        }
+    }, [session, isSessionLoading, navigate, isDev, waitingForPayment, sessionIdToUse]);
 
 
     // 3. Trigger AI Calls on Load (if not present)

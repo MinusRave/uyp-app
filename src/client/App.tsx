@@ -21,16 +21,15 @@ export default function App() {
   const location = useLocation();
   const navigate = useNavigate();
 
-  // Handle server-side redirects: /?_to=/report?session_id=xxx
-  // The server sends users here because direct /report hits the static file server 404.
-  // We pick up the target path and navigate client-side where React Router handles it.
+  // Handle legacy server-side redirects: /?_to=/report?session_id=xxx
+  // Kept as backward-compatible fallback for any old bookmarks or cached links.
   useEffect(() => {
     const params = new URLSearchParams(location.search);
     const redirectTo = params.get("_to");
     if (redirectTo && location.pathname === "/") {
       navigate(redirectTo, { replace: true });
     }
-  }, []);
+  }, [location.search, location.pathname, navigate]);
   const isMarketingPage = useMemo(() => {
     return (
       location.pathname === "/" || location.pathname.startsWith("/pricing")

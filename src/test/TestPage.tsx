@@ -63,22 +63,25 @@ export default function TestPage() {
         trackPixelEvent('ViewContent', { content_name: 'Relationship Test' });
     }, []);
 
-    // Redirect logged-in user with existing session (only on initial page load)
-    // Skip when we're in the email-gate or analyzing phase — handleEmailSubmit owns navigation then
+    // Redirect logged-in user with existing session (only on initial page load).
+    // Once the quiz flow starts (questions/email-gate/analyzing), this ref prevents
+    // the effect from interfering — handleEmailSubmit owns navigation from that point.
+    const quizFlowStarted = useRef(false);
+
     useEffect(() => {
-        if (phase === 'email-gate' || phase === 'analyzing') return;
+        if (quizFlowStarted.current) return;
         if (!user) { setPhase('wizard'); return; }
         if (isSessionLoading) return;
         if (existingSession) {
             if (existingSession.isPaid) {
-                navigate('/report');
+                navigate(`/report?session_id=${existingSession.id}`);
             } else {
-                navigate('/results');
+                navigate(`/results?session=${existingSession.id}`);
             }
         } else {
             setPhase('wizard');
         }
-    }, [user, existingSession, isSessionLoading, navigate, phase]);
+    }, [user, existingSession, isSessionLoading, navigate]);
 
     // Track quiz abandon on page unload
     useEffect(() => {
@@ -99,6 +102,7 @@ export default function TestPage() {
 
     // Wizard completed → start questions
     const handleProfileSubmit = (data: any) => {
+        quizFlowStarted.current = true;
         setWizardData(data);
         setPhase('questions');
 
@@ -196,7 +200,7 @@ export default function TestPage() {
             ]);
 
             trackPixelEvent('SubmitApplication', { status: 'completed' });
-            navigate(routes.TeaserRoute.build());
+            navigate(`/results?session=${result.sessionId}`);
         } catch (err) {
             console.error("Failed to save test:", err);
             setPhase('email-gate');
