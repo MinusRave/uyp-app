@@ -412,7 +412,9 @@ function QuizWizard({ onSubmit, isSubmitting }: { onSubmit: (data: any) => void,
         biggestFear: ""
     });
 
-    const totalSteps = 7;
+    // NOTE: Step6_Demographics (user/partner gender + age) is intentionally hidden from the wizard
+    // to reduce friction — those fields are collected as empty strings and kept in the schema for future use.
+    const totalSteps = 6;
 
     const updateData = (key: string, value: any) => {
         setFormData(prev => ({ ...prev, [key]: value }));
@@ -500,15 +502,6 @@ function QuizWizard({ onSubmit, isSubmitting }: { onSubmit: (data: any) => void,
                 )}
 
                 {step === 6 && (
-                    <Step6_Demographics
-                        data={formData}
-                        updateData={updateData}
-                        onNext={() => nextStep()}
-                        onBack={prevStep}
-                    />
-                )}
-
-                {step === 7 && (
                     <Step7_Fear
                         data={formData}
                         updateData={updateData}
@@ -890,7 +883,7 @@ function Step7_Fear({ data, updateData, onSubmit, onBack, isSubmitting }: { data
     return (
         <div className="space-y-6 animate-slide-up">
             <div className="text-center">
-                <h2 className="text-2xl font-bold mb-1">One last difficult question...</h2>
+                <h2 className="text-2xl font-bold mb-1">One question before the test...</h2>
                 <p className="text-muted-foreground">What is the one thing you are most afraid to tell your partner?</p>
             </div>
 

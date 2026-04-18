@@ -10,7 +10,7 @@ type GetTestSessionsArgs = {
     take?: number;
     statusFilter?: 'all' | 'completed' | 'paid' | 'abandoned';
     emailFilter?: string;
-    sourceFilter?: 'all' | 'meta' | 'google' | 'email' | 'direct';
+    sourceFilter?: 'all' | 'meta_paid' | 'meta_organic' | 'meta' | 'google' | 'email' | 'direct';
     progressFilter?: 'all' | 'no_start' | 'in_progress' | 'completed';
     leadFilter?: 'all' | 'lead' | 'anonymous';
     hideEmpty?: boolean;
@@ -97,14 +97,34 @@ export const getTestSessions: GetTestSessions<GetTestSessionsArgs, GetTestSessio
     }
 
     // Source Filter
-    if (sourceFilter === 'meta') {
+    // Meta PAID = click on a Meta ad (fbclid is appended by Meta only on ad clicks; fbc is the cookie version of it)
+    // Meta ORGANIC = visit coming from facebook/instagram WITHOUT fbclid/fbc (bio link, post link, share, etc.)
+    const metaSourceOR = [
+        { utm_source: { contains: 'fb', mode: 'insensitive' } },
+        { utm_source: { contains: 'ig', mode: 'insensitive' } },
+        { utm_source: { contains: 'facebook', mode: 'insensitive' } },
+        { utm_source: { contains: 'instagram', mode: 'insensitive' } },
+        { referrer: { contains: 'facebook', mode: 'insensitive' } },
+        { referrer: { contains: 'instagram', mode: 'insensitive' } }
+    ];
+
+    if (sourceFilter === 'meta_paid') {
         where.OR = [
-            { utm_source: { contains: 'fb', mode: 'insensitive' } },
-            { utm_source: { contains: 'ig', mode: 'insensitive' } },
-            { utm_source: { contains: 'facebook', mode: 'insensitive' } },
-            { utm_source: { contains: 'instagram', mode: 'insensitive' } },
-            { referrer: { contains: 'facebook', mode: 'insensitive' } },
-            { referrer: { contains: 'instagram', mode: 'insensitive' } }
+            { fbclid: { not: null } },
+            { fbc: { not: null } }
+        ];
+    } else if (sourceFilter === 'meta_organic') {
+        where.AND = [
+            { fbclid: null },
+            { fbc: null },
+            { OR: metaSourceOR }
+        ];
+    } else if (sourceFilter === 'meta') {
+        // Legacy: any Meta traffic (paid + organic)
+        where.OR = [
+            { fbclid: { not: null } },
+            { fbc: { not: null } },
+            ...metaSourceOR
         ];
     } else if (sourceFilter === 'email') {
         // Source is email (UTM) or Reactivated (Email Clicked)
@@ -125,14 +145,13 @@ export const getTestSessions: GetTestSessions<GetTestSessionsArgs, GetTestSessio
     }
 
     if (hideEmpty) {
-        where.AND = [
-            {
-                OR: [
-                    { onboardingStep: { gt: 0 } },
-                    { currentQuestionIndex: { gt: 0 } }
-                ]
-            }
-        ];
+        const hideEmptyClause = {
+            OR: [
+                { onboardingStep: { gt: 0 } },
+                { currentQuestionIndex: { gt: 0 } }
+            ]
+        };
+        where.AND = Array.isArray(where.AND) ? [...where.AND, hideEmptyClause] : [hideEmptyClause];
     }
 
     const [sessions, totalCount] = await Promise.all([

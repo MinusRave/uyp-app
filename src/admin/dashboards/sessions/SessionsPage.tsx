@@ -45,7 +45,7 @@ const SessionsPage = ({ user }: { user: AuthUser }) => {
 
     // Funnel metrics filters
     const [funnelFilters, setFunnelFilters] = useState({
-        trafficSource: 'all' as 'all' | 'meta' | 'direct',
+        trafficSource: 'all' as 'all' | 'meta_paid' | 'meta_organic' | 'direct',
         // dateFrom: '', // Removing redundant internal date state to use global
         // dateTo: '',   // Removing redundant internal date state to use global
         deviceType: 'all' as 'all' | 'mobile' | 'desktop' | 'tablet',
@@ -53,7 +53,7 @@ const SessionsPage = ({ user }: { user: AuthUser }) => {
     });
 
     // Session Table Filters
-    const [sourceFilter, setSourceFilter] = useState<'all' | 'meta' | 'google' | 'email' | 'direct'>('all');
+    const [sourceFilter, setSourceFilter] = useState<'all' | 'meta_paid' | 'meta_organic' | 'google' | 'email' | 'direct'>('all');
     const [progressFilter, setProgressFilter] = useState<'all' | 'no_start' | 'in_progress' | 'completed'>('all');
     const [leadFilter, setLeadFilter] = useState<'all' | 'lead' | 'anonymous'>('all');
     const [hideEmpty, setHideEmpty] = useState(false);
@@ -160,8 +160,9 @@ const SessionsPage = ({ user }: { user: AuthUser }) => {
                                 className="w-full rounded-lg border-[1.5px] border-stroke bg-transparent py-2 px-3 text-sm outline-none transition focus:border-primary dark:border-form-strokedark dark:bg-form-input"
                             >
                                 <option value="all">All Traffic</option>
-                                <option value="meta">Meta Ads Only</option>
-                                <option value="direct">Direct/Organic Only</option>
+                                <option value="meta_paid">Meta Paid (Ads)</option>
+                                <option value="meta_organic">Meta Organic</option>
+                                <option value="direct">Direct Only</option>
                             </select>
                         </div>
 
@@ -239,7 +240,8 @@ const SessionsPage = ({ user }: { user: AuthUser }) => {
                             className="rounded-lg border-[1.5px] border-stroke bg-transparent py-2 px-3 font-medium outline-none transition focus:border-primary active:border-primary dark:border-form-strokedark dark:bg-form-input dark:focus:border-primary text-sm min-w-[130px]"
                         >
                             <option value="all">Source: All</option>
-                            <option value="meta">Meta / IG</option>
+                            <option value="meta_paid">Meta Paid (Ads)</option>
+                            <option value="meta_organic">Meta Organic</option>
                             <option value="google">Google</option>
                             <option value="email">Email Campaign</option>
                             <option value="direct">Direct</option>
@@ -325,15 +327,27 @@ const SessionsPage = ({ user }: { user: AuthUser }) => {
                                             </p>
                                             <div className="flex flex-wrap items-center gap-2 mt-1">
                                                 {/* Source Badge */}
-                                                {(session.utm_source === 'email' || session.utm_medium === 'email') ? (
-                                                    <span className="text-[10px] bg-purple-100 text-purple-700 px-2 py-0.5 rounded-full font-bold border border-purple-200">EMAIL LEADS</span>
-                                                ) : session.fbclid || (session.utm_source && session.utm_source.includes('fb')) || (session.utm_source && session.utm_source.includes('ig')) ? (
-                                                    <span className="text-[10px] bg-blue-100 text-blue-700 px-2 py-0.5 rounded-full font-bold border border-blue-200">META AD</span>
-                                                ) : session.utm_source ? (
-                                                    <span className="text-[10px] bg-yellow-100 text-yellow-700 px-2 py-0.5 rounded-full font-bold border border-yellow-200 uppercase">{session.utm_source}</span>
-                                                ) : (
-                                                    <span className="text-[10px] bg-gray-100 text-gray-600 px-2 py-0.5 rounded-full border border-gray-200">DIRECT</span>
-                                                )}
+                                                {(() => {
+                                                    const utmSrc = (session.utm_source || '').toLowerCase();
+                                                    const ref = (session.referrer || '').toLowerCase();
+                                                    const isEmail = utmSrc === 'email' || (session.utm_medium || '').toLowerCase() === 'email';
+                                                    const isMetaPaid = !!session.fbclid || !!session.fbc;
+                                                    const isMetaHint = utmSrc.includes('fb') || utmSrc.includes('ig') || utmSrc.includes('facebook') || utmSrc.includes('instagram') || ref.includes('facebook') || ref.includes('instagram');
+
+                                                    if (isEmail) {
+                                                        return <span className="text-[10px] bg-purple-100 text-purple-700 px-2 py-0.5 rounded-full font-bold border border-purple-200">EMAIL LEADS</span>;
+                                                    }
+                                                    if (isMetaPaid) {
+                                                        return <span className="text-[10px] bg-blue-100 text-blue-700 px-2 py-0.5 rounded-full font-bold border border-blue-200">META PAID</span>;
+                                                    }
+                                                    if (isMetaHint) {
+                                                        return <span className="text-[10px] bg-sky-100 text-sky-700 px-2 py-0.5 rounded-full font-bold border border-sky-200">META ORGANIC</span>;
+                                                    }
+                                                    if (session.utm_source) {
+                                                        return <span className="text-[10px] bg-yellow-100 text-yellow-700 px-2 py-0.5 rounded-full font-bold border border-yellow-200 uppercase">{session.utm_source}</span>;
+                                                    }
+                                                    return <span className="text-[10px] bg-gray-100 text-gray-600 px-2 py-0.5 rounded-full border border-gray-200">DIRECT</span>;
+                                                })()}
 
                                                 {/* Email Engagement Badge */}
                                                 {(() => {
