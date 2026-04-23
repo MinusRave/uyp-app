@@ -1,49 +1,61 @@
 import React, { useState, useEffect } from 'react';
 import { X, ArrowRight } from 'lucide-react';
 
+// Exit intent heuristics tuned for cold Meta traffic:
+// - Fire only once per session.
+// - Require meaningful engagement (scrolled past the hero) before any trigger.
+// - Desktop: mouseleave at the top edge.
+// - Mobile + desktop: visibilitychange (tap home, switch app, background tab) — the real exit signal.
+// - Fallback: 75s time — catches idle readers who've engaged but parked without buying.
+const SCROLL_GUARD_PX = 800;
+const TIME_FALLBACK_MS = 75_000;
+const MIN_ENGAGEMENT_MS = 20_000; // visibilitychange only counts after this
+
 export default function ExitIntentPopup({ onCTAClick }: { onCTAClick: () => void }) {
     const [isVisible, setIsVisible] = useState(false);
-    const [hasShown, setHasShown] = useState(false);
 
     useEffect(() => {
-        // Check if already shown in this session
-        const alreadyShown = sessionStorage.getItem('exitIntentShown');
-        if (alreadyShown) {
-            setHasShown(true);
-            return;
-        }
+        if (sessionStorage.getItem('exitIntentShown')) return;
+
+        const pageLoadedAt = Date.now();
+        let hasEngaged = window.scrollY > SCROLL_GUARD_PX;
+
+        const trigger = () => {
+            if (sessionStorage.getItem('exitIntentShown')) return;
+            if (!hasEngaged) return;
+            sessionStorage.setItem('exitIntentShown', 'true');
+            setIsVisible(true);
+        };
+
+        const handleScroll = () => {
+            if (!hasEngaged && window.scrollY > SCROLL_GUARD_PX) hasEngaged = true;
+        };
 
         const handleMouseLeave = (e: MouseEvent) => {
-            if (e.clientY <= 0 && !hasShown && !isVisible) {
-                // Delay slightly to avoid accidental triggers
-                setTimeout(() => {
-                    const shown = sessionStorage.getItem('exitIntentShown');
-                    if (!shown) {
-                        setIsVisible(true);
-                        setHasShown(true);
-                        sessionStorage.setItem('exitIntentShown', 'true');
-                    }
-                }, 100);
+            if (e.clientY <= 0) {
+                // Tiny delay filters out accidental top-bar grazes.
+                setTimeout(trigger, 100);
             }
         };
 
-        // Mobile/Timer fallback: Show after 45 seconds of inactivity (increased from 30)
-        const timer = setTimeout(() => {
-            const shown = sessionStorage.getItem('exitIntentShown');
-            if (!shown && !isVisible) {
-                setIsVisible(true);
-                setHasShown(true);
-                sessionStorage.setItem('exitIntentShown', 'true');
+        const handleVisibility = () => {
+            if (document.visibilityState === 'hidden' && Date.now() - pageLoadedAt >= MIN_ENGAGEMENT_MS) {
+                trigger();
             }
-        }, 45000);
+        };
 
+        const timer = setTimeout(trigger, TIME_FALLBACK_MS);
+        window.addEventListener('scroll', handleScroll, { passive: true });
         document.addEventListener('mouseleave', handleMouseLeave);
+        document.addEventListener('visibilitychange', handleVisibility);
 
         return () => {
+            window.removeEventListener('scroll', handleScroll);
             document.removeEventListener('mouseleave', handleMouseLeave);
+            document.removeEventListener('visibilitychange', handleVisibility);
             clearTimeout(timer);
         };
-    }, [hasShown, isVisible]);
+    }, []);
 
     const closePopup = () => {
         setIsVisible(false);

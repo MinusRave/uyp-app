@@ -4,6 +4,7 @@ import type {
   CreateCheckoutSession,
   GetCustomerPortalUrl,
   VerifyPayment,
+  StartOffer,
 } from "wasp/server/operations";
 import * as z from "zod";
 import { PaymentPlanId, paymentPlans } from "../payment/plans";
@@ -60,21 +61,35 @@ export const generateCheckoutSession: GenerateCheckoutSession<
 };
 
 import { sendCapiEvent } from "../server/analytics/metaCapi";
+import {
+  ADDONS,
+  ADDON_IDS,
+  BUNDLE_PRICE,
+  BUNDLE_ID,
+  computeAddonsTotal,
+  getAddonById,
+  isBundle,
+  isBundleAvailable,
+} from "./addons";
 
 export type CreateCheckoutSessionArgs = {
   sessionId: string;
   eventID?: string;
-  addWorkbook?: boolean; // NEW: Order bump
+  addonIds?: string[];
 };
 
 export const createCheckoutSession: CreateCheckoutSession<
   CreateCheckoutSessionArgs,
   CheckoutSession
-> = async ({ sessionId, eventID, addWorkbook }, context) => {
+> = async ({ sessionId, eventID, addonIds }, context) => {
   // 1. Fetch Session
   console.log("[createCheckoutSession] SessionId:", sessionId);
   console.log("[createCheckoutSession] User Context:", context.user?.id);
-  console.log("[createCheckoutSession] Add Workbook:", addWorkbook);
+
+  const selectedAddons = (addonIds ?? []).filter((id) => ADDON_IDS.includes(id));
+  const uniqueAddons = Array.from(new Set(selectedAddons));
+  const selectedBundle = isBundle(uniqueAddons);
+  console.log("[createCheckoutSession] Selected addons:", uniqueAddons, "bundle:", selectedBundle);
 
   const testSession = await context.entities.TestSession.findUnique({
     where: { id: sessionId },
@@ -86,6 +101,12 @@ export const createCheckoutSession: CreateCheckoutSession<
   }
 
   console.log("[createCheckoutSession] TestSession Email:", testSession.email);
+
+  // Server-side bundle window enforcement.
+  // Bundle is only valid for 15 minutes after offerStartedAt was first set.
+  if (selectedBundle && !isBundleAvailable(testSession.offerStartedAt)) {
+    throw new HttpError(410, "The bundle offer has expired. Please pick guides individually.");
+  }
 
   // 2. Determine User / Email
   // If logged in, ensure ownership or claim.
@@ -111,11 +132,9 @@ export const createCheckoutSession: CreateCheckoutSession<
 
   // 3. Send Meta CAPI InitiateCheckout Event
   const reportPrice = parseFloat(process.env.REPORT_PRICE || "9.99");
-  const workbookPrice = 12.00;
   const productName = "Understand Your Partner - Full Analysis";
-
-  let totalPrice = reportPrice;
-  if (addWorkbook) totalPrice += workbookPrice;
+  const addonsTotal = computeAddonsTotal(uniqueAddons);
+  const totalPrice = reportPrice + addonsTotal;
 
   if (eventID) {
     // Run in background
@@ -151,7 +170,7 @@ export const createCheckoutSession: CreateCheckoutSession<
         currency: "usd",
         product_data: {
           name: productName,
-          description: "Complete Relationship Diagnosis, 5-Year Forecast, and 5 Targeted Strategic Protocol Guides.",
+          description: "Complete Relationship Diagnosis and 5-Year Forecast.",
         },
         unit_amount: Math.round(reportPrice * 100),
       },
@@ -159,18 +178,34 @@ export const createCheckoutSession: CreateCheckoutSession<
     }
   ];
 
-  if (addWorkbook) {
+  if (selectedBundle) {
     lineItems.push({
       price_data: {
         currency: "usd",
         product_data: {
-          name: "The 30-Day Reconnection Workbook",
-          description: "Daily guided exercises to rebuild connection.",
+          name: "All 6 Bonus Guides — Bundle",
+          description: "The full toolkit: 5 clinical guides plus the 30-Day Reconnection Workbook.",
         },
-        unit_amount: Math.round(workbookPrice * 100),
+        unit_amount: Math.round(BUNDLE_PRICE * 100),
       },
       quantity: 1,
     });
+  } else {
+    for (const addonId of uniqueAddons) {
+      const addon = getAddonById(addonId);
+      if (!addon) continue;
+      lineItems.push({
+        price_data: {
+          currency: "usd",
+          product_data: {
+            name: addon.name,
+            description: addon.stripeDescription,
+          },
+          unit_amount: Math.round(addon.price * 100),
+        },
+        quantity: 1,
+      });
+    }
   }
 
   let session;
@@ -191,7 +226,9 @@ export const createCheckoutSession: CreateCheckoutSession<
         userId: context.user?.id || "", // Empty if anonymous
         type: "report_unlock",
         capiEventId: eventID || "", // Pass it just in case we need it
-        hasOrderBump: addWorkbook ? "true" : "false", // Track if they bought it
+        addonIds: uniqueAddons.join(","),
+        bundleSelected: selectedBundle ? "true" : "false",
+        hasOrderBump: uniqueAddons.includes("workbook") ? "true" : "false", // Legacy field for workbook
       },
     });
   } catch (error) {
@@ -267,4 +304,29 @@ export const getCustomerPortalUrl: GetCustomerPortalUrl<
   }
 
   return null;
+};
+
+// Starts the 15-minute bundle timer. Idempotent: returns the existing offerStartedAt if already set.
+export const startOffer: StartOffer<{ sessionId: string }, { offerStartedAt: Date }> = async ({ sessionId }, context) => {
+  const testSession = await context.entities.TestSession.findUnique({
+    where: { id: sessionId },
+    select: { id: true, userId: true, offerStartedAt: true },
+  });
+
+  if (!testSession) throw new HttpError(404, "Session not found");
+
+  if (context.user && testSession.userId && testSession.userId !== context.user.id) {
+    throw new HttpError(403, "Invalid session ownership.");
+  }
+
+  if (testSession.offerStartedAt) {
+    return { offerStartedAt: testSession.offerStartedAt };
+  }
+
+  const now = new Date();
+  await context.entities.TestSession.update({
+    where: { id: sessionId },
+    data: { offerStartedAt: now },
+  });
+  return { offerStartedAt: now };
 };

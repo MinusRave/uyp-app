@@ -356,6 +356,11 @@ action verifyPayment {
   entities: [TestSession]
 }
 
+action startOffer {
+  fn: import { startOffer } from "@src/payment/operations",
+  entities: [TestSession]
+}
+
 api stripeWebhook {
   fn: import { stripeWebhook } from "@src/payment/reportWebhook",
   entities: [TestSession],

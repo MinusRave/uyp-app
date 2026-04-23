@@ -1,6 +1,6 @@
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Activity } from "lucide-react";
-import { createCheckoutSession } from "wasp/client/operations";
+import { createCheckoutSession, startOffer } from "wasp/client/operations";
 import { trackPixelEvent } from "../analytics/pixel";
 import { generateEventId } from "../analytics/eventId";
 
@@ -11,13 +11,40 @@ import { PainMap } from "./sections/PainMap";
 import { PatternBreaker } from "./sections/PatternBreaker";
 import { GodfatherOffer } from "./sections/GodfatherOffer";
 import { StickyMobileCTA } from "./components/StickyMobileCTA";
+import ExitIntentPopup from "./ExitIntentPopup";
+import { computeAddonsTotal, isBundleAvailable } from "../payment/addons";
+
+const REPORT_PRICE = parseFloat(import.meta.env.REACT_APP_REPORT_PRICE || "9.99");
 
 export default function ResultsPage() {
     const { session, isLoading, quickOverview, narcissismAnalysis } = useResultsSession();
-    const { showStickyCTA, trackCTA, scrollToOffer } = useScrollTracking();
+    const { showStickyCTA, trackCTA, scrollToOffer } = useScrollTracking(!!session && !session.isPaid);
 
-    const [addOrderBump, setAddOrderBump] = useState(false);
+    const [selectedAddons, setSelectedAddons] = useState<string[]>([]);
     const [isCheckoutLoading, setIsCheckoutLoading] = useState(false);
+    const [offerStartedAt, setOfferStartedAt] = useState<Date | null>(null);
+    const [bundleAvailable, setBundleAvailable] = useState(true);
+    const offerStartInitiated = useRef(false);
+
+    // Start the 15-min bundle timer on first view. Idempotent server-side.
+    useEffect(() => {
+        if (!session?.id || session.isPaid || offerStartInitiated.current) return;
+        offerStartInitiated.current = true;
+        const existing = (session as any).offerStartedAt;
+        if (existing) {
+            const startedAt = new Date(existing);
+            setOfferStartedAt(startedAt);
+            setBundleAvailable(isBundleAvailable(startedAt));
+            return;
+        }
+        startOffer({ sessionId: session.id })
+            .then((result) => {
+                const startedAt = new Date(result.offerStartedAt);
+                setOfferStartedAt(startedAt);
+                setBundleAvailable(isBundleAvailable(startedAt));
+            })
+            .catch((e) => console.error("[startOffer] failed:", e));
+    }, [session?.id, session?.isPaid]);
 
     // Checkout handler (preserved from TeaserPageNew)
     const handleCheckout = async (location: string) => {
@@ -26,10 +53,12 @@ export default function ResultsPage() {
         setIsCheckoutLoading(true);
 
         const eventID = generateEventId();
+        const addonsSubtotal = bundleAvailable ? computeAddonsTotal(selectedAddons) : selectedAddons.length * 2.99;
+        const totalValue = REPORT_PRICE + addonsSubtotal;
         trackPixelEvent("InitiateCheckout", {
             content_name: "Full Relationship Report",
             content_category: "Report",
-            value: addOrderBump ? 21.99 : 9.99,
+            value: totalValue,
             currency: "USD",
             eventID,
         });
@@ -38,14 +67,21 @@ export default function ResultsPage() {
             const checkout = await createCheckoutSession({
                 sessionId: session.id,
                 eventID,
-                addWorkbook: addOrderBump,
+                addonIds: selectedAddons,
             });
             if (checkout.sessionUrl) {
                 window.location.href = checkout.sessionUrl;
             }
-        } catch (e) {
+        } catch (e: any) {
             console.error(e);
-            alert("Checkout failed. Please try again.");
+            const statusCode = e?.statusCode || e?.status;
+            if (statusCode === 410) {
+                setBundleAvailable(false);
+                if (selectedAddons.length === 6) setSelectedAddons([]);
+                alert("The $9.99 bundle just ended. Please pick the guides you want.");
+            } else {
+                alert("Checkout failed. Please try again.");
+            }
         } finally {
             setIsCheckoutLoading(false);
         }
@@ -84,10 +120,17 @@ export default function ResultsPage() {
                 narcissismAnalysis={narcissismAnalysis}
                 onCheckout={handleCheckout}
                 isCheckoutLoading={isCheckoutLoading}
-                addOrderBump={addOrderBump}
-                setAddOrderBump={setAddOrderBump}
+                selectedAddons={selectedAddons}
+                setSelectedAddons={setSelectedAddons}
+                offerStartedAt={offerStartedAt}
+                bundleAvailable={bundleAvailable}
+                onBundleExpire={() => {
+                    setBundleAvailable(false);
+                    if (selectedAddons.length === 6) setSelectedAddons([]);
+                }}
             />
             <StickyMobileCTA show={showStickyCTA} onPress={scrollToOffer} />
+            <ExitIntentPopup onCTAClick={() => handleCheckout("exit_intent")} />
         </div>
     );
 }

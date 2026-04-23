@@ -6,6 +6,7 @@ import { emailSender } from "wasp/server/email";
 import { getPaymentConfirmationEmail } from "../server/email/templates/paymentConfirmation";
 import { buildPersonalizationData } from "../server/email/personalization";
 import { sendCapiEvent } from "../server/analytics/metaCapi";
+import { ADDON_IDS } from "./addons";
 
 // ... middleware config ...
 export const stripeMiddlewareConfigFn: MiddlewareConfigFn = (
@@ -91,8 +92,20 @@ export const stripeWebhook = async (
         emailSequenceType: null, // Stop sequences
       };
 
-      if (metadata.hasOrderBump === 'true') {
-        dataToUpdate.hasPurchasedOrderBump = true;
+      // Parse purchased addons from metadata.
+      // If bundle was selected, seed all addon IDs; otherwise use the comma list.
+      const bundleSelected = metadata.bundleSelected === 'true';
+      const rawAddonIds = (metadata.addonIds || '').split(',').map((s: string) => s.trim()).filter(Boolean);
+      const addonIds = bundleSelected
+        ? [...ADDON_IDS]
+        : rawAddonIds.filter((id: string) => ADDON_IDS.includes(id));
+
+      if (addonIds.length > 0) {
+        dataToUpdate.purchasedAddons = addonIds;
+      }
+
+      if (metadata.hasOrderBump === 'true' || addonIds.includes('workbook')) {
+        dataToUpdate.hasPurchasedOrderBump = true; // Legacy field
       }
 
       if (!testSession.email && session.customer_details?.email) {

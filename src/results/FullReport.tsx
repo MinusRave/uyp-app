@@ -913,18 +913,23 @@ export default function FullReport() {
 
 
                 {/* 8. GUIDES DOWNLOAD SECTION */}
+                {(() => {
+                    const purchasedAddons: string[] = (session as any)?.purchasedAddons ?? [];
+                    const owns = (id: string) => purchasedAddons.includes(id);
+                    const anyGuides = ["workbook", "mental-load", "dead-bedroom", "narcissist-detection", "emotional-affair", "stay-or-go"].some(owns);
+                    if (!anyGuides) return null;
+                    return (
                 <section className="py-12 mt-12 border-t border-slate-200 dark:border-slate-800">
                     <div className="text-center mb-12 space-y-4">
                         <span className="text-primary font-bold tracking-widest uppercase text-xs animate-pulse">Available For Download</span>
-                        <h2 className="text-3xl font-black text-slate-900 dark:text-white">Your Premium Clinical Guides</h2>
+                        <h2 className="text-3xl font-black text-slate-900 dark:text-white">Your Clinical Guides</h2>
                         <p className="text-lg text-slate-500 max-w-2xl mx-auto">
-                            These specialized protocols are included with your plan. Download them to your device.
+                            The guides you added at checkout. Download them to your device.
                         </p>
                     </div>
 
                     <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-                        {/* ORDER BUMP GUIDE - Only if purchased */}
-                        {(session as any).hasPurchasedOrderBump && (
+                        {owns("workbook") && (
                             <GuideCard
                                 title="30-Day Reconnection Workbook"
                                 format="Daily Workbook"
@@ -935,59 +940,65 @@ export default function FullReport() {
                                 sessionId={session?.id}
                             />
                         )}
-
-                        {/* Guide 1 */}
-                        <GuideCard
-                            title="The Mental Load Equalizer"
-                            format="PDF Protocol"
-                            desc="Spreadsheet tools and scripts to rebalance household management responsibilities without conflict."
-                            icon={<FileText size={24} />}
-                            color={{ bgLight: "bg-indigo-500/20", text: "text-indigo-500", btnBg: "bg-indigo-600", btnText: "text-white" }}
-                            filename="mental-load-equalizer.pdf"
-                            sessionId={session?.id}
-                        />
-                        {/* Guide 2 */}
-                        <GuideCard
-                            title="Dead Bedroom Revival"
-                            format="Clinical Guide"
-                            desc="Techniques to bypass psychological 'brakes' and accelerate desire in long-term relationships."
-                            icon={<Heart size={24} />}
-                            color={{ bgLight: "bg-pink-500/20", text: "text-pink-500", btnBg: "bg-pink-600", btnText: "text-white" }}
-                            filename="dead-bedroom-revival.pdf"
-                            sessionId={session?.id}
-                        />
-                        {/* Guide 3 */}
-                        <GuideCard
-                            title="Narcissist Detection"
-                            format="Safety Screen"
-                            desc="Clinical checklist to distinguish between 'difficult' traits and dangerous pathology."
-                            icon={<ShieldAlert size={24} />}
-                            color={{ bgLight: "bg-orange-500/20", text: "text-orange-500", btnBg: "bg-orange-600", btnText: "text-white" }}
-                            filename="narcissist-detection-manual.pdf"
-                            sessionId={session?.id}
-                        />
-                        {/* Guide 4 */}
-                        <GuideCard
-                            title="Emotional Affair Screen"
-                            format="Assessment"
-                            desc="Identify the 19 subtle signs of micro-cheating before it escalates to physical infidelity."
-                            icon={<MessageCircle size={24} />}
-                            color={{ bgLight: "bg-blue-500/20", text: "text-blue-500", btnBg: "bg-blue-600", btnText: "text-white" }}
-                            filename="emotional-affair-warning.pdf"
-                            sessionId={session?.id}
-                        />
-                        {/* Guide 5 */}
-                        <GuideCard
-                            title="Should I Stay or Should I Go?"
-                            format="Decision Matrix"
-                            desc="The framework used by therapists to help patients make the hardest choice of their lives with zero regret."
-                            icon={<Compass size={24} />}
-                            color={{ bgLight: "bg-gray-500/20", text: "text-gray-500", btnBg: "bg-gray-700", btnText: "text-white" }}
-                            filename="stay-or-go-matrix.pdf"
-                            sessionId={session?.id}
-                        />
+                        {owns("mental-load") && (
+                            <GuideCard
+                                title="The Mental Load Equalizer"
+                                format="PDF Protocol"
+                                desc="Spreadsheet tools and scripts to rebalance household management responsibilities without conflict."
+                                icon={<FileText size={24} />}
+                                color={{ bgLight: "bg-indigo-500/20", text: "text-indigo-500", btnBg: "bg-indigo-600", btnText: "text-white" }}
+                                filename="mental-load-equalizer.pdf"
+                                sessionId={session?.id}
+                            />
+                        )}
+                        {owns("dead-bedroom") && (
+                            <GuideCard
+                                title="Dead Bedroom Revival"
+                                format="Clinical Guide"
+                                desc="Techniques to bypass psychological 'brakes' and accelerate desire in long-term relationships."
+                                icon={<Heart size={24} />}
+                                color={{ bgLight: "bg-pink-500/20", text: "text-pink-500", btnBg: "bg-pink-600", btnText: "text-white" }}
+                                filename="dead-bedroom-revival.pdf"
+                                sessionId={session?.id}
+                            />
+                        )}
+                        {owns("narcissist-detection") && (
+                            <GuideCard
+                                title="Narcissist Detection"
+                                format="Safety Screen"
+                                desc="Clinical checklist to distinguish between 'difficult' traits and dangerous pathology."
+                                icon={<ShieldAlert size={24} />}
+                                color={{ bgLight: "bg-orange-500/20", text: "text-orange-500", btnBg: "bg-orange-600", btnText: "text-white" }}
+                                filename="narcissist-detection-manual.pdf"
+                                sessionId={session?.id}
+                            />
+                        )}
+                        {owns("emotional-affair") && (
+                            <GuideCard
+                                title="Emotional Affair Screen"
+                                format="Assessment"
+                                desc="Identify the 19 subtle signs of micro-cheating before it escalates to physical infidelity."
+                                icon={<MessageCircle size={24} />}
+                                color={{ bgLight: "bg-blue-500/20", text: "text-blue-500", btnBg: "bg-blue-600", btnText: "text-white" }}
+                                filename="emotional-affair-warning.pdf"
+                                sessionId={session?.id}
+                            />
+                        )}
+                        {owns("stay-or-go") && (
+                            <GuideCard
+                                title="Should I Stay or Should I Go?"
+                                format="Decision Matrix"
+                                desc="The framework used by therapists to help patients make the hardest choice of their lives with zero regret."
+                                icon={<Compass size={24} />}
+                                color={{ bgLight: "bg-gray-500/20", text: "text-gray-500", btnBg: "bg-gray-700", btnText: "text-white" }}
+                                filename="stay-or-go-matrix.pdf"
+                                sessionId={session?.id}
+                            />
+                        )}
                     </div>
                 </section>
+                    );
+                })()}
 
             </main>
         </div>
