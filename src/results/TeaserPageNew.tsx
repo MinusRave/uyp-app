@@ -688,7 +688,7 @@ export default function TeaserPageNew() {
         trackPixelEvent('InitiateCheckout', {
             content_name: 'Full Relationship Report',
             content_category: 'Report',
-            value: addOrderBump ? 41 : 29,
+            value: addOrderBump ? 21.99 : 9.99,
             currency: 'USD',
             eventID: eventID
         });
@@ -1389,7 +1389,7 @@ export default function TeaserPageNew() {
                             </tr>
                             <tr className="bg-primary/5 hover:bg-primary/10 transition-colors border-l-4 border-l-primary">
                                 <td className="p-4 font-black text-primary text-base">This Analysis</td>
-                                <td className="p-4"><span className="font-black text-2xl text-primary">$29</span></td>
+                                <td className="p-4"><span className="font-black text-2xl text-primary">$9.99</span></td>
                                 <td className="p-4 font-bold text-foreground">Instant</td>
                                 <td className="p-4 font-bold text-foreground">Personalized to YOUR 30 answers. Pattern identified. 5 clinical guides. Exact scripts.</td>
                             </tr>
@@ -1742,7 +1742,7 @@ export default function TeaserPageNew() {
 
                             {/* Rationale — NO AI mention */}
                             <div className="max-w-xl mx-auto text-center mb-8 space-y-3">
-                                <h3 className="text-xl font-bold text-foreground">Why this costs $29 instead of $520</h3>
+                                <h3 className="text-xl font-bold text-foreground">Why this costs $9.99 instead of $520</h3>
                                 <p className="text-sm text-muted-foreground leading-relaxed">
                                     A therapist charges $150/session. It takes 4-6 sessions just to identify your pattern — that's $600-900 and 6 weeks before they even start helping.
                                 </p>
@@ -1774,8 +1774,8 @@ export default function TeaserPageNew() {
                             {/* Price */}
                             <div className="text-center mb-6">
                                 <p className="text-sm font-bold uppercase tracking-wider text-muted-foreground">Your Price Today</p>
-                                <p className="text-6xl font-black text-primary">${import.meta.env.REACT_APP_REPORT_PRICE || "29.00"}</p>
-                                <p className="text-sm text-muted-foreground mt-2">Less than a single therapy copay. Less than a dinner where you both stare at your phones.</p>
+                                <p className="text-6xl font-black text-primary">${import.meta.env.REACT_APP_REPORT_PRICE || "9.99"}</p>
+                                <p className="text-sm text-muted-foreground mt-2">Less than two coffees. Less than a movie ticket.</p>
                             </div>
 
                             {/* Guarantee — INSIDE the card, before CTA */}
@@ -1824,7 +1824,7 @@ export default function TeaserPageNew() {
                                     onClick={() => handleCheckout('offer_cta')}
                                     className="w-full md:w-auto bg-primary hover:bg-primary/90 text-primary-foreground text-xl font-bold py-5 px-12 rounded-full shadow-2xl hover:shadow-3xl hover:scale-105 transition-all flex items-center justify-center gap-3"
                                 >
-                                    {isCheckoutLoading ? "Processing..." : `Unlock My Full Analysis — $${addOrderBump ? 41 : 29}`} <ArrowRight size={24} />
+                                    {isCheckoutLoading ? "Processing..." : `Unlock My Full Analysis — $${addOrderBump ? 21.99 : 9.99}`} <ArrowRight size={24} />
                                 </button>
                                 <div className="flex items-center justify-center gap-4 mt-6 text-muted-foreground">
                                     <FaCcVisa className="h-7 w-auto opacity-70 hover:opacity-100 transition-opacity" />

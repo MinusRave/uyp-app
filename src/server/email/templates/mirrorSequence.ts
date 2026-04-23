@@ -375,7 +375,7 @@ Your full report contains:
 - 5 clinical guides ($194 value, included)
 - Your 5-year trajectory with specific intervention windows
 
-It's $29. Less than a dinner where you both stare at your phones.
+It's $9.99. Less than two coffees.
 
 Go ahead and unlock it now: ${link}
 
@@ -415,7 +415,7 @@ Unsubscribe: ${vars.unsubscribe_url}
       <li>Your 5-year trajectory with specific intervention windows</li>
     </ul>
 
-    <p>It's $29. Less than a dinner where you both stare at your phones.</p>
+    <p>It's $9.99. Less than two coffees.</p>
 
     <p style="margin: 30px 0;">
       <a href="${link}" style="background-color: #8B55A5; color: #ffffff; padding: 14px 28px; text-decoration: none; border-radius: 8px; font-weight: 600; display: inline-block;">

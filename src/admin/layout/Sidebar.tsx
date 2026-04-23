@@ -237,6 +237,20 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
                           </li>
                           <li>
                             <NavLink
+                              to="/admin/analytics/marketing"
+                              end
+                              className={({ isActive }) =>
+                                cn(
+                                  "text-muted-foreground hover:text-accent group relative flex items-center gap-2.5 rounded-md px-4 font-medium duration-300 ease-in-out",
+                                  { "text-accent!": isActive },
+                                )
+                              }
+                            >
+                              Marketing Stats
+                            </NavLink>
+                          </li>
+                          <li>
+                            <NavLink
                               to="/admin/ai"
                               end
                               className={({ isActive }) =>

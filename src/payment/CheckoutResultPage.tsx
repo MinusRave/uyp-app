@@ -16,7 +16,7 @@ export default function CheckoutResultPage() {
       // Use the Stripe Session ID as the EventID for deduplication
       // This matches the backend logic in reportWebhook.ts
       trackPixelEvent('Purchase', {
-        value: parseFloat(import.meta.env.REACT_APP_REPORT_PRICE || "29.00"),
+        value: parseFloat(import.meta.env.REACT_APP_REPORT_PRICE || "9.99"),
         currency: 'USD',
         eventID: sessionId || undefined
       });

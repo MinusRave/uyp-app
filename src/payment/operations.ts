@@ -110,7 +110,7 @@ export const createCheckoutSession: CreateCheckoutSession<
   // This supports the "Skip Email Gate" A/B test case.
 
   // 3. Send Meta CAPI InitiateCheckout Event
-  const reportPrice = parseFloat(process.env.REPORT_PRICE || "29.00");
+  const reportPrice = parseFloat(process.env.REPORT_PRICE || "9.99");
   const workbookPrice = 12.00;
   const productName = "Understand Your Partner - Full Analysis";
 

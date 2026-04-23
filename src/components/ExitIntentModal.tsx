@@ -49,7 +49,7 @@ const ExitIntentModal: React.FC<ExitIntentModalProps> = ({ show, onClose, onSave
                             <X className="text-red-500 shrink-0" size={16} /> You'll have to retake the entire assessment
                         </div>
                         <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                            <X className="text-red-500 shrink-0" size={16} /> The $29 special pricing expires
+                            <X className="text-red-500 shrink-0" size={16} /> The $9.99 launch price expires
                         </div>
                     </div>
 

@@ -29,7 +29,7 @@ export default function TermsOfServicePage() {
 
                     <h2>4. Payment & Refunds</h2>
                     <p>
-                        <strong>Pricing:</strong> The full report costs $15 (one-time payment).
+                        <strong>Pricing:</strong> The full report costs $9.99 (one-time payment).
                     </p>
                     <p>
                         <strong>Refund Policy:</strong> We offer a 7-day money-back guarantee. If you're not satisfied with your report, email us at admin@understandyourpartner.com within 7 days of purchase for a full refund.
@@ -50,7 +50,7 @@ export default function TermsOfServicePage() {
 
                     <h2>7. Limitation of Liability</h2>
                     <p>
-                        UnderstandYourPartner is provided "as is" without warranties of any kind. We are not liable for any decisions you make based on your report. Maximum liability is limited to the amount you paid ($15).
+                        UnderstandYourPartner is provided "as is" without warranties of any kind. We are not liable for any decisions you make based on your report. Maximum liability is limited to the amount you paid ($9.99).
                     </p>
 
                     <h2>8. Privacy</h2>

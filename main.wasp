@@ -534,6 +534,12 @@ page AdminDemographicsPage {
   component: import AdminDemographicsPage from "@src/admin/dashboards/analytics/DemographicsPage"
 }
 
+route AdminMarketingStatsRoute { path: "/admin/analytics/marketing", to: AdminMarketingStatsPage }
+page AdminMarketingStatsPage {
+  authRequired: true,
+  component: import AdminMarketingStatsPage from "@src/admin/dashboards/analytics/MarketingStatsPage"
+}
+
 route AdminConfigRoute { path: "/admin/config", to: AdminConfigPage }
 page AdminConfigPage {
   authRequired: true,
@@ -577,6 +583,11 @@ query getConversionFunnelMetrics {
 
 query getDemographicStats {
   fn: import { getDemographicStats } from "@src/admin/operations",
+  entities: [TestSession]
+}
+
+query getMarketingStats {
+  fn: import { getMarketingStats } from "@src/admin/operations",
   entities: [TestSession]
 }
 

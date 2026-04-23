@@ -55,7 +55,7 @@ export const stripeWebhook = async (
       try {
         const eventId = session.id; // cs_test_...
         const userEmail = testSession?.email || session.customer_details?.email;
-        const amountTotal = session.amount_total ? session.amount_total / 100 : parseFloat(process.env.REPORT_PRICE || "29.00");
+        const amountTotal = session.amount_total ? session.amount_total / 100 : parseFloat(process.env.REPORT_PRICE || "9.99");
 
         // Import dynamically if needed or assume it's available. 
         // Since this is a server file, we can import from metaCapi.

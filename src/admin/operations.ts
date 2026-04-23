@@ -1,6 +1,6 @@
 
 import { type TestSession, type User } from "wasp/entities";
-import { type GetTestSessions, type GetSessionDetail, type GetFunnelStats, type GetDemographicStats, type GetEmailStats, type GetAiLogs, type GetSessionAnalytics, type GetQuizFunnelStats } from "wasp/server/operations";
+import { type GetTestSessions, type GetSessionDetail, type GetFunnelStats, type GetDemographicStats, type GetEmailStats, type GetAiLogs, type GetSessionAnalytics, type GetQuizFunnelStats, type GetMarketingStats } from "wasp/server/operations";
 import { HttpError } from "wasp/server";
 
 // --- Types ---
@@ -638,6 +638,320 @@ export const getQuizFunnelStats: GetQuizFunnelStats<void, QuizFunnelStatsResult>
         startToLeadRate: quizStarts > 0 ? Math.round((leads / quizStarts) * 100) : 0,
         leadToPurchaseRate: leads > 0 ? Math.round((purchased / leads) * 100) : 0,
         dropOffDistribution,
+    };
+};
+
+// --- Marketing Stats ---
+// Generic cross-cuts over "leads" (sessions with a captured email).
+// The UI turns these into ready-to-paste headlines like:
+//   "X% of women report their partner withdraws during a fight."
+
+type MarketingRow = {
+    label: string;
+    count: number;
+    pct: number; // 0..100
+};
+
+type MarketingCrosstab = {
+    id: string;
+    title: string;           // describes the filtered audience, e.g. "Women (leads)"
+    dimension: string;       // describes the measured field, e.g. "Partner conflict style"
+    filterTotal: number;     // sample size after filtering
+    rows: MarketingRow[];    // sorted desc by pct
+};
+
+type MarketingSingleStat = {
+    id: string;
+    label: string;
+    count: number;
+    total: number;
+    pct: number;
+};
+
+type MarketingStatsResult = {
+    leadTotal: number;
+    completedTotal: number;
+    paidTotal: number;
+    singleStats: MarketingSingleStat[];
+    crosstabs: MarketingCrosstab[];
+    resultStats: MarketingCrosstab[]; // 12 Vital Signs, attachment style, narcissism risk, etc.
+};
+
+const GENDER_VALUES = ['female', 'male'];
+
+// Simple label map — keep in sync with the values the test collects.
+const LABELS: Record<string, string> = {
+    female: 'women',
+    male: 'men',
+    withdraws: 'partner withdraws during a fight',
+    engages: 'partner engages during a fight',
+    escalates: 'partner escalates the fight',
+    daily: 'fight daily',
+    weekly: 'fight weekly',
+    monthly: 'fight monthly',
+    rarely: 'fight rarely',
+    always: 'always repair after a fight',
+    sometimes: 'sometimes repair after a fight',
+    never: 'never repair after a fight',
+};
+
+const labelize = (v: string) => LABELS[v] ?? v;
+
+export const getMarketingStats: GetMarketingStats<void, MarketingStatsResult> = async (_args, context) => {
+    if (!context.user?.isAdmin) {
+        throw new HttpError(401, "Unauthorized");
+    }
+
+    // Leads = any session with a captured email (lead capture happens before the paywall).
+    const leadWhere = { email: { not: null } };
+    const Session = context.entities.TestSession;
+
+    const [
+        leadTotal,
+        completedTotal,
+        paidTotal,
+        livingTogetherCount,
+        hasChildrenCount,
+        previousMarriageCount,
+        mobileCount,
+    ] = await Promise.all([
+        Session.count({ where: leadWhere }),
+        Session.count({ where: { ...leadWhere, isCompleted: true } }),
+        Session.count({ where: { ...leadWhere, isPaid: true } }),
+        Session.count({ where: { ...leadWhere, livingTogether: true } }),
+        Session.count({ where: { ...leadWhere, hasChildren: true } }),
+        Session.count({ where: { ...leadWhere, previousMarriage: true } }),
+        Session.count({ where: { ...leadWhere, deviceType: 'mobile' } }),
+    ]);
+
+    const pct = (n: number, d: number) => (d > 0 ? Math.round((n / d) * 1000) / 10 : 0);
+
+    const singleStats: MarketingSingleStat[] = [
+        { id: 'completion', label: 'leads who finished the test', count: completedTotal, total: leadTotal, pct: pct(completedTotal, leadTotal) },
+        { id: 'paid', label: 'leads who paid', count: paidTotal, total: leadTotal, pct: pct(paidTotal, leadTotal) },
+        { id: 'cohabit', label: 'leads living with their partner', count: livingTogetherCount, total: leadTotal, pct: pct(livingTogetherCount, leadTotal) },
+        { id: 'kids', label: 'leads with children', count: hasChildrenCount, total: leadTotal, pct: pct(hasChildrenCount, leadTotal) },
+        { id: 'remarriage', label: 'leads on a second (or later) marriage', count: previousMarriageCount, total: leadTotal, pct: pct(previousMarriageCount, leadTotal) },
+        { id: 'mobile', label: 'leads take the test on a phone', count: mobileCount, total: leadTotal, pct: pct(mobileCount, leadTotal) },
+    ];
+
+    // Helper: build a crosstab for (gender filter) × (dimension field)
+    const buildCrosstab = async (
+        id: string,
+        gender: string,
+        dimension: string,
+        field: keyof TestSession,
+    ): Promise<MarketingCrosstab> => {
+        const where: any = { ...leadWhere, userGender: gender, [field]: { not: null } };
+
+        const [filterTotal, groups] = await Promise.all([
+            Session.count({ where }),
+            Session.groupBy({
+                by: [field as any],
+                _count: { [field]: true } as any,
+                where,
+            }),
+        ]);
+
+        const rows: MarketingRow[] = groups
+            .map((g: any) => {
+                const value = g[field];
+                const count = g._count[field];
+                return {
+                    label: labelize(String(value)),
+                    count,
+                    pct: pct(count, filterTotal),
+                };
+            })
+            .sort((a, b) => b.pct - a.pct);
+
+        return {
+            id,
+            title: `${labelize(gender)} (n=${filterTotal})`,
+            dimension,
+            filterTotal,
+            rows,
+        };
+    };
+
+    // Build the crosstab grid: gender × (dimension field)
+    const dims: { field: keyof TestSession; dimension: string; slug: string }[] = [
+        { field: 'partnerConflictStyle', dimension: 'Partner conflict style', slug: 'conflict' },
+        { field: 'fightFrequency',       dimension: 'Fight frequency',         slug: 'fight' },
+        { field: 'repairFrequency',      dimension: 'Repair frequency',        slug: 'repair' },
+        { field: 'relationshipStatus',   dimension: 'Relationship status',     slug: 'status' },
+        { field: 'userAgeRange',         dimension: 'Age range',                slug: 'age' },
+        { field: 'relationshipDuration', dimension: 'Relationship duration',    slug: 'duration' },
+    ];
+
+    const crosstabs: MarketingCrosstab[] = [];
+    for (const g of GENDER_VALUES) {
+        for (const d of dims) {
+            crosstabs.push(await buildCrosstab(`${g}-${d.slug}`, g, d.dimension, d.field));
+        }
+    }
+
+    // --- Result-based stats: 12 Vital Signs, attachment style, narcissism risk ---
+    // These fields are JSON so we aggregate in-memory. Restrict to completed leads only.
+    const resultSessions = await Session.findMany({
+        where: { ...leadWhere, isCompleted: true },
+        select: {
+            scores: true,
+            advancedMetrics: true,
+            narcissismAnalysis: true,
+        },
+    });
+
+    const resultTotal = resultSessions.length;
+
+    // 12 Vital Signs — each is a 0..100 metric. "High" threshold = 60.
+    // Health-direction metrics (high = good): sustainability_forecast, repair_efficiency, compatibility_quotient, erotic_potential, resilience_battery.
+    // Risk-direction metrics (high = bad): everything else + toxicity_score.
+    const RISK_METRICS: { key: string; label: string }[] = [
+        { key: 'erotic_death_spiral',    label: 'score high on the "erotic death spiral" metric' },
+        { key: 'betrayal_vulnerability', label: 'score high on betrayal vulnerability' },
+        { key: 'duty_sex_index',         label: 'score high on the "duty sex" index' },
+        { key: 'ceo_vs_intern',          label: 'score high on the "CEO vs. intern" imbalance' },
+        { key: 'silent_divorce_risk',    label: 'are at risk of a "silent divorce"' },
+        { key: 'internalized_malice',    label: 'score high on internalized malice' },
+        { key: 'nervous_system_load',    label: 'score high on nervous-system burnout' },
+    ];
+    const HEALTH_METRICS: { key: string; label: string }[] = [
+        { key: 'sustainability_forecast', label: 'have a healthy sustainability forecast' },
+        { key: 'repair_efficiency',       label: 'repair well after a fight' },
+        { key: 'compatibility_quotient',  label: 'score high on compatibility' },
+        { key: 'erotic_potential',        label: 'have high erotic potential' },
+        { key: 'resilience_battery',      label: 'have a full resilience battery' },
+    ];
+    const HIGH_THRESHOLD = 60;
+
+    const metricCounts: Record<string, number> = {};
+    const flagCounts = { safetyTrigger: 0, silentDivorceHighRisk: 0 };
+    const attachmentCounts: Record<string, number> = {};
+    const dominantLensCounts: Record<string, number> = {};
+    const narcissismCounts: Record<string, number> = {};
+    let narcissismTotal = 0;
+    let toxicitySum = 0;
+    let toxicityCount = 0;
+
+    for (const s of resultSessions) {
+        const am: any = s.advancedMetrics;
+        if (am && typeof am === 'object') {
+            for (const m of [...RISK_METRICS, ...HEALTH_METRICS]) {
+                if (typeof am[m.key] === 'number' && am[m.key] >= HIGH_THRESHOLD) {
+                    metricCounts[m.key] = (metricCounts[m.key] ?? 0) + 1;
+                }
+            }
+            if (am.flags?.safetyTrigger) flagCounts.safetyTrigger++;
+            if (am.flags?.silentDivorceHighRisk) flagCounts.silentDivorceHighRisk++;
+        }
+
+        const sc: any = s.scores;
+        if (sc && typeof sc === 'object') {
+            if (sc.attachmentStyle) {
+                attachmentCounts[sc.attachmentStyle] = (attachmentCounts[sc.attachmentStyle] ?? 0) + 1;
+            }
+            if (sc.dominantLens) {
+                dominantLensCounts[sc.dominantLens] = (dominantLensCounts[sc.dominantLens] ?? 0) + 1;
+            }
+        }
+
+        const na: any = s.narcissismAnalysis;
+        if (na && typeof na === 'object' && na.risk_level) {
+            narcissismCounts[na.risk_level] = (narcissismCounts[na.risk_level] ?? 0) + 1;
+            narcissismTotal++;
+            if (typeof na.toxicity_score === 'number') {
+                toxicitySum += na.toxicity_score;
+                toxicityCount++;
+            }
+        }
+    }
+
+    const buildResultTab = (
+        id: string,
+        dimension: string,
+        title: string,
+        filterTotal: number,
+        entries: { label: string; count: number }[],
+    ): MarketingCrosstab => ({
+        id,
+        dimension,
+        title,
+        filterTotal,
+        rows: entries
+            .map(e => ({ label: e.label, count: e.count, pct: pct(e.count, filterTotal) }))
+            .sort((a, b) => b.pct - a.pct),
+    });
+
+    const resultStats: MarketingCrosstab[] = [
+        buildResultTab(
+            'vital-signs-risk',
+            '12 Vital Signs — risk metrics',
+            `completed tests (n=${resultTotal})`,
+            resultTotal,
+            RISK_METRICS.map(m => ({ label: m.label, count: metricCounts[m.key] ?? 0 })),
+        ),
+        buildResultTab(
+            'vital-signs-health',
+            '12 Vital Signs — health metrics',
+            `completed tests (n=${resultTotal})`,
+            resultTotal,
+            HEALTH_METRICS.map(m => ({ label: m.label, count: metricCounts[m.key] ?? 0 })),
+        ),
+        buildResultTab(
+            'vital-flags',
+            'Vital Signs — safety flags',
+            `completed tests (n=${resultTotal})`,
+            resultTotal,
+            [
+                { label: 'trigger a safety-concern flag', count: flagCounts.safetyTrigger },
+                { label: 'trigger a silent-divorce high-risk flag', count: flagCounts.silentDivorceHighRisk },
+            ],
+        ),
+        buildResultTab(
+            'attachment-style',
+            'Attachment style',
+            `completed tests (n=${Object.values(attachmentCounts).reduce((a, b) => a + b, 0)})`,
+            Object.values(attachmentCounts).reduce((a, b) => a + b, 0),
+            Object.entries(attachmentCounts).map(([k, v]) => ({ label: `have a ${k} attachment style`, count: v })),
+        ),
+        buildResultTab(
+            'dominant-lens',
+            'Dominant relationship lens',
+            `completed tests (n=${Object.values(dominantLensCounts).reduce((a, b) => a + b, 0)})`,
+            Object.values(dominantLensCounts).reduce((a, b) => a + b, 0),
+            Object.entries(dominantLensCounts).map(([k, v]) => ({
+                label: `have ${k.replace(/_/g, ' ')} as their dominant relationship lens`,
+                count: v,
+            })),
+        ),
+        buildResultTab(
+            'narcissism-risk',
+            'Narcissism risk level',
+            `ran narcissism assessment (n=${narcissismTotal})`,
+            narcissismTotal,
+            Object.entries(narcissismCounts).map(([k, v]) => ({ label: `score ${k} on partner-narcissism risk`, count: v })),
+        ),
+    ];
+
+    // Add the average toxicity score as a single stat when available.
+    if (toxicityCount > 0) {
+        singleStats.push({
+            id: 'avg-toxicity',
+            label: 'average partner-toxicity score (0-100)',
+            count: Math.round(toxicitySum / toxicityCount),
+            total: toxicityCount,
+            pct: Math.round(toxicitySum / toxicityCount),
+        });
+    }
+
+    return {
+        leadTotal,
+        completedTotal,
+        paidTotal,
+        singleStats,
+        crosstabs,
+        resultStats,
     };
 };
 

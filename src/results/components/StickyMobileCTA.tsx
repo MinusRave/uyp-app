@@ -15,7 +15,7 @@ export function StickyMobileCTA({ show, onPress }: Props) {
                 className="w-full py-4 rounded-xl bg-primary text-primary-foreground font-bold text-base flex items-center justify-center gap-2 active:scale-[0.98] transition-transform"
             >
                 <Lock size={16} />
-                Unlock Your Full Report — ${import.meta.env.REACT_APP_REPORT_PRICE || "29"}
+                Unlock Your Full Report — ${import.meta.env.REACT_APP_REPORT_PRICE || "9.99"}
             </button>
         </div>
     );

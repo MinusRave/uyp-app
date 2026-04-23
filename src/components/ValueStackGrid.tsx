@@ -35,7 +35,7 @@ const ValueStackGrid: React.FC = () => {
 
             <div className="text-center space-y-2">
                 <div className="text-lg text-muted-foreground">Total Value: <span className="line-through decoration-red-500 decoration-2">$97</span></div>
-                <div className="text-2xl font-bold text-primary">YOUR PRICE: $29</div>
+                <div className="text-2xl font-bold text-primary">YOUR PRICE: $9.99</div>
                 <p className="text-xs text-muted-foreground font-medium pt-2">
                     Everything tailored to YOUR pattern and YOUR answers.
                 </p>

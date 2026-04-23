@@ -27,7 +27,7 @@ const FAQ_ITEMS = [
 export function GodfatherOffer({ session, quickOverview, narcissismAnalysis, onCheckout, isCheckoutLoading, addOrderBump, setAddOrderBump }: Props) {
     const scores = session?.scores as any;
     const metrics = session?.advancedMetrics as any;
-    const price = addOrderBump ? 41 : 29;
+    const price = addOrderBump ? 21.99 : 9.99;
 
     // Pull user data for deep personalization
     const dominantLens = scores?.dominantLens as DimensionKey | undefined;
@@ -246,7 +246,7 @@ export function GodfatherOffer({ session, quickOverview, narcissismAnalysis, onC
 
                 {/* ═══ RATIONALE — why launch price ═══ */}
                 <div className="bg-card border border-border rounded-2xl p-6 text-center space-y-2">
-                    <p className="text-sm font-bold text-foreground">Why is this only ${import.meta.env.REACT_APP_REPORT_PRICE || "29"}?</p>
+                    <p className="text-sm font-bold text-foreground">Why is this only ${import.meta.env.REACT_APP_REPORT_PRICE || "9.99"}?</p>
                     <p className="text-sm text-muted-foreground leading-relaxed max-w-lg mx-auto">
                         We just launched. We want thousands of people to try this and tell their friends. So we made the price as low as we could. The regular price will be $49. Right now you get it for less while we grow.
                     </p>
@@ -278,7 +278,7 @@ export function GodfatherOffer({ session, quickOverview, narcissismAnalysis, onC
                     <div className="text-center">
                         <p className="text-sm font-bold uppercase tracking-wider text-muted-foreground">One payment. Nothing else.</p>
                         <p className="text-lg text-red-500 line-through font-bold">$49</p>
-                        <p className="text-6xl font-black text-primary">${import.meta.env.REACT_APP_REPORT_PRICE || "29"}</p>
+                        <p className="text-6xl font-black text-primary">${import.meta.env.REACT_APP_REPORT_PRICE || "9.99"}</p>
                         <span className="inline-block mt-1 text-xs font-bold uppercase tracking-widest bg-primary/10 text-primary px-3 py-1 rounded-full">Launch Price</span>
                     </div>
 
@@ -437,7 +437,7 @@ export function GodfatherOffer({ session, quickOverview, narcissismAnalysis, onC
                     </div>
                 </div>
 
-                {/* ═══ COMPARISON TABLE — why $29 is absurd ═══ */}
+                {/* ═══ COMPARISON TABLE — why $9.99 is absurd ═══ */}
                 <div className="space-y-4">
                     <h3 className="text-lg font-black text-center text-foreground">What You'd Pay Anywhere Else</h3>
                     <div className="overflow-x-auto rounded-2xl border border-border bg-card">
@@ -455,7 +455,7 @@ export function GodfatherOffer({ session, quickOverview, narcissismAnalysis, onC
                                 <tr><td className="p-3 text-foreground">Online course</td><td className="p-3 text-muted-foreground font-bold">$97–$297</td><td className="p-3 text-muted-foreground">8–12 hours of video</td></tr>
                                 <tr className="bg-primary/5 border-l-4 border-l-primary">
                                     <td className="p-3 font-black text-primary">Your report</td>
-                                    <td className="p-3 font-black text-primary text-xl">$29</td>
+                                    <td className="p-3 font-black text-primary text-xl">$9.99</td>
                                     <td className="p-3 font-bold text-foreground">Right now</td>
                                 </tr>
                             </tbody>
@@ -470,7 +470,7 @@ export function GodfatherOffer({ session, quickOverview, narcissismAnalysis, onC
                         author="Mike R."
                     />
                     <TestimonialCard
-                        text="I was two weeks from calling a lawyer. Not joking. $29 felt like nothing to lose. The report said things our therapist hasn't figured out in 8 months. We brought it to our next session and she asked where we got it."
+                        text="I was two weeks from calling a lawyer. Not joking. $9.99 felt like nothing to lose. The report said things our therapist hasn't figured out in 8 months. We brought it to our next session and she asked where we got it."
                         author="Ana, 36"
                     />
                 </div>
@@ -479,7 +479,7 @@ export function GodfatherOffer({ session, quickOverview, narcissismAnalysis, onC
                 <div className="bg-card border-2 border-primary/30 rounded-2xl p-6 text-center space-y-5 shadow-lg">
                     <p className="text-lg font-black text-foreground">Ready?</p>
                     <p className="text-sm text-red-500 line-through font-bold">$49</p>
-                    <p className="text-3xl font-black text-primary">${import.meta.env.REACT_APP_REPORT_PRICE || "29"}</p>
+                    <p className="text-3xl font-black text-primary">${import.meta.env.REACT_APP_REPORT_PRICE || "9.99"}</p>
                     <button
                         onClick={() => onCheckout("bottom_cta")}
                         disabled={isCheckoutLoading}
@@ -489,7 +489,7 @@ export function GodfatherOffer({ session, quickOverview, narcissismAnalysis, onC
                         {!isCheckoutLoading && <ArrowRight size={22} />}
                     </button>
                     <p className="text-xs text-muted-foreground">
-                        Launch price — it won't stay ${import.meta.env.REACT_APP_REPORT_PRICE || "29"} for long.
+                        Launch price — it won't stay ${import.meta.env.REACT_APP_REPORT_PRICE || "9.99"} for long.
                     </p>
                 </div>
 

@@ -29,7 +29,7 @@ export default function ResultsPage() {
         trackPixelEvent("InitiateCheckout", {
             content_name: "Full Relationship Report",
             content_category: "Report",
-            value: addOrderBump ? 41 : 29,
+            value: addOrderBump ? 21.99 : 9.99,
             currency: "USD",
             eventID,
         });

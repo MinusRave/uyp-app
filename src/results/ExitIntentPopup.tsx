@@ -88,7 +88,7 @@ export default function ExitIntentPopup({ onCTAClick }: { onCTAClick: () => void
                             }}
                             className="w-full bg-primary hover:bg-primary/90 text-primary-foreground font-bold text-lg py-4 px-8 rounded-xl shadow-lg hover:shadow-xl transition-all flex items-center justify-center gap-2 group"
                         >
-                            Show Me My Analysis - $29
+                            Show Me My Analysis - $9.99
                             <ArrowRight className="group-hover:translate-x-1 transition-transform" />
                         </button>
 
