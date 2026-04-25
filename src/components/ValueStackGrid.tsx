@@ -34,10 +34,12 @@ const ValueStackGrid: React.FC = () => {
             </div>
 
             <div className="text-center space-y-2">
-                <div className="text-lg text-muted-foreground">Total Value: <span className="line-through decoration-red-500 decoration-2">$97</span></div>
                 <div className="text-2xl font-bold text-primary">YOUR PRICE: $9.99</div>
                 <p className="text-xs text-muted-foreground font-medium pt-2">
                     Everything tailored to YOUR pattern and YOUR answers.
+                </p>
+                <p className="text-xs text-muted-foreground pt-1">
+                    Want extra guides? Add them at checkout — $2.99 each. All 6 for just $9.99 in the first 15 minutes.
                 </p>
                 <div className="pt-2">
                     <span className="inline-flex items-center gap-1 text-sm font-bold text-primary border-b border-primary/20 pb-0.5 cursor-pointer">

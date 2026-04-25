@@ -1,11 +1,14 @@
 ﻿import React, { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router";
 import { ArrowRight, Lock, CheckCircle, AlertTriangle, TrendingUp, Shield, Heart, BadgeCheck, Compass, Zap, X, Activity, ChevronDown, Check, Eye, Microscope, ListChecks, ShieldAlert, Clock, MessageCircle, Brain, Quote, Star, Play, TrendingDown, Battery, Thermometer, FileWarning, BookOpen, Users, FileText, ShieldCheck, Info, ChevronUp, Link, Repeat, Ghost } from "lucide-react";
-import { useQuery, generateQuickOverview, generateFullReportV2, createCheckoutSession, getTestSession, getSystemConfig, deactivateSession } from "wasp/client/operations";
+import { useQuery, generateQuickOverview, generateFullReportV2, createCheckoutSession, getTestSession, getSystemConfig, deactivateSession, startOffer } from "wasp/client/operations";
 import { useAuth } from "wasp/client/auth";
 
 import { trackPixelEvent } from '../analytics/pixel';
 import { FaCcVisa, FaCcMastercard, FaCcPaypal, FaApplePay, FaGooglePay } from "react-icons/fa";
+import { AddonSelector } from "./components/AddonSelector";
+import { CountdownBadge } from "./components/CountdownBadge";
+import { computeAddonsTotal, isBundleAvailable } from "../payment/addons";
 
 // EmailCaptureModal removed — users always have email in new session model
 
@@ -524,9 +527,12 @@ export default function TeaserPageNew() {
     const quickOverviewInitiated = useRef(false);
     const fullReportInitiated = useRef(false);
 
-    const [addOrderBump, setAddOrderBump] = useState(false);
+    const [selectedAddons, setSelectedAddons] = useState<string[]>([]);
     const [isCheckoutLoading, setIsCheckoutLoading] = useState(false);
     const [showStickyCTA, setShowStickyCTA] = useState(false);
+    const [offerStartedAt, setOfferStartedAt] = useState<Date | null>(null);
+    const [bundleAvailable, setBundleAvailable] = useState(true);
+    const offerStartInitiated = useRef(false);
 
     // Soft Gate State & Config
     const { data: systemConfig } = useQuery(getSystemConfig);
@@ -547,6 +553,26 @@ export default function TeaserPageNew() {
             navigate(urlSessionId ? `/report?session_id=${urlSessionId}` : '/report');
         }
     }, [session?.isPaid, urlSessionId, navigate]);
+
+    // Start the 15-min bundle timer on first view. Idempotent server-side.
+    useEffect(() => {
+        if (!session?.id || session.isPaid || offerStartInitiated.current) return;
+        offerStartInitiated.current = true;
+        const existing = (session as any).offerStartedAt;
+        if (existing) {
+            const startedAt = new Date(existing);
+            setOfferStartedAt(startedAt);
+            setBundleAvailable(isBundleAvailable(startedAt));
+            return;
+        }
+        startOffer({ sessionId: session.id })
+            .then((result) => {
+                const startedAt = new Date(result.offerStartedAt);
+                setOfferStartedAt(startedAt);
+                setBundleAvailable(isBundleAvailable(startedAt));
+            })
+            .catch((e) => console.error("[startOffer] failed:", e));
+    }, [session?.id, session?.isPaid]);
 
     useEffect(() => {
         const offerSection = document.getElementById('offer');
@@ -685,10 +711,13 @@ export default function TeaserPageNew() {
         const { generateEventId } = await import("../analytics/eventId");
         const eventID = generateEventId();
 
+        const reportPrice = parseFloat(import.meta.env.REACT_APP_REPORT_PRICE || "9.99");
+        const addonsSubtotal = bundleAvailable ? computeAddonsTotal(selectedAddons) : selectedAddons.length * 2.99;
+        const checkoutTotal = +(reportPrice + addonsSubtotal).toFixed(2);
         trackPixelEvent('InitiateCheckout', {
             content_name: 'Full Relationship Report',
             content_category: 'Report',
-            value: addOrderBump ? 21.99 : 9.99,
+            value: checkoutTotal,
             currency: 'USD',
             eventID: eventID
         });
@@ -697,14 +726,21 @@ export default function TeaserPageNew() {
             const checkout = await createCheckoutSession({
                 sessionId: session.id,
                 eventID: eventID,
-                addWorkbook: addOrderBump
+                addonIds: selectedAddons
             });
             if (checkout.sessionUrl) {
                 window.location.href = checkout.sessionUrl;
             }
-        } catch (e) {
+        } catch (e: any) {
             console.error(e);
-            alert("Checkout failed. Please try again.");
+            const statusCode = e?.statusCode || e?.status;
+            if (statusCode === 410) {
+                setBundleAvailable(false);
+                if (selectedAddons.length === 6) setSelectedAddons([]);
+                alert("The $9.99 bundle just ended. Please pick the guides you want.");
+            } else {
+                alert("Checkout failed. Please try again.");
+            }
         } finally {
             setIsCheckoutLoading(false);
         }
@@ -1193,11 +1229,11 @@ export default function TeaserPageNew() {
                 <div className="max-w-5xl mx-auto relative z-10">
                     <div className="text-center mb-14 space-y-4">
                         <span className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary/10 text-primary text-xs font-bold uppercase tracking-widest">
-                            <CheckCircle size={12} /> $194 Value — Included Free
+                            <CheckCircle size={12} /> Optional Add-On Guides
                         </span>
                         <h2 className="text-3xl md:text-5xl font-black text-foreground">The Emergency Intervention Toolkit</h2>
                         <p className="text-lg text-muted-foreground max-w-2xl mx-auto leading-relaxed">
-                            5 clinical PDF protocols therapists charge $200+/hr to teach. Yours free with your report.
+                            Pick the guides you want. $2.99 each — or all 6 for $9.99 in the first 15 minutes.
                         </p>
                     </div>
 
@@ -1320,8 +1356,7 @@ export default function TeaserPageNew() {
                                                     </span>
                                                 )}
                                                 <div className="text-right">
-                                                    <span className="text-xs text-destructive line-through mr-1.5">{guide.value}</span>
-                                                    <span className="text-xs font-bold text-success">Free</span>
+                                                    <span className="text-xs font-bold text-primary">+$2.99</span>
                                                 </div>
                                             </div>
                                         </div>
@@ -1329,20 +1364,21 @@ export default function TeaserPageNew() {
                                 })}
                             </div>
 
-                            {/* Total value anchor */}
+                            {/* Add-on pricing anchor */}
                             <div className="mt-10 bg-card border border-border rounded-2xl p-6 flex flex-col md:flex-row items-center justify-between gap-4 shadow-sm">
                                 <div className="flex items-center gap-3">
-                                    <div className="bg-success/10 text-success p-2 rounded-full">
+                                    <div className="bg-primary/10 text-primary p-2 rounded-full">
                                         <CheckCircle size={20} />
                                     </div>
                                     <div>
-                                        <p className="font-bold text-foreground">All 5 guides included free with your report</p>
-                                        <p className="text-sm text-muted-foreground">No extra cost. Instant PDF download after purchase.</p>
+                                        <p className="font-bold text-foreground">Pick what you need. Skip what you don't.</p>
+                                        <p className="text-sm text-muted-foreground">Add these at checkout. Or just get the report.</p>
                                     </div>
                                 </div>
                                 <div className="flex items-center gap-3 shrink-0">
-                                    <span className="text-2xl text-destructive line-through font-bold">$194</span>
-                                    <span className="text-2xl font-black text-success">$0</span>
+                                    <span className="text-lg font-bold text-foreground">$2.99 each</span>
+                                    <span className="text-muted-foreground">or</span>
+                                    <span className="text-lg font-black text-primary">$9.99 for all 6 — 15 min only</span>
                                 </div>
                             </div>
                             </>
@@ -1701,8 +1737,9 @@ export default function TeaserPageNew() {
                     {/* ─── BLOCK 3: PREMIUMS (INSIDE THE OFFER) ─── */}
                     <div className="mb-16">
                         <div className="text-center mb-8">
-                            <span className="text-primary font-bold tracking-widest uppercase text-xs">Included Free — $194 Value</span>
-                            <h3 className="text-2xl font-black text-foreground mt-2">+ 5 Clinical PDF Guides</h3>
+                            <span className="text-primary font-bold tracking-widest uppercase text-xs">Optional Add-Ons — $2.99 Each</span>
+                            <h3 className="text-2xl font-black text-foreground mt-2">5 Clinical PDF Guides</h3>
+                            <p className="text-sm text-muted-foreground mt-1">Pick at checkout. All 6 for $9.99 in the first 15 minutes.</p>
                         </div>
                         <div className="grid grid-cols-2 md:grid-cols-5 gap-3">
                             {[
@@ -1722,8 +1759,7 @@ export default function TeaserPageNew() {
                                         {guide.icon}
                                     </div>
                                     <p className="text-xs font-bold text-foreground leading-tight">{guide.name}</p>
-                                    <p className="text-[10px] text-destructive line-through">{guide.value}</p>
-                                    <p className="text-[9px] font-bold text-success">Included</p>
+                                    <p className="text-[10px] font-bold text-primary">+$2.99</p>
                                 </div>
                             ))}
                         </div>
@@ -1734,9 +1770,9 @@ export default function TeaserPageNew() {
                         <div className="absolute top-0 inset-x-0 h-2 bg-linear-to-r from-primary to-purple-500"></div>
                         <div className="p-8 md:p-12">
 
-                            {/* Value total */}
+                            {/* Therapy comparison anchor */}
                             <div className="text-center mb-8">
-                                <p className="text-sm font-bold uppercase tracking-wider text-muted-foreground mb-1">Total Value of Everything Above</p>
+                                <p className="text-sm font-bold uppercase tracking-wider text-muted-foreground mb-1">Same Work From A Therapist Costs</p>
                                 <p className="text-4xl font-black text-foreground line-through decoration-red-500 decoration-2 opacity-60">$520+</p>
                             </div>
 
@@ -1793,29 +1829,21 @@ export default function TeaserPageNew() {
                                 </div>
                             </div>
 
-                            {/* ORDER BUMP */}
-                            <div className="w-full bg-yellow-50 dark:bg-yellow-900/10 border-2 border-dashed border-yellow-400 p-4 rounded-xl text-left cursor-pointer hover:bg-yellow-100 dark:hover:bg-yellow-900/20 transition-colors mb-8 max-w-lg mx-auto" onClick={() => setAddOrderBump(!addOrderBump)}>
-                                <div className="flex items-start gap-3">
-                                    <div className={`mt-1 h-5 w-5 shrink-0 rounded border flex items-center justify-center transition-colors ${addOrderBump ? 'bg-primary border-primary text-primary-foreground' : 'bg-card border-border'}`}>
-                                        {addOrderBump && <Check size={14} strokeWidth={4} />}
-                                    </div>
-                                    <div>
-                                        <p className="font-bold text-foreground text-sm leading-tight mb-2">
-                                            YES! Add the <span className="text-primary">30-Day Reconnection Workbook</span> for just $12.
-                                        </p>
-                                        <p className="text-xs text-muted-foreground leading-relaxed mb-2 font-medium">
-                                            The report tells you <em>what's wrong.</em> Without this, you'll understand the problem but won't <em>do anything about it</em>.
-                                        </p>
-                                        <ul className="text-xs text-muted-foreground space-y-1">
-                                            <li className="flex items-start gap-2"><CheckCircle size={12} className="text-primary mt-0.5 shrink-0" /> <span className="leading-tight">5-minute daily exercises that rewire the pattern</span></li>
-                                            <li className="flex items-start gap-2"><CheckCircle size={12} className="text-primary mt-0.5 shrink-0" /> <span className="leading-tight">Word-for-word scripts for the 3 conversations that matter most</span></li>
-                                            <li className="flex items-start gap-2"><CheckCircle size={12} className="text-primary mt-0.5 shrink-0" /> <span className="leading-tight">Track your progress — see the dynamic shift week by week</span></li>
-                                        </ul>
-                                        <div className="mt-3 inline-block bg-yellow-100 dark:bg-yellow-900/50 text-yellow-800 dark:text-yellow-400 text-[10px] font-bold uppercase tracking-wider px-2 py-1 rounded">
-                                            Most Chosen Add-On
-                                        </div>
-                                    </div>
-                                </div>
+                            {/* OPTIONAL ADD-ON GUIDES */}
+                            <div className="w-full max-w-lg mx-auto mb-8 space-y-3">
+                                <CountdownBadge
+                                    offerStartedAt={offerStartedAt}
+                                    onExpire={() => {
+                                        setBundleAvailable(false);
+                                        if (selectedAddons.length === 6) setSelectedAddons([]);
+                                    }}
+                                    variant="banner"
+                                />
+                                <AddonSelector
+                                    selected={selectedAddons}
+                                    onChange={setSelectedAddons}
+                                    bundleAvailable={bundleAvailable}
+                                />
                             </div>
 
                             {/* CTA */}
@@ -1824,7 +1852,7 @@ export default function TeaserPageNew() {
                                     onClick={() => handleCheckout('offer_cta')}
                                     className="w-full md:w-auto bg-primary hover:bg-primary/90 text-primary-foreground text-xl font-bold py-5 px-12 rounded-full shadow-2xl hover:shadow-3xl hover:scale-105 transition-all flex items-center justify-center gap-3"
                                 >
-                                    {isCheckoutLoading ? "Processing..." : `Unlock My Full Analysis — $${addOrderBump ? 21.99 : 9.99}`} <ArrowRight size={24} />
+                                    {isCheckoutLoading ? "Processing..." : `Unlock My Full Analysis — $${(parseFloat(import.meta.env.REACT_APP_REPORT_PRICE || "9.99") + (bundleAvailable ? computeAddonsTotal(selectedAddons) : selectedAddons.length * 2.99)).toFixed(2)}`} <ArrowRight size={24} />
                                 </button>
                                 <div className="flex items-center justify-center gap-4 mt-6 text-muted-foreground">
                                     <FaCcVisa className="h-7 w-auto opacity-70 hover:opacity-100 transition-opacity" />

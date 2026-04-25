@@ -1,9 +1,11 @@
 import { ArrowRight, Shield, Clock, MessageCircle, Calendar, Brain, TrendingUp, ShieldAlert, Activity, Heart, Compass, FileText, Play, Check } from "lucide-react";
 import { FaCcVisa, FaCcMastercard, FaCcPaypal, FaApplePay, FaGooglePay } from "react-icons/fa";
-import { OrderBump } from "../components/OrderBump";
+import { AddonSelector } from "../components/AddonSelector";
+import { CountdownBadge } from "../components/CountdownBadge";
 import { TestimonialCard } from "../components/TestimonialCard";
 import { FAQAccordion } from "../components/FAQAccordion";
 import { DIMENSION_LABELS, type DimensionKey, type NarcissismData, type QuickOverviewData } from "../types";
+import { computeAddonsTotal } from "../../payment/addons";
 
 type Props = {
     session: any;
@@ -11,8 +13,11 @@ type Props = {
     narcissismAnalysis: NarcissismData | null;
     onCheckout: (location: string) => void;
     isCheckoutLoading: boolean;
-    addOrderBump: boolean;
-    setAddOrderBump: (v: boolean) => void;
+    selectedAddons: string[];
+    setSelectedAddons: (ids: string[]) => void;
+    offerStartedAt?: Date | null;
+    bundleAvailable?: boolean;
+    onBundleExpire?: () => void;
 };
 
 const FAQ_ITEMS = [
@@ -24,10 +29,12 @@ const FAQ_ITEMS = [
     { question: "Is my info safe?", answer: "Yes. Your data is never sold. Your answers are never shared. You can delete everything from your account at any time." },
 ];
 
-export function GodfatherOffer({ session, quickOverview, narcissismAnalysis, onCheckout, isCheckoutLoading, addOrderBump, setAddOrderBump }: Props) {
+export function GodfatherOffer({ session, quickOverview, narcissismAnalysis, onCheckout, isCheckoutLoading, selectedAddons, setSelectedAddons, offerStartedAt = null, bundleAvailable = true, onBundleExpire }: Props) {
     const scores = session?.scores as any;
     const metrics = session?.advancedMetrics as any;
-    const price = addOrderBump ? 21.99 : 9.99;
+    const reportPrice = parseFloat(import.meta.env.REACT_APP_REPORT_PRICE || "9.99");
+    const addonsSubtotal = bundleAvailable ? computeAddonsTotal(selectedAddons) : selectedAddons.length * 2.99;
+    const price = +(reportPrice + addonsSubtotal).toFixed(2);
 
     // Pull user data for deep personalization
     const dominantLens = scores?.dominantLens as DimensionKey | undefined;
@@ -238,6 +245,31 @@ export function GodfatherOffer({ session, quickOverview, narcissismAnalysis, onC
                     </p>
                 </div>
 
+                {/* ═══ VIDEO SHOWCASE — shows the actual product before the offer ═══ */}
+                <div className="text-center space-y-4">
+                    <div className="space-y-1">
+                        <span className="inline-flex items-center gap-2 text-xs font-bold uppercase tracking-widest text-muted-foreground">
+                            <Play size={14} className="text-primary" /> 60-Second Look Inside
+                        </span>
+                        <h3 className="text-lg md:text-xl font-black text-foreground">See What Your Report Looks Like</h3>
+                        <p className="text-xs text-muted-foreground">This is a sample. Yours is built from your {Object.keys(session?.answers || {}).length || 30} answers.</p>
+                    </div>
+                    <div className="relative max-w-xs mx-auto w-full">
+                        <div className="rounded-2xl overflow-hidden shadow-xl border-2 border-border bg-foreground">
+                            <video
+                                src="/demo/screen-capture.webm"
+                                className="w-full"
+                                autoPlay
+                                loop
+                                muted
+                                playsInline
+                                controls
+                                preload="metadata"
+                            />
+                        </div>
+                    </div>
+                </div>
+
                 {/* ═══ SOCIAL PROOF — early testimonial ═══ */}
                 <TestimonialCard
                     text="I bought this at 1am after another fight about nothing. I didn't even want to read it. But the first page described our exact fight. Like someone had been standing in our kitchen. I cried for 20 minutes. Then I read the whole thing. We're not fixed. But last week we talked — really talked — for the first time in months."
@@ -254,7 +286,7 @@ export function GodfatherOffer({ session, quickOverview, narcissismAnalysis, onC
 
                 {/* ═══ PREMIUM SUMMARY — above first CTA ═══ */}
                 <p className="text-center text-sm font-bold text-foreground">
-                    Includes 5 bonus guides (<span className="text-red-500 line-through">$194</span> <span className="text-emerald-600">free</span>) — yours the moment you unlock.
+                    Add optional PDF guides at checkout — $2.99 each. All 6 for $9.99 in the first 15 minutes.
                 </p>
 
                 {/* ═══ PRIMARY OFFER CARD (early placement for ready buyers) ═══ */}
@@ -295,8 +327,17 @@ export function GodfatherOffer({ session, quickOverview, narcissismAnalysis, onC
                         </div>
                     </div>
 
-                    {/* Order bump */}
-                    <OrderBump checked={addOrderBump} onChange={setAddOrderBump} />
+                    {/* Bundle countdown + optional add-on guides */}
+                    <CountdownBadge
+                        offerStartedAt={offerStartedAt}
+                        onExpire={onBundleExpire}
+                        variant="banner"
+                    />
+                    <AddonSelector
+                        selected={selectedAddons}
+                        onChange={setSelectedAddons}
+                        bundleAvailable={bundleAvailable}
+                    />
 
                     {/* CTA */}
                     <div className="flex flex-col items-center">
@@ -326,35 +367,12 @@ export function GodfatherOffer({ session, quickOverview, narcissismAnalysis, onC
 
                 <p className="text-center text-sm text-muted-foreground">Still not sure? Keep scrolling. Here's more about what you get.</p>
 
-                {/* ═══ VIDEO SHOWCASE ═══ */}
-                <div className="text-center space-y-6">
-                    <div className="space-y-2">
-                        <span className="inline-flex items-center gap-2 text-xs font-bold uppercase tracking-widest text-muted-foreground">
-                            <Play size={14} className="text-primary" /> 60-Second Look Inside
-                        </span>
-                        <h3 className="text-xl md:text-2xl font-black text-foreground">See What Your Report Looks Like</h3>
-                        <p className="text-sm text-muted-foreground">This is a sample. Yours is built from your {Object.keys(session?.answers || {}).length || 30} answers.</p>
-                    </div>
-                    <div className="relative max-w-sm mx-auto w-full">
-                        <div className="rounded-2xl overflow-hidden shadow-2xl border-2 border-border bg-foreground">
-                            <video
-                                src="/demo/screen-capture.webm"
-                                className="w-full"
-                                controls
-                                playsInline
-                                muted
-                                preload="metadata"
-                            />
-                        </div>
-                    </div>
-                </div>
-
                 {/* ═══ BONUS GUIDES — full detail with bullets ═══ */}
                 <div className="space-y-6">
                     <div className="text-center space-y-1">
-                        <span className="text-primary font-bold tracking-widest uppercase text-xs">Included free — $194 value</span>
-                        <h3 className="text-xl font-black text-foreground">Your Emergency Toolkit (5 Guides)</h3>
-                        <p className="text-sm text-muted-foreground">PDF guides you download right away. Keep them forever.</p>
+                        <span className="text-primary font-bold tracking-widest uppercase text-xs">Optional Add-Ons — $2.99 each</span>
+                        <h3 className="text-xl font-black text-foreground">Your Emergency Toolkit (6 Guides)</h3>
+                        <p className="text-sm text-muted-foreground">Pick the ones you need. All 6 for $9.99 in the first 15 minutes.</p>
                     </div>
 
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -415,11 +433,10 @@ export function GodfatherOffer({ session, quickOverview, narcissismAnalysis, onC
                                         {isCritical ? (
                                             <span className="text-[10px] font-bold uppercase tracking-wider bg-primary/10 text-primary px-2 py-0.5 rounded-full">You need this</span>
                                         ) : (
-                                            <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">Included</span>
+                                            <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">Optional</span>
                                         )}
                                         <div className="text-right">
-                                            <span className="text-xs text-red-500 line-through mr-1.5">{g.value}</span>
-                                            <span className="text-xs font-bold text-emerald-600">Free</span>
+                                            <span className="text-xs font-bold text-primary">+$2.99</span>
                                         </div>
                                     </div>
                                 </div>
@@ -427,12 +444,13 @@ export function GodfatherOffer({ session, quickOverview, narcissismAnalysis, onC
                         })}
                     </div>
 
-                    {/* Total value bar */}
+                    {/* Bundle pricing bar */}
                     <div className="bg-card border border-border rounded-xl p-4 flex items-center justify-between">
-                        <p className="text-sm font-bold text-foreground">All 5 guides — yours free with the report</p>
+                        <p className="text-sm font-bold text-foreground">Want them all? Save with the bundle.</p>
                         <div className="flex items-center gap-2 shrink-0">
-                            <span className="text-lg text-red-500 line-through font-bold">$194</span>
-                            <span className="text-lg font-black text-emerald-600">$0</span>
+                            <span className="text-sm text-muted-foreground">$2.99 each</span>
+                            <span className="text-muted-foreground">/</span>
+                            <span className="text-lg font-black text-primary">$9.99 for all 6 — 15 min only</span>
                         </div>
                     </div>
                 </div>

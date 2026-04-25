@@ -1,33 +1,55 @@
 import { useState, useEffect, useRef } from "react";
 
-export function useScrollTracking() {
+export function useScrollTracking(ready: boolean = true) {
     const [showStickyCTA, setShowStickyCTA] = useState(false);
     const scrollDepthTracked = useRef<Set<number>>(new Set());
 
-    // Sticky CTA visibility
+    // Sticky CTA visibility.
+    // Show when the user has scrolled past the hero AND the offer card is not currently in view.
+    // Both signals update the state: scroll events (for the hero threshold) and the
+    // IntersectionObserver (for whether the offer card is visible).
     useEffect(() => {
-        const offerSection = document.getElementById("offer");
-        if (!offerSection) return;
+        if (!ready) return;
 
-        let hasScrolledPastHero = false;
-        const handleScroll = () => {
-            hasScrolledPastHero = window.scrollY > 600;
+        let observer: IntersectionObserver | null = null;
+        let retryTimer: ReturnType<typeof setTimeout> | null = null;
+        let retries = 0;
+        let isOfferVisible = false;
+
+        const update = () => {
+            const pastHero = window.scrollY > 600;
+            setShowStickyCTA(!isOfferVisible && pastHero);
         };
+
+        const handleScroll = () => update();
         window.addEventListener("scroll", handleScroll, { passive: true });
 
-        const observer = new IntersectionObserver(
-            ([entry]) => {
-                setShowStickyCTA(!entry.isIntersecting && hasScrolledPastHero);
-            },
-            { threshold: 0.1 }
-        );
-        observer.observe(offerSection);
+        const attach = () => {
+            const offerSection = document.getElementById("offer");
+            if (!offerSection) {
+                if (retries++ < 40) retryTimer = setTimeout(attach, 250);
+                return;
+            }
+            observer = new IntersectionObserver(
+                ([entry]) => {
+                    isOfferVisible = entry.isIntersecting;
+                    update();
+                },
+                { threshold: 0.1 },
+            );
+            observer.observe(offerSection);
+        };
+        attach();
+
+        // Evaluate once at mount in case the user landed already-scrolled (e.g. back button).
+        update();
 
         return () => {
-            observer.disconnect();
+            observer?.disconnect();
+            if (retryTimer) clearTimeout(retryTimer);
             window.removeEventListener("scroll", handleScroll);
         };
-    }, []);
+    }, [ready]);
 
     // Scroll depth analytics
     useEffect(() => {

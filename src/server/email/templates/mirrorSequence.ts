@@ -372,7 +372,7 @@ Here's what that number means in plain English:
 Your full report contains:
 - The exact scripts for YOUR trigger points
 - A 30-day action plan (week by week)
-- 5 clinical guides ($194 value, included)
+- 5 optional clinical guides (add any for $2.99 each)
 - Your 5-year trajectory with specific intervention windows
 
 It's $9.99. Less than two coffees.
@@ -411,7 +411,7 @@ Unsubscribe: ${vars.unsubscribe_url}
     <ul style="padding-left: 20px;">
       <li>The exact scripts for YOUR trigger points</li>
       <li>A 30-day action plan (week by week)</li>
-      <li>5 clinical guides ($194 value, included)</li>
+      <li>5 optional clinical guides (add any for $2.99 each)</li>
       <li>Your 5-year trajectory with specific intervention windows</li>
     </ul>
 

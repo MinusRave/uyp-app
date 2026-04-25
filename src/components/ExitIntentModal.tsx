@@ -37,7 +37,7 @@ const ExitIntentModal: React.FC<ExitIntentModalProps> = ({ show, onClose, onSave
 
                 <div className="p-8">
                     <p className="text-lg font-medium leading-relaxed mb-6">
-                        You just spent 18 minutes answering 32 questions about the most important relationship in your life.
+                        You just spent 10 minutes answering 30 questions about the most important relationship in your life.
                     </p>
 
                     <div className="space-y-3 mb-8 bg-secondary/10 p-4 rounded-xl">
@@ -53,7 +53,7 @@ const ExitIntentModal: React.FC<ExitIntentModalProps> = ({ show, onClose, onSave
                         </div>
                     </div>
 
-                    <p className="text-center font-bold text-xl mb-4">Don't let 18 minutes go to waste.</p>
+                    <p className="text-center font-bold text-xl mb-4">Don't let 10 minutes go to waste.</p>
 
                     <form onSubmit={handleSubmit} className="space-y-4">
                         <input

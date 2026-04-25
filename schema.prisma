@@ -46,7 +46,9 @@ model TestSession {
   
   // Payment gate
   isPaid               Boolean  @default(false)
-  hasPurchasedOrderBump Boolean @default(false)
+  hasPurchasedOrderBump Boolean @default(false) // DEPRECATED — kept for backward compat; use purchasedAddons
+  purchasedAddons      String[] @default([]) // Addon IDs user has paid for (e.g. "workbook", "mental-load")
+  offerStartedAt       DateTime? // First time the results/offer page was viewed — drives the 15-min bundle timer
   email                String?  // Lead capture before matching with User
 
   // User Profile Data (Collected before test)
