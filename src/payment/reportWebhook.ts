@@ -7,6 +7,9 @@ import { getPaymentConfirmationEmail } from "../server/email/templates/paymentCo
 import { buildPersonalizationData } from "../server/email/personalization";
 import { sendCapiEvent } from "../server/analytics/metaCapi";
 import { ADDON_IDS } from "./addons";
+import { computeSoLResult, type SoLAnswers } from "../test/stayOrLeaveScoring";
+import { generateAssessment } from "../server/stayOrLeaveAi";
+import { STAY_OR_LEAVE_PRICE, STAY_OR_LEAVE_PRODUCT_NAME } from "./stayOrLeaveOperations";
 
 // ... middleware config ...
 export const stripeMiddlewareConfigFn: MiddlewareConfigFn = (
@@ -138,6 +141,94 @@ export const stripeWebhook = async (
           console.error(`Failed to send payment confirmation email:`, emailError);
           // Don't fail the webhook if email fails
         }
+      }
+    }
+
+    // === STAY OR LEAVE PRODUCT ===
+    if (metadata && metadata.type === "stay_or_leave_unlock" && metadata.testSessionId) {
+      console.log(`Unlocking S-o-L assessment: ${metadata.testSessionId}`);
+
+      const testSession = await context.entities.TestSession.findUnique({
+        where: { id: metadata.testSessionId },
+      });
+      if (!testSession) {
+        console.error(`[Webhook] S-o-L: session not found: ${metadata.testSessionId}`);
+        return response.json({ received: true });
+      }
+
+      // Meta CAPI Purchase event
+      try {
+        const userEmail = testSession.email || session.customer_details?.email;
+        const amountTotal = session.amount_total ? session.amount_total / 100 : STAY_OR_LEAVE_PRICE;
+        await sendCapiEvent({
+          eventName: "Purchase",
+          eventId: session.id,
+          eventSourceUrl: "https://understandyourpartner.com/assessment",
+          userData: {
+            email: userEmail,
+            fbp: testSession.fbp || metadata.fbp,
+            fbc: testSession.fbc,
+          },
+          customData: {
+            currency: "usd",
+            value: amountTotal,
+            content_name: STAY_OR_LEAVE_PRODUCT_NAME,
+            content_type: "product",
+            order_id: session.id,
+          },
+        });
+      } catch (e) {
+        console.error("[Webhook] S-o-L CAPI failed:", e);
+      }
+
+      // Mark paid + capture email if missing
+      const dataToUpdate: any = {
+        isPaid: true,
+        emailSequenceType: null,
+      };
+      if (!testSession.email && session.customer_details?.email) {
+        dataToUpdate.email = session.customer_details.email;
+      }
+      await context.entities.TestSession.update({
+        where: { id: metadata.testSessionId },
+        data: dataToUpdate,
+      });
+
+      // Fire AI assessment generation (3 parallel Sonnet calls).
+      // Don't block the webhook response: do it but catch errors.
+      try {
+        const refreshed = await context.entities.TestSession.findUnique({
+          where: { id: metadata.testSessionId },
+        });
+        if (refreshed) {
+          const answers = refreshed.answers as unknown as SoLAnswers;
+          const existingData = (refreshed.stayOrLeaveData as any) || {};
+          if (!existingData.aiCommentary && answers && typeof answers === "object") {
+            const result = computeSoLResult(answers);
+            const { commentary } = await generateAssessment(answers, result);
+            await context.entities.TestSession.update({
+              where: { id: metadata.testSessionId },
+              data: {
+                stayOrLeaveData: {
+                  ...existingData,
+                  scores: result.scores,
+                  overall: result.overall,
+                  verdict: result.verdict,
+                  recommendation: result.recommendation,
+                  finalAnswer: result.finalAnswer,
+                  weakestDimension: result.weakestDimension,
+                  strongestDimension: result.strongestDimension,
+                  aiCommentary: commentary,
+                  assessmentGeneratedAt: new Date().toISOString(),
+                },
+              },
+            });
+            console.log(`[Webhook] S-o-L assessment generated for ${metadata.testSessionId}`);
+          }
+        }
+      } catch (aiError) {
+        console.error("[Webhook] S-o-L AI generation failed (will retry on page load):", aiError);
+        // The assessment page will call generateStayOrLeaveAssessment as a fallback.
       }
     }
   }

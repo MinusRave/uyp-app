@@ -26,6 +26,21 @@ const getDominantLens = (session: any) => {
     return scores.dominantLens ? scores.dominantLens.replace('_', ' ') : null;
 };
 
+// Helper to detect Stay-or-Leave session
+const isSolSession = (session: any) => session.testType === "stay-or-leave";
+
+// Verdict label maps for the table — kept inline so we don't have to import server types client-side
+const SOL_VERDICT_LABELS: Record<string, string> = {
+    worth_saving: "Worth Saving",
+    high_risk: "High Risk",
+    time_to_leave: "Time to Leave",
+};
+const SOL_VERDICT_COLOR: Record<string, string> = {
+    worth_saving: "text-emerald-600",
+    high_risk: "text-amber-600",
+    time_to_leave: "text-red-600",
+};
+
 // Helper to get compatibility (if available in scores, otherwise placeholder)
 const getCompatibility = (session: any) => {
     // This depends on where we store it in scores
@@ -56,6 +71,7 @@ const SessionsPage = ({ user }: { user: AuthUser }) => {
     const [sourceFilter, setSourceFilter] = useState<'all' | 'meta_paid' | 'meta_organic' | 'google' | 'email' | 'direct'>('all');
     const [progressFilter, setProgressFilter] = useState<'all' | 'no_start' | 'in_progress' | 'completed'>('all');
     const [leadFilter, setLeadFilter] = useState<'all' | 'lead' | 'anonymous'>('all');
+    const [productFilter, setProductFilter] = useState<'all' | 'stay-or-leave' | 'uyp'>('all');
     const [hideEmpty, setHideEmpty] = useState(false);
 
     const take = 50;
@@ -69,6 +85,7 @@ const SessionsPage = ({ user }: { user: AuthUser }) => {
         sourceFilter,
         progressFilter,
         leadFilter,
+        productFilter,
         hideEmpty
     });
 
@@ -84,7 +101,8 @@ const SessionsPage = ({ user }: { user: AuthUser }) => {
     // Fetch Session Analytics (Aggregates & Trends)
     const { data: analyticsData, isLoading: isLoadingAnalytics } = useQuery(getSessionAnalytics, {
         dateFrom: dateRange.from || undefined,
-        dateTo: dateRange.to || undefined
+        dateTo: dateRange.to || undefined,
+        productFilter
     });
 
     // Cast the data to include the user relation
@@ -96,6 +114,28 @@ const SessionsPage = ({ user }: { user: AuthUser }) => {
                 <div className="flex flex-col gap-2">
                     <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Sessions Explorer</h1>
                     <p className="text-gray-500">Deep dive into user journeys and results.</p>
+                </div>
+
+                {/* Product Tabs — switch between Stay or Leave and UYP */}
+                <div className="bg-white dark:bg-boxdark p-1 rounded-lg shadow-sm border border-gray-200 dark:border-strokedark inline-flex gap-1 self-start">
+                    {([
+                        { id: 'all', label: 'All Tests' },
+                        { id: 'stay-or-leave', label: 'Stay or Leave' },
+                        { id: 'uyp', label: 'Understand Your Partner' },
+                    ] as const).map((tab) => (
+                        <button
+                            key={tab.id}
+                            onClick={() => { setProductFilter(tab.id); setPage(1); }}
+                            className={cn(
+                                'px-4 py-2 rounded-md text-sm font-medium transition-colors',
+                                productFilter === tab.id
+                                    ? 'bg-primary text-white'
+                                    : 'text-gray-600 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-700',
+                            )}
+                        >
+                            {tab.label}
+                        </button>
+                    ))}
                 </div>
 
                 {/* Global Date Filter */}
@@ -422,19 +462,55 @@ const SessionsPage = ({ user }: { user: AuthUser }) => {
                                             <EmailHistoryBadge session={session} />
                                         </td>
 
-                                        {/* RESULT */}
+                                        {/* RESULT (product-aware) */}
                                         <td className="py-4 px-4">
-                                            {session.isCompleted ? (
-                                                <div className="flex flex-col gap-1">
-                                                    <span className="font-bold text-primary capitalize text-sm">
-                                                        {getDominantLens(session) || "Unknown Lens"}
+                                            {(() => {
+                                                // Tiny product badge so admin can scan All view at a glance.
+                                                const productBadge = isSolSession(session) ? (
+                                                    <span className="text-[9px] bg-purple-100 text-purple-700 px-1.5 py-0.5 rounded font-bold border border-purple-200 uppercase">
+                                                        S-o-L
                                                     </span>
-                                                    {/* Placeholder for compatibility if we had it */}
-                                                    {/* <span className="text-xs text-gray-500">Compat: 72%</span> */}
-                                                </div>
-                                            ) : (
-                                                <span className="text-gray-300 text-lg">•</span>
-                                            )}
+                                                ) : (
+                                                    <span className="text-[9px] bg-blue-100 text-blue-700 px-1.5 py-0.5 rounded font-bold border border-blue-200 uppercase">
+                                                        UYP
+                                                    </span>
+                                                );
+
+                                                if (!session.isCompleted) {
+                                                    return (
+                                                        <div className="flex items-center gap-2">
+                                                            {productBadge}
+                                                            <span className="text-gray-300 text-lg">•</span>
+                                                        </div>
+                                                    );
+                                                }
+
+                                                if (isSolSession(session)) {
+                                                    const sol = (session as any).stayOrLeaveData ?? {};
+                                                    const verdict = sol.verdict as string | undefined;
+                                                    const overall = typeof sol.overall === "number" ? sol.overall : null;
+                                                    return (
+                                                        <div className="flex flex-col gap-1">
+                                                            {productBadge}
+                                                            <span className={cn("font-bold text-sm", verdict ? SOL_VERDICT_COLOR[verdict] : "text-gray-400")}>
+                                                                {verdict ? SOL_VERDICT_LABELS[verdict] : "—"}
+                                                            </span>
+                                                            {overall !== null && (
+                                                                <span className="text-xs text-gray-500">Score: {overall}/100</span>
+                                                            )}
+                                                        </div>
+                                                    );
+                                                }
+
+                                                return (
+                                                    <div className="flex flex-col gap-1">
+                                                        {productBadge}
+                                                        <span className="font-bold text-primary capitalize text-sm">
+                                                            {getDominantLens(session) || "Unknown Lens"}
+                                                        </span>
+                                                    </div>
+                                                );
+                                            })()}
                                         </td>
 
                                         {/* ACTION */}

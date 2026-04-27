@@ -1,5 +1,6 @@
 import { emailSender } from "wasp/server/email";
 import { type PersonalizationVars, buildPersonalizationData } from "./personalization";
+import { buildSoLEmailVars } from "./solPersonalization";
 import { type TestSession } from "wasp/entities";
 
 // Import new Mirror Sequence templates
@@ -13,35 +14,58 @@ import {
     getMirror7_Archive
 } from "./templates/mirrorSequence";
 
-// Email template selector
+// Stay-or-Leave sequences (4th-grade English, two flows)
+import {
+    solAbandoned1, solAbandoned2, solAbandoned3, solAbandoned4, solAbandoned5,
+    solCompleted1, solCompleted2, solCompleted3, solCompleted4, solCompleted5,
+} from "./templates/solSequences";
+
+// Email template selector — UYP (Mirror Strategy)
 function getEmailTemplate(
     scenario: string,
     stage: number
 ): ((vars: PersonalizationVars) => { subject: string; html: string; text: string }) | null {
-    // We only support "teaser_viewer" now (The Mirror Strategy)
     if (scenario === "teaser_viewer") {
         switch (stage) {
-            case 1:
-                return getMirror1_ColdTruth;
-            case 2:
-                return getMirror2_VitalSign;
-            case 3:
-                return getMirror3_Forecast;
-            case 4:
-                return getMirror4_Manager;
-            case 5:
-                return getMirror5_Hope;
-            case 6:
-                return getMirror6_Loop;
-            case 7:
-                return getMirror7_Archive;
-            default:
-                return null;
+            case 1: return getMirror1_ColdTruth;
+            case 2: return getMirror2_VitalSign;
+            case 3: return getMirror3_Forecast;
+            case 4: return getMirror4_Manager;
+            case 5: return getMirror5_Hope;
+            case 6: return getMirror6_Loop;
+            case 7: return getMirror7_Archive;
+            default: return null;
         }
     }
-
     return null;
 }
+
+// Email template selector — Stay or Leave Test
+function getSoLTemplate(scenario: string, stage: number) {
+    if (scenario === "sol_test_abandoned") {
+        switch (stage) {
+            case 1: return solAbandoned1;
+            case 2: return solAbandoned2;
+            case 3: return solAbandoned3;
+            case 4: return solAbandoned4;
+            case 5: return solAbandoned5;
+            default: return null;
+        }
+    }
+    if (scenario === "sol_test_completed_no_purchase") {
+        switch (stage) {
+            case 1: return solCompleted1;
+            case 2: return solCompleted2;
+            case 3: return solCompleted3;
+            case 4: return solCompleted4;
+            case 5: return solCompleted5;
+            default: return null;
+        }
+    }
+    return null;
+}
+
+const SOL_SEQUENCES = ["sol_test_abandoned", "sol_test_completed_no_purchase"];
 
 // Main email sending function
 export async function sendRetentionEmail(
@@ -60,39 +84,45 @@ export async function sendRetentionEmail(
             return false;
         }
 
-        // Get personalization data (from cache or build fresh)
-        // Rebuild if cached data is missing session_id (pre-migration cache)
-        let personalizationData: PersonalizationVars;
-        if (session.personalizationData && (session.personalizationData as any).session_id) {
-            personalizationData = session.personalizationData as unknown as PersonalizationVars;
+        const appUrl = process.env.WASP_WEB_CLIENT_URL || "http://localhost:3000";
+        const apiUrl = process.env.WASP_API_SERVER_URL || "http://localhost:3001";
+
+        let emailContent: { subject: string; html: string; text: string };
+
+        if (SOL_SEQUENCES.includes(session.emailSequenceType)) {
+            // Stay-or-Leave path: simple personalization, no caching needed.
+            const solVars = buildSoLEmailVars(session, appUrl, apiUrl);
+            const templateFn = getSoLTemplate(session.emailSequenceType, stage);
+            if (!templateFn) {
+                console.error(`No SoL template found for ${session.emailSequenceType} stage ${stage}`);
+                return false;
+            }
+            emailContent = templateFn(solVars);
         } else {
-            const appUrl = process.env.WASP_WEB_CLIENT_URL || "http://localhost:3000";
-            const apiUrl = process.env.WASP_API_SERVER_URL || "http://localhost:3001";
-            personalizationData = buildPersonalizationData(session, appUrl, apiUrl);
-
-            // Cache it
-            await context.entities.TestSession.update({
-                where: { id: session.id },
-                data: { personalizationData: personalizationData as any },
-            });
+            // Legacy UYP path
+            let personalizationData: PersonalizationVars;
+            if (session.personalizationData && (session.personalizationData as any).session_id) {
+                personalizationData = session.personalizationData as unknown as PersonalizationVars;
+            } else {
+                personalizationData = buildPersonalizationData(session, appUrl, apiUrl);
+                await context.entities.TestSession.update({
+                    where: { id: session.id },
+                    data: { personalizationData: personalizationData as any },
+                });
+            }
+            const templateFn = getEmailTemplate(session.emailSequenceType, stage);
+            if (!templateFn) {
+                console.error(`No template found for scenario ${session.emailSequenceType} stage ${stage}`);
+                return false;
+            }
+            emailContent = templateFn(personalizationData);
         }
 
-        // Get email template
-        const templateFn = getEmailTemplate(session.emailSequenceType, stage);
-        if (!templateFn) {
-            console.error(
-                `No template found for scenario ${session.emailSequenceType} stage ${stage}`
-            );
-            return false;
-        }
-
-        // Generate email content
-        const emailContent = templateFn(personalizationData);
-
-        // Derive Tracking ID (e.g., M1, M2... using M for Mirror to distinguish from old B series if needed, or keep B)
-        // Let's use M to be clear it's the new sequence
+        // Derive Tracking ID
         let emailCode = "X0";
         if (session.emailSequenceType === "teaser_viewer") emailCode = `M${stage}`;
+        if (session.emailSequenceType === "sol_test_abandoned") emailCode = `SA${stage}`;
+        if (session.emailSequenceType === "sol_test_completed_no_purchase") emailCode = `SC${stage}`;
 
         // Send email with Custom Args for Tracking
         await emailSender.send({
@@ -162,6 +192,35 @@ export function getDelayForStage(scenario: string, stage: number): number {
     // Check if in test mode (shorter delays for testing)
     const isTestMode = process.env.EMAIL_RETENTION_TEST_MODE === "true";
     const MINUTE = 60 * 1000;
+
+    // Stay-or-Leave: ABANDONED — get them back to finish.
+    // Stage 1 immediate (15 min after they hit the gate, the job will catch up).
+    // Then 1h, 24h, 72h, 168h (7 days).
+    if (scenario === "sol_test_abandoned") {
+        if (isTestMode) return stage === 1 ? 0 : stage * MINUTE;
+        switch (stage) {
+            case 1: return 0;
+            case 2: return 1 * HOUR;
+            case 3: return 24 * HOUR;
+            case 4: return 72 * HOUR;
+            case 5: return 168 * HOUR;
+            default: return 0;
+        }
+    }
+
+    // Stay-or-Leave: COMPLETED, NO PURCHASE — convert the lead.
+    // 30 min, 2h, 24h, 72h, 168h.
+    if (scenario === "sol_test_completed_no_purchase") {
+        if (isTestMode) return stage === 1 ? 0 : stage * MINUTE;
+        switch (stage) {
+            case 1: return 30 * 60 * 1000;
+            case 2: return 2 * HOUR;
+            case 3: return 24 * HOUR;
+            case 4: return 72 * HOUR;
+            case 5: return 168 * HOUR;
+            default: return 0;
+        }
+    }
 
     if (scenario === "teaser_viewer") {
         if (isTestMode) {

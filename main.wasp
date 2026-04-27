@@ -103,7 +103,33 @@ app OpenSaaS {
 
 
 
-route LandingPageRoute { path: "/", to: HomePage }
+// Homepage — promotes both tests (organic/direct traffic).
+// Cold Meta ads bypass this and land directly on /stay-or-leave.
+route LandingPageRoute { path: "/", to: DualTestHomePage }
+page DualTestHomePage {
+  component: import DualTestHomePage from "@src/landing-page/DualTestHomePage"
+}
+
+// Stay or Leave Test — direct quiz entry (Meta ads land here)
+route StayOrLeaveTestRoute { path: "/stay-or-leave", to: StayOrLeaveTestPage }
+page StayOrLeaveTestPage {
+  component: import StayOrLeaveTestPage from "@src/test/StayOrLeaveTestPage"
+}
+
+// Sales page (bridge + verdict reveal + paywall)
+route StayOrLeaveResultsRoute { path: "/sol-results", to: StayOrLeaveResultsPage }
+page StayOrLeaveResultsPage {
+  component: import StayOrLeaveResultsPage from "@src/test/StayOrLeaveResultsPage"
+}
+
+// Paid assessment
+route StayOrLeaveAssessmentRoute { path: "/assessment", to: StayOrLeaveAssessmentPage }
+page StayOrLeaveAssessmentPage {
+  component: import StayOrLeaveAssessmentPage from "@src/test/StayOrLeaveAssessmentPage"
+}
+
+// Legacy UYP marketing landing — kept reachable for organic/share traffic.
+route UypAboutRoute { path: "/about", to: HomePage }
 page HomePage {
   component: import HomePage from "@src/landing-page/HomePage"
 }
@@ -358,6 +384,36 @@ action verifyPayment {
 
 action startOffer {
   fn: import { startOffer } from "@src/payment/operations",
+  entities: [TestSession]
+}
+
+action completeStayOrLeaveTest {
+  fn: import { completeStayOrLeaveTest } from "@src/payment/stayOrLeaveOperations",
+  entities: [TestSession]
+}
+
+action generateStayOrLeaveAssessment {
+  fn: import { generateStayOrLeaveAssessment } from "@src/payment/stayOrLeaveOperations",
+  entities: [TestSession]
+}
+
+action createStayOrLeaveCheckoutSession {
+  fn: import { createStayOrLeaveCheckoutSession } from "@src/payment/stayOrLeaveOperations",
+  entities: [TestSession]
+}
+
+action startStayOrLeaveSession {
+  fn: import { startStayOrLeaveSession } from "@src/payment/stayOrLeaveOperations",
+  entities: [TestSession, User]
+}
+
+action trackMetaCapiEvent {
+  fn: import { trackMetaCapiEvent } from "@src/payment/stayOrLeaveOperations",
+  entities: [TestSession]
+}
+
+action saveStayOrLeaveAnswers {
+  fn: import { saveStayOrLeaveAnswers } from "@src/payment/stayOrLeaveOperations",
   entities: [TestSession]
 }
 

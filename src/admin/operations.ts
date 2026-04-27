@@ -13,8 +13,11 @@ type GetTestSessionsArgs = {
     sourceFilter?: 'all' | 'meta_paid' | 'meta_organic' | 'meta' | 'google' | 'email' | 'direct';
     progressFilter?: 'all' | 'no_start' | 'in_progress' | 'completed';
     leadFilter?: 'all' | 'lead' | 'anonymous';
+    productFilter?: 'all' | 'stay-or-leave' | 'uyp';
     hideEmpty?: boolean;
 };
+
+const UYP_TEST_TYPES = ['standard', 'toxic-men'];
 
 type GetTestSessionsResult = {
     sessions: TestSession[];
@@ -58,9 +61,16 @@ export const getTestSessions: GetTestSessions<GetTestSessionsArgs, GetTestSessio
         throw new HttpError(401, "Unauthorized");
     }
 
-    const { skip = 0, take = 10, statusFilter = 'all', emailFilter, sourceFilter, progressFilter, leadFilter, hideEmpty } = args;
+    const { skip = 0, take = 10, statusFilter = 'all', emailFilter, sourceFilter, progressFilter, leadFilter, productFilter = 'all', hideEmpty } = args;
 
     const where: any = {};
+
+    // Product (test type) filter
+    if (productFilter === 'stay-or-leave') {
+        where.testType = 'stay-or-leave';
+    } else if (productFilter === 'uyp') {
+        where.testType = { in: UYP_TEST_TYPES };
+    }
 
     if (emailFilter) {
         where.email = { contains: emailFilter, mode: 'insensitive' };
@@ -492,6 +502,7 @@ export const retriggerAiProcessing = async ({ sessionId }: { sessionId: string }
 type GetSessionAnalyticsArgs = {
     dateFrom?: string;
     dateTo?: string;
+    productFilter?: 'all' | 'stay-or-leave' | 'uyp';
 };
 
 type DailyAnalytics = {
@@ -517,8 +528,14 @@ type SessionAnalyticsResult = {
 export const getSessionAnalytics: GetSessionAnalytics<GetSessionAnalyticsArgs, SessionAnalyticsResult> = async (args, context) => {
     if (!context.user?.isAdmin) throw new HttpError(401, "Unauthorized");
 
-    const { dateFrom, dateTo } = args;
+    const { dateFrom, dateTo, productFilter = 'all' } = args;
     const where: any = {};
+
+    if (productFilter === 'stay-or-leave') {
+        where.testType = 'stay-or-leave';
+    } else if (productFilter === 'uyp') {
+        where.testType = { in: UYP_TEST_TYPES };
+    }
 
     if (dateFrom || dateTo) {
         where.createdAt = {};

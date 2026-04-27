@@ -12,7 +12,7 @@ export async function sendRetentionEmails(args: any, context: any) {
             where: {
                 isPaid: false,
                 email: { not: null },
-                emailSequenceType: "teaser_viewer", // Filter directly in DB for efficiency
+                emailSequenceType: { in: ["teaser_viewer", "sol_test_abandoned", "sol_test_completed_no_purchase"] },
                 unsubscribedFromEmails: false,
                 isArchived: false,
             },
