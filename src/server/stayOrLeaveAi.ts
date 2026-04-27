@@ -28,7 +28,7 @@ const HAIKU_MODEL = process.env.ANTHROPIC_HAIKU_MODEL || "claude-haiku-4-5-20251
 
 const TONE_RULES = `
 WRITING RULES (these are non-negotiable):
-- 4th grade English. Short sentences. Simple words.
+- 3rd grade English. Short sentences. Simple words. Same register as the sales page they just read.
 - No psychology jargon. No "attachment style", "emotional regulation", "Cluster B".
 - Direct. Calm. Serious. Not soft. Not mean.
 - Reference what the person actually said in their answers.
@@ -212,9 +212,17 @@ All their answers:
 ${formatAnswersForPrompt(answers)}
 
 YOUR TASK
-Write 2 to 3 short paragraphs that name the real story under their numbers. Look at:
+Write 2 to 3 short paragraphs that name the real story under their numbers.
+
+You MUST identify ONE specific answer that does not fit the rest. This is a contractual promise to the user — the sales page told them: "the one answer that does not fit the rest, and what it really tells us." Find it. Name it. Explain it.
+
+Format requirement for the contradiction call-out (do this in paragraph 2 or 3):
+- Reference the specific question topic (e.g. "You said you trust them at 4 out of 5 — but you also said you check their phone at 5 out of 5.")
+- Use the actual scores they gave.
+- One sentence to name the gap. One sentence to say what it really means.
+
+Beyond that one specific contradiction, also cover:
 - Where their weakest dimension hurts the most in their day-to-day.
-- Any contradictions (e.g. they say they trust the partner but also check the phone).
 - The pattern across what they said, not just one answer.
 
 Write to them, not about them. Use "you" and "your".
@@ -337,17 +345,24 @@ Write four pieces:
 
 1. OPENING (2 short paragraphs)
 Paragraph 1: name what the test showed in plain language. Be direct.
-Paragraph 2: tell them what they will read — opening, scores, story, forecast, 4-week plan, recommendation.
+You MUST in this paragraph: name the 2 LOWEST-SCORING dimensions explicitly, with their numbers. The sales page promised "the 2 scores that pushed your answer". Deliver that. Example wording: "Two scores pushed your answer to ${finalAnswerLabel}: Trust at 32, Emotional Safety at 28."
+${
+  result.verdict === "high_risk"
+    ? `You MUST also state how close they are to flipping. Use the thresholds: STAY territory starts at overall 70. LEAVE territory starts below overall 40. Their overall is ${result.overall}. Compute distance from each side and state which side they are closer to.`
+    : ``
+}
+Paragraph 2: tell them what they will read — scores, story, forecast, 4-week plan, recommendation.
 
 2. FORECAST (2-3 short paragraphs)
 The realistic 12-18 month trajectory if nothing changes. Use probabilistic language ("typically", "roughly X%"). Give the range of outcomes (best/middle/worst). Tie the forecast to their specific weakest dimensions. End with the trigger condition that flips the trajectory ("the one thing that changes this").
 
 3. ACTION PLAN — 4 weeks, 1 specific action per week
 Each week: 2-3 short sentences. Concrete and prescriptive. Tied to their weakest dimension or to the contradiction in their answers. Each week builds on the previous.
-- Week 1: a stop-doing or start-doing action they can execute today
-- Week 2: a conversation or measurement step
-- Week 3: a behavior change with a tracking element
-- Week 4: a reassessment or escalation step
+EACH week must START with an explicit day marker: "Day 1:" for week1, "Day 8:" for week2, "Day 15:" for week3, "Day 22:" for week4. The sales page promised "Day 1 to Day 28". Honor that.
+- Week 1 (Day 1): a stop-doing or start-doing action they can execute today
+- Week 2 (Day 8): a conversation or measurement step
+- Week 3 (Day 15): a behavior change with a tracking element
+- Week 4 (Day 22): a reassessment or escalation step
 
 4. CLOSING (2 short paragraphs)
 Paragraph 1: state the binary answer explicitly. Open with "The data says: ${finalAnswerLabel}." Then 2-3 sentences explaining why, tied to their specific answers.
