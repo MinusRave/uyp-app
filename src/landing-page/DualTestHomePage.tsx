@@ -19,9 +19,9 @@ export default function DualTestHomePage() {
             UnderstandYourPartner.com
           </p>
           <h1 className="text-3xl md:text-5xl font-black text-foreground leading-tight">
-            Two simple tests.
+            Two tests for one question:
             <br />
-            One real answer.
+            what's going on with your relationship?
           </h1>
           <p className="text-base md:text-lg text-muted-foreground max-w-xl mx-auto">
             Pick the one that fits where you are right now.

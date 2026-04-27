@@ -25,63 +25,29 @@ const VERDICT_COLOR: Record<SoLVerdict, { bg: string; text: string; ring: string
   time_to_leave: { bg: "bg-red-50 dark:bg-red-900/10", text: "text-red-700 dark:text-red-300", ring: "ring-red-200 dark:ring-red-900/40" },
 };
 
-// Pain agitation per verdict — 4th grade English. Pulled from customer-avatar.
-const PAIN_AGITATION: Record<SoLVerdict, { headline: string; body: string[] }> = {
-  time_to_leave: {
-    headline: "You already knew. Now you have the proof.",
-    body: [
-      "You did not need a test to feel something was wrong.",
-      "The eggshells. The 1am Googling. The fights that were not really about the dishes.",
-      "You came here for a reason.",
-      "The numbers say what you have been feeling for months. Maybe years.",
-      "This is not \"communication issues.\" This is the door.",
-    ],
-  },
-  high_risk: {
-    headline: "You're not crazy. The numbers say what you've been feeling.",
-    body: [
-      "You wake up tired. You go to bed tired.",
-      "You do not know which version of them you will get today. Some weeks are fine. Some weeks one of you sleeps on the couch.",
-      "You keep asking yourself the same question: am I overreacting, or is this real?",
-      "High Risk does not mean \"leave now.\" It means the gap is getting wider.",
-      "If you do nothing, this becomes \"Time to Leave\" in 18 months.",
-    ],
-  },
-  worth_saving: {
-    headline: "There's a way back. But only if you act.",
-    body: [
-      "You came here because something is off. That part is real. Do not let anyone tell you it isn't.",
-      "But your numbers say the foundation is still there. The trust. The respect. The bones.",
-      "You both still want this. You just stopped knowing how to talk about it.",
-      "\"Worth Saving\" is not \"everything is fine.\" It is \"the door is still open.\"",
-      "The next 6 months matter more than the last 6.",
-    ],
-  },
-};
-
 // Fascinations per verdict — every bullet maps to a real section the user
-// actually reads in the paid assessment. No promises we don't keep.
+// actually reads in the paid assessment. 3rd grade English. Curiosity-driven.
 const FASCINATIONS: Record<SoLVerdict, string[]> = {
   time_to_leave: [
-    "The full reasoning behind your binary answer — written from what you said",
-    "Your 6 scores, explained in plain English (what each one really means for you)",
-    "The pattern under your numbers — the contradiction in your answers most people miss",
-    "Your 12-18 month forecast: what your relationship looks like if nothing changes",
-    "Your 4-week plan: one specific action per week, starting tomorrow",
+    "The 2 scores that pushed your answer to LEAVE",
+    "Your 6 scores, one by one — what each one really says about you",
+    "The one answer that does not fit the rest — and what it really tells us",
+    "Where you end up in 1 to 2 years if nothing changes",
+    "Day 1 to Day 28: what to do, week by week",
   ],
   high_risk: [
-    "Why your binary answer is what it is — and how close you are to flipping it",
-    "Your 6 scores, decoded — including the 2 that pulled you down",
-    "The pattern your answers reveal — the one answer that contradicts the rest",
-    "Your 12-18 month forecast — and the trigger that flips the trajectory",
-    "Your 4-week plan: 4 prescriptive actions, one per week, tied to your weakest score",
+    "Why your answer is what it is — and how close it is to flipping the other way",
+    "Your 6 scores, one by one — and the 2 that dragged you down",
+    "The one answer that does not fit the rest — and the real story behind it",
+    "Where your relationship goes in 12 to 18 months — and the one thing that can change it",
+    "Day 1 to Day 28: what to do, week by week",
   ],
   worth_saving: [
-    "The full reasoning behind your binary answer — what your numbers really say",
-    "Your 6 scores, decoded — including the strongest one (your real superpower)",
-    "The pattern under your numbers — where you keep getting stuck and why",
-    "Your 12-18 month forecast — what stays solid, what slips, what to watch",
-    "Your 4-week plan: 4 specific actions to widen the gap from a downgrade",
+    "Why your answer is STAY — and the score that made it clear",
+    "Your 6 scores, one by one — and your strongest one (your real strength)",
+    "Where you keep getting stuck — and why",
+    "What stays good, what slips, what to watch in 12 to 18 months",
+    "Day 1 to Day 28: what to do, week by week",
   ],
 };
 
@@ -254,7 +220,6 @@ function SalesView({
     return [...matched, ...rest];
   }, [verdict]);
 
-  const pain = PAIN_AGITATION[verdict];
   const fascinations = FASCINATIONS[verdict];
 
   return (
@@ -289,21 +254,7 @@ function SalesView({
           </p>
         </div>
 
-        {/* 2. PAIN AGITATION (verdict-specific, hardcoded copy) */}
-        <div className="space-y-4">
-          <h2 className="text-2xl md:text-3xl font-black text-foreground leading-snug text-center">
-            {pain.headline}
-          </h2>
-          <div className="space-y-3 max-w-lg mx-auto">
-            {pain.body.map((line, i) => (
-              <p key={i} className="text-base md:text-lg text-foreground/85 leading-relaxed text-center">
-                {line}
-              </p>
-            ))}
-          </div>
-        </div>
-
-        {/* 3. SCORES */}
+        {/* 2. SCORES */}
         <div className="space-y-3">
           <h2 className="text-sm font-bold uppercase tracking-widest text-muted-foreground text-center">
             Your 6 scores
@@ -326,7 +277,23 @@ function SalesView({
           </p>
         </div>
 
-        {/* 4. SALES CARD — fascinations + price + primary CTA + guarantee */}
+        {/* 2b. WHY PAY — handles "I got the answer free, why pay?" objection */}
+        <div className="space-y-4">
+          <h2 className="text-2xl md:text-3xl font-black text-foreground leading-snug text-center">
+            You have the answer. Now what?
+          </h2>
+          <div className="space-y-4 max-w-lg mx-auto text-base md:text-lg text-foreground/85 leading-relaxed">
+            <p>You got your answer. Stay, or leave. That part is free.</p>
+            <p>But the answer is just one word. One word is not a plan.</p>
+            <p>If your answer is STAY, you still don't know what to fix.</p>
+            <p>If your answer is LEAVE, you still don't know why. You could do it all over again with the next person.</p>
+            <p className="font-bold text-foreground">$13.90 gives you the rest.</p>
+            <p>Why your answer is what it is. What your relationship looks like in 12 to 18 months. What to do in week 1, 2, 3, and 4. All written from what you said.</p>
+            <p className="text-foreground font-bold pt-2">The answer is a word. The rest is a path.</p>
+          </div>
+        </div>
+
+        {/* 3. SALES CARD — fascinations + price + primary CTA + guarantee */}
         <div className="rounded-3xl border-2 border-primary/30 bg-card p-6 md:p-10 shadow-xl space-y-6">
           <div className="text-center space-y-2">
             <h2 className="text-2xl md:text-3xl font-black text-foreground leading-snug">
@@ -392,7 +359,7 @@ function SalesView({
           </div>
         </div>
 
-        {/* 5. METHODOLOGY (small trust block) */}
+        {/* 4. METHODOLOGY (small trust block) */}
         <div className="rounded-2xl border border-border bg-card p-6 space-y-3">
           <p className="text-xs font-bold uppercase tracking-widest text-muted-foreground">
             How this works
@@ -412,7 +379,7 @@ function SalesView({
           </div>
         </div>
 
-        {/* 6. TESTIMONIALS */}
+        {/* 5. TESTIMONIALS */}
         {testimonials.length > 0 && (
           <div className="space-y-3">
             <h3 className="text-sm font-bold uppercase tracking-widest text-muted-foreground text-center">
@@ -429,7 +396,7 @@ function SalesView({
           </div>
         )}
 
-        {/* 7. SECONDARY CTA — for users who scrolled past the main card */}
+        {/* 6. SECONDARY CTA — for users who scrolled past the main card */}
         <div className="rounded-2xl border-2 border-primary/30 bg-card p-6 text-center space-y-4 shadow-md">
           <p className="text-base font-bold text-foreground">Ready to read it?</p>
           <p className="text-3xl font-black text-primary">$13.90</p>
@@ -443,7 +410,7 @@ function SalesView({
           </button>
         </div>
 
-        {/* 8. FAQ */}
+        {/* 7. FAQ */}
         <div className="space-y-3">
           <h3 className="text-xl md:text-2xl font-black text-foreground text-center">
             Common questions
@@ -455,7 +422,7 @@ function SalesView({
           </div>
         </div>
 
-        {/* 9. FINAL CTA */}
+        {/* 8. FINAL CTA */}
         <div className="text-center space-y-4 py-4">
           <p className="text-lg md:text-xl font-bold text-foreground">
             Decide tonight. $13.90.

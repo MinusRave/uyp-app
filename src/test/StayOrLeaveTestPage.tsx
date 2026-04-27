@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { useNavigate, useSearchParams } from "react-router";
-import { ArrowRight, ArrowLeft, Loader2 } from "lucide-react";
+import { ArrowRight, ArrowLeft, Loader2, Check } from "lucide-react";
 import {
   startStayOrLeaveSession,
   completeStayOrLeaveTest,
@@ -26,6 +26,21 @@ const LIKERT_OPTIONS = [
 ];
 
 const LOCAL_STORAGE_KEY = "sol-quiz-state-v1";
+const INTRO_SEEN_KEY = "sol-intro-seen-v1";
+
+function hasSeenIntro(): boolean {
+  try {
+    return localStorage.getItem(INTRO_SEEN_KEY) === "true";
+  } catch {
+    return false;
+  }
+}
+
+function markIntroSeen() {
+  try {
+    localStorage.setItem(INTRO_SEEN_KEY, "true");
+  } catch {}
+}
 
 type LocalState = {
   answers: SoLAnswers;
@@ -77,6 +92,19 @@ export default function StayOrLeaveTestPage() {
   const [submitting, setSubmitting] = useState(false);
   const [hydrating, setHydrating] = useState(!!urlSessionId);
   const hydrationDone = useRef(false);
+  // Intro screen: shown only on the very first visit. Skipped if the user
+  // is returning (localStorage flag) or coming back via an email recovery
+  // link (?session=XYZ).
+  const [showIntro, setShowIntro] = useState<boolean>(() => {
+    if (urlSessionId) return false;
+    if (typeof window === "undefined") return false;
+    return !hasSeenIntro();
+  });
+
+  const handleIntroStart = () => {
+    markIntroSeen();
+    setShowIntro(false);
+  };
 
   // Server-side recovery: if URL has ?session=XYZ, fetch from server.
   // Server is the source of truth — works across devices/browsers (email links).
@@ -266,6 +294,54 @@ export default function StayOrLeaveTestPage() {
         <div className="text-center space-y-4">
           <Loader2 className="animate-spin text-primary mx-auto" size={28} />
           <p className="text-sm text-muted-foreground">Picking up where you left off...</p>
+        </div>
+      </div>
+    );
+  }
+
+  // Intro screen — first-visit cold Meta traffic only. Sets expectations
+  // (volume + time + privacy + output) before sunk cost begins at Q1.
+  if (showIntro) {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center p-6">
+        <div className="max-w-md w-full space-y-8 text-center">
+          <div className="space-y-3">
+            <p className="text-xs font-bold uppercase tracking-widest text-muted-foreground">
+              Stay or Leave Test
+            </p>
+            <h1 className="text-3xl md:text-4xl font-black text-foreground leading-tight">
+              Should you stay with your partner — or leave?
+            </h1>
+            <p className="text-base md:text-lg text-foreground/80">
+              30 short questions. Free. You get a real answer at the end.
+            </p>
+          </div>
+
+          <ul className="space-y-2.5 text-left bg-card border border-border rounded-xl p-5">
+            {[
+              "A clear answer at the end: stay, or leave",
+              "Your answers are private — nobody sees them",
+              "Based on real research, not feelings",
+            ].map((line, i) => (
+              <li key={i} className="flex items-start gap-2 text-sm text-foreground/85">
+                <Check size={14} className="text-primary mt-1 shrink-0" />
+                <span className="leading-relaxed">{line}</span>
+              </li>
+            ))}
+          </ul>
+
+          <button
+            type="button"
+            onClick={handleIntroStart}
+            className="w-full bg-primary hover:bg-primary/90 text-primary-foreground text-lg font-bold py-5 rounded-full shadow-2xl hover:scale-[1.02] active:scale-[0.98] transition-all flex items-center justify-center gap-2"
+          >
+            Start the test
+            <ArrowRight size={20} />
+          </button>
+
+          <p className="text-xs text-muted-foreground">
+            Takes about 10 minutes.
+          </p>
         </div>
       </div>
     );

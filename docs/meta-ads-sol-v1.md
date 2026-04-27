@@ -63,11 +63,12 @@ Your verdict in 10 minutes. Free to take.
 
 - **Background:** solid off-white `#F8F6F3`
 - **Top center, small uppercase tracking-wide:** `STAY OR LEAVE TEST`
-- **Centered, large bold black, 4 lines:**
+- **Centered, large bold black, 5 lines:**
   ```
   Do you want
   to stay
-  but still
+  with your partner
+  — but still
   have doubts?
   ```
 - **Bottom, small text:** `Take the 10-minute test → understandyourpartner.com`
@@ -108,11 +109,10 @@ Worth Saving. High Risk. Time to Leave.
 ### Image spec (1080×1080)
 
 - **Background:** solid charcoal `#1A1A1A`
-- **Centered, large bold white, 3 lines:**
+- **Centered, large bold white, 2 lines:**
   ```
-  Stay
-  or
-  Leave?
+  Stay or leave
+  your partner?
   ```
 - **Slight emphasis on "or" in primary purple `#8B55A5`**
 - **Bottom:** `Take the 10-minute test`
@@ -151,10 +151,11 @@ The Stay or Leave test does not pick a side. It gives you a structured answer ba
 ### Image spec (1080×1080)
 
 - **Background:** solid muted red `#A33A3A` — quiet, not loud
-- **Centered, large bold off-white, 3 lines (with one blank line):**
+- **Centered, large bold off-white, 4 lines (with one blank line):**
   ```
   You want
-  to leave.
+  to leave
+  your partner.
 
   Are you sure?
   ```
