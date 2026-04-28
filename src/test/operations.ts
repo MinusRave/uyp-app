@@ -351,6 +351,7 @@ export const deactivateSession: DeactivateSession<DeactivateSessionArgs, void> =
 // trackQuizEvent: Lightweight analytics event (no PII, no session link)
 type TrackQuizEventArgs = {
     type: "quiz_start" | "quiz_abandon";
+    testType?: string;
     questionIndex?: number;
     deviceType?: string;
     referrer?: string;
@@ -365,6 +366,7 @@ export const trackQuizEvent: TrackQuizEvent<TrackQuizEventArgs, void> = async (
     await context.entities.QuizEvent.create({
         data: {
             type: args.type,
+            testType: args.testType,
             questionIndex: args.questionIndex,
             deviceType: args.deviceType,
             referrer: args.referrer,

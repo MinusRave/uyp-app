@@ -1,7 +1,7 @@
 
 import { useState } from "react";
 import { type AuthUser } from "wasp/auth";
-import { useQuery, getFunnelStats } from "wasp/client/operations";
+import { useQuery, getFunnelStats, getQuizFunnelStats } from "wasp/client/operations";
 import DefaultLayout from "../../layout/DefaultLayout";
 import ReactApexChart from "react-apexcharts";
 import { ApexOptions } from "apexcharts";
@@ -12,6 +12,7 @@ type ProductFilter = 'all' | 'stay-or-leave' | 'uyp';
 const AdminFunnelPage = ({ user }: { user: AuthUser }) => {
     const [productFilter, setProductFilter] = useState<ProductFilter>('all');
     const { data: stats, isLoading } = useQuery(getFunnelStats, { productFilter });
+    const { data: quizStats, isLoading: isLoadingQuiz } = useQuery(getQuizFunnelStats, { productFilter });
 
     const questionCategories = Array.from({ length: 28 }, (_, i) => `Q${i + 1}`);
 
@@ -126,6 +127,69 @@ const AdminFunnelPage = ({ user }: { user: AuthUser }) => {
                         </div>
                     </div>
                 )}
+
+                {/* Pre-email Drop-off (anonymous QuizEvent tracking) */}
+                <div className="bg-white dark:bg-boxdark rounded-lg shadow-sm p-6 border border-gray-200 dark:border-strokedark">
+                    <div className="mb-4">
+                        <h2 className="text-lg font-bold text-gray-900 dark:text-white">Pre-Email Drop-off (Anonymous)</h2>
+                        <p className="text-sm text-gray-500">
+                            Where users abandon BEFORE submitting their email. Only counts visitors who clicked "Start the test".
+                        </p>
+                    </div>
+                    {isLoadingQuiz ? (
+                        <div className="h-[300px] flex items-center justify-center">Loading...</div>
+                    ) : quizStats ? (
+                        <>
+                            <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-6">
+                                <div className="p-3 rounded-lg bg-gray-50 dark:bg-meta-4 border border-gray-200 dark:border-strokedark">
+                                    <p className="text-xs text-gray-500 uppercase tracking-wide">Quiz Starts</p>
+                                    <p className="text-2xl font-bold">{quizStats.quizStarts.toLocaleString()}</p>
+                                </div>
+                                <div className="p-3 rounded-lg bg-gray-50 dark:bg-meta-4 border border-gray-200 dark:border-strokedark">
+                                    <p className="text-xs text-gray-500 uppercase tracking-wide">Abandons</p>
+                                    <p className="text-2xl font-bold text-red-600">{quizStats.quizAbandons.toLocaleString()}</p>
+                                </div>
+                                <div className="p-3 rounded-lg bg-gray-50 dark:bg-meta-4 border border-gray-200 dark:border-strokedark">
+                                    <p className="text-xs text-gray-500 uppercase tracking-wide">Leads (Email)</p>
+                                    <p className="text-2xl font-bold text-primary">{quizStats.leads.toLocaleString()}</p>
+                                    <p className="text-xs text-gray-500 mt-0.5">Start → Lead: {quizStats.startToLeadRate}%</p>
+                                </div>
+                                <div className="p-3 rounded-lg bg-gray-50 dark:bg-meta-4 border border-gray-200 dark:border-strokedark">
+                                    <p className="text-xs text-gray-500 uppercase tracking-wide">Purchased</p>
+                                    <p className="text-2xl font-bold text-success">{quizStats.purchased.toLocaleString()}</p>
+                                    <p className="text-xs text-gray-500 mt-0.5">Lead → Paid: {quizStats.leadToPurchaseRate}%</p>
+                                </div>
+                            </div>
+
+                            {quizStats.dropOffDistribution.length === 0 ? (
+                                <div className="text-sm text-gray-500 italic py-8 text-center">
+                                    No abandon events recorded yet for this filter. Once users start dropping off, you'll see the per-question distribution here.
+                                </div>
+                            ) : (
+                                <ReactApexChart
+                                    type="bar"
+                                    height={350}
+                                    series={[{
+                                        name: "Abandons",
+                                        data: quizStats.dropOffDistribution.map(d => d.count),
+                                    }]}
+                                    options={{
+                                        chart: { type: "bar", toolbar: { show: false } },
+                                        plotOptions: { bar: { borderRadius: 4, horizontal: false, columnWidth: "60%" } },
+                                        dataLabels: { enabled: true },
+                                        xaxis: {
+                                            categories: quizStats.dropOffDistribution.map(d => `Q${d.questionIndex}`),
+                                            title: { text: "Question index where user left" },
+                                        },
+                                        yaxis: { title: { text: "Number of users" } },
+                                        colors: ["#EF4444"],
+                                        title: { text: "Drop-off by Question", align: "left" },
+                                    }}
+                                />
+                            )}
+                        </>
+                    ) : null}
+                </div>
 
             </div>
         </DefaultLayout>

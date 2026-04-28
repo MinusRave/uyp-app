@@ -642,22 +642,55 @@ type QuizFunnelStatsResult = {
     dropOffDistribution: { questionIndex: number; count: number }[];
 };
 
-export const getQuizFunnelStats: GetQuizFunnelStats<void, QuizFunnelStatsResult> = async (_args, context) => {
+type GetQuizFunnelStatsArgs = {
+    productFilter?: 'all' | 'stay-or-leave' | 'uyp';
+};
+
+export const getQuizFunnelStats: GetQuizFunnelStats<GetQuizFunnelStatsArgs, QuizFunnelStatsResult> = async (args, context) => {
     if (!context.user?.isAdmin) {
         throw new HttpError(401, "Unauthorized");
     }
 
+    const { productFilter = 'all' } = args || {};
+
+    // QuizEvent filter: scoped to test type when requested.
+    // Legacy rows have testType=null and originated from the UYP test page,
+    // so include them when filtering for UYP.
+    const eventTypeFilter: any = {};
+    if (productFilter === 'stay-or-leave') {
+        eventTypeFilter.testType = 'stay-or-leave';
+    } else if (productFilter === 'uyp') {
+        eventTypeFilter.OR = [
+            { testType: { in: UYP_TEST_TYPES } },
+            { testType: null },
+        ];
+    }
+
+    // TestSession filter for leads / purchased counts: scoped by testType.
+    const sessionProductFilter: any = {};
+    if (productFilter === 'stay-or-leave') {
+        sessionProductFilter.testType = 'stay-or-leave';
+    } else if (productFilter === 'uyp') {
+        sessionProductFilter.testType = { in: UYP_TEST_TYPES };
+    }
+
     const [quizStarts, quizAbandons, leads, purchased] = await Promise.all([
-        context.entities.QuizEvent.count({ where: { type: 'quiz_start' } }),
-        context.entities.QuizEvent.count({ where: { type: 'quiz_abandon' } }),
-        context.entities.TestSession.count({ where: { email: { not: null }, OR: [{ isArchived: false }, { isPaid: true }] } }),
-        context.entities.TestSession.count({ where: { isPaid: true } }),
+        context.entities.QuizEvent.count({ where: { type: 'quiz_start', ...eventTypeFilter } }),
+        context.entities.QuizEvent.count({ where: { type: 'quiz_abandon', ...eventTypeFilter } }),
+        context.entities.TestSession.count({
+            where: {
+                email: { not: null },
+                OR: [{ isArchived: false }, { isPaid: true }],
+                ...sessionProductFilter,
+            },
+        }),
+        context.entities.TestSession.count({ where: { isPaid: true, ...sessionProductFilter } }),
     ]);
 
     // Drop-off distribution: group abandons by question index
     const dropOffGroups = await context.entities.QuizEvent.groupBy({
         by: ['questionIndex'],
-        where: { type: 'quiz_abandon', questionIndex: { not: null } },
+        where: { type: 'quiz_abandon', questionIndex: { not: null }, ...eventTypeFilter },
         _count: { questionIndex: true },
         orderBy: { questionIndex: 'asc' },
     });

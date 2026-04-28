@@ -6,6 +6,7 @@ import {
   completeStayOrLeaveTest,
   trackMetaCapiEvent,
   saveStayOrLeaveAnswers,
+  trackQuizEvent,
   getTestSession,
   useQuery,
 } from "wasp/client/operations";
@@ -16,6 +17,7 @@ import {
 import type { SoLAnswers } from "./stayOrLeaveScoring";
 import { trackPixelEvent } from "../analytics/pixel";
 import { generateEventId } from "../analytics/eventId";
+import { getDeviceInfo } from "../client/utils/deviceDetection";
 
 const LIKERT_OPTIONS = [
   { value: 1, label: "Strongly disagree" },
@@ -101,9 +103,39 @@ export default function StayOrLeaveTestPage() {
     return !hasSeenIntro();
   });
 
+  // Anonymous analytics: device + URL attribution (no PII).
+  // Captured once on mount; used for quiz_start / quiz_abandon QuizEvents.
+  const analyticsCtx = useRef<{ deviceType?: string; referrer?: string; utm_source?: string; utm_medium?: string }>(
+    (() => {
+      try {
+        const params = new URLSearchParams(window.location.search);
+        return {
+          deviceType: getDeviceInfo()?.deviceType,
+          referrer: document.referrer || undefined,
+          utm_source: params.get("utm_source") || undefined,
+          utm_medium: params.get("utm_medium") || undefined,
+        };
+      } catch {
+        return {};
+      }
+    })(),
+  );
+  const quizStartTracked = useRef(false);
+
+  const fireQuizStart = () => {
+    if (quizStartTracked.current) return;
+    quizStartTracked.current = true;
+    trackQuizEvent({
+      type: "quiz_start",
+      testType: "stay-or-leave",
+      ...analyticsCtx.current,
+    }).catch(() => {});
+  };
+
   const handleIntroStart = () => {
     markIntroSeen();
     setShowIntro(false);
+    fireQuizStart();
   };
 
   // Server-side recovery: if URL has ?session=XYZ, fetch from server.
@@ -185,6 +217,23 @@ export default function StayOrLeaveTestPage() {
   useEffect(() => {
     saveState({ answers, currentIndex, sessionId });
   }, [answers, currentIndex, sessionId]);
+
+  // Track quiz_abandon on unload — only PRE-email-gate (sessionId is null).
+  // Post-gate the TestSession.currentQuestionIndex is the source of truth.
+  useEffect(() => {
+    if (showIntro) return;
+    if (sessionId) return;
+    const handleUnload = () => {
+      trackQuizEvent({
+        type: "quiz_abandon",
+        testType: "stay-or-leave",
+        questionIndex: currentIndex,
+        ...analyticsCtx.current,
+      }).catch(() => {});
+    };
+    window.addEventListener("beforeunload", handleUnload);
+    return () => window.removeEventListener("beforeunload", handleUnload);
+  }, [showIntro, sessionId, currentIndex]);
 
   const totalQuestions = STAY_OR_LEAVE_QUESTIONS.length;
   const progress = (currentIndex / totalQuestions) * 100;

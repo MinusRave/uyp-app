@@ -261,6 +261,7 @@ model SystemConfig {
 model QuizEvent {
   id            String   @id @default(uuid())
   type          String   // "quiz_start" | "quiz_abandon"
+  testType      String?  // "stay-or-leave" | "standard" | "toxic-men" — null on legacy UYP rows
   questionIndex Int?     // last question answered (for abandon events)
   deviceType    String?
   referrer      String?

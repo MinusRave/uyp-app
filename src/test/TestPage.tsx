@@ -89,6 +89,7 @@ export default function TestPage() {
         const handleUnload = () => {
             trackQuizEvent({
                 type: 'quiz_abandon',
+                testType: 'standard',
                 questionIndex: currentQIndex,
                 deviceType: deviceInfo?.deviceType,
                 referrer: attribution?.referrer,
@@ -111,6 +112,7 @@ export default function TestPage() {
             trackPixelEvent('CustomEvent', { content_name: 'QuizStart' });
             trackQuizEvent({
                 type: 'quiz_start',
+                testType: 'standard',
                 deviceType: deviceInfo?.deviceType,
                 referrer: attribution?.referrer,
                 utm_source: attribution?.utm_source,
