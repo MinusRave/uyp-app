@@ -339,9 +339,6 @@ export default function StayOrLeaveTestPage() {
             <ArrowRight size={20} />
           </button>
 
-          <p className="text-xs text-muted-foreground">
-            Takes about 10 minutes.
-          </p>
         </div>
       </div>
     );
