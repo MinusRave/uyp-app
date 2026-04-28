@@ -198,13 +198,33 @@ export const getSessionDetail: GetSessionDetail<{ sessionId: string }, TestSessi
     });
 };
 
-export const getFunnelStats: GetFunnelStats<void, FunnelStats> = async (_args, context) => {
+type GetFunnelStatsArgs = {
+    productFilter?: 'all' | 'stay-or-leave' | 'uyp';
+};
+
+export const getFunnelStats: GetFunnelStats<GetFunnelStatsArgs, FunnelStats> = async (args, context) => {
     if (!context.user?.isAdmin) {
         throw new HttpError(401, "Unauthorized");
     }
 
+    const { productFilter = 'all' } = args || {};
+
     // Filter: only active (non-archived) sessions, plus paid sessions
-    const activeFilter = { OR: [{ isArchived: false }, { isPaid: true }] };
+    const baseFilter: any = { OR: [{ isArchived: false }, { isPaid: true }] };
+    if (productFilter === 'stay-or-leave') {
+        baseFilter.testType = 'stay-or-leave';
+    } else if (productFilter === 'uyp') {
+        baseFilter.testType = { in: UYP_TEST_TYPES };
+    }
+    const activeFilter = baseFilter;
+
+    // Paid filter: must respect product filter, but ignore archived (paid sessions are kept regardless)
+    const paidFilter: any = { isPaid: true };
+    if (productFilter === 'stay-or-leave') {
+        paidFilter.testType = 'stay-or-leave';
+    } else if (productFilter === 'uyp') {
+        paidFilter.testType = { in: UYP_TEST_TYPES };
+    }
 
     const started = await context.entities.TestSession.count({ where: activeFilter });
 
@@ -217,7 +237,7 @@ export const getFunnelStats: GetFunnelStats<void, FunnelStats> = async (_args, c
     const onboarding = await context.entities.TestSession.count({ where: { ...activeFilter, onboardingStep: { gt: 0 } } });
     const emailCaptured = await context.entities.TestSession.count({ where: { ...activeFilter, email: { not: null } } });
     const completed = await context.entities.TestSession.count({ where: { ...activeFilter, isCompleted: true } });
-    const paid = await context.entities.TestSession.count({ where: { isPaid: true } });
+    const paid = await context.entities.TestSession.count({ where: paidFilter });
 
     // Detailed Question Funnel
     const progressGroups = await context.entities.TestSession.groupBy({

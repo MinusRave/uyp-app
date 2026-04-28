@@ -1,12 +1,17 @@
 
+import { useState } from "react";
 import { type AuthUser } from "wasp/auth";
 import { useQuery, getFunnelStats } from "wasp/client/operations";
 import DefaultLayout from "../../layout/DefaultLayout";
 import ReactApexChart from "react-apexcharts";
 import { ApexOptions } from "apexcharts";
+import { cn } from "../../../client/utils";
+
+type ProductFilter = 'all' | 'stay-or-leave' | 'uyp';
 
 const AdminFunnelPage = ({ user }: { user: AuthUser }) => {
-    const { data: stats, isLoading } = useQuery(getFunnelStats);
+    const [productFilter, setProductFilter] = useState<ProductFilter>('all');
+    const { data: stats, isLoading } = useQuery(getFunnelStats, { productFilter });
 
     const questionCategories = Array.from({ length: 28 }, (_, i) => `Q${i + 1}`);
 
@@ -70,6 +75,28 @@ const AdminFunnelPage = ({ user }: { user: AuthUser }) => {
                 <div>
                     <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Funnel Analysis</h1>
                     <p className="text-gray-500">Track user conversion through key milestones.</p>
+                </div>
+
+                {/* Product Tabs — switch between Stay or Leave and UYP */}
+                <div className="bg-white dark:bg-boxdark p-1 rounded-lg shadow-sm border border-gray-200 dark:border-strokedark inline-flex gap-1 self-start">
+                    {([
+                        { id: 'all', label: 'All Tests' },
+                        { id: 'stay-or-leave', label: 'Stay or Leave' },
+                        { id: 'uyp', label: 'Understand Your Partner' },
+                    ] as const).map((tab) => (
+                        <button
+                            key={tab.id}
+                            onClick={() => setProductFilter(tab.id)}
+                            className={cn(
+                                'px-4 py-2 rounded-md text-sm font-medium transition-colors',
+                                productFilter === tab.id
+                                    ? 'bg-primary text-white'
+                                    : 'text-gray-600 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-700',
+                            )}
+                        >
+                            {tab.label}
+                        </button>
+                    ))}
                 </div>
 
                 <div className="bg-white dark:bg-boxdark rounded-lg shadow-sm p-6 border border-gray-200 dark:border-strokedark">
