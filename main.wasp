@@ -1,6 +1,6 @@
 app OpenSaaS {
   wasp: {
-    version: "^0.22.0"
+    version: "^0.23.0"
   },
 
   title: "UnderstandYourPartner - Scientific Relationship Insights",
@@ -111,6 +111,16 @@ page DualTestHomePage {
 }
 
 // Stay or Leave Test — direct quiz entry (Meta ads land here)
+route WorkbookRoute { path: "/workbook", to: WorkbookSalesPage }
+page WorkbookSalesPage {
+  component: import WorkbookSalesPage from "@src/workbook/WorkbookSalesPage"
+}
+
+route WorkbookDownloadRoute { path: "/workbook/download", to: WorkbookDownloadPage }
+page WorkbookDownloadPage {
+  component: import WorkbookDownloadPage from "@src/workbook/WorkbookDownloadPage"
+}
+
 route StayOrLeaveTestRoute { path: "/stay-or-leave", to: StayOrLeaveTestPage }
 page StayOrLeaveTestPage {
   component: import StayOrLeaveTestPage from "@src/test/StayOrLeaveTestPage"
@@ -417,6 +427,16 @@ action saveStayOrLeaveAnswers {
   entities: [TestSession]
 }
 
+action createWorkbookCheckoutSession {
+  fn: import { createWorkbookCheckoutSession } from "@src/payment/workbookOperations",
+  entities: [TestSession]
+}
+
+query getWorkbookDownloadUrl {
+  fn: import { getWorkbookDownloadUrl } from "@src/payment/workbookOperations",
+  entities: [TestSession]
+}
+
 api stripeWebhook {
   fn: import { stripeWebhook } from "@src/payment/reportWebhook",
   entities: [TestSession],
@@ -634,7 +654,7 @@ query getSessionDetail {
 
 query getFunnelStats {
   fn: import { getFunnelStats } from "@src/admin/operations",
-  entities: [TestSession]
+  entities: [TestSession, QuizEvent]
 }
 
 query getConversionFunnelMetrics {

@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { useNavigate, useSearchParams } from "react-router";
-import { ArrowRight, Loader2, Lock, Shield, Check, ChevronDown } from "lucide-react";
+import { ArrowRight, Loader2, Shield, Check, ChevronDown } from "lucide-react";
 import { useQuery, getTestSession, createStayOrLeaveCheckoutSession } from "wasp/client/operations";
 import {
   SOL_DIMENSION_LABELS,
@@ -277,7 +277,43 @@ function SalesView({
           </p>
         </div>
 
-        {/* 2b. WHY PAY — handles "I got the answer free, why pay?" objection */}
+        {/* 2b. PROPRIETARY METHOD BLOCK */}
+        <div className="rounded-[20px] border-2 border-primary bg-card p-7 md:p-8 space-y-4">
+          <p className="text-center text-xs font-bold uppercase tracking-[0.25em] text-primary">
+            The Method
+          </p>
+          <h3 className="text-center text-2xl md:text-3xl font-black text-foreground leading-tight tracking-tight">
+            The 6-Dimension Trajectory Assessment
+          </h3>
+          <div className="flex flex-wrap items-center justify-center gap-x-2.5 gap-y-1 bg-muted/40 rounded-xl px-5 py-4">
+            {["Score", "Identify", "Project", "Plan"].map((step, i, arr) => (
+              <span key={step} className="flex items-center gap-2.5">
+                <span className="text-base font-black text-foreground">{step}</span>
+                {i < arr.length - 1 && <span className="text-primary font-black">→</span>}
+              </span>
+            ))}
+          </div>
+          <p className="text-center text-xs text-muted-foreground italic leading-relaxed border-t border-border/50 pt-4">
+            Built on the <strong className="text-foreground not-italic">Gottman Method</strong>,{" "}
+            <strong className="text-foreground not-italic">attachment theory</strong>, and{" "}
+            <strong className="text-foreground not-italic">40+ years of clinical research</strong>.
+            {" "}Adapted into a personal assessment you read tonight.
+          </p>
+        </div>
+
+        {/* CTA #1 — after method block */}
+        <div className="text-center">
+          <button
+            onClick={onCheckout}
+            disabled={isCheckoutLoading}
+            className="bg-primary hover:bg-primary/90 text-primary-foreground font-bold py-4 px-8 rounded-full shadow-lg hover:scale-[1.02] active:scale-[0.98] transition-all inline-flex items-center gap-2 disabled:opacity-70"
+          >
+            {isCheckoutLoading ? "Processing..." : "Read the full reasoning — $13.90"}
+            {!isCheckoutLoading && <ArrowRight size={18} />}
+          </button>
+        </div>
+
+        {/* 2c. WHY PAY — handles "I got the answer free, why pay?" objection */}
         <div className="space-y-4">
           <h2 className="text-2xl md:text-3xl font-black text-foreground leading-snug text-center">
             You have the answer. Now what?
@@ -290,6 +326,37 @@ function SalesView({
             <p className="font-bold text-foreground">$13.90 gives you the rest.</p>
             <p>Why your answer is what it is. What your relationship looks like in 12 to 18 months. What to do in week 1, 2, 3, and 4. All written from what you said.</p>
             <p className="text-foreground font-bold pt-2">The answer is a word. The rest is a path.</p>
+          </div>
+        </div>
+
+        {/* 2d. OBJECTIONS IN FLOW */}
+        <div className="bg-muted/50 rounded-2xl p-6 md:p-8 space-y-6">
+          <p className="text-center text-xs font-bold uppercase tracking-[0.25em] text-primary">
+            Before you read this
+          </p>
+          <p className="text-center text-lg md:text-xl italic text-foreground leading-snug">
+            I know what you're thinking.
+          </p>
+          <div className="space-y-0 divide-y divide-border/50">
+            {[
+              {
+                q: '"Maybe the test is wrong."',
+                a: "The test is built from your own answers. 30 of them. Across 6 dimensions. The math is yours. The verdict is the math showing itself back to you. The full assessment doesn't change the verdict — it shows you the reasoning, line by line. So you can decide if it's wrong.",
+              },
+              {
+                q: '"I\'m not ready to read something that confirms what I fear."',
+                a: "You don't have to read it tonight. You can read it next week. The full assessment is yours forever. But waiting doesn't change it. The math doesn't get better with time. The pattern got you here. Reading it is the first thing under your control in months.",
+              },
+              {
+                q: '"$13.90 won\'t help if my partner won\'t change."',
+                a: "True. But the assessment isn't for your partner. It's for you. It tells you what's actually happening — independent of whether they read it, change, or do nothing. Most people who read it find that the most important decision was about themselves, not about the partner.",
+              },
+            ].map((obj, i) => (
+              <div key={i} className="pt-5 pb-1 space-y-2">
+                <p className="font-bold text-foreground text-base leading-snug">{obj.q}</p>
+                <p className="text-sm text-foreground/80 leading-relaxed">{obj.a}</p>
+              </div>
+            ))}
           </div>
         </div>
 
@@ -311,7 +378,7 @@ function SalesView({
             </p>
             {fascinations.map((line, i) => (
               <div key={i} className="flex items-start gap-2.5 text-sm">
-                <Lock size={14} className="text-primary mt-1 shrink-0" />
+                <span className="text-primary font-black mt-0.5 shrink-0 leading-none">→</span>
                 <span className="text-foreground leading-relaxed">{line}</span>
               </div>
             ))}
@@ -334,7 +401,7 @@ function SalesView({
             disabled={isCheckoutLoading}
             className="w-full bg-primary hover:bg-primary/90 text-primary-foreground text-lg font-bold py-5 rounded-full shadow-2xl hover:scale-[1.02] active:scale-[0.98] transition-all flex items-center justify-center gap-3 disabled:opacity-70"
           >
-            {isCheckoutLoading ? "Processing..." : "Unlock My Assessment"}
+            {isCheckoutLoading ? "Processing..." : "Read what your answers say — $13.90"}
             {!isCheckoutLoading && <ArrowRight size={20} />}
           </button>
 
@@ -396,6 +463,18 @@ function SalesView({
           </div>
         )}
 
+        {/* CTA #3 — after testimonials */}
+        <div className="text-center">
+          <button
+            onClick={onCheckout}
+            disabled={isCheckoutLoading}
+            className="bg-primary hover:bg-primary/90 text-primary-foreground font-bold py-4 px-8 rounded-full shadow-lg hover:scale-[1.02] active:scale-[0.98] transition-all inline-flex items-center gap-2 disabled:opacity-70"
+          >
+            {isCheckoutLoading ? "Processing..." : "Get the same clarity Daniel got — $13.90"}
+            {!isCheckoutLoading && <ArrowRight size={18} />}
+          </button>
+        </div>
+
         {/* 6. SECONDARY CTA — for users who scrolled past the main card */}
         <div className="rounded-2xl border-2 border-primary/30 bg-card p-6 text-center space-y-4 shadow-md">
           <p className="text-base font-bold text-foreground">Ready to read it?</p>
@@ -405,7 +484,7 @@ function SalesView({
             disabled={isCheckoutLoading}
             className="w-full md:w-auto bg-primary hover:bg-primary/90 text-primary-foreground text-base font-bold py-4 px-10 rounded-full shadow-xl hover:scale-[1.02] active:scale-[0.98] transition-all flex items-center justify-center gap-2 mx-auto disabled:opacity-70"
           >
-            {isCheckoutLoading ? "Processing..." : "Unlock My Assessment"}
+            {isCheckoutLoading ? "Processing..." : "Unlock the full assessment"}
             {!isCheckoutLoading && <ArrowRight size={18} />}
           </button>
         </div>
@@ -432,7 +511,7 @@ function SalesView({
             disabled={isCheckoutLoading}
             className="bg-primary hover:bg-primary/90 text-primary-foreground text-lg font-bold py-5 px-10 rounded-full shadow-2xl hover:scale-[1.02] active:scale-[0.98] transition-all inline-flex items-center justify-center gap-3 disabled:opacity-70"
           >
-            {isCheckoutLoading ? "Processing..." : "Unlock My Assessment"}
+            {isCheckoutLoading ? "Processing..." : "Decide tonight — $13.90"}
             {!isCheckoutLoading && <ArrowRight size={20} />}
           </button>
         </div>

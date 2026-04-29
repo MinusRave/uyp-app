@@ -1,0 +1,1551 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Should I Stay or Leave My Partner? — The Workbook</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:wght@400;700&family=Lora:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --background: #faf8f5;
+    --foreground: #13293d;
+    --primary: #8b5fbf;
+    --secondary: #d98b6a;
+    --accent: #cc6652;
+    --muted: #ece7df;
+    --muted-soft: rgba(236, 231, 223, 0.4);
+    --border: #ddd6cc;
+    --border-soft: rgba(221, 214, 204, 0.5);
+    --muted-foreground: #5d6b7a;
+    --success: #4dbd72;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
+
+  body {
+    font-family: 'Atkinson Hyperlegible', system-ui, sans-serif;
+    background: var(--background);
+    color: var(--foreground);
+    line-height: 1.65;
+    font-size: 17px;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  .container {
+    max-width: 620px;
+    margin: 0 auto;
+    padding: 0 24px;
+  }
+
+  .container-wide {
+    max-width: 760px;
+    margin: 0 auto;
+    padding: 0 24px;
+  }
+
+  /* ─── HEADER ─── */
+
+  header {
+    padding: 18px 0;
+    border-bottom: 1px solid var(--border-soft);
+    background: var(--background);
+  }
+
+  header .container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 16px;
+    flex-wrap: wrap;
+  }
+
+  .brand-mark {
+    font-size: 14px;
+    font-weight: 700;
+    letter-spacing: -0.01em;
+  }
+
+  .brand-mark::before {
+    content: "💜 ";
+  }
+
+  .trust-badge {
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    color: var(--muted-foreground);
+    background: var(--muted);
+    padding: 6px 12px;
+    border-radius: 999px;
+    white-space: nowrap;
+  }
+
+  .header-cta {
+    font-weight: 700;
+    color: var(--primary);
+    text-decoration: none;
+    font-size: 13px;
+    white-space: nowrap;
+  }
+
+  @media (max-width: 640px) {
+    .trust-badge { display: none; }
+  }
+
+  /* ─── HERO ─── */
+
+  .hero {
+    padding: 48px 0 32px;
+    text-align: center;
+  }
+
+  .pre-headline {
+    font-size: 13px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.18em;
+    color: var(--primary);
+    margin-bottom: 24px;
+    line-height: 1.5;
+  }
+
+  .hero h1 {
+    font-size: clamp(34px, 6vw, 48px);
+    font-weight: 900;
+    line-height: 1.05;
+    letter-spacing: -0.02em;
+    color: var(--foreground);
+    margin-bottom: 18px;
+  }
+
+  .hero-sub {
+    font-size: 22px;
+    font-weight: 700;
+    color: var(--foreground);
+    margin: 0 auto 12px;
+    max-width: 28ch;
+    line-height: 1.3;
+  }
+
+  .hero-tag {
+    font-family: 'Lora', Georgia, serif;
+    font-style: italic;
+    font-size: 16px;
+    color: var(--muted-foreground);
+    line-height: 1.5;
+    margin: 0 auto 36px;
+    max-width: 32ch;
+  }
+
+  .hero-mockup {
+    margin: 32px auto 28px;
+    max-width: 480px;
+    width: 100%;
+  }
+
+  .hero-mockup img {
+    width: 100%;
+    height: auto;
+    display: block;
+  }
+
+  /* ─── EARLY OFFER STRIP (under hero) ─── */
+
+  .early-offer {
+    text-align: center;
+    margin-top: 8px;
+  }
+
+  .early-offer .price-line {
+    font-size: 28px;
+    font-weight: 900;
+    color: var(--foreground);
+    margin-bottom: 4px;
+    letter-spacing: -0.015em;
+  }
+
+  .early-offer .price-line .strike {
+    text-decoration: line-through;
+    color: var(--muted-foreground);
+    font-weight: 400;
+    font-size: 18px;
+    margin-right: 8px;
+  }
+
+  .early-offer .price-line .now {
+    color: var(--primary);
+  }
+
+  .early-offer .price-line .save {
+    display: inline-block;
+    background: rgba(77, 189, 114, 0.15);
+    color: #2c7a4a;
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.18em;
+    padding: 4px 10px;
+    border-radius: 999px;
+    margin-left: 10px;
+    vertical-align: middle;
+  }
+
+  .early-offer .includes-line {
+    font-family: 'Lora', Georgia, serif;
+    font-style: italic;
+    color: var(--muted-foreground);
+    font-size: 15px;
+    margin-bottom: 16px;
+    line-height: 1.5;
+  }
+
+  /* ─── PLACEHOLDER STYLE ─── */
+
+  .img-placeholder {
+    background: linear-gradient(135deg, var(--muted) 0%, var(--muted-soft) 100%);
+    border: 2px dashed var(--border);
+    border-radius: 16px;
+    padding: 40px 24px;
+    text-align: center;
+    color: var(--muted-foreground);
+    margin: 24px auto;
+    width: 100%;
+  }
+
+  .img-placeholder .label {
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.25em;
+    color: var(--primary);
+    margin-bottom: 12px;
+  }
+
+  .img-placeholder .desc {
+    font-size: 14px;
+    line-height: 1.55;
+    color: var(--foreground);
+    margin-bottom: 8px;
+    font-weight: 700;
+  }
+
+  .img-placeholder .meta {
+    font-size: 12px;
+    line-height: 1.5;
+    color: var(--muted-foreground);
+    font-family: 'Lora', Georgia, serif;
+    font-style: italic;
+  }
+
+  .img-placeholder.hero-size {
+    aspect-ratio: 4 / 3;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: 60px 32px;
+  }
+
+  .img-placeholder.mirror-photo {
+    aspect-ratio: 2 / 1;
+    margin: 16px 0 24px;
+    padding: 32px 24px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+  }
+
+  .img-placeholder.bonus-thumb {
+    aspect-ratio: 3 / 2;
+    margin: 14px 0 0;
+    padding: 20px 14px;
+  }
+
+  .img-placeholder.bonus-thumb .meta {
+    font-size: 11px;
+  }
+
+  /* ─── SECTIONS ─── */
+
+  section {
+    padding: 48px 0;
+  }
+
+  .section-headline {
+    font-size: 26px;
+    font-weight: 900;
+    line-height: 1.2;
+    color: var(--foreground);
+    margin-bottom: 24px;
+    letter-spacing: -0.015em;
+  }
+
+  section p {
+    color: var(--foreground);
+    margin-bottom: 14px;
+    line-height: 1.7;
+  }
+
+  section p strong {
+    font-weight: 700;
+  }
+
+  section p.muted {
+    color: var(--muted-foreground);
+  }
+
+  /* ─── PAIN BLOCK ─── */
+
+  .pain-block {
+    background: var(--muted-soft);
+    border-radius: 16px;
+    padding: 32px;
+    margin: 16px 0;
+  }
+
+  .pain-block p {
+    font-size: 17px;
+    margin-bottom: 12px;
+  }
+
+  .pain-block p:last-child {
+    margin-bottom: 0;
+  }
+
+  /* ─── FALSE BELIEF / BRIDGE ─── */
+
+  .belief-break {
+    background: #fff;
+    border-left: 4px solid var(--primary);
+    padding: 24px 28px;
+    margin: 24px 0;
+    border-radius: 0 12px 12px 0;
+  }
+
+  .belief-break p {
+    font-size: 17px;
+    margin-bottom: 10px;
+  }
+
+  .belief-break p:last-child { margin-bottom: 0; }
+
+  .belief-break .quoted {
+    font-family: 'Lora', Georgia, serif;
+    font-style: italic;
+    color: var(--muted-foreground);
+  }
+
+  /* ─── FUTURE STATE ─── */
+
+  .future-state {
+    background: var(--muted-soft);
+    border-radius: 16px;
+    padding: 32px;
+    margin: 24px 0;
+  }
+
+  .future-state p {
+    font-size: 17px;
+    margin-bottom: 12px;
+  }
+
+  .future-state p:last-child { margin-bottom: 0; }
+
+  .future-state .opener {
+    font-family: 'Lora', Georgia, serif;
+    font-style: italic;
+    font-size: 18px;
+    color: var(--foreground);
+    margin-bottom: 20px;
+  }
+
+  /* ─── 5-STEP METHOD BLOCK ─── */
+
+  .method-block {
+    background: #fff;
+    border: 2px solid var(--primary);
+    border-radius: 20px;
+    padding: 36px 32px;
+    margin: 32px 0;
+  }
+
+  .method-eyebrow {
+    text-align: center;
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.25em;
+    color: var(--primary);
+    margin-bottom: 12px;
+  }
+
+  .method-name {
+    text-align: center;
+    font-size: 28px;
+    font-weight: 900;
+    color: var(--foreground);
+    line-height: 1.15;
+    letter-spacing: -0.02em;
+    margin-bottom: 20px;
+  }
+
+  .method-steps {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 4px 10px;
+    margin: 24px 0;
+    padding: 20px;
+    background: var(--muted-soft);
+    border-radius: 12px;
+  }
+
+  .method-step {
+    font-size: 16px;
+    font-weight: 900;
+    color: var(--foreground);
+    letter-spacing: -0.01em;
+  }
+
+  .method-arrow {
+    color: var(--primary);
+    font-weight: 900;
+    font-size: 14px;
+  }
+
+  .method-block .method-explainer {
+    font-family: 'Lora', Georgia, serif;
+    font-style: italic;
+    font-size: 16px;
+    color: var(--muted-foreground);
+    text-align: center;
+    line-height: 1.55;
+    max-width: 38ch;
+    margin: 16px auto 0;
+  }
+
+  .method-block .method-foundation {
+    text-align: center;
+    font-size: 13px;
+    color: var(--muted-foreground);
+    margin-top: 14px;
+    padding-top: 14px;
+    border-top: 1px solid var(--border-soft);
+  }
+
+  .method-block .method-foundation strong {
+    color: var(--foreground);
+  }
+
+  /* ─── CURIOSITY BULLETS ─── */
+
+  .curiosity-list {
+    list-style: none;
+    margin: 24px 0;
+    padding: 0;
+  }
+
+  .curiosity-list li {
+    display: flex;
+    align-items: flex-start;
+    gap: 14px;
+    margin-bottom: 18px;
+    color: var(--foreground);
+    font-size: 16px;
+    line-height: 1.6;
+  }
+
+  .curiosity-list li::before {
+    content: "→";
+    flex-shrink: 0;
+    color: var(--primary);
+    font-weight: 900;
+    font-size: 16px;
+    margin-top: 1px;
+  }
+
+  /* ─── INSIDE GRID ─── */
+
+  .inside-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 12px;
+    margin: 28px 0;
+  }
+
+  @media (max-width: 540px) {
+    .inside-grid { grid-template-columns: 1fr; }
+  }
+
+  .inside-grid .img-placeholder {
+    aspect-ratio: 3 / 4;
+    padding: 20px 12px;
+  }
+
+  .inside-grid .img-placeholder .desc {
+    font-size: 12px;
+  }
+
+  .inside-grid .img-placeholder .meta {
+    font-size: 11px;
+  }
+
+  /* ─── FOR YOU / NOT FOR YOU ─── */
+
+  .qualifier {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    margin: 24px 0;
+  }
+
+  @media (max-width: 540px) {
+    .qualifier { grid-template-columns: 1fr; }
+  }
+
+  .qualifier-card {
+    background: #fff;
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 28px 24px;
+  }
+
+  .qualifier-card .heading {
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.2em;
+    margin-bottom: 16px;
+    line-height: 1.4;
+  }
+
+  .qualifier-card.yes .heading {
+    color: var(--success);
+  }
+
+  .qualifier-card.no .heading {
+    color: var(--accent);
+  }
+
+  .qualifier-card ul {
+    list-style: none;
+  }
+
+  .qualifier-card ul li {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    margin-bottom: 12px;
+    color: var(--foreground);
+    font-size: 15px;
+    line-height: 1.5;
+  }
+
+  .qualifier-card.yes ul li::before {
+    content: "✓";
+    flex-shrink: 0;
+    color: var(--success);
+    font-weight: 900;
+  }
+
+  .qualifier-card.no ul li::before {
+    content: "✕";
+    flex-shrink: 0;
+    color: var(--accent);
+    font-weight: 900;
+  }
+
+  /* ─── OBJECTIONS BLOCK ─── */
+
+  .objections {
+    background: var(--muted-soft);
+    border-radius: 16px;
+    padding: 32px;
+    margin: 16px 0;
+  }
+
+  .objections .obj-eyebrow {
+    text-align: center;
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.25em;
+    color: var(--primary);
+    margin-bottom: 8px;
+  }
+
+  .objections .obj-title {
+    text-align: center;
+    font-family: 'Lora', Georgia, serif;
+    font-style: italic;
+    font-size: 19px;
+    color: var(--foreground);
+    margin-bottom: 28px;
+    line-height: 1.4;
+  }
+
+  .objection {
+    margin-bottom: 24px;
+    padding-bottom: 20px;
+    border-bottom: 1px solid var(--border-soft);
+  }
+
+  .objection:last-child {
+    margin-bottom: 0;
+    padding-bottom: 0;
+    border-bottom: none;
+  }
+
+  .objection .obj-quote {
+    font-weight: 700;
+    color: var(--foreground);
+    font-size: 16px;
+    margin-bottom: 8px;
+    line-height: 1.4;
+  }
+
+  .objection .obj-answer {
+    color: var(--foreground);
+    font-size: 15px;
+    line-height: 1.6;
+    margin: 0;
+  }
+
+  /* ─── SCIENCE / REFERENCES ─── */
+
+  .science-block {
+    background: #fff;
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 36px 32px;
+  }
+
+  .science-block .label {
+    text-align: center;
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.25em;
+    color: var(--primary);
+    margin-bottom: 12px;
+  }
+
+  .science-block h3 {
+    text-align: center;
+    font-size: 24px;
+    font-weight: 900;
+    line-height: 1.2;
+    margin-bottom: 8px;
+    letter-spacing: -0.01em;
+  }
+
+  .science-block .lead {
+    text-align: center;
+    font-family: 'Lora', Georgia, serif;
+    font-style: italic;
+    font-size: 16px;
+    color: var(--muted-foreground);
+    margin-bottom: 28px;
+    line-height: 1.5;
+  }
+
+  .reference {
+    border-top: 1px solid var(--border-soft);
+    padding: 20px 0;
+  }
+
+  .reference:last-child {
+    border-bottom: 1px solid var(--border-soft);
+  }
+
+  .reference .claim {
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--foreground);
+    margin-bottom: 8px;
+    line-height: 1.4;
+  }
+
+  .reference .citation {
+    font-size: 14px;
+    color: var(--muted-foreground);
+    line-height: 1.55;
+  }
+
+  .reference .citation strong {
+    color: var(--foreground);
+    font-weight: 700;
+  }
+
+  .science-conclusion {
+    text-align: center;
+    margin-top: 24px;
+    font-family: 'Lora', Georgia, serif;
+    font-style: italic;
+    font-size: 16px;
+    color: var(--foreground);
+    line-height: 1.55;
+    max-width: 42ch;
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  /* ─── BUNDLE / VALUE STACK ─── */
+
+  .bundle-block {
+    background: #fff;
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    padding: 36px 32px;
+    margin: 16px 0;
+  }
+
+  .bundle-eyebrow {
+    text-align: center;
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.25em;
+    color: var(--primary);
+    margin-bottom: 10px;
+  }
+
+  .bundle-title {
+    text-align: center;
+    font-size: 24px;
+    font-weight: 900;
+    line-height: 1.2;
+    margin-bottom: 24px;
+    letter-spacing: -0.01em;
+  }
+
+  .bundle-item {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 16px;
+    align-items: start;
+    padding: 22px 0;
+    border-bottom: 1px solid var(--border-soft);
+  }
+
+  .bundle-item:first-of-type {
+    border-top: 1px solid var(--border-soft);
+  }
+
+  .bundle-item .item-content {
+    font-size: 15px;
+    color: var(--foreground);
+    line-height: 1.5;
+  }
+
+  .bundle-item .item-name {
+    font-weight: 900;
+    font-size: 16px;
+    margin-bottom: 4px;
+    line-height: 1.3;
+  }
+
+  .bundle-item .item-tag {
+    display: inline-block;
+    font-size: 10px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.18em;
+    color: var(--secondary);
+    margin-bottom: 6px;
+  }
+
+  .bundle-item .item-name.bonus {
+    color: var(--foreground);
+  }
+
+  .bundle-item .item-desc {
+    color: var(--muted-foreground);
+    font-size: 14px;
+    line-height: 1.5;
+  }
+
+  .bundle-item .item-price {
+    text-align: right;
+    flex-shrink: 0;
+    min-width: 80px;
+  }
+
+  .bundle-item .item-price .strike {
+    text-decoration: line-through;
+    color: var(--muted-foreground);
+    font-size: 14px;
+    display: block;
+    margin-bottom: 2px;
+  }
+
+  .bundle-item .item-price .free {
+    color: var(--success);
+    font-weight: 900;
+    font-size: 14px;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+  }
+
+  .bundle-item .item-price .included {
+    color: var(--success);
+    font-weight: 700;
+    font-size: 13px;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+  }
+
+  .bundle-totals {
+    margin-top: 24px;
+    padding-top: 20px;
+    border-top: 2px solid var(--border);
+    text-align: center;
+  }
+
+  .bundle-totals .total-line {
+    font-size: 15px;
+    color: var(--muted-foreground);
+    margin-bottom: 4px;
+  }
+
+  .bundle-totals .total-line strong {
+    color: var(--foreground);
+  }
+
+  .bundle-totals .total-was {
+    text-decoration: line-through;
+  }
+
+  .bundle-totals .now-pay {
+    margin-top: 12px;
+    font-size: 14px;
+    color: var(--muted-foreground);
+    margin-bottom: 4px;
+  }
+
+  .bundle-totals .now-price {
+    font-size: 56px;
+    font-weight: 900;
+    color: var(--primary);
+    line-height: 1;
+    letter-spacing: -0.025em;
+    margin-bottom: 8px;
+  }
+
+  .bundle-totals .save-tag {
+    display: inline-block;
+    background: rgba(77, 189, 114, 0.15);
+    color: #2c7a4a;
+    font-size: 12px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.18em;
+    padding: 6px 14px;
+    border-radius: 999px;
+    margin-bottom: 20px;
+  }
+
+  /* ─── OFFER ─── */
+
+  .feature-card {
+    background: #fff;
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 32px;
+  }
+
+  .price-reframe {
+    font-family: 'Lora', Georgia, serif;
+    font-style: italic;
+    font-size: 15px;
+    color: var(--muted-foreground);
+    margin-top: 14px;
+    margin-bottom: 24px;
+    line-height: 1.55;
+    max-width: 40ch;
+    margin-left: auto;
+    margin-right: auto;
+    text-align: center;
+  }
+
+  /* ─── CTA ─── */
+
+  .cta {
+    display: block;
+    width: 100%;
+    background: var(--primary);
+    color: white;
+    font-family: inherit;
+    font-weight: 700;
+    font-size: 17px;
+    padding: 18px 24px;
+    border-radius: 999px;
+    border: none;
+    cursor: pointer;
+    text-decoration: none;
+    text-align: center;
+    transition: transform 0.2s, box-shadow 0.2s;
+    box-shadow: 0 4px 14px rgba(139, 95, 191, 0.25);
+    line-height: 1.3;
+  }
+
+  .cta:hover {
+    transform: scale(1.02);
+    box-shadow: 0 8px 24px rgba(139, 95, 191, 0.35);
+  }
+
+  .cta::after {
+    content: "  →";
+  }
+
+  .cta-meta {
+    text-align: center;
+    margin-top: 12px;
+    font-size: 13px;
+    color: var(--muted-foreground);
+    line-height: 1.5;
+  }
+
+  /* ─── NAMED GUARANTEE ─── */
+
+  .guarantee {
+    background: rgba(247, 226, 144, 0.4);
+    border: 1px solid rgba(217, 168, 56, 0.3);
+    border-radius: 12px;
+    padding: 24px 28px;
+    margin-top: 20px;
+  }
+
+  .guarantee-header {
+    display: flex;
+    gap: 14px;
+    align-items: flex-start;
+    margin-bottom: 12px;
+  }
+
+  .guarantee-icon {
+    flex-shrink: 0;
+    color: #b8841a;
+    font-size: 22px;
+    margin-top: 2px;
+  }
+
+  .guarantee h4 {
+    font-size: 16px;
+    font-weight: 900;
+    line-height: 1.3;
+  }
+
+  .guarantee p {
+    font-size: 14px;
+    color: var(--foreground);
+    line-height: 1.6;
+    margin: 0 0 10px 0;
+  }
+
+  .guarantee p:last-child { margin: 0; }
+
+  .guarantee-promise {
+    font-family: 'Lora', Georgia, serif;
+    font-style: italic;
+    color: var(--muted-foreground);
+    margin-top: 6px !important;
+  }
+
+  .secure-line {
+    text-align: center;
+    margin-top: 14px;
+    font-size: 13px;
+    color: var(--muted-foreground);
+    padding: 12px;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+  }
+
+  /* ─── FAQ ─── */
+
+  .faq-headline {
+    text-align: center;
+    margin-bottom: 32px;
+    font-size: 24px;
+    font-weight: 900;
+    letter-spacing: -0.015em;
+  }
+
+  .faq-item {
+    background: #fff;
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    margin-bottom: 10px;
+    overflow: hidden;
+  }
+
+  .faq-item summary {
+    padding: 18px 22px;
+    cursor: pointer;
+    font-weight: 700;
+    font-size: 15px;
+    list-style: none;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .faq-item summary::-webkit-details-marker { display: none; }
+
+  .faq-item summary::after {
+    content: "▾";
+    font-size: 12px;
+    color: var(--muted-foreground);
+  }
+
+  .faq-item[open] summary::after {
+    transform: rotate(180deg);
+  }
+
+  .faq-item .faq-answer {
+    padding: 0 22px 20px;
+    color: var(--muted-foreground);
+    font-size: 15px;
+    line-height: 1.6;
+  }
+
+  /* ─── FINAL CTA ─── */
+
+  .final-cta-section {
+    text-align: center;
+    padding: 48px 0 80px;
+  }
+
+  .final-cta-line {
+    font-size: 22px;
+    font-weight: 900;
+    margin-bottom: 24px;
+  }
+
+  /* ─── INLINE CTA STRIP ─── */
+
+  .inline-cta {
+    text-align: center;
+    margin: 24px 0;
+  }
+
+  .inline-cta .cta {
+    max-width: 380px;
+    margin: 0 auto;
+  }
+
+  /* ─── FOOTER ─── */
+
+  footer {
+    text-align: center;
+    padding: 32px 24px;
+    border-top: 1px solid var(--border-soft);
+    font-size: 12px;
+    color: var(--muted-foreground);
+    line-height: 1.6;
+  }
+
+</style>
+</head>
+<body>
+
+<!-- ─── HEADER ─── -->
+<header>
+  <div class="container">
+    <div class="brand-mark">UnderstandYourPartner</div>
+    <div class="trust-badge">⭐ Built on Motivational Interviewing</div>
+    <a href="#offer" class="header-cta">Get the workbook →</a>
+  </div>
+</header>
+
+<!-- ─── HERO with early offer ─── -->
+<section class="hero">
+  <div class="container">
+    <div class="pre-headline">For people who have been thinking about leaving their partner for months — but can't decide.</div>
+    <h1>Should I stay or leave my partner?</h1>
+    <p class="hero-sub">Stop wondering. Decide this week.</p>
+    <p class="hero-tag">A 5-step writing method to help you decide without regrets — in one evening.</p>
+
+    <div class="hero-mockup">
+      <div class="img-placeholder hero-size">
+        <div class="label">Mockup #1 — HERO BUNDLE COMPOSITION</div>
+        <div class="desc">Show ALL the bundle in ONE image — not just the workbook cover</div>
+        <div class="meta">
+          <strong>What to include in this image:</strong><br>
+          1. iPad/tablet showing the workbook cover (centered, foreground)<br>
+          2. Phone showing page 22 (decision page) — left side, slightly behind<br>
+          3. Tablet/laptop showing "What If I Regret It?" cover — right side, slightly behind<br>
+          4. A printed page (page 8 — the two lists) with a pen — bottom foreground<br><br>
+
+          <strong>How to do it in Canva:</strong><br>
+          → Search "digital product bundle mockup" or "ebook collection mockup"<br>
+          → Pick a template with multiple devices on a soft cream/wood background<br>
+          → Drop your screenshots into each device slot<br>
+          → Make sure lighting and shadows are consistent<br><br>
+
+          <strong>Why this matters:</strong><br>
+          The eye reads "I'm getting a lot of stuff" before reading any copy. This single image sells the value stack visually.<br><br>
+
+          <strong>Final size:</strong> 1600 × 1200 px, PNG, cream background.
+        </div>
+      </div>
+    </div>
+
+    <div class="early-offer">
+      <div class="price-line">
+        <span class="strike">$30</span>
+        <span class="now">$11</span>
+        <span class="save">Save 63%</span>
+      </div>
+      <p class="includes-line">Includes the workbook + 1 free bonus.</p>
+      <a href="#offer" class="cta" style="max-width: 380px; margin: 0 auto;">Get the workbook + bonus</a>
+      <p class="cta-meta">Instant download · 30-day money-back · One-time payment</p>
+    </div>
+  </div>
+</section>
+
+<!-- ─── MIRROR ─── -->
+<section style="padding-top: 16px;">
+  <div class="container">
+    <h2 class="section-headline">You've been asking yourself for months.</h2>
+
+    <!-- STOCK PHOTO — emotional mirror -->
+    <div class="img-placeholder mirror-photo">
+      <div class="label">Stock Photo #1 — MIRROR EMOTION</div>
+      <div class="desc">A contemplative, gender-neutral image to anchor the emotional moment</div>
+      <div class="meta">
+        <strong>What to find:</strong><br>
+        Gender-ambiguous, calm, contemplative. NOT dramatic. NOT crying.<br><br>
+
+        <strong>Where to look (free, real photos — NOT AI):</strong><br>
+        → Unsplash.com or Pexels.com (both available inside Canva Pro)<br>
+        → Search terms: "contemplative window morning" / "hands holding coffee cup" / "person reading window light" / "thinking morning light"<br><br>
+
+        <strong>Best options:</strong><br>
+        → Hands holding a cup (no face — works for any gender)<br>
+        → Back of a person looking out a window<br>
+        → Close-up of an open journal with a pen (no person at all)<br><br>
+
+        <strong>Avoid:</strong><br>
+        → AI-generated photos (the audience sees them and trust drops)<br>
+        → Crying faces, dramatic poses, couples<br>
+        → Anything that gender-codes the viewer<br><br>
+
+        <strong>Final size:</strong> 1200 × 600 px, landscape, soft warm tones.
+      </div>
+    </div>
+
+    <div class="pain-block">
+      <p>Stay or leave.</p>
+      <p>You've thought about it at 2am.</p>
+      <p>You've talked to people. They're tired.</p>
+      <p>You've read articles online. They said both.</p>
+      <p><strong>You still don't know.</strong></p>
+    </div>
+  </div>
+</section>
+
+<!-- ─── FALSE BELIEF BREAKDOWN ─── -->
+<section style="padding-top: 24px;">
+  <div class="container">
+    <h2 class="section-headline">Thinking about it more won't help.</h2>
+
+    <p>You've been telling yourself: <em>"if I just think about it a little longer, I'll figure it out."</em></p>
+
+    <p>That's not how this works.</p>
+
+    <div class="belief-break">
+      <p>Thinking about a relationship doubt at 2am does not produce clarity.</p>
+      <p>It produces more thinking.</p>
+      <p class="quoted">The mind that built the loop cannot exit it.</p>
+    </div>
+
+    <p>You don't need more thinking.</p>
+    <p><strong>You need a different process.</strong></p>
+  </div>
+</section>
+
+<!-- ─── FUTURE STATE ─── -->
+<section>
+  <div class="container">
+    <h2 class="section-headline">Imagine waking up next Monday.</h2>
+
+    <!-- STOCK PHOTO — future state, calmer -->
+    <div class="img-placeholder mirror-photo">
+      <div class="label">Stock Photo #2 — FUTURE STATE (CALM)</div>
+      <div class="desc">A calmer, more luminous image — the "after"</div>
+      <div class="meta">
+        <strong>What to find:</strong><br>
+        Same gender-neutral / no-face style as Photo #1, but with a feeling of resolution and calm.<br><br>
+
+        <strong>Search terms (Unsplash / Pexels in Canva Pro):</strong><br>
+        → "morning light through window"<br>
+        → "open journal coffee morning"<br>
+        → "sunrise window calm"<br>
+        → "writing in notebook morning"<br><br>
+
+        <strong>The visual contrast that matters:</strong><br>
+        Photo #1 (Mirror) is contemplative and slightly heavy.<br>
+        Photo #2 (Future State) should be lighter — more sunlight, more open space.<br>
+        The two photos together should tell a "before / after" story.<br><br>
+
+        <strong>Final size:</strong> 1200 × 600 px landscape, brighter and warmer than Photo #1.
+      </div>
+    </div>
+
+    <div class="future-state">
+      <p class="opener">You're not asking yourself again. You decided.</p>
+      <p>Maybe you decided to stay. With clear conditions written down. You know what has to change — and by when.</p>
+      <p>Maybe you decided to leave. With a real first step. You know what to do this week.</p>
+      <p><strong>Either way — the loop is over.</strong></p>
+    </div>
+
+    <p class="muted">That's what this workbook gives you. Not advice. Not a verdict. The end of the loop.</p>
+
+    <!-- INLINE CTA -->
+    <div class="inline-cta">
+      <a href="#offer" class="cta">End the loop — get the workbook for $11</a>
+    </div>
+  </div>
+</section>
+
+<!-- ─── 5-STEP DECISION METHOD ─── -->
+<section>
+  <div class="container">
+    <div class="method-block">
+      <div class="method-eyebrow">The Mechanism</div>
+      <div class="method-name">The 5-Step Decision Method</div>
+
+      <div class="method-steps">
+        <span class="method-step">Surface</span>
+        <span class="method-arrow">→</span>
+        <span class="method-step">Map</span>
+        <span class="method-arrow">→</span>
+        <span class="method-step">Audit</span>
+        <span class="method-arrow">→</span>
+        <span class="method-step">Project</span>
+        <span class="method-arrow">→</span>
+        <span class="method-step">Sign</span>
+      </div>
+
+      <p class="method-explainer">A 5-step writing method that turns emotional doubt into a clear, signed decision in one evening.</p>
+
+      <div class="method-foundation">
+        Built on <strong>Motivational Interviewing</strong> — the evidence-based technique used by therapists to help people commit to hard life decisions. <em>Adapted into a workbook you can do alone, with a pen, in one evening.</em>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ─── CURIOSITY BULLETS ─── -->
+<section>
+  <div class="container">
+    <h2 class="section-headline" style="text-align: center;">What you'll do.</h2>
+    <p class="muted" style="text-align: center; margin-bottom: 24px;">27 questions. 5 sections. ~25 pages. Done in one evening.</p>
+
+    <ul class="curiosity-list">
+      <li>The single sentence on page 4 that, if written honestly, often produces the decision by itself — most people skip it. Don't.</li>
+      <li>Why telling your friends about your relationship is making your decision harder, not easier (page 11 explains the mechanism).</li>
+      <li>The "two lists" exercise on page 8 that ends every "it's complicated" — you'll see your relationship in two columns, side by side, for the first time.</li>
+      <li>The "two futures" page that has stopped people from pretending they don't know. You write both. One feels alive. The other doesn't.</li>
+      <li>Why most decision tools skip what's on the last page — and why this is the page that makes the decision yours.</li>
+    </ul>
+
+    <!-- INLINE CTA -->
+    <div class="inline-cta">
+      <a href="#offer" class="cta">Get the workbook now — $11</a>
+    </div>
+  </div>
+</section>
+
+<!-- ─── INSIDE THE WORKBOOK / page previews ─── -->
+<section>
+  <div class="container-wide">
+    <h2 class="section-headline" style="text-align: center; margin-bottom: 8px;">Inside the workbook.</h2>
+    <p style="text-align: center; color: var(--muted-foreground); margin-bottom: 32px;">A preview of three of the most important pages.</p>
+
+    <div class="inside-grid">
+      <div class="img-placeholder">
+        <div class="label">Mockup A — COVER</div>
+        <div class="desc">The workbook cover, framed</div>
+        <div class="meta">
+          <strong>How:</strong><br>
+          → Canva: search "ebook cover mockup" or "PDF mockup"<br>
+          → Drop in your screenshot of <strong>page 1</strong> (cover)<br>
+          → Choose a clean, simple frame mockup<br>
+          → Background: cream or soft wood<br><br>
+          <strong>Size:</strong> 600 × 800 px portrait
+        </div>
+      </div>
+      <div class="img-placeholder">
+        <div class="label">Mockup B — TWO LISTS PAGE</div>
+        <div class="desc">An inside page on a tablet/phone</div>
+        <div class="meta">
+          <strong>How:</strong><br>
+          → Canva: search "phone mockup" or "tablet mockup"<br>
+          → Drop in your screenshot of <strong>page 8</strong> (Wrong / Right two columns)<br>
+          → This is the most visually distinctive page — shows the workbook's structure<br>
+          → Background: same cream or wood as Mockup A<br><br>
+          <strong>Size:</strong> 600 × 800 px portrait
+        </div>
+      </div>
+      <div class="img-placeholder">
+        <div class="label">Mockup C — DECISION PAGE</div>
+        <div class="desc">The signature page, printed with a pen</div>
+        <div class="meta">
+          <strong>How:</strong><br>
+          → Canva: search "paper mockup" or "printed page mockup with pen"<br>
+          → Drop in your screenshot of <strong>page 22</strong> (signature page)<br>
+          → A pen visible next to the page communicates "you fill this in"<br>
+          → Top-down view works best<br><br>
+          <strong>Size:</strong> 600 × 800 px portrait
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ─── FOR YOU / NOT FOR YOU ─── -->
+<section>
+  <div class="container">
+    <h2 class="section-headline" style="text-align: center;">Is this for you?</h2>
+
+    <div class="qualifier">
+      <div class="qualifier-card yes">
+        <div class="heading">This is for you if…</div>
+        <ul>
+          <li>You've been wondering for months</li>
+          <li>You've talked to friends and they're tired</li>
+          <li>You want to decide alone, without telling anyone yet</li>
+          <li>You want a method, not more advice</li>
+          <li>You're afraid of regret — staying too long, or leaving too soon</li>
+        </ul>
+      </div>
+      <div class="qualifier-card no">
+        <div class="heading">This is not for you if…</div>
+        <ul>
+          <li>You want someone to tell you what to do</li>
+          <li>You want a quick test that gives you an answer in 3 minutes</li>
+          <li>You're not willing to spend an evening with a pen</li>
+          <li>You're already 100% sure about your decision</li>
+          <li>You want endless theory, not a practical method</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ─── OBJECTIONS ("I know what you're thinking") ─── -->
+<section>
+  <div class="container">
+    <div class="objections">
+      <div class="obj-eyebrow">Before you decide</div>
+      <div class="obj-title">I know what you're thinking.</div>
+
+      <div class="objection">
+        <div class="obj-quote">"I've already tried everything. Nothing works."</div>
+        <p class="obj-answer">Most things you've tried were thinking-based. Read articles. Ask friends. Run scenarios in your head. This workbook is the opposite — it's writing-based. You sit down with a pen and you write things you've never written before. Different process. Different result.</p>
+      </div>
+
+      <div class="objection">
+        <div class="obj-quote">"I don't have time for this."</div>
+        <p class="obj-answer">You've spent more time thinking about this in the last month than 60 minutes. The question isn't if you have the time. The question is: are you willing to spend it on a method that ends the loop, instead of on more thinking that doesn't?</p>
+      </div>
+
+      <div class="objection">
+        <div class="obj-quote">"My situation is real. It's not just in my head."</div>
+        <p class="obj-answer">It is real. The workbook doesn't pretend otherwise. What it does is help you see your real situation clearly — without your fear, your guilt, or your tiredness distorting it. The situation stays the same. Your view of it changes.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ─── SCIENCE / REFERENCES ─── -->
+<section>
+  <div class="container">
+    <div class="science-block">
+      <div class="label">The Science Behind</div>
+      <h3>This isn't 27 random questions.</h3>
+      <p class="lead">We didn't invent how this works. We adapted what already does.</p>
+
+      <div class="reference">
+        <div class="claim">Writing produces clarity that thinking alone cannot.</div>
+        <p class="citation"><strong>Pennebaker (1997, University of Texas).</strong> Decades of research on expressive writing show that writing about emotional difficulty produces measurable improvements in decision-making and clarity — even with no feedback or reader involved.</p>
+      </div>
+
+      <div class="reference">
+        <div class="claim">People commit to decisions they generate themselves — not decisions they're given.</div>
+        <p class="citation"><strong>Miller & Rollnick (1983, Motivational Interviewing).</strong> The clinical foundation of how therapists help people make hard life decisions. The principle: change talk that comes from the client predicts behavior change far better than advice from the therapist.</p>
+      </div>
+
+      <div class="reference">
+        <div class="claim">Couples in difficulty wait, on average, 6 years before seeking help.</div>
+        <p class="citation"><strong>Doherty et al. (2021), Journal of Marital and Family Therapy.</strong> By the time most people get professional support for relationship doubt, the cost has already been paid. Self-administered structured tools fill the gap before that point.</p>
+      </div>
+
+      <p class="science-conclusion">The 5-Step Decision Method is built on these three findings: write to clarify, generate your own commitment, don't wait six years.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ─── BUNDLE / VALUE STACK ─── -->
+<section id="offer">
+  <div class="container">
+
+    <div class="bundle-block">
+      <div class="bundle-eyebrow">Today's Bundle</div>
+      <div class="bundle-title">Everything you get when you buy.</div>
+
+      <!-- MAIN PRODUCT -->
+      <div class="bundle-item">
+        <div class="item-content">
+          <div class="item-tag">Main product</div>
+          <div class="item-name">The Stay or Leave Workbook</div>
+          <p class="item-desc">25 pages. 27 questions. The 5-Step Decision Method. Read on phone or print to write by hand. Lifetime access.</p>
+        </div>
+        <div class="item-price">
+          <span class="strike">$19</span>
+          <span class="included">Included</span>
+        </div>
+      </div>
+
+      <!-- BONUS 1 -->
+      <div class="bundle-item">
+        <div class="item-content">
+          <div class="item-tag" style="color: var(--primary);">Free bonus</div>
+          <div class="item-name bonus">"What If I Regret It?" — The Decision Companion</div>
+          <p class="item-desc">A short manual to read after the workbook. It helps you tell real regret from the inevitable pain that comes with any hard choice. For the doubt that may come back at 2am, three months from now.</p>
+          <!-- VISUAL THUMB OF BONUS -->
+          <div class="img-placeholder bonus-thumb">
+            <div class="label">Mockup D — BONUS COVER</div>
+            <div class="desc">"What If I Regret It?" cover, small thumbnail</div>
+            <div class="meta">
+              <strong>How:</strong><br>
+              → Same style as Mockup A but for the bonus cover<br>
+              → Take a screenshot of the bonus PDF cover (or use the cover I already designed)<br>
+              → Small format: 300 × 400 px, used as inline visual proof<br>
+              → Just the cover, framed cleanly
+            </div>
+          </div>
+        </div>
+        <div class="item-price">
+          <span class="strike">$11</span>
+          <span class="free">Free</span>
+        </div>
+      </div>
+
+      <!-- TOTALS -->
+      <div class="bundle-totals">
+        <div class="total-line">Total value: <strong class="total-was">$30</strong></div>
+        <div class="now-pay">Today you pay only:</div>
+        <div class="now-price">$11</div>
+        <div class="save-tag">Save $19 today</div>
+
+        <p class="price-reframe" style="margin-bottom: 24px;">Less than dinner with the friend who's tired of hearing about it. More useful.</p>
+
+        <a href="#" class="cta">Get the bundle — $11</a>
+        <p class="cta-meta">Instant download · One-time payment · No subscription</p>
+      </div>
+
+      <!-- NAMED GUARANTEE -->
+      <div class="guarantee">
+        <div class="guarantee-header">
+          <span class="guarantee-icon">🛡</span>
+          <h4>The "Decision or Refund" Promise</h4>
+        </div>
+        <p>Read the workbook. Do the exercises. If you don't end up with a clear decision you feel confident about — write to us within 30 days. We'll refund you in full. We won't ask why.</p>
+        <p class="guarantee-promise">If it doesn't help you decide, we'd rather you have your $11 back than carry doubt about a tool that should have helped.</p>
+      </div>
+
+      <div class="secure-line">🔒 Secure one-time payment. Instant access. Discreet file name. We do not share your data.</div>
+    </div>
+
+  </div>
+</section>
+
+<!-- ─── INLINE CTA before FAQ ─── -->
+<section style="padding: 16px 0;">
+  <div class="container">
+    <div class="inline-cta">
+      <a href="#offer" class="cta">Decide tonight — $11</a>
+    </div>
+  </div>
+</section>
+
+<!-- ─── FAQ ─── -->
+<section>
+  <div class="container">
+    <h2 class="faq-headline">Common questions</h2>
+
+    <div class="faq-item">
+      <details>
+        <summary>How is this different from a free relationship quiz?</summary>
+        <div class="faq-answer">A quiz gives you an answer in 3 minutes. This workbook does the opposite — it makes you sit with the question for an hour, on paper, with a pen. The decision you write at the end is yours, not the workbook's. That's what makes it last.</div>
+      </details>
+    </div>
+
+    <div class="faq-item">
+      <details>
+        <summary>What if I read it and I'm still not sure?</summary>
+        <div class="faq-answer">Read sections 4 and 5 again in 48 hours. If you still feel the same — you have your answer. If not — you needed more time. Most people who do the workbook honestly know what they want by the last page.</div>
+      </details>
+    </div>
+
+    <div class="faq-item">
+      <details>
+        <summary>What if my partner finds it?</summary>
+        <div class="faq-answer">The PDF you receive has a neutral file name — nothing in the filename or in the email subject reveals what's inside. You can keep it on your phone in a private folder. You can print just the pages you've filled in and keep them somewhere safe.</div>
+      </details>
+    </div>
+
+    <div class="faq-item">
+      <details>
+        <summary>Will the workbook tell me what to do?</summary>
+        <div class="faq-answer">No. It will not give you a verdict. You write your own decision on the last page. That's the point. Decisions written by a tool produce regret. Decisions written by you don't.</div>
+      </details>
+    </div>
+
+    <div class="faq-item">
+      <details>
+        <summary>How long does it take?</summary>
+        <div class="faq-answer">Plan for 60 to 90 minutes in one sitting. Some people take longer. Don't take less. The workbook is designed to be done in one evening — that's the point.</div>
+      </details>
+    </div>
+
+    <div class="faq-item">
+      <details>
+        <summary>What is "What If I Regret It?" exactly?</summary>
+        <div class="faq-answer">It's a short manual you receive together with the workbook. You read it after you've made your decision. It helps you tell real regret from the pain that comes with any hard choice — so the decision you wrote in the workbook holds up three months from now, when the doubt comes back. (And it does come back. For everyone.)</div>
+      </details>
+    </div>
+
+    <div class="faq-item">
+      <details>
+        <summary>Can I really get a refund?</summary>
+        <div class="faq-answer">Yes. 30 days. No forms. No questions. You email us, we refund you. The workbook is designed to help you. If it doesn't, we don't want your money.</div>
+      </details>
+    </div>
+  </div>
+</section>
+
+<!-- ─── FINAL CTA ─── -->
+<section class="final-cta-section">
+  <div class="container">
+    <p class="final-cta-line">Decide tonight. $11.</p>
+    <a href="#offer" class="cta" style="max-width: 380px; margin: 0 auto;">Get the workbook + bonus</a>
+    <p class="cta-meta" style="margin-top: 16px;">Workbook + "What If I Regret It?" companion · Instant download · 30-day refund</p>
+  </div>
+</section>
+
+<!-- ─── FOOTER ─── -->
+<footer>
+  This is not therapy or legal advice. The choice is yours.<br>
+  © UnderstandYourPartner — Should I Stay or Leave My Partner?
+</footer>
+
+</body>
+</html>

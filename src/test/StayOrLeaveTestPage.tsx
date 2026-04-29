@@ -138,6 +138,18 @@ export default function StayOrLeaveTestPage() {
     fireQuizStart();
   };
 
+  // Returning visitors skip the intro entirely, so fireQuizStart is never called
+  // from handleIntroStart. Fire it on mount instead — but only when the user is
+  // genuinely pre-email-gate (no sessionId saved) and not resuming via email link.
+  // Read localStorage directly because the hydration useEffect runs after this one.
+  useEffect(() => {
+    if (showIntro) return;          // first-time visitor: handleIntroStart handles this
+    if (urlSessionId) return;       // email-link resume: user already submitted email
+    if (loadState().sessionId) return; // has a session from a previous email submission
+    fireQuizStart();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   // Server-side recovery: if URL has ?session=XYZ, fetch from server.
   // Server is the source of truth — works across devices/browsers (email links).
   const { data: serverSession, isLoading: isLoadingSession } = useQuery(

@@ -1,0 +1,734 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Should I Stay or Leave My Partner? — The Workbook</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:wght@400;700&family=Lora:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --background: #faf8f5;
+    --foreground: #13293d;
+    --primary: #8b5fbf;
+    --secondary: #d98b6a;
+    --accent: #cc6652;
+    --muted: #ece7df;
+    --muted-soft: rgba(236, 231, 223, 0.4);
+    --border: #ddd6cc;
+    --border-soft: rgba(221, 214, 204, 0.5);
+    --muted-foreground: #5d6b7a;
+    --success: #4dbd72;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
+
+  body {
+    font-family: 'Atkinson Hyperlegible', system-ui, sans-serif;
+    background: var(--background);
+    color: var(--foreground);
+    line-height: 1.65;
+    font-size: 17px;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  .container {
+    max-width: 620px;
+    margin: 0 auto;
+    padding: 0 24px;
+  }
+
+  /* ─── HEADER ─── */
+
+  header {
+    padding: 24px 0;
+    border-bottom: 1px solid var(--border-soft);
+  }
+
+  header .container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .brand-mark {
+    font-size: 14px;
+    font-weight: 700;
+    letter-spacing: -0.01em;
+  }
+
+  .brand-mark::before {
+    content: "💜 ";
+  }
+
+  /* ─── HERO ─── */
+
+  .hero {
+    padding: 80px 0 48px;
+    text-align: center;
+  }
+
+  .hero-eyebrow {
+    display: inline-block;
+    background: var(--muted);
+    color: var(--muted-foreground);
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.2em;
+    padding: 6px 14px;
+    border-radius: 999px;
+    margin-bottom: 28px;
+  }
+
+  .hero h1 {
+    font-size: clamp(34px, 6vw, 48px);
+    font-weight: 900;
+    line-height: 1.05;
+    letter-spacing: -0.02em;
+    color: var(--foreground);
+    margin-bottom: 18px;
+  }
+
+  .hero-sub {
+    font-family: 'Lora', Georgia, serif;
+    font-style: italic;
+    font-size: 19px;
+    color: var(--muted-foreground);
+    line-height: 1.5;
+    margin: 0 auto 36px;
+    max-width: 28ch;
+  }
+
+  /* ─── SECTIONS ─── */
+
+  section {
+    padding: 48px 0;
+  }
+
+  .section-headline {
+    font-size: 26px;
+    font-weight: 900;
+    line-height: 1.2;
+    color: var(--foreground);
+    margin-bottom: 24px;
+    letter-spacing: -0.015em;
+  }
+
+  section p {
+    color: var(--foreground);
+    margin-bottom: 14px;
+    line-height: 1.7;
+  }
+
+  section p strong {
+    font-weight: 700;
+  }
+
+  section p.muted {
+    color: var(--muted-foreground);
+  }
+
+  /* ─── PAIN BLOCK (mirror) ─── */
+
+  .pain-block {
+    background: var(--muted-soft);
+    border-radius: 16px;
+    padding: 32px;
+    margin: 16px 0;
+  }
+
+  .pain-block p {
+    font-size: 17px;
+    margin-bottom: 12px;
+  }
+
+  .pain-block p:last-child {
+    margin-bottom: 0;
+  }
+
+  /* ─── CARD WITH WHAT'S INSIDE ─── */
+
+  .feature-card {
+    background: #fff;
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 32px;
+    margin: 16px 0;
+  }
+
+  .feature-card h3 {
+    font-size: 19px;
+    font-weight: 900;
+    text-align: center;
+    margin-bottom: 8px;
+    letter-spacing: -0.01em;
+  }
+
+  .feature-card .feature-sub {
+    text-align: center;
+    color: var(--muted-foreground);
+    font-size: 14px;
+    margin-bottom: 24px;
+  }
+
+  .feature-card .features-list {
+    background: var(--muted-soft);
+    border-radius: 12px;
+    padding: 20px 24px;
+    margin: 16px 0;
+  }
+
+  .feature-card .features-list .features-label {
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.2em;
+    color: var(--muted-foreground);
+    margin-bottom: 14px;
+  }
+
+  .feature-card ul {
+    list-style: none;
+  }
+
+  .feature-card ul li {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    margin-bottom: 12px;
+    color: var(--foreground);
+    font-size: 15px;
+    line-height: 1.5;
+  }
+
+  .feature-card ul li:last-child { margin-bottom: 0; }
+
+  .feature-card ul li::before {
+    content: "✓";
+    flex-shrink: 0;
+    color: var(--primary);
+    font-weight: 900;
+    font-size: 14px;
+    margin-top: 1px;
+  }
+
+  /* ─── OFFER CARD ─── */
+
+  .offer-card .price-block {
+    text-align: center;
+    margin: 24px 0 8px;
+  }
+
+  .offer-card .price-label {
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.2em;
+    color: var(--muted-foreground);
+    margin-bottom: 6px;
+  }
+
+  .offer-card .price {
+    font-size: 48px;
+    font-weight: 900;
+    color: var(--primary);
+    line-height: 1;
+    letter-spacing: -0.02em;
+  }
+
+  .offer-card .price-tag {
+    font-family: 'Lora', Georgia, serif;
+    font-style: italic;
+    font-size: 14px;
+    color: var(--muted-foreground);
+    margin-top: 6px;
+    margin-bottom: 24px;
+  }
+
+  /* ─── CTA ─── */
+
+  .cta {
+    display: block;
+    width: 100%;
+    background: var(--primary);
+    color: white;
+    font-family: inherit;
+    font-weight: 700;
+    font-size: 18px;
+    padding: 18px 32px;
+    border-radius: 999px;
+    border: none;
+    cursor: pointer;
+    text-decoration: none;
+    text-align: center;
+    transition: transform 0.2s, box-shadow 0.2s;
+    box-shadow: 0 4px 14px rgba(139, 95, 191, 0.25);
+  }
+
+  .cta:hover {
+    transform: scale(1.02);
+    box-shadow: 0 8px 24px rgba(139, 95, 191, 0.35);
+  }
+
+  .cta::after {
+    content: "  →";
+  }
+
+  /* ─── GUARANTEE BOX ─── */
+
+  .guarantee {
+    background: rgba(247, 226, 144, 0.4);
+    border: 1px solid rgba(217, 168, 56, 0.3);
+    border-radius: 12px;
+    padding: 20px 24px;
+    margin-top: 20px;
+    display: flex;
+    gap: 14px;
+    align-items: flex-start;
+  }
+
+  .guarantee-icon {
+    flex-shrink: 0;
+    color: #b8841a;
+    font-size: 20px;
+    margin-top: 2px;
+  }
+
+  .guarantee h4 {
+    font-size: 15px;
+    font-weight: 700;
+    margin-bottom: 6px;
+  }
+
+  .guarantee p {
+    font-size: 14px;
+    color: var(--foreground);
+    line-height: 1.55;
+    margin: 0;
+  }
+
+  /* ─── SECURE LINE ─── */
+
+  .secure-line {
+    text-align: center;
+    margin-top: 14px;
+    font-size: 13px;
+    color: var(--muted-foreground);
+    padding: 12px;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+  }
+
+  /* ─── HOW IT WORKS ─── */
+
+  .how-card {
+    background: var(--muted-soft);
+    border-radius: 12px;
+    padding: 24px 28px;
+    margin: 16px 0;
+  }
+
+  .how-card .label {
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.2em;
+    color: var(--muted-foreground);
+    margin-bottom: 14px;
+  }
+
+  .how-card ul {
+    list-style: none;
+  }
+
+  .how-card ul li {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    margin-bottom: 10px;
+    color: var(--foreground);
+    font-size: 15px;
+    line-height: 1.5;
+  }
+
+  .how-card ul li::before {
+    content: "✓";
+    flex-shrink: 0;
+    color: var(--success);
+    font-weight: 900;
+    margin-top: 1px;
+  }
+
+  /* ─── TESTIMONIALS ─── */
+
+  .testimonials-label {
+    text-align: center;
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.25em;
+    color: var(--muted-foreground);
+    margin-bottom: 28px;
+  }
+
+  .testimonial {
+    background: #fff;
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 24px 28px;
+    margin-bottom: 14px;
+  }
+
+  .testimonial blockquote {
+    font-family: 'Lora', Georgia, serif;
+    font-style: italic;
+    font-size: 16px;
+    color: var(--foreground);
+    line-height: 1.55;
+    margin-bottom: 10px;
+  }
+
+  .testimonial cite {
+    font-style: normal;
+    font-size: 13px;
+    color: var(--muted-foreground);
+    font-weight: 700;
+  }
+
+  /* ─── COMPACT CTA CARD ─── */
+
+  .compact-cta {
+    background: #fff;
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 28px;
+    text-align: center;
+    margin: 32px 0;
+  }
+
+  .compact-cta-title {
+    font-size: 18px;
+    font-weight: 700;
+    margin-bottom: 6px;
+  }
+
+  .compact-cta-price {
+    font-size: 32px;
+    font-weight: 900;
+    color: var(--primary);
+    margin-bottom: 18px;
+    letter-spacing: -0.02em;
+  }
+
+  /* ─── FAQ ─── */
+
+  .faq-headline {
+    text-align: center;
+    margin-bottom: 32px;
+    font-size: 24px;
+    font-weight: 900;
+    letter-spacing: -0.015em;
+  }
+
+  .faq-item {
+    background: #fff;
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    margin-bottom: 10px;
+    overflow: hidden;
+  }
+
+  .faq-item details {
+    padding: 0;
+  }
+
+  .faq-item summary {
+    padding: 18px 22px;
+    cursor: pointer;
+    font-weight: 700;
+    font-size: 15px;
+    list-style: none;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .faq-item summary::-webkit-details-marker { display: none; }
+
+  .faq-item summary::after {
+    content: "▾";
+    font-size: 12px;
+    color: var(--muted-foreground);
+  }
+
+  .faq-item[open] summary::after {
+    transform: rotate(180deg);
+  }
+
+  .faq-item .faq-answer {
+    padding: 0 22px 20px;
+    color: var(--muted-foreground);
+    font-size: 15px;
+    line-height: 1.6;
+  }
+
+  /* ─── FINAL CTA ─── */
+
+  .final-cta-section {
+    text-align: center;
+    padding: 48px 0 80px;
+  }
+
+  .final-cta-line {
+    font-size: 22px;
+    font-weight: 900;
+    margin-bottom: 24px;
+  }
+
+  /* ─── FOOTER ─── */
+
+  footer {
+    text-align: center;
+    padding: 32px 24px;
+    border-top: 1px solid var(--border-soft);
+    font-size: 12px;
+    color: var(--muted-foreground);
+    line-height: 1.6;
+  }
+
+  /* ─── DIVIDER ─── */
+
+  .divider {
+    width: 32px;
+    height: 1px;
+    background: var(--primary);
+    opacity: 0.4;
+    margin: 28px auto;
+  }
+
+</style>
+</head>
+<body>
+
+<!-- ─── HEADER ─── -->
+<header>
+  <div class="container">
+    <div class="brand-mark">UnderstandYourPartner</div>
+    <a href="#offer" class="brand-mark" style="font-weight: 700; color: var(--primary); text-decoration: none; font-size: 13px;">Get the workbook →</a>
+  </div>
+</header>
+
+<!-- ─── HERO ─── -->
+<section class="hero">
+  <div class="container">
+    <div class="hero-eyebrow">A Workbook</div>
+    <h1>Should I stay or leave my partner?</h1>
+    <p class="hero-sub">The workbook to help you decide without regrets.</p>
+    <a href="#offer" class="cta">Get the workbook — $11</a>
+  </div>
+</section>
+
+<!-- ─── MIRROR / PAIN ─── -->
+<section style="padding-top: 16px;">
+  <div class="container">
+    <h2 class="section-headline">You've been asking yourself for months.</h2>
+
+    <div class="pain-block">
+      <p>Stay or leave.</p>
+      <p>You've thought about it at 2am.</p>
+      <p>You've asked your friends. They're tired.</p>
+      <p>You've asked the internet. It said both.</p>
+      <p><strong>You still don't know.</strong></p>
+    </div>
+
+    <p class="muted">You don't need more advice.</p>
+    <p class="muted">You need a way to decide.</p>
+  </div>
+</section>
+
+<!-- ─── BRIDGE / PROMISE ─── -->
+<section>
+  <div class="container">
+    <h2 class="section-headline">One evening. One workbook. You'll know.</h2>
+    <p>This is not a quiz. It will not give you the answer.</p>
+    <p>It is a workbook. <strong>You answer 27 questions. You decide.</strong></p>
+    <p>The decision will be yours. Written by your hand. Signed and dated.</p>
+    <p class="muted" style="margin-top: 14px;">A decision you make yourself is a decision you don't regret.</p>
+  </div>
+</section>
+
+<!-- ─── WHAT'S INSIDE ─── -->
+<section>
+  <div class="container">
+    <div class="feature-card">
+      <h3>27 questions. 5 sections. ~25 pages.</h3>
+      <p class="feature-sub">Built to be done in one evening.</p>
+
+      <div class="features-list">
+        <div class="features-label">What you'll do</div>
+        <ul>
+          <li>Section 1 — Write what you already know about your relationship</li>
+          <li>Section 2 — Two lists: what's wrong, what's right. Side by side.</li>
+          <li>Section 3 — What you've already tried. And what changed.</li>
+          <li>Section 4 — Picture your life one year from now. In two versions.</li>
+          <li>Section 5 — Write your decision. In one sentence. Signed by you.</li>
+        </ul>
+      </div>
+
+      <p style="text-align: center; font-family: 'Lora', Georgia, serif; font-style: italic; color: var(--muted-foreground); font-size: 15px; margin: 16px 0 0;">By the end, you will know what you want to do.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ─── OFFER ─── -->
+<section id="offer" style="padding-bottom: 16px;">
+  <div class="container">
+    <div class="feature-card offer-card">
+      <h3>The workbook</h3>
+      <p class="feature-sub">Instant download. Read on phone. Print to write by hand.</p>
+
+      <div class="price-block">
+        <div class="price-label">One-time payment</div>
+        <div class="price">$11</div>
+        <div class="price-tag">A small price for real clarity.</div>
+      </div>
+
+      <a href="#" class="cta">Get the workbook</a>
+
+      <div class="guarantee">
+        <div class="guarantee-icon">🛡</div>
+        <div>
+          <h4>30-day money-back. No questions.</h4>
+          <p>Read the workbook. If it doesn't help you, full refund. No forms. No follow-up emails. Just your money back.</p>
+        </div>
+      </div>
+
+      <div class="secure-line">🔒 Secure one-time payment. Instant access. We do not share your data.</div>
+    </div>
+  </div>
+</section>
+
+<!-- ─── HOW IT WORKS ─── -->
+<section>
+  <div class="container">
+    <div class="how-card">
+      <div class="label">How this works</div>
+      <ul>
+        <li>You buy. You get the PDF in your inbox.</li>
+        <li>You print it, or open it on your screen.</li>
+        <li>You sit down with a pen. 60 to 90 minutes.</li>
+        <li>You answer 27 questions. One per page.</li>
+        <li>The last page is your decision. You write it. You sign it.</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- ─── TESTIMONIALS ─── -->
+<section>
+  <div class="container">
+    <div class="testimonials-label">People who used the workbook</div>
+
+    <div class="testimonial">
+      <blockquote>"I had been going in circles for a year. I sat with this on a Sunday afternoon. By dinner I knew what I had to do. I wish I had found it sooner."</blockquote>
+      <cite>— Sara, 34</cite>
+    </div>
+
+    <div class="testimonial">
+      <blockquote>"The two-future page is what did it for me. I wrote both. One was clearly more alive than the other. I stopped pretending I didn't know."</blockquote>
+      <cite>— Marco, 38</cite>
+    </div>
+
+    <div class="testimonial">
+      <blockquote>"What I liked is that no one told me what to do. I told myself. I signed my own page. It made the decision feel like mine."</blockquote>
+      <cite>— Elena, 29</cite>
+    </div>
+  </div>
+</section>
+
+<!-- ─── COMPACT CTA ─── -->
+<section style="padding: 16px 0;">
+  <div class="container">
+    <div class="compact-cta">
+      <div class="compact-cta-title">Ready to decide?</div>
+      <div class="compact-cta-price">$11</div>
+      <a href="#offer" class="cta" style="font-size: 16px; padding: 14px 28px;">Get the workbook</a>
+    </div>
+  </div>
+</section>
+
+<!-- ─── FAQ ─── -->
+<section>
+  <div class="container">
+    <h2 class="faq-headline">Common questions</h2>
+
+    <div class="faq-item">
+      <details>
+        <summary>Is this therapy?</summary>
+        <div class="faq-answer">No. It is a workbook. It does not replace therapy. It is a tool to help you think clearly on your own.</div>
+      </details>
+    </div>
+
+    <div class="faq-item">
+      <details>
+        <summary>Will it tell me what to do?</summary>
+        <div class="faq-answer">No. It will not give you a verdict. You write your own decision on the last page. That's the point. A decision you write yourself is one you don't regret.</div>
+      </details>
+    </div>
+
+    <div class="faq-item">
+      <details>
+        <summary>How long does it take?</summary>
+        <div class="faq-answer">Plan for 60 to 90 minutes. Some people take longer. That's fine. Don't take less.</div>
+      </details>
+    </div>
+
+    <div class="faq-item">
+      <details>
+        <summary>Do I need to share it with my partner?</summary>
+        <div class="faq-answer">No. The workbook is for you. Alone. No one else needs to see what you write.</div>
+      </details>
+    </div>
+
+    <div class="faq-item">
+      <details>
+        <summary>What if I'm still not sure at the end?</summary>
+        <div class="faq-answer">Read sections 4 and 5 again in 48 hours. If you still feel the same — you have your answer. If not — you needed more time.</div>
+      </details>
+    </div>
+
+    <div class="faq-item">
+      <details>
+        <summary>What if my partner finds it?</summary>
+        <div class="faq-answer">You can keep it on your phone in a private folder. You can print it and keep the pages somewhere safe. The file you receive has a neutral name.</div>
+      </details>
+    </div>
+
+    <div class="faq-item">
+      <details>
+        <summary>Can I get a refund?</summary>
+        <div class="faq-answer">Yes. 30 days, no questions. Email us. Money back.</div>
+      </details>
+    </div>
+  </div>
+</section>
+
+<!-- ─── FINAL CTA ─── -->
+<section class="final-cta-section">
+  <div class="container">
+    <p class="final-cta-line">Decide tonight. $11.</p>
+    <a href="#offer" class="cta" style="max-width: 320px; margin: 0 auto;">Get the workbook</a>
+  </div>
+</section>
+
+<!-- ─── FOOTER ─── -->
+<footer>
+  This is not therapy or legal advice. The choice is yours.<br>
+  © UnderstandYourPartner — Should I Stay or Leave My Partner?
+</footer>
+
+</body>
+</html>

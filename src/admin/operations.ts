@@ -226,9 +226,14 @@ export const getFunnelStats: GetFunnelStats<GetFunnelStatsArgs, FunnelStats> = a
         paidFilter.testType = { in: UYP_TEST_TYPES };
     }
 
-    const started = await context.entities.TestSession.count({ where: activeFilter });
+    // For SoL, TestSession is only created at the email gate — every row already has an email.
+    // Using TestSession.count as "started" would make started = emailCaptured (100% conversion).
+    // Use QuizEvent quiz_start count instead so the funnel shows the real pre-email drop-off.
+    const started = productFilter === 'stay-or-leave'
+        ? await context.entities.QuizEvent.count({ where: { type: 'quiz_start', testType: 'stay-or-leave' } })
+        : await context.entities.TestSession.count({ where: activeFilter });
 
-    // Wizard Steps (onboardingStep)
+    // Wizard Steps (onboardingStep) — UYP only; SoL has no wizard so these are 0
     const step1 = await context.entities.TestSession.count({ where: { ...activeFilter, onboardingStep: { gte: 1 } } });
     const step2 = await context.entities.TestSession.count({ where: { ...activeFilter, onboardingStep: { gte: 2 } } });
     const step3 = await context.entities.TestSession.count({ where: { ...activeFilter, onboardingStep: { gte: 3 } } });

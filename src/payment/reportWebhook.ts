@@ -10,6 +10,7 @@ import { ADDON_IDS } from "./addons";
 import { computeSoLResult, type SoLAnswers } from "../test/stayOrLeaveScoring";
 import { generateAssessment } from "../server/stayOrLeaveAi";
 import { STAY_OR_LEAVE_PRICE, STAY_OR_LEAVE_PRODUCT_NAME } from "./stayOrLeaveOperations";
+import { WORKBOOK_PRICE, WORKBOOK_PRODUCT_NAME } from "./workbookOperations";
 
 // ... middleware config ...
 export const stripeMiddlewareConfigFn: MiddlewareConfigFn = (
@@ -230,6 +231,52 @@ export const stripeWebhook = async (
         console.error("[Webhook] S-o-L AI generation failed (will retry on page load):", aiError);
         // The assessment page will call generateStayOrLeaveAssessment as a fallback.
       }
+    }
+
+    // === WORKBOOK PRODUCT ===
+    if (metadata && metadata.type === "workbook_purchase" && metadata.testSessionId) {
+      console.log(`Unlocking Workbook purchase: ${metadata.testSessionId}`);
+
+      const testSession = await context.entities.TestSession.findUnique({
+        where: { id: metadata.testSessionId },
+      });
+      if (!testSession) {
+        console.error(`[Webhook] Workbook: session not found: ${metadata.testSessionId}`);
+        return response.json({ received: true });
+      }
+
+      try {
+        const userEmail = testSession.email || session.customer_details?.email;
+        const amountTotal = session.amount_total ? session.amount_total / 100 : WORKBOOK_PRICE;
+        await sendCapiEvent({
+          eventName: "Purchase",
+          eventId: session.id,
+          eventSourceUrl: "https://understandyourpartner.com/workbook",
+          userData: {
+            email: userEmail,
+            fbp: testSession.fbp || metadata.fbp,
+            fbc: testSession.fbc,
+          },
+          customData: {
+            currency: "usd",
+            value: amountTotal,
+            content_name: WORKBOOK_PRODUCT_NAME,
+            content_type: "product",
+            order_id: session.id,
+          },
+        });
+      } catch (e) {
+        console.error("[Webhook] Workbook CAPI failed:", e);
+      }
+
+      const dataToUpdate: any = { isPaid: true, emailSequenceType: null };
+      if (!testSession.email && session.customer_details?.email) {
+        dataToUpdate.email = session.customer_details.email;
+      }
+      await context.entities.TestSession.update({
+        where: { id: metadata.testSessionId },
+        data: dataToUpdate,
+      });
     }
   }
 
