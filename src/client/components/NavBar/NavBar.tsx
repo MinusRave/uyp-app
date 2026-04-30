@@ -1,4 +1,4 @@
-import { LogIn, Menu, ArrowRight } from "lucide-react";
+import { LogIn, Menu } from "lucide-react";
 import { Dispatch, SetStateAction, useEffect, useState } from "react";
 import { Link as ReactRouterLink } from "react-router";
 import { useAuth } from "wasp/client/auth";
@@ -108,10 +108,6 @@ export default function NavBar({
   );
 }
 
-import { Button } from "../../components/ui/button";
-
-// ... (existing code)
-
 function NavBarDesktopUserDropdown({ isScrolled }: { isScrolled: boolean }) {
   const { data: user, isLoading: isUserLoading } = useAuth();
 
@@ -121,34 +117,27 @@ function NavBarDesktopUserDropdown({ isScrolled }: { isScrolled: boolean }) {
         <DarkModeSwitcher />
       </ul>
       {isUserLoading ? null : !user ? (
-        <>
-          <Button variant="default" size={isScrolled ? "sm" : "default"} className="font-bold rounded-full shadow-lg" asChild>
-            <WaspRouterLink to={routes.TestRoute.to}>
-              Start Test <ArrowRight size={16} className="ml-1" />
-            </WaspRouterLink>
-          </Button>
-          <WaspRouterLink
-            to={routes.LoginRoute.to}
-            className={cn(
-              "ml-3 font-semibold leading-6 transition-all duration-300",
-              {
-                "text-sm": !isScrolled,
-                "text-xs": isScrolled,
-              },
-            )}
-          >
-            <div className="text-foreground hover:text-primary flex items-center transition-colors duration-300 ease-in-out">
-              Log in{" "}
-              <LogIn
-                size={isScrolled ? "1rem" : "1.1rem"}
-                className={cn("transition-all duration-300", {
-                  "ml-1 mt-[0.1rem]": !isScrolled,
-                  "ml-1": isScrolled,
-                })}
-              />
-            </div>
-          </WaspRouterLink>
-        </>
+        <WaspRouterLink
+          to={routes.LoginRoute.to}
+          className={cn(
+            "font-semibold leading-6 transition-all duration-300",
+            {
+              "text-sm": !isScrolled,
+              "text-xs": isScrolled,
+            },
+          )}
+        >
+          <div className="text-foreground hover:text-primary flex items-center transition-colors duration-300 ease-in-out">
+            Log in{" "}
+            <LogIn
+              size={isScrolled ? "1rem" : "1.1rem"}
+              className={cn("transition-all duration-300", {
+                "ml-1 mt-[0.1rem]": !isScrolled,
+                "ml-1": isScrolled,
+              })}
+            />
+          </div>
+        </WaspRouterLink>
       ) : (
         <div className="ml-3">
           <UserDropdown user={user} />

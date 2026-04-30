@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { ArrowRight, Check, Shield, ChevronDown, X } from "lucide-react";
+import { ArrowRight, Check, Shield, ChevronDown, X, Image as ImageIcon } from "lucide-react";
 import { createWorkbookCheckoutSession } from "wasp/client/operations";
 
 const FAQ_ITEMS = [
@@ -29,24 +29,13 @@ export default function WorkbookSalesPage() {
 
   return (
     <div className="min-h-screen bg-background text-foreground">
-
-      {/* Header */}
-      <header className="border-b border-border/50 bg-background">
-        <div className="max-w-2xl mx-auto px-5 py-4 flex items-center justify-between gap-4">
-          <span className="text-sm font-bold">💜 UnderstandYourPartner</span>
-          <span className="hidden sm:inline-block bg-muted text-muted-foreground text-xs font-bold uppercase tracking-widest px-3 py-1 rounded-full">
-            Built on Motivational Interviewing
-          </span>
-          <a href="#offer" className="text-primary text-sm font-bold whitespace-nowrap">
-            Get the workbook →
-          </a>
-        </div>
-      </header>
-
       <div className="max-w-2xl mx-auto px-5 space-y-0">
 
         {/* Hero */}
         <section className="py-12 text-center space-y-4">
+          <span className="inline-block bg-muted text-muted-foreground text-xs font-bold uppercase tracking-widest px-3 py-1 rounded-full">
+            ⭐ Built on Motivational Interviewing
+          </span>
           <p className="text-xs font-bold uppercase tracking-widest text-primary">
             For people who have been thinking about leaving their partner for months — but can't decide.
           </p>
@@ -57,6 +46,15 @@ export default function WorkbookSalesPage() {
           <p className="text-base text-muted-foreground italic">
             A 5-step writing method to help you decide without regrets — in one evening.
           </p>
+
+          {/* Hero mockup — bundle composition */}
+          <div className="max-w-md mx-auto pt-2">
+            <ImagePlaceholder
+              label="Hero bundle mockup"
+              description="iPad with workbook cover + phone showing decision page + bonus PDF"
+              aspect="4/3"
+            />
+          </div>
 
           {/* Early offer strip */}
           <div className="pt-4 space-y-3">
@@ -78,6 +76,11 @@ export default function WorkbookSalesPage() {
           <h2 className="text-2xl md:text-3xl font-black text-foreground leading-snug">
             You've been asking yourself for months.
           </h2>
+          <ImagePlaceholder
+            label="Mirror emotion (stock photo)"
+            description="Contemplative, gender-neutral — hands holding a cup, or back of person at window"
+            aspect="2/1"
+          />
           <div className="bg-muted/40 rounded-2xl p-6 space-y-2 text-base text-foreground/85 leading-relaxed">
             <p>Stay or leave.</p>
             <p>You've thought about it at 2am.</p>
@@ -110,6 +113,11 @@ export default function WorkbookSalesPage() {
           <h2 className="text-2xl md:text-3xl font-black text-foreground leading-snug">
             Imagine waking up next Monday.
           </h2>
+          <ImagePlaceholder
+            label="Future state (stock photo)"
+            description="Calmer, brighter than mirror photo — morning light, open journal, sunrise window"
+            aspect="2/1"
+          />
           <div className="bg-muted/40 rounded-2xl p-6 space-y-2 text-base text-foreground/85 leading-relaxed">
             <p className="italic text-foreground">You're not asking yourself again. You decided.</p>
             <p>Maybe you decided to stay. With clear conditions written down. You know what has to change — and by when.</p>
@@ -166,6 +174,17 @@ export default function WorkbookSalesPage() {
           </ul>
           <div className="text-center pt-2">
             <CTAButton isLoading={isLoading} onClick={handleCheckout} label="Get the workbook now — $11" size="md" />
+          </div>
+        </section>
+
+        {/* Inside the workbook */}
+        <section className="py-10 space-y-4">
+          <h2 className="text-2xl md:text-3xl font-black text-foreground text-center leading-snug">Inside the workbook.</h2>
+          <p className="text-muted-foreground text-center">A preview of three of the most important pages.</p>
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-2">
+            <ImagePlaceholder label="Cover" description="Workbook cover, framed" aspect="3/4" />
+            <ImagePlaceholder label="Two lists page" description="Page 8 — wrong/right columns, on tablet" aspect="3/4" />
+            <ImagePlaceholder label="Decision page" description="Page 22 — signature, with pen" aspect="3/4" />
           </div>
         </section>
 
@@ -290,10 +309,13 @@ export default function WorkbookSalesPage() {
                 </div>
               </div>
               <div className="py-5 flex items-start justify-between gap-4">
-                <div className="space-y-1">
+                <div className="space-y-2 flex-1">
                   <p className="text-xs font-bold uppercase tracking-widest text-primary">Free bonus</p>
                   <p className="font-black text-foreground text-base">"What If I Regret It?" — The Decision Companion</p>
                   <p className="text-sm text-muted-foreground leading-relaxed">A short manual to read after the workbook. It helps you tell real regret from the inevitable pain that comes with any hard choice. For the doubt that may come back at 2am, three months from now.</p>
+                  <div className="max-w-[180px] pt-2">
+                    <ImagePlaceholder label="Bonus cover" aspect="3/2" />
+                  </div>
                 </div>
                 <div className="text-right shrink-0 space-y-0.5">
                   <p className="text-sm line-through text-muted-foreground">$11</p>
@@ -366,6 +388,41 @@ export default function WorkbookSalesPage() {
           <p>© UnderstandYourPartner — Should I Stay or Leave My Partner?</p>
         </footer>
       </div>
+    </div>
+  );
+}
+
+function ImagePlaceholder({
+  label,
+  description,
+  aspect = "4/3",
+  src,
+  alt,
+}: {
+  label: string;
+  description?: string;
+  aspect?: "4/3" | "2/1" | "3/4" | "3/2";
+  src?: string;
+  alt?: string;
+}) {
+  if (src) {
+    return (
+      <div className="rounded-2xl overflow-hidden border border-border bg-card">
+        <img src={src} alt={alt ?? label} className="w-full h-auto block" />
+      </div>
+    );
+  }
+  const aspectClass = {
+    "4/3": "aspect-[4/3]",
+    "2/1": "aspect-[2/1]",
+    "3/4": "aspect-[3/4]",
+    "3/2": "aspect-[3/2]",
+  }[aspect];
+  return (
+    <div className={`${aspectClass} w-full rounded-2xl border-2 border-dashed border-border bg-muted/40 flex flex-col items-center justify-center p-6 text-center gap-2`}>
+      <ImageIcon size={28} className="text-primary/60" />
+      <p className="text-[10px] font-bold uppercase tracking-[0.25em] text-primary">{label}</p>
+      {description && <p className="text-xs text-muted-foreground italic max-w-xs">{description}</p>}
     </div>
   );
 }
