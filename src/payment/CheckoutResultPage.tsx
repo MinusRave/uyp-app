@@ -18,6 +18,10 @@ export default function CheckoutResultPage() {
       trackPixelEvent('Purchase', {
         value: parseFloat(import.meta.env.REACT_APP_REPORT_PRICE || "9.99"),
         currency: 'USD',
+        content_name: 'Full Relationship Report',
+        content_category: 'Report',
+        content_ids: ['report-full'],
+        content_type: 'product',
         eventID: sessionId || undefined
       });
     }

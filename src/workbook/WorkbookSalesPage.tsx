@@ -1,6 +1,17 @@
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { ArrowRight, Check, Shield, ChevronDown, X, Image as ImageIcon } from "lucide-react";
 import { createWorkbookCheckoutSession } from "wasp/client/operations";
+import { trackPixelEvent } from "../analytics/pixel";
+import { generateEventId } from "../analytics/eventId";
+
+const WORKBOOK_PIXEL_PAYLOAD = {
+  content_name: "Should I Stay or Leave My Partner? — The Workbook + Bonus",
+  content_category: "Workbook",
+  content_ids: ["workbook"],
+  content_type: "product",
+  value: 11,
+  currency: "USD",
+};
 
 const FAQ_ITEMS = [
   { q: "How is this different from a free relationship quiz?", a: "A quiz gives you an answer in 3 minutes. This workbook does the opposite — it makes you sit with the question for an hour, on paper, with a pen. The decision you write at the end is yours, not the workbook's. That's what makes it last." },
@@ -14,11 +25,20 @@ const FAQ_ITEMS = [
 
 export default function WorkbookSalesPage() {
   const [isLoading, setIsLoading] = useState(false);
+  const viewContentFired = useRef(false);
+
+  useEffect(() => {
+    if (viewContentFired.current) return;
+    viewContentFired.current = true;
+    trackPixelEvent("ViewContent", { ...WORKBOOK_PIXEL_PAYLOAD });
+  }, []);
 
   const handleCheckout = async () => {
     setIsLoading(true);
+    const eventID = generateEventId();
+    trackPixelEvent("InitiateCheckout", { ...WORKBOOK_PIXEL_PAYLOAD, eventID });
     try {
-      const result = await createWorkbookCheckoutSession({});
+      const result = await createWorkbookCheckoutSession({ eventID });
       if (result.sessionUrl) window.location.href = result.sessionUrl;
     } catch (e) {
       console.error("[workbook checkout] failed", e);

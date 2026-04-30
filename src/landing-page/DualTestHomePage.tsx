@@ -1,9 +1,10 @@
 import { Link } from "react-router";
-import { ArrowRight, Heart, Compass } from "lucide-react";
+import { ArrowRight, Heart, Compass, BookOpen } from "lucide-react";
 
-// Homepage that promotes both active tests:
-// - Stay or Leave Test (primary, hero card)
-// - Understand Your Partner (secondary, smaller card)
+// Homepage that promotes the three products:
+// - Stay or Leave Test (primary free quiz, hero card)
+// - Understand Your Partner (secondary free quiz)
+// - Stay or Leave Workbook (paid writing method)
 //
 // Cold Meta traffic does NOT land here — Meta ads point straight to /stay-or-leave.
 // This page exists for organic / direct / link-share traffic.
@@ -19,9 +20,9 @@ export default function DualTestHomePage() {
             UnderstandYourPartner.com
           </p>
           <h1 className="text-3xl md:text-5xl font-black text-foreground leading-tight">
-            Two tests for one question:
+            One question. Three ways to answer it.
             <br />
-            what's going on with your relationship?
+            What's going on with your relationship?
           </h1>
           <p className="text-base md:text-lg text-muted-foreground max-w-xl mx-auto">
             Pick the one that fits where you are right now.
@@ -95,6 +96,50 @@ export default function DualTestHomePage() {
               </p>
               <div className="inline-flex items-center gap-1.5 text-sm font-bold text-foreground pt-1 group-hover:gap-2.5 transition-all">
                 Take this test instead
+                <ArrowRight size={14} />
+              </div>
+            </div>
+          </div>
+        </Link>
+
+        {/* Divider — different track */}
+        <div className="text-center">
+          <span className="text-xs uppercase tracking-widest text-muted-foreground/60">
+            or
+          </span>
+        </div>
+
+        {/* Third card — Workbook (paid product) */}
+        <Link
+          to="/workbook"
+          className="block rounded-2xl border border-amber-300/70 dark:border-amber-700/60 bg-amber-50/40 dark:bg-amber-900/10 hover:bg-amber-50 dark:hover:bg-amber-900/20 transition-all p-6 md:p-8 group"
+        >
+          <div className="flex items-start gap-4">
+            <div className="bg-amber-100 dark:bg-amber-900/40 text-amber-700 dark:text-amber-300 p-2.5 rounded-xl shrink-0">
+              <BookOpen size={22} />
+            </div>
+            <div className="flex-1 space-y-3">
+              <div>
+                <p className="text-xs font-bold uppercase tracking-widest text-amber-700 dark:text-amber-400 mb-1">
+                  $11 · Paid
+                </p>
+                <p className="text-xs font-bold uppercase tracking-widest text-muted-foreground mb-1">
+                  Ready to decide?
+                </p>
+                <h2 className="text-xl md:text-2xl font-bold text-foreground leading-tight">
+                  The Stay or Leave Workbook
+                </h2>
+              </div>
+              <p className="text-sm text-foreground/80 leading-relaxed">
+                A 5-step writing method to help you decide without regrets — in one evening.
+              </p>
+              <ul className="space-y-1.5 text-xs text-muted-foreground">
+                <li>27 questions. 5 sections. ~60 minutes.</li>
+                <li>Includes the "What If I Regret It?" bonus.</li>
+                <li>Done with a pen, in one evening.</li>
+              </ul>
+              <div className="inline-flex items-center gap-1.5 text-sm font-bold text-amber-700 dark:text-amber-400 pt-1 group-hover:gap-2.5 transition-all">
+                Get the workbook
                 <ArrowRight size={14} />
               </div>
             </div>

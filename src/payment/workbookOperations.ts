@@ -2,9 +2,12 @@ import { HttpError } from "wasp/server";
 import type { CreateWorkbookCheckoutSession, GetWorkbookDownloadUrl } from "wasp/server/operations";
 import { stripeClient } from "./stripe/stripeClient";
 import { getDownloadFileSignedURLFromS3 } from "../file-upload/s3Utils";
+import { sendCapiEvent } from "../server/analytics/metaCapi";
 
 export const WORKBOOK_PRICE = 11.00;
 export const WORKBOOK_PRODUCT_NAME = "Should I Stay or Leave My Partner? — The Workbook + Bonus";
+export const WORKBOOK_CONTENT_ID = "workbook";
+export const WORKBOOK_CONTENT_CATEGORY = "Workbook";
 export const WORKBOOK_S3_KEY = "products/should-i-stay-or-leave-workbook.pdf";
 export const WORKBOOK_BONUS_S3_KEY = "products/what-if-i-regret-it.pdf";
 
@@ -27,6 +30,32 @@ export const createWorkbookCheckoutSession: CreateWorkbookCheckoutSession<
       email: context.user?.email ?? null,
     },
   });
+
+  // Fire-and-forget Meta CAPI InitiateCheckout (paired with the client Pixel via eventID)
+  if (eventID) {
+    sendCapiEvent({
+      eventName: "InitiateCheckout",
+      eventId: eventID,
+      eventSourceUrl:
+        (context as any).req?.headers?.referer ||
+        "https://understandyourpartner.com/workbook",
+      userData: {
+        email: context.user?.email || undefined,
+        clientIp: (context as any).req?.ip,
+        userAgent: (context as any).req?.headers?.["user-agent"],
+        fbp: (context as any).req?.cookies?.["_fbp"],
+        fbc: (context as any).req?.cookies?.["_fbc"],
+      },
+      customData: {
+        currency: "usd",
+        value: WORKBOOK_PRICE,
+        content_name: WORKBOOK_PRODUCT_NAME,
+        content_category: WORKBOOK_CONTENT_CATEGORY,
+        content_ids: [WORKBOOK_CONTENT_ID],
+        content_type: "product",
+      },
+    });
+  }
 
   let session;
   try {
@@ -84,6 +113,7 @@ export type GetWorkbookDownloadUrlArgs = {
 export type WorkbookDownloadUrlResult = {
   workbookUrl: string;
   bonusUrl: string;
+  stripeCheckoutSessionId: string | null;
 };
 
 export const getWorkbookDownloadUrl: GetWorkbookDownloadUrl<
@@ -103,5 +133,9 @@ export const getWorkbookDownloadUrl: GetWorkbookDownloadUrl<
     getDownloadFileSignedURLFromS3({ s3Key: WORKBOOK_BONUS_S3_KEY }),
   ]);
 
-  return { workbookUrl, bonusUrl };
+  return {
+    workbookUrl,
+    bonusUrl,
+    stripeCheckoutSessionId: testSession.stripeCheckoutSessionId ?? null,
+  };
 };

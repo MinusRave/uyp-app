@@ -10,8 +10,18 @@ import { sendCapiEvent } from "../server/analytics/metaCapi";
 import { ADDON_IDS } from "./addons";
 import { computeSoLResult, type SoLAnswers } from "../test/stayOrLeaveScoring";
 import { generateAssessment } from "../server/stayOrLeaveAi";
-import { STAY_OR_LEAVE_PRICE, STAY_OR_LEAVE_PRODUCT_NAME } from "./stayOrLeaveOperations";
-import { WORKBOOK_PRICE, WORKBOOK_PRODUCT_NAME } from "./workbookOperations";
+import {
+  STAY_OR_LEAVE_PRICE,
+  STAY_OR_LEAVE_PRODUCT_NAME,
+  STAY_OR_LEAVE_CONTENT_ID,
+  STAY_OR_LEAVE_CONTENT_CATEGORY,
+} from "./stayOrLeaveOperations";
+import {
+  WORKBOOK_PRICE,
+  WORKBOOK_PRODUCT_NAME,
+  WORKBOOK_CONTENT_ID,
+  WORKBOOK_CONTENT_CATEGORY,
+} from "./workbookOperations";
 
 // ... middleware config ...
 export const stripeMiddlewareConfigFn: MiddlewareConfigFn = (
@@ -81,6 +91,8 @@ export const stripeWebhook = async (
             currency: 'usd',
             value: amountTotal,
             content_name: 'Full Relationship Report',
+            content_category: 'Report',
+            content_ids: ['report-full'],
             content_type: 'product',
             order_id: session.id
           }
@@ -175,6 +187,8 @@ export const stripeWebhook = async (
             currency: "usd",
             value: amountTotal,
             content_name: STAY_OR_LEAVE_PRODUCT_NAME,
+            content_category: STAY_OR_LEAVE_CONTENT_CATEGORY,
+            content_ids: [STAY_OR_LEAVE_CONTENT_ID],
             content_type: "product",
             order_id: session.id,
           },
@@ -262,6 +276,8 @@ export const stripeWebhook = async (
             currency: "usd",
             value: amountTotal,
             content_name: WORKBOOK_PRODUCT_NAME,
+            content_category: WORKBOOK_CONTENT_CATEGORY,
+            content_ids: [WORKBOOK_CONTENT_ID],
             content_type: "product",
             order_id: session.id,
           },

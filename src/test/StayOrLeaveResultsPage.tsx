@@ -144,8 +144,11 @@ export default function StayOrLeaveResultsPage() {
         setIsCheckoutLoading(true);
         const eventID = generateEventId();
         trackPixelEvent("InitiateCheckout", {
-          content_name: "Stay or Leave Test - Full Assessment",
+          // Must match server constants in stayOrLeaveOperations.ts (STAY_OR_LEAVE_PRODUCT_NAME, STAY_OR_LEAVE_CONTENT_ID, STAY_OR_LEAVE_CONTENT_CATEGORY)
+          content_name: "Stay or Leave Test — Full Professional Assessment",
           content_category: "Assessment",
+          content_ids: ["stay-or-leave-assessment"],
+          content_type: "product",
           value: 13.9,
           currency: "USD",
           eventID,

@@ -58,6 +58,8 @@ export default function ResultsPage() {
         trackPixelEvent("InitiateCheckout", {
             content_name: "Full Relationship Report",
             content_category: "Report",
+            content_ids: ["report-full"],
+            content_type: "product",
             value: totalValue,
             currency: "USD",
             eventID,

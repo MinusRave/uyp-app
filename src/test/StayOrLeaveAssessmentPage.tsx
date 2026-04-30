@@ -49,9 +49,11 @@ export default function StayOrLeaveAssessmentPage() {
     trackPixelEvent("Purchase", {
       value: 13.9,
       currency: "USD",
-      content_name: "Stay or Leave Test - Full Assessment",
-      content_type: "product",
+      // Must match server constants in stayOrLeaveOperations.ts
+      content_name: "Stay or Leave Test — Full Professional Assessment",
+      content_category: "Assessment",
       content_ids: ["stay-or-leave-assessment"],
+      content_type: "product",
       eventID: stripeSessionId,
     });
   }, [session?.isPaid, (session as any)?.stripeCheckoutSessionId]);

@@ -1,18 +1,38 @@
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useSearchParams } from "react-router";
 import { useQuery, getWorkbookDownloadUrl } from "wasp/client/operations";
 import { ArrowDown, Loader2, RefreshCw } from "lucide-react";
+import { trackPixelEvent } from "../analytics/pixel";
 
 export default function WorkbookDownloadPage() {
   const [params] = useSearchParams();
   const sessionId = params.get("session") ?? "";
   const [refreshKey, setRefreshKey] = useState(0);
+  const purchaseFired = useRef(false);
 
   const { data, isLoading, error } = useQuery(
     getWorkbookDownloadUrl,
     { sessionId, _refresh: refreshKey } as any,
     { enabled: !!sessionId },
   );
+
+  // Pixel Purchase event. eventID = Stripe checkout session id (matches CAPI sent
+  // server-side from the webhook). Fires once when the download URLs are ready.
+  useEffect(() => {
+    if (purchaseFired.current) return;
+    const stripeId = data?.stripeCheckoutSessionId;
+    if (!stripeId) return;
+    purchaseFired.current = true;
+    trackPixelEvent("Purchase", {
+      value: 11,
+      currency: "USD",
+      content_name: "Should I Stay or Leave My Partner? — The Workbook + Bonus",
+      content_category: "Workbook",
+      content_ids: ["workbook"],
+      content_type: "product",
+      eventID: stripeId,
+    });
+  }, [data?.stripeCheckoutSessionId]);
 
   if (!sessionId) {
     return (

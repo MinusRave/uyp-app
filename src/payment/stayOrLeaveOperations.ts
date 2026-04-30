@@ -15,6 +15,8 @@ import { STAY_OR_LEAVE_QUESTIONS } from "../test/stayOrLeaveQuestions";
 
 export const STAY_OR_LEAVE_PRICE = 13.90;
 export const STAY_OR_LEAVE_PRODUCT_NAME = "Stay or Leave Test — Full Professional Assessment";
+export const STAY_OR_LEAVE_CONTENT_ID = "stay-or-leave-assessment";
+export const STAY_OR_LEAVE_CONTENT_CATEGORY = "Assessment";
 
 // ============================================================================
 // completeStayOrLeaveTest
@@ -311,8 +313,8 @@ export const createStayOrLeaveCheckoutSession: CreateStayOrLeaveCheckoutSession<
         currency: "usd",
         value: STAY_OR_LEAVE_PRICE,
         content_name: STAY_OR_LEAVE_PRODUCT_NAME,
-        content_category: "Assessment",
-        content_ids: ["stay-or-leave-assessment"],
+        content_category: STAY_OR_LEAVE_CONTENT_CATEGORY,
+        content_ids: [STAY_OR_LEAVE_CONTENT_ID],
         content_type: "product",
       },
     });
