@@ -4,6 +4,7 @@ import express, { Request, Response } from "express";
 import { stripeClient } from "./stripe/stripeClient";
 import { emailSender } from "wasp/server/email";
 import { getPaymentConfirmationEmail } from "../server/email/templates/paymentConfirmation";
+import { getWorkbookDeliveryEmail } from "../server/email/templates/workbookDelivery";
 import { buildPersonalizationData } from "../server/email/personalization";
 import { sendCapiEvent } from "../server/analytics/metaCapi";
 import { ADDON_IDS } from "./addons";
@@ -277,6 +278,26 @@ export const stripeWebhook = async (
         where: { id: metadata.testSessionId },
         data: dataToUpdate,
       });
+
+      try {
+        const deliveryEmail = testSession.email || session.customer_details?.email;
+        if (deliveryEmail) {
+          const appUrl = process.env.WASP_WEB_CLIENT_URL || "http://localhost:3000";
+          const downloadUrl = `${appUrl}/workbook/download?session=${metadata.testSessionId}`;
+          const emailContent = getWorkbookDeliveryEmail({ downloadUrl });
+          await emailSender.send({
+            to: deliveryEmail,
+            subject: emailContent.subject,
+            text: emailContent.text,
+            html: emailContent.html,
+          });
+          console.log(`[Webhook] Workbook delivery email sent to ${deliveryEmail}`);
+        } else {
+          console.error(`[Webhook] Workbook: no email to deliver to for session ${metadata.testSessionId}`);
+        }
+      } catch (emailError) {
+        console.error("[Webhook] Workbook delivery email failed:", emailError);
+      }
     }
   }
 

@@ -51,7 +51,8 @@ export default function WorkbookSalesPage() {
           <div className="max-w-md mx-auto pt-2">
             <ImagePlaceholder
               label="Hero bundle mockup"
-              description="iPad with workbook cover + phone showing decision page + bonus PDF"
+              src="/images/wrokbook-hero.png"
+              alt="Stay or Leave workbook + bonus"
               aspect="4/3"
             />
           </div>
@@ -77,8 +78,9 @@ export default function WorkbookSalesPage() {
             You've been asking yourself for months.
           </h2>
           <ImagePlaceholder
-            label="Mirror emotion (stock photo)"
-            description="Contemplative, gender-neutral — hands holding a cup, or back of person at window"
+            label="Mirror emotion"
+            src="/images/workbook-mirroremotion.png"
+            alt="Contemplative moment — sitting with the doubt"
             aspect="2/1"
           />
           <div className="bg-muted/40 rounded-2xl p-6 space-y-2 text-base text-foreground/85 leading-relaxed">
@@ -114,8 +116,9 @@ export default function WorkbookSalesPage() {
             Imagine waking up next Monday.
           </h2>
           <ImagePlaceholder
-            label="Future state (stock photo)"
-            description="Calmer, brighter than mirror photo — morning light, open journal, sunrise window"
+            label="Future state"
+            src="/images/workbook-futurestate.png"
+            alt="Calm morning after the decision — the loop is over"
             aspect="2/1"
           />
           <div className="bg-muted/40 rounded-2xl p-6 space-y-2 text-base text-foreground/85 leading-relaxed">
@@ -182,9 +185,9 @@ export default function WorkbookSalesPage() {
           <h2 className="text-2xl md:text-3xl font-black text-foreground text-center leading-snug">Inside the workbook.</h2>
           <p className="text-muted-foreground text-center">A preview of three of the most important pages.</p>
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-2">
-            <ImagePlaceholder label="Cover" description="Workbook cover, framed" aspect="3/4" />
-            <ImagePlaceholder label="Two lists page" description="Page 8 — wrong/right columns, on tablet" aspect="3/4" />
-            <ImagePlaceholder label="Decision page" description="Page 22 — signature, with pen" aspect="3/4" />
+            <ImagePlaceholder label="Cover" src="/images/wrokbook-cover.png" alt="Stay or Leave workbook cover" aspect="3/4" />
+            <ImagePlaceholder label="Two lists page" src="/images/wrokbook-twopages.png" alt="Two lists page — wrong/right columns" aspect="3/4" />
+            <ImagePlaceholder label="Decision page" src="/images/wrokbook-decision.png" alt="Decision page — signature, with pen" aspect="3/4" />
           </div>
         </section>
 
@@ -314,7 +317,7 @@ export default function WorkbookSalesPage() {
                   <p className="font-black text-foreground text-base">"What If I Regret It?" — The Decision Companion</p>
                   <p className="text-sm text-muted-foreground leading-relaxed">A short manual to read after the workbook. It helps you tell real regret from the inevitable pain that comes with any hard choice. For the doubt that may come back at 2am, three months from now.</p>
                   <div className="max-w-[180px] pt-2">
-                    <ImagePlaceholder label="Bonus cover" aspect="3/2" />
+                    <ImagePlaceholder label="Bonus cover" src="/images/workbook-bonus-cover.png" alt="What If I Regret It? — bonus cover" aspect="3/2" />
                   </div>
                 </div>
                 <div className="text-right shrink-0 space-y-0.5">

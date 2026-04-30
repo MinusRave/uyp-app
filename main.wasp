@@ -627,6 +627,37 @@ page AdminConfigPage {
   component: import AdminConfigPage from "@src/admin/AdminConfigPage"
 }
 
+route AdminFilesRoute { path: "/admin/files", to: AdminFilesPage }
+page AdminFilesPage {
+  authRequired: true,
+  component: import AdminFilesPage from "@src/admin/AdminFilesPage"
+}
+
+query listAdminFiles {
+  fn: import { listAdminFiles } from "@src/admin/fileOperations",
+  entities: []
+}
+
+query getAdminFileDownloadUrl {
+  fn: import { getAdminFileDownloadUrl } from "@src/admin/fileOperations",
+  entities: []
+}
+
+action createAdminFileUploadUrl {
+  fn: import { createAdminFileUploadUrl } from "@src/admin/fileOperations",
+  entities: []
+}
+
+action deleteAdminFile {
+  fn: import { deleteAdminFile } from "@src/admin/fileOperations",
+  entities: []
+}
+
+action createAdminFolder {
+  fn: import { createAdminFolder } from "@src/admin/fileOperations",
+  entities: []
+}
+
 //#endregion
 
 //#region Contact Form Messages
