@@ -68,7 +68,7 @@ export default function WorkbookSalesPage() {
             Should I stay or leave my partner?
           </h1>
           <p className="text-2xl font-bold text-foreground leading-snug">Stop wondering. Decide this week.</p>
-          <p className="text-base text-muted-foreground italic">
+          <p className="text-[17px] text-muted-foreground italic">
             A 5-step writing method to help you decide without regrets — in one evening.
           </p>
 
@@ -108,7 +108,7 @@ export default function WorkbookSalesPage() {
             alt="Contemplative moment — sitting with the doubt"
             aspect="2/1"
           />
-          <div className="bg-muted/40 rounded-2xl p-6 space-y-2 text-base text-foreground/85 leading-relaxed">
+          <div className="bg-muted/40 rounded-2xl p-6 space-y-2 text-[17px] text-foreground/85 leading-relaxed">
             <p>Stay or leave.</p>
             <p>You've thought about it at 2am.</p>
             <p>You've talked to people. They're tired.</p>
@@ -122,17 +122,17 @@ export default function WorkbookSalesPage() {
           <h2 className="text-2xl md:text-3xl font-black text-foreground leading-snug">
             Thinking about it more won't help.
           </h2>
-          <p className="text-base text-foreground/85 leading-relaxed">
+          <p className="text-[17px] text-foreground/85 leading-relaxed">
             You've been telling yourself: <em>"if I just think about it a little longer, I'll figure it out."</em>
           </p>
-          <p className="text-base text-foreground/85 leading-relaxed">That's not how this works.</p>
+          <p className="text-[17px] text-foreground/85 leading-relaxed">That's not how this works.</p>
           <div className="border-l-4 border-primary bg-card rounded-r-xl p-6 space-y-2">
-            <p className="text-base text-foreground/85 leading-relaxed">Thinking about a relationship doubt at 2am does not produce clarity.</p>
-            <p className="text-base text-foreground/85 leading-relaxed">It produces more thinking.</p>
-            <p className="text-base text-muted-foreground italic">The mind that built the loop cannot exit it.</p>
+            <p className="text-[17px] text-foreground/85 leading-relaxed">Thinking about a relationship doubt at 2am does not produce clarity.</p>
+            <p className="text-[17px] text-foreground/85 leading-relaxed">It produces more thinking.</p>
+            <p className="text-[17px] text-muted-foreground italic">The mind that built the loop cannot exit it.</p>
           </div>
-          <p className="text-base text-foreground/85 leading-relaxed">You don't need more thinking.</p>
-          <p className="text-base font-bold text-foreground">You need a different process.</p>
+          <p className="text-[17px] text-foreground/85 leading-relaxed">You don't need more thinking.</p>
+          <p className="text-[17px] font-bold text-foreground">You need a different process.</p>
         </section>
 
         {/* Future state */}
@@ -146,7 +146,7 @@ export default function WorkbookSalesPage() {
             alt="Calm morning after the decision — the loop is over"
             aspect="2/1"
           />
-          <div className="bg-muted/40 rounded-2xl p-6 space-y-2 text-base text-foreground/85 leading-relaxed">
+          <div className="bg-muted/40 rounded-2xl p-6 space-y-2 text-[17px] text-foreground/85 leading-relaxed">
             <p className="italic text-foreground">You're not asking yourself again. You decided.</p>
             <p>Maybe you decided to stay. With clear conditions written down. You know what has to change — and by when.</p>
             <p>Maybe you decided to leave. With a real first step. You know what to do this week.</p>
@@ -173,7 +173,7 @@ export default function WorkbookSalesPage() {
                 </span>
               ))}
             </div>
-            <p className="text-center text-sm text-muted-foreground italic leading-relaxed">
+            <p className="text-center text-base text-muted-foreground italic leading-relaxed">
               A 5-step writing method that turns emotional doubt into a clear, signed decision in one evening.
             </p>
             <p className="text-center text-xs text-muted-foreground border-t border-border/50 pt-4 leading-relaxed">
@@ -194,7 +194,7 @@ export default function WorkbookSalesPage() {
               'The “two futures” page that has stopped people from pretending they don’t know. You write both. One feels alive. The other doesn’t.',
               "Why most decision tools skip what's on the last page — and why this is the page that makes the decision yours.",
             ].map((line, i) => (
-              <li key={i} className="flex items-start gap-3 text-base text-foreground/85 leading-relaxed">
+              <li key={i} className="flex items-start gap-3 text-[17px] text-foreground/85 leading-relaxed">
                 <span className="text-primary font-black mt-0.5 shrink-0">→</span>
                 <span>{line}</span>
               </li>
@@ -230,7 +230,7 @@ export default function WorkbookSalesPage() {
                   "You want a method, not more advice",
                   "You're afraid of regret — staying too long, or leaving too soon",
                 ].map((line, i) => (
-                  <li key={i} className="flex items-start gap-2 text-sm text-foreground leading-relaxed">
+                  <li key={i} className="flex items-start gap-2 text-base text-foreground leading-relaxed">
                     <Check size={14} className="text-green-500 mt-1 shrink-0" />
                     <span>{line}</span>
                   </li>
@@ -247,7 +247,7 @@ export default function WorkbookSalesPage() {
                   "You're already 100% sure about your decision",
                   "You want endless theory, not a practical method",
                 ].map((line, i) => (
-                  <li key={i} className="flex items-start gap-2 text-sm text-foreground leading-relaxed">
+                  <li key={i} className="flex items-start gap-2 text-base text-foreground leading-relaxed">
                     <X size={14} className="text-red-400 mt-1 shrink-0" />
                     <span>{line}</span>
                   </li>
@@ -278,7 +278,7 @@ export default function WorkbookSalesPage() {
             ].map((obj, i, arr) => (
               <div key={i} className={`space-y-2 ${i < arr.length - 1 ? "pb-5 border-b border-border/50" : ""}`}>
                 <p className="font-bold text-foreground leading-snug">{obj.q}</p>
-                <p className="text-sm text-foreground/80 leading-relaxed">{obj.a}</p>
+                <p className="text-base text-foreground/80 leading-relaxed">{obj.a}</p>
               </div>
             ))}
           </div>
@@ -289,7 +289,7 @@ export default function WorkbookSalesPage() {
           <div className="rounded-2xl border border-border bg-card p-6 md:p-8 space-y-6">
             <p className="text-center text-xs font-bold uppercase tracking-widest text-primary">The Science Behind</p>
             <h3 className="text-center text-2xl font-black text-foreground leading-snug">This isn't 27 random questions.</h3>
-            <p className="text-center text-sm text-muted-foreground italic">We didn't invent how this works. We adapted what already does.</p>
+            <p className="text-center text-base text-muted-foreground italic">We didn't invent how this works. We adapted what already does.</p>
             <div className="space-y-0 divide-y divide-border/50">
               {[
                 {
@@ -307,11 +307,11 @@ export default function WorkbookSalesPage() {
               ].map((ref, i) => (
                 <div key={i} className="py-5">
                   <p className="font-bold text-foreground text-base leading-snug mb-2">{ref.claim}</p>
-                  <p className="text-sm text-muted-foreground leading-relaxed">{ref.citation}</p>
+                  <p className="text-base text-muted-foreground leading-relaxed">{ref.citation}</p>
                 </div>
               ))}
             </div>
-            <p className="text-center text-sm italic text-foreground/80 leading-relaxed">
+            <p className="text-center text-base italic text-foreground/80 leading-relaxed">
               The 5-Step Decision Method is built on these three findings: write to clarify, generate your own commitment, don't wait six years.
             </p>
           </div>
@@ -328,7 +328,7 @@ export default function WorkbookSalesPage() {
               <div className="space-y-1">
                 <p className="text-xs font-bold uppercase tracking-widest text-muted-foreground">The workbook</p>
                 <p className="font-black text-foreground text-base">The Stay or Leave Workbook</p>
-                <p className="text-sm text-muted-foreground leading-relaxed">25 pages. 27 questions. The 5-Step Decision Method. Read on phone or print to write by hand. Lifetime access.</p>
+                <p className="text-base text-muted-foreground leading-relaxed">25 pages. 27 questions. The 5-Step Decision Method. Read on phone or print to write by hand. Lifetime access.</p>
               </div>
               <div className="text-right shrink-0 space-y-0.5">
                 <p className="text-sm line-through text-muted-foreground">$49</p>
@@ -364,7 +364,7 @@ export default function WorkbookSalesPage() {
                       <p className="font-black text-primary text-lg">+${COMPANION_PRICE}</p>
                     </div>
                   </div>
-                  <p className="text-sm text-foreground/80 leading-relaxed">
+                  <p className="text-base text-foreground/80 leading-relaxed">
                     A short manual you read after the workbook. It helps you tell real regret from the pain that comes with any hard choice — for the doubt that may come back at 2am, three months from now.
                   </p>
                   <div className="max-w-[140px] pt-1">
@@ -382,7 +382,7 @@ export default function WorkbookSalesPage() {
               {includeCompanion && (
                 <p className="text-xs text-muted-foreground">Workbook ${WORKBOOK_PRICE} + Companion ${COMPANION_PRICE}</p>
               )}
-              <p className="text-sm text-muted-foreground italic">Less than dinner with the friend who's tired of hearing about it. More useful.</p>
+              <p className="text-base text-muted-foreground italic">Less than dinner with the friend who's tired of hearing about it. More useful.</p>
             </div>
 
             <CTAButton
@@ -400,10 +400,10 @@ export default function WorkbookSalesPage() {
                 <span className="text-xl shrink-0">🛡</span>
                 <h4 className="font-black text-foreground text-base leading-snug">The "Decision or Refund" Promise</h4>
               </div>
-              <p className="text-sm text-foreground/80 leading-relaxed">
+              <p className="text-base text-foreground/80 leading-relaxed">
                 Read the workbook. Do the exercises. If you don't end up with a clear decision you feel confident about — write to us within 30 days. We'll refund you in full. We won't ask why.
               </p>
-              <p className="text-sm text-muted-foreground italic leading-relaxed">
+              <p className="text-base text-muted-foreground italic leading-relaxed">
                 If it doesn't help you decide, we'd rather you have your money back than carry doubt about a tool that should have helped.
               </p>
             </div>
@@ -528,7 +528,7 @@ function FAQRow({ q, a }: { q: string; a: string }) {
       </button>
       {open && (
         <div className="px-4 pb-4 pt-0">
-          <p className="text-sm text-foreground/80 leading-relaxed">{a}</p>
+          <p className="text-base text-foreground/80 leading-relaxed">{a}</p>
         </div>
       )}
     </div>
