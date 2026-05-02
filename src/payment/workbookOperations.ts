@@ -4,15 +4,19 @@ import { stripeClient } from "./stripe/stripeClient";
 import { getDownloadFileSignedURLFromS3 } from "../file-upload/s3Utils";
 import { sendCapiEvent } from "../server/analytics/metaCapi";
 
-export const WORKBOOK_PRICE = 11.00;
-export const WORKBOOK_PRODUCT_NAME = "Should I Stay or Leave My Partner? — The Workbook + Bonus";
+export const WORKBOOK_PRICE = 17.00;
+export const COMPANION_PRICE = 7.00;
+export const WORKBOOK_PRODUCT_NAME = "Should I Stay or Leave My Partner? — The Workbook";
+export const COMPANION_PRODUCT_NAME = '"What If I Regret It?" — The Decision Companion';
 export const WORKBOOK_CONTENT_ID = "workbook";
+export const COMPANION_CONTENT_ID = "companion";
 export const WORKBOOK_CONTENT_CATEGORY = "Workbook";
 export const WORKBOOK_S3_KEY = "products/should-i-stay-or-leave-workbook.pdf";
 export const WORKBOOK_BONUS_S3_KEY = "products/what-if-i-regret-it.pdf";
 
 export type CreateWorkbookCheckoutArgs = {
   eventID?: string;
+  includeCompanion?: boolean;
 };
 
 export type WorkbookCheckoutResult = {
@@ -22,7 +26,10 @@ export type WorkbookCheckoutResult = {
 export const createWorkbookCheckoutSession: CreateWorkbookCheckoutSession<
   CreateWorkbookCheckoutArgs,
   WorkbookCheckoutResult
-> = async ({ eventID }, context) => {
+> = async ({ eventID, includeCompanion }, context) => {
+  const wantsCompanion = !!includeCompanion;
+  const totalValue = WORKBOOK_PRICE + (wantsCompanion ? COMPANION_PRICE : 0);
+
   const testSession = await context.entities.TestSession.create({
     data: {
       testType: "workbook",
@@ -48,12 +55,42 @@ export const createWorkbookCheckoutSession: CreateWorkbookCheckoutSession<
       },
       customData: {
         currency: "usd",
-        value: WORKBOOK_PRICE,
+        value: totalValue,
         content_name: WORKBOOK_PRODUCT_NAME,
         content_category: WORKBOOK_CONTENT_CATEGORY,
-        content_ids: [WORKBOOK_CONTENT_ID],
+        content_ids: wantsCompanion
+          ? [WORKBOOK_CONTENT_ID, COMPANION_CONTENT_ID]
+          : [WORKBOOK_CONTENT_ID],
         content_type: "product",
       },
+    });
+  }
+
+  const lineItems: any[] = [
+    {
+      price_data: {
+        currency: "usd",
+        product_data: {
+          name: WORKBOOK_PRODUCT_NAME,
+          description: "27 questions. 5 sections. ~25 pages. Built to be done in one evening.",
+        },
+        unit_amount: Math.round(WORKBOOK_PRICE * 100),
+      },
+      quantity: 1,
+    },
+  ];
+
+  if (wantsCompanion) {
+    lineItems.push({
+      price_data: {
+        currency: "usd",
+        product_data: {
+          name: COMPANION_PRODUCT_NAME,
+          description: "A short manual to read after the workbook. Helps you tell real regret from the pain of any hard choice.",
+        },
+        unit_amount: Math.round(COMPANION_PRICE * 100),
+      },
+      quantity: 1,
     });
   }
 
@@ -64,19 +101,7 @@ export const createWorkbookCheckoutSession: CreateWorkbookCheckoutSession<
       billing_address_collection: "auto",
       submit_type: "pay",
       allow_promotion_codes: true,
-      line_items: [
-        {
-          price_data: {
-            currency: "usd",
-            product_data: {
-              name: WORKBOOK_PRODUCT_NAME,
-              description: "27 questions. 5 sections. ~25 pages. Built to be done in one evening.",
-            },
-            unit_amount: Math.round(WORKBOOK_PRICE * 100),
-          },
-          quantity: 1,
-        },
-      ],
+      line_items: lineItems,
       mode: "payment",
       success_url: `${process.env.WASP_WEB_CLIENT_URL || "http://localhost:3000"}/workbook/download?session=${testSession.id}`,
       cancel_url: `${process.env.WASP_WEB_CLIENT_URL || "http://localhost:3000"}/workbook`,
@@ -85,6 +110,7 @@ export const createWorkbookCheckoutSession: CreateWorkbookCheckoutSession<
         testSessionId: testSession.id,
         type: "workbook_purchase",
         capiEventId: eventID || "",
+        includeCompanion: wantsCompanion ? "true" : "false",
       },
     });
   } catch (error) {
@@ -112,7 +138,7 @@ export type GetWorkbookDownloadUrlArgs = {
 
 export type WorkbookDownloadUrlResult = {
   workbookUrl: string;
-  bonusUrl: string;
+  bonusUrl: string | null;
   stripeCheckoutSessionId: string | null;
 };
 
@@ -128,10 +154,12 @@ export const getWorkbookDownloadUrl: GetWorkbookDownloadUrl<
   if (testSession.testType !== "workbook") throw new HttpError(400, "Invalid session type");
   if (!testSession.isPaid) throw new HttpError(403, "Payment not confirmed yet");
 
-  const [workbookUrl, bonusUrl] = await Promise.all([
-    getDownloadFileSignedURLFromS3({ s3Key: WORKBOOK_S3_KEY }),
-    getDownloadFileSignedURLFromS3({ s3Key: WORKBOOK_BONUS_S3_KEY }),
-  ]);
+  const hasCompanion = testSession.purchasedAddons.includes(COMPANION_CONTENT_ID);
+
+  const workbookUrl = await getDownloadFileSignedURLFromS3({ s3Key: WORKBOOK_S3_KEY });
+  const bonusUrl = hasCompanion
+    ? await getDownloadFileSignedURLFromS3({ s3Key: WORKBOOK_BONUS_S3_KEY })
+    : null;
 
   return {
     workbookUrl,

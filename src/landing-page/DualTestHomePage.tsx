@@ -121,7 +121,7 @@ export default function DualTestHomePage() {
             <div className="flex-1 space-y-3">
               <div>
                 <p className="text-xs font-bold uppercase tracking-widest text-amber-700 dark:text-amber-400 mb-1">
-                  $11 · Paid
+                  $17 · Paid
                 </p>
                 <p className="text-xs font-bold uppercase tracking-widest text-muted-foreground mb-1">
                   Ready to decide?
@@ -135,7 +135,7 @@ export default function DualTestHomePage() {
               </p>
               <ul className="space-y-1.5 text-xs text-muted-foreground">
                 <li>27 questions. 5 sections. ~60 minutes.</li>
-                <li>Includes the "What If I Regret It?" bonus.</li>
+                <li>The 5-Step Decision Method, on paper.</li>
                 <li>Done with a pen, in one evening.</li>
               </ul>
               <div className="inline-flex items-center gap-1.5 text-sm font-bold text-amber-700 dark:text-amber-400 pt-1 group-hover:gap-2.5 transition-all">

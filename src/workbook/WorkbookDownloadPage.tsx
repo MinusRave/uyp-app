@@ -23,16 +23,17 @@ export default function WorkbookDownloadPage() {
     const stripeId = data?.stripeCheckoutSessionId;
     if (!stripeId) return;
     purchaseFired.current = true;
+    const hasCompanion = !!data?.bonusUrl;
     trackPixelEvent("Purchase", {
-      value: 11,
+      value: hasCompanion ? 24 : 17,
       currency: "USD",
-      content_name: "Should I Stay or Leave My Partner? — The Workbook + Bonus",
+      content_name: "Should I Stay or Leave My Partner? — The Workbook",
       content_category: "Workbook",
-      content_ids: ["workbook"],
+      content_ids: hasCompanion ? ["workbook", "companion"] : ["workbook"],
       content_type: "product",
       eventID: stripeId,
     });
-  }, [data?.stripeCheckoutSessionId]);
+  }, [data?.stripeCheckoutSessionId, data?.bonusUrl]);
 
   if (!sessionId) {
     return (
@@ -80,10 +81,12 @@ export default function WorkbookDownloadPage() {
         <div className="space-y-3">
           <p className="text-xs font-bold uppercase tracking-widest text-muted-foreground">Payment confirmed</p>
           <h1 className="text-3xl md:text-4xl font-black text-foreground leading-tight">
-            Your bundle is ready.
+            {data.bonusUrl ? "Your files are ready." : "Your workbook is ready."}
           </h1>
           <p className="text-base text-muted-foreground">
-            Download both files. Print the workbook and sit down with a pen tonight.
+            {data.bonusUrl
+              ? "Download both files. Print the workbook and sit down with a pen tonight."
+              : "Print the workbook and sit down with a pen tonight."}
           </p>
         </div>
 
@@ -96,14 +99,16 @@ export default function WorkbookDownloadPage() {
             Download the workbook
             <ArrowDown size={20} />
           </a>
-          <a
-            href={data.bonusUrl}
-            download
-            className="w-full border-2 border-primary/40 bg-card hover:bg-muted/40 text-foreground text-base font-bold py-4 rounded-full transition-all flex items-center justify-center gap-2"
-          >
-            Download "What If I Regret It?" (bonus)
-            <ArrowDown size={18} />
-          </a>
+          {data.bonusUrl && (
+            <a
+              href={data.bonusUrl}
+              download
+              className="w-full border-2 border-primary/40 bg-card hover:bg-muted/40 text-foreground text-base font-bold py-4 rounded-full transition-all flex items-center justify-center gap-2"
+            >
+              Download "What If I Regret It?"
+              <ArrowDown size={18} />
+            </a>
+          )}
         </div>
 
         <p className="text-xs text-muted-foreground">

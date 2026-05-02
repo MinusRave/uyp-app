@@ -4,14 +4,8 @@ import { createWorkbookCheckoutSession } from "wasp/client/operations";
 import { trackPixelEvent } from "../analytics/pixel";
 import { generateEventId } from "../analytics/eventId";
 
-const WORKBOOK_PIXEL_PAYLOAD = {
-  content_name: "Should I Stay or Leave My Partner? — The Workbook + Bonus",
-  content_category: "Workbook",
-  content_ids: ["workbook"],
-  content_type: "product",
-  value: 11,
-  currency: "USD",
-};
+const WORKBOOK_PRICE = 17;
+const COMPANION_PRICE = 7;
 
 const FAQ_ITEMS = [
   { q: "How is this different from a free relationship quiz?", a: "A quiz gives you an answer in 3 minutes. This workbook does the opposite — it makes you sit with the question for an hour, on paper, with a pen. The decision you write at the end is yours, not the workbook's. That's what makes it last." },
@@ -19,26 +13,37 @@ const FAQ_ITEMS = [
   { q: "What if my partner finds it?", a: "The PDF you receive has a neutral file name — nothing in the filename or in the email subject reveals what's inside. You can keep it on your phone in a private folder. You can print just the pages you've filled in and keep them somewhere safe." },
   { q: "Will the workbook tell me what to do?", a: "No. It will not give you a verdict. You write your own decision on the last page. That's the point. Decisions written by a tool produce regret. Decisions written by you don't." },
   { q: "How long does it take?", a: "Plan for 60 to 90 minutes in one sitting. Some people take longer. Don't take less. The workbook is designed to be done in one evening — that's the point." },
-  { q: "What is \"What If I Regret It?\" exactly?", a: "It's a short manual you receive together with the workbook. You read it after you've made your decision. It helps you tell real regret from the pain that comes with any hard choice — so the decision you wrote in the workbook holds up three months from now, when the doubt comes back. (And it does come back. For everyone.)" },
   { q: "Can I really get a refund?", a: "Yes. 30 days. No forms. No questions. You email us, we refund you. The workbook is designed to help you. If it doesn't, we don't want your money." },
 ];
 
 export default function WorkbookSalesPage() {
   const [isLoading, setIsLoading] = useState(false);
+  const [includeCompanion, setIncludeCompanion] = useState(false);
   const viewContentFired = useRef(false);
+
+  const totalPrice = WORKBOOK_PRICE + (includeCompanion ? COMPANION_PRICE : 0);
+
+  const buildPixelPayload = (withCompanion: boolean) => ({
+    content_name: "Should I Stay or Leave My Partner? — The Workbook",
+    content_category: "Workbook",
+    content_ids: withCompanion ? ["workbook", "companion"] : ["workbook"],
+    content_type: "product",
+    value: WORKBOOK_PRICE + (withCompanion ? COMPANION_PRICE : 0),
+    currency: "USD",
+  });
 
   useEffect(() => {
     if (viewContentFired.current) return;
     viewContentFired.current = true;
-    trackPixelEvent("ViewContent", { ...WORKBOOK_PIXEL_PAYLOAD });
+    trackPixelEvent("ViewContent", buildPixelPayload(false));
   }, []);
 
   const handleCheckout = async () => {
     setIsLoading(true);
     const eventID = generateEventId();
-    trackPixelEvent("InitiateCheckout", { ...WORKBOOK_PIXEL_PAYLOAD, eventID });
+    trackPixelEvent("InitiateCheckout", { ...buildPixelPayload(includeCompanion), eventID });
     try {
-      const result = await createWorkbookCheckoutSession({ eventID });
+      const result = await createWorkbookCheckoutSession({ eventID, includeCompanion });
       if (result.sessionUrl) window.location.href = result.sessionUrl;
     } catch (e) {
       console.error("[workbook checkout] failed", e);
@@ -67,12 +72,12 @@ export default function WorkbookSalesPage() {
             A 5-step writing method to help you decide without regrets — in one evening.
           </p>
 
-          {/* Hero mockup — bundle composition */}
+          {/* Hero mockup */}
           <div className="max-w-md mx-auto pt-2">
             <ImagePlaceholder
-              label="Hero bundle mockup"
+              label="Hero workbook mockup"
               src="/images/wrokbook-hero.png"
-              alt="Stay or Leave workbook + bonus"
+              alt="Stay or Leave workbook"
               aspect="4/3"
             />
           </div>
@@ -80,14 +85,14 @@ export default function WorkbookSalesPage() {
           {/* Early offer strip */}
           <div className="pt-4 space-y-3">
             <div className="flex items-center justify-center gap-3 text-2xl font-black">
-              <span className="line-through text-muted-foreground font-normal text-lg">$30</span>
-              <span className="text-primary">$11</span>
+              <span className="line-through text-muted-foreground font-normal text-lg">$49</span>
+              <span className="text-primary">${WORKBOOK_PRICE}</span>
               <span className="inline-block bg-green-100 dark:bg-green-900/20 text-green-700 dark:text-green-400 text-xs font-bold uppercase tracking-widest px-3 py-1 rounded-full">
-                Save 63%
+                Save 65%
               </span>
             </div>
-            <p className="text-sm text-muted-foreground italic">Includes the workbook + 1 free bonus.</p>
-            <CTAButton isLoading={isLoading} onClick={handleCheckout} label="Get the workbook + bonus" size="lg" fullWidth />
+            <p className="text-sm text-muted-foreground italic">One-time payment. Lifetime access.</p>
+            <CTAButton isLoading={isLoading} onClick={handleCheckout} label={`Get the workbook — $${WORKBOOK_PRICE}`} size="lg" fullWidth />
             <p className="text-xs text-muted-foreground">Instant download · 30-day money-back · One-time payment</p>
           </div>
         </section>
@@ -149,7 +154,7 @@ export default function WorkbookSalesPage() {
           </div>
           <p className="text-muted-foreground">That's what this workbook gives you. Not advice. Not a verdict. The end of the loop.</p>
           <div className="text-center pt-2">
-            <CTAButton isLoading={isLoading} onClick={handleCheckout} label="End the loop — get the workbook for $11" size="md" />
+            <CTAButton isLoading={isLoading} onClick={handleCheckout} label={`End the loop — get the workbook for $${WORKBOOK_PRICE}`} size="md" />
           </div>
         </section>
 
@@ -196,7 +201,7 @@ export default function WorkbookSalesPage() {
             ))}
           </ul>
           <div className="text-center pt-2">
-            <CTAButton isLoading={isLoading} onClick={handleCheckout} label="Get the workbook now — $11" size="md" />
+            <CTAButton isLoading={isLoading} onClick={handleCheckout} label={`Get the workbook now — $${WORKBOOK_PRICE}`} size="md" />
           </div>
         </section>
 
@@ -312,53 +317,81 @@ export default function WorkbookSalesPage() {
           </div>
         </section>
 
-        {/* Bundle / Offer */}
+        {/* Offer */}
         <section id="offer" className="py-10">
           <div className="rounded-3xl border-2 border-primary/30 bg-card p-6 md:p-10 shadow-xl space-y-6">
-            <p className="text-center text-xs font-bold uppercase tracking-widest text-primary">Today's Bundle</p>
-            <h3 className="text-center text-2xl font-black text-foreground leading-snug">Everything you get when you buy.</h3>
+            <p className="text-center text-xs font-bold uppercase tracking-widest text-primary">Today's Offer</p>
+            <h3 className="text-center text-2xl font-black text-foreground leading-snug">Here's what you get.</h3>
 
-            {/* Bundle items */}
-            <div className="space-y-0 divide-y divide-border/50">
-              <div className="py-5 flex items-start justify-between gap-4">
-                <div className="space-y-1">
-                  <p className="text-xs font-bold uppercase tracking-widest text-muted-foreground">Main product</p>
-                  <p className="font-black text-foreground text-base">The Stay or Leave Workbook</p>
-                  <p className="text-sm text-muted-foreground leading-relaxed">25 pages. 27 questions. The 5-Step Decision Method. Read on phone or print to write by hand. Lifetime access.</p>
-                </div>
-                <div className="text-right shrink-0 space-y-0.5">
-                  <p className="text-sm line-through text-muted-foreground">$19</p>
-                  <p className="text-xs font-bold uppercase tracking-widest text-green-600 dark:text-green-400">Included</p>
-                </div>
+            {/* Main item */}
+            <div className="py-5 flex items-start justify-between gap-4 border-b border-border/50">
+              <div className="space-y-1">
+                <p className="text-xs font-bold uppercase tracking-widest text-muted-foreground">The workbook</p>
+                <p className="font-black text-foreground text-base">The Stay or Leave Workbook</p>
+                <p className="text-sm text-muted-foreground leading-relaxed">25 pages. 27 questions. The 5-Step Decision Method. Read on phone or print to write by hand. Lifetime access.</p>
               </div>
-              <div className="py-5 flex items-start justify-between gap-4">
-                <div className="space-y-2 flex-1">
-                  <p className="text-xs font-bold uppercase tracking-widest text-primary">Free bonus</p>
-                  <p className="font-black text-foreground text-base">"What If I Regret It?" — The Decision Companion</p>
-                  <p className="text-sm text-muted-foreground leading-relaxed">A short manual to read after the workbook. It helps you tell real regret from the inevitable pain that comes with any hard choice. For the doubt that may come back at 2am, three months from now.</p>
-                  <div className="max-w-[180px] pt-2">
-                    <ImagePlaceholder label="Bonus cover" src="/images/workbook-bonus-cover.png" alt="What If I Regret It? — bonus cover" aspect="3/2" />
-                  </div>
-                </div>
-                <div className="text-right shrink-0 space-y-0.5">
-                  <p className="text-sm line-through text-muted-foreground">$11</p>
-                  <p className="text-xs font-bold uppercase tracking-widest text-green-600 dark:text-green-400">Free</p>
-                </div>
+              <div className="text-right shrink-0 space-y-0.5">
+                <p className="text-sm line-through text-muted-foreground">$49</p>
+                <p className="font-black text-primary text-lg">${WORKBOOK_PRICE}</p>
               </div>
             </div>
+
+            {/* Order bump — companion */}
+            <label
+              htmlFor="add-companion"
+              className={`block rounded-2xl border-2 border-dashed p-5 cursor-pointer transition-all ${
+                includeCompanion
+                  ? "border-primary bg-primary/5"
+                  : "border-amber-400/60 bg-amber-50/40 dark:bg-amber-900/10 hover:bg-amber-50/70 dark:hover:bg-amber-900/15"
+              }`}
+            >
+              <div className="flex items-start gap-3">
+                <input
+                  id="add-companion"
+                  type="checkbox"
+                  checked={includeCompanion}
+                  onChange={(e) => setIncludeCompanion(e.target.checked)}
+                  className="mt-1 w-5 h-5 shrink-0 accent-primary cursor-pointer"
+                />
+                <div className="flex-1 space-y-2">
+                  <div className="flex items-start justify-between gap-3">
+                    <div>
+                      <p className="text-xs font-bold uppercase tracking-widest text-amber-700 dark:text-amber-400">⚡ One-time add-on</p>
+                      <p className="font-black text-foreground text-base mt-1">YES — add "What If I Regret It?" to my order</p>
+                    </div>
+                    <div className="text-right shrink-0">
+                      <p className="text-xs line-through text-muted-foreground">$19</p>
+                      <p className="font-black text-primary text-lg">+${COMPANION_PRICE}</p>
+                    </div>
+                  </div>
+                  <p className="text-sm text-foreground/80 leading-relaxed">
+                    A short manual you read after the workbook. It helps you tell real regret from the pain that comes with any hard choice — for the doubt that may come back at 2am, three months from now.
+                  </p>
+                  <div className="max-w-[140px] pt-1">
+                    <ImagePlaceholder label="Companion cover" src="/images/workbook-bonus-cover.png" alt='"What If I Regret It?" — companion cover' aspect="3/2" />
+                  </div>
+                  <p className="text-xs text-muted-foreground italic">Only available at checkout. You won't see this offer again.</p>
+                </div>
+              </div>
+            </label>
 
             {/* Totals */}
             <div className="text-center space-y-3 pt-2 border-t-2 border-border">
-              <p className="text-sm text-muted-foreground">Total value: <span className="line-through font-bold text-foreground">$30</span></p>
               <p className="text-sm text-muted-foreground">Today you pay only:</p>
-              <p className="text-6xl font-black text-primary leading-none">$11</p>
-              <span className="inline-block bg-green-100 dark:bg-green-900/20 text-green-700 dark:text-green-400 text-xs font-bold uppercase tracking-widest px-4 py-1.5 rounded-full">
-                Save $19 today
-              </span>
+              <p className="text-6xl font-black text-primary leading-none">${totalPrice}</p>
+              {includeCompanion && (
+                <p className="text-xs text-muted-foreground">Workbook ${WORKBOOK_PRICE} + Companion ${COMPANION_PRICE}</p>
+              )}
               <p className="text-sm text-muted-foreground italic">Less than dinner with the friend who's tired of hearing about it. More useful.</p>
             </div>
 
-            <CTAButton isLoading={isLoading} onClick={handleCheckout} label="Get the bundle — $11" size="lg" fullWidth />
+            <CTAButton
+              isLoading={isLoading}
+              onClick={handleCheckout}
+              label={includeCompanion ? `Get it all — $${totalPrice}` : `Get the workbook — $${WORKBOOK_PRICE}`}
+              size="lg"
+              fullWidth
+            />
             <p className="text-center text-xs text-muted-foreground">Instant download · One-time payment · No subscription</p>
 
             {/* Named guarantee */}
@@ -371,7 +404,7 @@ export default function WorkbookSalesPage() {
                 Read the workbook. Do the exercises. If you don't end up with a clear decision you feel confident about — write to us within 30 days. We'll refund you in full. We won't ask why.
               </p>
               <p className="text-sm text-muted-foreground italic leading-relaxed">
-                If it doesn't help you decide, we'd rather you have your $11 back than carry doubt about a tool that should have helped.
+                If it doesn't help you decide, we'd rather you have your money back than carry doubt about a tool that should have helped.
               </p>
             </div>
 
@@ -384,7 +417,7 @@ export default function WorkbookSalesPage() {
 
         {/* Inline CTA before FAQ */}
         <div className="text-center py-4">
-          <CTAButton isLoading={isLoading} onClick={handleCheckout} label="Decide tonight — $11" size="md" />
+          <CTAButton isLoading={isLoading} onClick={handleCheckout} label={`Decide tonight — $${totalPrice}`} size="md" />
         </div>
 
         {/* FAQ */}
@@ -399,10 +432,10 @@ export default function WorkbookSalesPage() {
 
         {/* Final CTA */}
         <section className="text-center space-y-4 py-12">
-          <p className="text-lg md:text-xl font-bold text-foreground">Decide tonight. $11.</p>
-          <CTAButton isLoading={isLoading} onClick={handleCheckout} label="Get the workbook + bonus" size="lg" />
+          <p className="text-lg md:text-xl font-bold text-foreground">Decide tonight. ${WORKBOOK_PRICE}.</p>
+          <CTAButton isLoading={isLoading} onClick={handleCheckout} label={`Get the workbook — $${WORKBOOK_PRICE}`} size="lg" />
           <p className="text-xs text-muted-foreground">
-            Workbook + "What If I Regret It?" companion · Instant download · 30-day refund
+            Instant download · 30-day refund · One-time payment
           </p>
         </section>
 

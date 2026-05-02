@@ -21,6 +21,7 @@ import {
   WORKBOOK_PRODUCT_NAME,
   WORKBOOK_CONTENT_ID,
   WORKBOOK_CONTENT_CATEGORY,
+  COMPANION_CONTENT_ID,
 } from "./workbookOperations";
 
 // ... middleware config ...
@@ -263,6 +264,7 @@ export const stripeWebhook = async (
       try {
         const userEmail = testSession.email || session.customer_details?.email;
         const amountTotal = session.amount_total ? session.amount_total / 100 : WORKBOOK_PRICE;
+        const withCompanion = metadata.includeCompanion === "true";
         await sendCapiEvent({
           eventName: "Purchase",
           eventId: session.id,
@@ -277,7 +279,9 @@ export const stripeWebhook = async (
             value: amountTotal,
             content_name: WORKBOOK_PRODUCT_NAME,
             content_category: WORKBOOK_CONTENT_CATEGORY,
-            content_ids: [WORKBOOK_CONTENT_ID],
+            content_ids: withCompanion
+              ? [WORKBOOK_CONTENT_ID, COMPANION_CONTENT_ID]
+              : [WORKBOOK_CONTENT_ID],
             content_type: "product",
             order_id: session.id,
           },
@@ -286,9 +290,16 @@ export const stripeWebhook = async (
         console.error("[Webhook] Workbook CAPI failed:", e);
       }
 
+      const includeCompanion = metadata.includeCompanion === "true";
       const dataToUpdate: any = { isPaid: true, emailSequenceType: null };
       if (!testSession.email && session.customer_details?.email) {
         dataToUpdate.email = session.customer_details.email;
+      }
+      if (includeCompanion) {
+        const existing = testSession.purchasedAddons || [];
+        if (!existing.includes(COMPANION_CONTENT_ID)) {
+          dataToUpdate.purchasedAddons = [...existing, COMPANION_CONTENT_ID];
+        }
       }
       await context.entities.TestSession.update({
         where: { id: metadata.testSessionId },
@@ -300,7 +311,7 @@ export const stripeWebhook = async (
         if (deliveryEmail) {
           const appUrl = process.env.WASP_WEB_CLIENT_URL || "http://localhost:3000";
           const downloadUrl = `${appUrl}/workbook/download?session=${metadata.testSessionId}`;
-          const emailContent = getWorkbookDeliveryEmail({ downloadUrl });
+          const emailContent = getWorkbookDeliveryEmail({ downloadUrl, hasCompanion: includeCompanion });
           await emailSender.send({
             to: deliveryEmail,
             subject: emailContent.subject,
